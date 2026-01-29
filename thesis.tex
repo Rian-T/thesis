@@ -44,8 +44,8 @@
   unicode,
   ]{hyperref}
 \hypersetup{
-  pdftitle=Improving Representations for Language Modeling,
-  pdfauthor=Nathan Godey
+  pdftitle=Public-Data Pretraining for Clinical Information Extraction,
+  pdfauthor=Rian Touchent,
 }
 
 \usepackage{bookmark}
@@ -130,9 +130,9 @@
 % Incipit
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Improving representations for language modeling}
+\title{Public-Data Pretraining for Clinical Information Extraction}
 %\subtitle{A minimal, modern \LaTeX{} package for typesetting your thesis}
-\author{Nathan Godey}
+\author{Rian Touchent}
 
 \begin{document}
 
@@ -153,48 +153,25 @@
 \include{sources/related_works}
 
 
-\part[Analysis of the Representations of Language Models]{%
-  Analysis of the Representations of Language Models\\
-  %
-  \vspace{1cm}
-  %
-  \begin{minipage}[l]{\textwidth}
-    %
-    \textnormal{%
-      \normalsize
-      %
-      \begin{singlespace*}
-        \onehalfspacing
-        %
-        This part studies the representation degeneration phenomenon from various perspectives. We extend the works mentioned in \Cref{chap:rw_repr_ana} by exploring these questions at larger model scales, for other modalities and using different analysis tools. This provides valuable insights towards improving the language modeling paradigm, that we leverage in \Cref{part:solutions}.
-      \end{singlespace*}
-    }
-  \end{minipage}
+\part[Building a Biomedical Corpus]{%
+  Building a Biomedical Corpus
 }
-\label{part:analysis}
+\label{part:corpus}
 \include{sources/part_1/analysis_lm}
 
 
-\part[Extensions of the Language Modeling Paradigm]{%
- Extensions of the Language Modeling Paradigm\\
-  %
-  \vspace{1cm}
-  %
-  \begin{minipage}[l]{\textwidth}
-    %
-    \textnormal{%
-      \normalsize
-      %
-      \begin{singlespace*}
-        \onehalfspacing
-        %
-        In this part, we leverage the insights provided in \Cref{part:analysis} in various ways and derive methods that mitigate the identifies limitations of the classical language modeling framework. Our approaches yield several benefits in robustness, performance, and efficiency.
-      \end{singlespace*}
-    }
-  \end{minipage}
+\part[Pretraining Language Models]{%
+  Pretraining Language Models
 }
-\label{part:solutions}
+\label{part:pretraining}
 \include{sources/part_2/extensions_lm}
+
+
+\part[Adapting to Clinical Tasks]{%
+  Adapting to Clinical Tasks
+}
+\label{part:adaptation}
+\include{sources/part_3/clinical_tasks}
 
 \include{sources/conclusion}
 
@@ -216,8 +193,9 @@
 \printindex
 
 % Entries for the entire Anthology, followed by custom entries
-\bibliography{thesis}
-\bibliographystyle{acl_natbib}
+% TODO: Uncomment when adding \cite{} commands
+% \bibliography{thesis}
+% \bibliographystyle{acl_natbib}
 
 \part*{Appendix}
 \input{sources/appendix}

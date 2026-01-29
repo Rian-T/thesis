@@ -285,3 +285,7 @@ TSWLatexianTemp*
 
 # Apple
 .DS_Store
+
+# Claude Code
+CLAUDE.md
+thesis.pdf

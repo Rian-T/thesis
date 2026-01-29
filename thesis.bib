@@ -804,20 +804,6 @@
 	editor       = {Roark, Brian  and Nenkova, Ani},
 	abstract     = {Pipelined NLP systems have largely been superseded by end-to-end neural modeling, yet nearly all commonly used models still require an explicit tokenization step. While recent tokenization approaches based on data-derived subword lexicons are less brittle than manually engineered tokenizers, these techniques are not equally suited to all languages, and the use of any fixed vocabulary may limit a model{'}s ability to adapt. In this paper, we present Canine, a neural encoder that operates directly on character sequences{---}without explicit tokenization or vocabulary{---}and a pre-training strategy that operates either directly on characters or optionally uses subwords as a soft inductive bias. To use its finer-grained input effectively and efficiently, Canine combines downsampling, which reduces the input sequence length, with a deep transformer stack, which encodes context. Canine outperforms a comparable mBert model by 5.7 F1 on TyDi QA, a challenging multilingual benchmark, despite having fewer model parameters.}
 }
-@inproceedings{godey-etal-2022-manta,
-	title        = {{MANT}a: Efficient Gradient-Based Tokenization for End-to-End Robust Language Modeling},
-	author       = {Godey, Nathan  and Castagn{\'e}, Roman  and de la Clergerie, {\'E}ric  and Sagot, Beno{\^\i}t},
-	year         = 2022,
-	month        = dec,
-	booktitle    = {Findings of the Association for Computational Linguistics: EMNLP 2022},
-	publisher    = {Association for Computational Linguistics},
-	address      = {Abu Dhabi, United Arab Emirates},
-	pages        = {2859--2870},
-	doi          = {10.18653/v1/2022.findings-emnlp.207},
-	url          = {https://aclanthology.org/2022.findings-emnlp.207},
-	editor       = {Goldberg, Yoav  and Kozareva, Zornitsa  and Zhang, Yue},
-	abstract     = {Static subword tokenization algorithms have been an essential component of recent works on language modeling. However, their static nature results in important flaws that degrade the models{'} downstream performance and robustness. In this work, we propose MANTa, a Module for Adaptive Neural TokenizAtion. MANTa is a differentiable tokenizer trained end-to-end with the language model. The resulting system offers a trade-off between the expressiveness of byte-level models and the speed of models trained using subword tokenization. In addition, our tokenizer is highly explainable since it produces an explicit segmentation of sequences into blocks. We evaluate our pre-trained model on several English datasets from different domains as well as on synthetic noise. We find that MANTa improves robustness to character perturbations and out-of-domain data. We then show that MANTa performs comparably to other models on the general-domain GLUE benchmark. Finally, we show that it is considerably faster than strictly byte-level models.}
-}
 @inproceedings{wang-etal-2018-glue,
 	title        = {{GLUE}: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding},
 	author       = {Wang, Alex  and Singh, Amanpreet  and Michael, Julian  and Hill, Felix  and Levy, Omer  and Bowman, Samuel},
@@ -2608,14 +2594,6 @@ url={https://openreview.net/forum?id=_VjQlMeSB_J}
 	doi          = {10.18653/v1/2023.findings-emnlp.953},
 	url          = {https://aclanthology.org/2023.findings-emnlp.953},
 	editor       = {Bouamor, Houda  and Pino, Juan  and Bali, Kalika}
-}
-@misc{godey2024anisotropy,
-	title        = {Anisotropy Is Inherent to Self-Attention in Transformers},
-	author       = {Nathan Godey and Éric de la Clergerie and Benoît Sagot},
-	year         = 2024,
-	eprint       = {2401.12143},
-	archiveprefix = {arXiv},
-	primaryclass = {cs.CL}
 }
 @article{freq-based-dist,
 	title        = {Frequency-based Distortions in Contextualized Word Embeddings},
