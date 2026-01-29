@@ -1,0 +1,136 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{pgfgantt}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\geometry{margin=2.5cm}
+
+\definecolor{thesis}{HTML}{5B9BD5}
+\definecolor{done}{HTML}{70AD47}
+\definecolor{todo}{HTML}{ED7D31}
+\definecolor{review}{HTML}{9673A6}
+\definecolor{milestone}{HTML}{C00000}
+
+\title{Calendrier de thèse}
+\author{Rian Touchent}
+\date{Janvier 2025}
+
+\begin{document}
+\maketitle
+
+\section*{Rédaction de la thèse}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Période} & \textbf{Objectifs} \\
+\midrule
+29 jan -- 2 fév         & Introduction \\
+3 -- 16 fév             & Related Works (3 chapitres) \\
+17 fév -- 9 mars        & Part 1: Corpus (3 chapitres) \\
+10 -- 30 mars           & Part 2: Pretraining (3 chapitres) \\
+31 mars -- 13 avr       & Part 3: Adaptation (3 chapitres) \\
+7 -- 13 avr             & Relecture directeur (Parts 1-2) \\
+14 -- 17 avr            & Corrections \\
+18 -- 20 avr            & Conclusion + Abstract \\
+\textbf{20 avril}       & \textbf{Dépôt} \\
+21 avr -- 22 juin       & Lecture rapporteurs \\
+\textbf{Fin juin}       & \textbf{Soutenance} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Publications \& Releases}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Article / Modèle} & \textbf{Venue} & \textbf{Deadline} & \textbf{Statut} \\
+\midrule
+Biomed-Enriched            & ACL 2026          & ARR Jan 5         & Soumis \\
+GAPeron                    & ACL 2026          & ARR Jan 5         & Soumis \\
+ModernCamemBERT-bio        & HuggingFace       & 15 fév 2025       & Release \\
+Ontobook                   & Clinical NLP 2026 & 18 fév 2026       & À finaliser \\
+ModernCamemBERT-bio        & COLM 2026         & 31 mars 2026      & À écrire \\
+ModernCamemBERT-bio-gliner & BioNLP 2026       & 17 avril 2026     & À faire \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+\begin{landscape}
+\section*{Calendrier de thèse}
+
+\begin{center}
+\begin{ganttchart}[
+    hgrid,
+    vgrid={*{6}{draw=none}, dotted},
+    x unit=0.19cm,
+    y unit chart=0.5cm,
+    y unit title=0.5cm,
+    title height=1,
+    bar height=0.5,
+    group height=0.25,
+    title label font=\scriptsize,
+    bar label font=\footnotesize,
+    group label font=\footnotesize\bfseries,
+    milestone label font=\footnotesize,
+    time slot format=isodate,
+    today=2025-01-29,
+    today rule/.style={draw=red, thick, dashed},
+    today label=Auj.,
+    today label font=\scriptsize\itshape,
+    milestone/.append style={fill=milestone, shape=diamond, inner sep=1.5pt}
+]{2025-01-27}{2025-04-27}
+
+\gantttitlecalendar{month=shortname} \\
+\gantttitlecalendar{week} \\
+
+% Thèse - Rédaction
+\ganttgroup[group/.append style={fill=thesis!30}]{Rédaction}{2025-01-29}{2025-04-13} \\
+\ganttbar[bar/.append style={fill=thesis}]{Introduction}{2025-01-29}{2025-02-02} \\
+\ganttbar[bar/.append style={fill=thesis}]{Related Works (3 ch.)}{2025-02-03}{2025-02-16} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 1: Corpus (3 ch.)}{2025-02-17}{2025-03-09} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 2: Pretraining (3 ch.)}{2025-03-10}{2025-03-30} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 3: Adaptation (3 ch.)}{2025-03-31}{2025-04-13} \\
+
+% Thèse - Relecture & Finalisation
+\ganttgroup[group/.append style={fill=review!30}]{Relecture \& Finalisation}{2025-04-07}{2025-04-20} \\
+\ganttbar[bar/.append style={fill=review}]{Relecture directeur}{2025-04-07}{2025-04-13} \\
+\ganttbar[bar/.append style={fill=review}]{Corrections}{2025-04-14}{2025-04-17} \\
+\ganttbar[bar/.append style={fill=thesis}]{Conclusion + Abstract}{2025-04-18}{2025-04-20} \\
+\ganttmilestone{Dépôt}{2025-04-20} \\
+
+% Publications
+\ganttgroup[group/.append style={fill=gray!20}]{Publications}{2025-01-27}{2025-04-17} \\
+\ganttbar[bar/.append style={fill=done}]{Biomed-Enriched $\rightarrow$ ACL}{2025-01-27}{2025-01-27} \\
+\ganttbar[bar/.append style={fill=done}]{GAPeron $\rightarrow$ ACL}{2025-01-27}{2025-01-27} \\
+\ganttbar[bar/.append style={fill=todo}]{Ontobook $\rightarrow$ Clinical NLP}{2025-01-29}{2025-02-17} \\
+\ganttmilestone{MCB-bio release}{2025-02-15} \\
+\ganttmilestone{Clinical NLP}{2025-02-18} \\
+\ganttbar[bar/.append style={fill=todo}]{ModernCamemBERT-bio $\rightarrow$ COLM}{2025-02-17}{2025-03-30} \\
+\ganttmilestone{COLM}{2025-03-31} \\
+\ganttbar[bar/.append style={fill=todo}]{MCB-bio-gliner $\rightarrow$ BioNLP}{2025-03-17}{2025-04-16} \\
+\ganttmilestone{BioNLP}{2025-04-17}
+
+\end{ganttchart}
+\end{center}
+
+\vspace{0.8cm}
+
+\begin{center}
+\begin{tabular}{cccc}
+\colorbox{done}{\strut\hspace{0.6em}} \footnotesize Soumis &
+\colorbox{thesis}{\strut\hspace{0.6em}} \footnotesize Rédaction &
+\colorbox{review}{\strut\hspace{0.6em}} \footnotesize Relecture &
+\colorbox{todo}{\strut\hspace{0.6em}} \footnotesize À faire
+\end{tabular}
+\end{center}
+
+\end{landscape}
+
+\end{document}
