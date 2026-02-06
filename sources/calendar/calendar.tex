@@ -29,14 +29,12 @@
 \toprule
 \textbf{Période} & \textbf{Objectifs} \\
 \midrule
-29 jan -- 2 fév         & Introduction \\
-3 -- 16 fév             & Related Works (3 chapitres) \\
-17 fév -- 9 mars        & Part 1: Corpus (3 chapitres) \\
-10 -- 30 mars           & Part 2: Pretraining (3 chapitres) \\
-31 mars -- 13 avr       & Part 3: Adaptation (3 chapitres) \\
-7 -- 13 avr             & Relecture directeur (Parts 1-2) \\
-14 -- 17 avr            & Corrections \\
-18 -- 20 avr            & Conclusion + Abstract \\
+29 jan -- 16 fév        & Related Works (3 chapitres) \\
+17 fév -- 2 mars        & Part 1: Corpus (3 chapitres) \\
+3 -- 16 mars            & Part 2: Pretraining (3 chapitres) \\
+17 mars -- 6 avr        & Part 3: Adaptation (3 chapitres) \\
+7 -- 13 avr             & Intro + Conclusion + Abstract + Relecture \\
+14 -- 20 avr            & Corrections \\
 \textbf{20 avril}       & \textbf{Dépôt} \\
 21 avr -- 22 juin       & Lecture rapporteurs \\
 \textbf{Fin juin}       & \textbf{Soutenance} \\
@@ -80,7 +78,7 @@ ModernCamemBERT-bio-gliner & BioNLP 2026       & 17 avril 2026     & À faire \\
     group label font=\footnotesize\bfseries,
     milestone label font=\footnotesize,
     time slot format=isodate,
-    today=2025-01-29,
+    today=2025-02-06,
     today rule/.style={draw=red, thick, dashed},
     today label=Auj.,
     today label font=\scriptsize\itshape,
@@ -92,17 +90,16 @@ ModernCamemBERT-bio-gliner & BioNLP 2026       & 17 avril 2026     & À faire \\
 
 % Thèse - Rédaction
 \ganttgroup[group/.append style={fill=thesis!30}]{Rédaction}{2025-01-29}{2025-04-13} \\
-\ganttbar[bar/.append style={fill=thesis}]{Introduction}{2025-01-29}{2025-02-02} \\
-\ganttbar[bar/.append style={fill=thesis}]{Related Works (3 ch.)}{2025-02-03}{2025-02-16} \\
-\ganttbar[bar/.append style={fill=thesis}]{Part 1: Corpus (3 ch.)}{2025-02-17}{2025-03-09} \\
-\ganttbar[bar/.append style={fill=thesis}]{Part 2: Pretraining (3 ch.)}{2025-03-10}{2025-03-30} \\
-\ganttbar[bar/.append style={fill=thesis}]{Part 3: Adaptation (3 ch.)}{2025-03-31}{2025-04-13} \\
+\ganttbar[bar/.append style={fill=thesis}]{Related Works (3 ch.)}{2025-01-29}{2025-02-16} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 1: Corpus (3 ch.)}{2025-02-17}{2025-03-02} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 2: Pretraining (3 ch.)}{2025-03-03}{2025-03-16} \\
+\ganttbar[bar/.append style={fill=thesis}]{Part 3: Adaptation (3 ch.)}{2025-03-17}{2025-04-06} \\
 
 % Thèse - Relecture & Finalisation
 \ganttgroup[group/.append style={fill=review!30}]{Relecture \& Finalisation}{2025-04-07}{2025-04-20} \\
+\ganttbar[bar/.append style={fill=thesis}]{Intro + Conclusion + Abstract}{2025-04-07}{2025-04-13} \\
 \ganttbar[bar/.append style={fill=review}]{Relecture directeur}{2025-04-07}{2025-04-13} \\
-\ganttbar[bar/.append style={fill=review}]{Corrections}{2025-04-14}{2025-04-17} \\
-\ganttbar[bar/.append style={fill=thesis}]{Conclusion + Abstract}{2025-04-18}{2025-04-20} \\
+\ganttbar[bar/.append style={fill=review}]{Corrections}{2025-04-14}{2025-04-20} \\
 \ganttmilestone{Dépôt}{2025-04-20} \\
 
 % Publications
