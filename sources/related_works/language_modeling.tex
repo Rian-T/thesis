@@ -1,4 +1,476 @@
-\chapter{Language Models for the Clinical Domain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Language Models}
 \label{chap:rw-lm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: Related works - Language Models for the Clinical Domain
+% TODO rediger proprement
+
+
+\section{Introduction}
+\label{sec:lm-intro}
+
+Un language model c'est un modele probabiliste sur des sequences de tokens:
+$$
+P(\mathbf{w}) = \prod_{t=1}^{L} P(w_t \mid w_{<t})
+$$
+
+Factorisation autoregressive (chain rule). Fondation de tout le NLP moderne.
+
+Pourquoi c'est important pour la these:
+\begin{itemize}
+  \item Clinical IE repose sur des LMs pretrained
+  \item Domain adaptation = defi central
+  \item French + biomedical + clinical = triple rarete de donnees
+\end{itemize}
+
+-> plan du chapitre: on remonte des n-grams jusqu'aux archis modernes, puis on zoome sur le continual pretraining qui est au coeur de la these
+
+% TODO rediger l'annonce du plan
+
+
+\section{From Statistical to Neural Language Models}
+\label{sec:lm-stat-neural}
+
+\subsection{N-gram Models}
+
+Hypothese de Markov: $P(w_t \mid w_{<t}) \approx P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$.
+\begin{itemize}
+  \item Kneser-Ney smoothing
+  \item Probleme: curse of dimensionality, $|\mathcal{V}|^n$ explose
+\end{itemize}
+
+\subsection{Neural LMs}
+
+\begin{itemize}
+  \item Bengio et al. (2003): neural probabilistic LM
+    \begin{itemize}
+      \item Embeddings denses, resout la sparsity
+      \item Mots similaires -> vecteurs proches
+    \end{itemize}
+  \item Word2Vec (Mikolov et al., 2013): skip-gram / CBOW
+    \begin{itemize}
+      \item $\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}$
+    \end{itemize}
+  \item ELMo (Peters et al., 2018): embeddings contextuels via biLSTM
+    \begin{itemize}
+      \item Meme mot, contextes differents -> vecteurs differents
+      \item Precurseur du pretrain-then-finetune
+    \end{itemize}
+\end{itemize}
+
+\subsection{RNNs}
+
+\begin{itemize}
+  \item LSTM (Hochreiter \& Schmidhuber, 1997)
+  \item En theorie: long-range dependencies
+  \item En pratique: vanishing gradients, pas parallelisable
+\end{itemize}
+
+-> bottleneck pour scaler -> besoin d'une nouvelle archi
+
+
+\section{Transformer}
+\label{sec:lm-transformer}
+
+\subsection{Self-Attention}
+
+Vaswani et al. (2017).
+$$
+Q = XW_Q, \quad K = XW_K, \quad V = XW_V
+$$
+$$
+\mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+\begin{itemize}
+  \item Interactions directes cross-position (vs RNN indirect via hidden state)
+  \item $O(L^2)$ temps et memoire
+  \item Parallelisable
+  \item Multi-head: $h$ tetes, chacune specialise (syntaxe, semantique, position)
+\end{itemize}
+
+% TODO reprendre les details de Nathan ou version plus courte?
+% cf \_archive/related\_works/language\_modeling.tex
+
+\subsection{Positional Encodings}
+
+\begin{itemize}
+  \item APE sinusoidal (Vaswani 2017) -> extrapolation limitee
+  \item APE learned (Devlin 2019) -> pas d'extrapolation
+  \item ALiBi (Press et al. 2022) -> bias lineaire, mieux
+  \item RoPE (Su et al. 2021) -> matrices de rotation, le meilleur
+\end{itemize}
+
+RoPE = standard maintenant: LLaMA, Mistral, ModernBERT.
+
+% TODO tableau
+
+\subsection{Encoder vs Decoder}
+
+\begin{itemize}
+  \item Encoder: attention bidirectionnelle, MLM, classification/NER (BERT, RoBERTa)
+  \item Decoder: attention causale, CLM, generation (GPT, LLaMA)
+  \item Encoder-decoder: T5 (Raffel et al., 2020), seq2seq, plus trop utilise
+\end{itemize}
+
+% TODO tableau
+
+-> maintenant qu'on a l'archi, question: quel objectif de pretraining?
+
+
+\section{Pretraining Objectives}
+\label{sec:lm-objectives}
+
+\subsection{CLM (Causal Language Modeling)}
+
+GPT (Radford et al., 2018).
+$$
+\mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t})
+$$
+\begin{itemize}
+  \item Tous les tokens contribuent au gradient
+  \item Supervision dense
+  \item Naturel pour la generation
+\end{itemize}
+
+\subsection{MLM (Masked Language Modeling)}
+
+BERT (Devlin et al., 2019).
+$$
+\mathcal{L}_{\text{MLM}} = -\sum_{t \in \mathcal{M}} \log P(w_t \mid \mathbf{w}_{\setminus t})
+$$
+\begin{itemize}
+  \item 15\% tokens masked (80\% [MASK], 10\% random, 10\% unchanged)
+  \item Contexte bidirectionnel -> representations plus riches
+  \item Mais: seulement 15\% contribuent -> gradient sparse
+  \item Contraste avec CLM ou chaque token compte
+\end{itemize}
+
+\subsection{Objectifs hybrides (2024-2025)}
+
+Important pour le Ch.5 de la these.
+
+Approche CLM puis MLM:
+\begin{itemize}
+  \item CLM d'abord puis decay vers MLM = meilleur que MLM seul
+  \item CLM: gradients denses (tous les tokens), MLM: sparse (15\%)
+  \item Hypothese: CLM ``compresse'' la connaissance, MLM restaure la bidirectionnalite
+\end{itemize}
+
+Refs:
+\begin{itemize}
+  \item ``Should We Still Pretrain Encoders with MLM?'' (arXiv:2507.00994, 2025) -> biphasic CLM vers MLM bat pure MLM
+  \item GPT-BERT (arXiv:2410.24159, 2024) -> unifie CLM+MLM
+  \item AntLM (CoNLL 2024) -> alternance CLM/MLM
+\end{itemize}
+
+Note: ELECTRA (Clark et al., 2020) avait propose RTD pour signal plus dense, mais ModernBERT montre que bonne archi + MLM suffit (bat DeBERTaV3 qui utilise RTD).
+
+-> on a les archis et les objectifs, question maintenant: est-ce que ca scale?
+
+
+\section{Scaling Laws \& LLMs}
+\label{sec:lm-scaling}
+
+\subsection{Scaling}
+
+\begin{itemize}
+  \item GPT-3 (Brown et al., 2020): 175B params, few-shot emergent, prompting remplace le finetuning
+  \item Chinchilla (Hoffmann et al., 2022):
+    $$
+    L(N,D) = \frac{A}{N^\alpha} + \frac{B}{D^\beta} + E
+    $$
+    -> compute-optimal: smaller model + more data bat larger model + less data
+  \item LLaMA (Touvron et al., 2023): 7B rivalise avec bcp plus gros via 1T tokens
+    -> open weights, democratisation
+\end{itemize}
+
+\subsection{Post-ChatGPT}
+
+\begin{itemize}
+  \item RLHF (Ouyang et al., 2022) -> preference learning
+  \item Instruction tuning
+  \item ChatGPT, Claude, Gemini
+  \item Emergent abilities (Wei et al., 2022) -> chain-of-thought etc.
+\end{itemize}
+
+% TODO section courte, juste poser le contexte
+
+-> ok ca scale pour le general, mais nous on a un domaine specifique -> comment adapter?
+
+
+\section{Continual Pretraining}
+\label{sec:lm-continual}
+
+Section centrale pour la these. C'est le coeur de ce qu'on fait (CamemBERT-bio, ModernCamemBERT-bio).
+
+\subsection{Fondements et terminologie}
+
+``Don't Stop Pretraining'' (Gururangan et al., ACL 2020):
+\begin{itemize}
+  \item DAPT = Domain-Adaptive Pre-Training: 2eme phase sur corpus domaine
+  \item TAPT = Task-Adaptive Pre-Training: sur donnees non-annotees de la tache
+  \item DAPT + TAPT combine -> meilleurs resultats
+  \item Jusqu'a +3 F1 meme avec petit corpus
+\end{itemize}
+
+Taxonomie moderne (Wang et al., CSUR 2025):
+\begin{itemize}
+  \item CPT = nouvelles donnees generales au fil du temps
+  \item DAP = specialisation domaine
+  \item CFT = adaptation sequentielle de taches
+\end{itemize}
+
+\subsection{Catastrophic Forgetting}
+
+Le probleme (Kirkpatrick et al., 2017):
+\begin{itemize}
+  \item Les reseaux ecrasent les poids necessaires aux taches precedentes
+  \item EWC (Elastic Weight Consolidation): penaliser les changements sur les poids importants
+\end{itemize}
+
+Pourquoi ca compte pour les LLMs:
+\begin{itemize}
+  \item Continual PT peut degrader les capacites generales
+  \item Capacite a suivre des instructions particulierement fragile
+  \item Petits modeles plus sensibles (Yildiz et al., 2024)
+\end{itemize}
+
+``Spurious forgetting'' (2024): les baisses de perf refletent peut-etre une perte d'alignement, pas une vraie perte de connaissance.
+
+-> ok c'est un vrai probleme, quelles solutions?
+
+\subsection{Solutions recentes (2024-2025)}
+
+Ibrahim et al. (2024), ``Simple and Scalable Strategies'':
+\begin{itemize}
+  \item LR re-warming: relancer le learning rate quand on ajoute des donnees
+  \item LR re-decaying: cosine decay apres warmup
+  \item Replay: mixer 1\% des donnees precedentes -> ca suffit
+  \item Valide a 405M et 10B
+  \item -> egalise from-scratch pour une fraction du compute
+\end{itemize}
+
+Stability gap (arXiv:2406.14833, 2024):
+\begin{itemize}
+  \item Chute temporaire au debut du continual PT, puis recovery
+  \item Solutions: subset propre, sous-corpus de qualite, data mixing
+  \item 36.2\% -> 40.7\% avec seulement 40\% du budget training
+\end{itemize}
+
+Data selection:
+\begin{itemize}
+  \item Donnees non pertinentes = degradation
+  \item 10\% du corpus bien selectionne fait aussi bien que 100\% vanilla continual PT
+\end{itemize}
+
+\subsection{From scratch vs continual PT}
+
+\begin{itemize}
+  \item From scratch (PubMedBERT, DrBERT): vocab custom, pas de forgetting, mais tres cher
+  \item Continual (BioBERT, Gururangan): efficient, preserve le general, mais tokenizer sous-optimal
+\end{itemize}
+
+Cout compute:
+\begin{itemize}
+  \item DrBERT from scratch: 128x V100, 20h
+  \item AliBERT from scratch: 48x A100, 20h
+  \item BioBERT continual: 8x V100, \~{}10 jours
+  \item -> from-scratch coute \~{}30x plus de compute
+\end{itemize}
+
+% TODO tableau
+
+\subsection{Encoders vs decoders: dynamiques differentes}
+
+Decoders (LLMs), ca marche pas bien:
+\begin{itemize}
+  \item BioMistral: $-$0.9 points apres continual PT
+  \item Dorfner et al. (2024): biomedical LLMs sous-performent les generalistes
+  \item OpenBioLLM-8B: 30\% vs Llama-3-8B: 64.3\% sur cas NEJM
+  \item -> hypothese: perte de connaissances generales pendant la specialisation
+\end{itemize}
+
+Encoders, c'est different:
+\begin{itemize}
+  \item Contexte bidirectionnel peut-etre plus robuste au forgetting
+  \item MLM moins sujet au catastrophic forgetting?
+  \item -> voir Ch.5: approche CLM vers MLM sur les encoders
+\end{itemize}
+
+-> tension narrative: continual PT marche pas pour les decoders, et pour les encoders? -> c'est la question de la these
+
+\subsection{Tentatives anterieures en francais biomedical}
+
+\begin{itemize}
+  \item Copara et al. (2020): 31K articles -> aucune amelioration (corpus trop petit)
+  \item Le Clercq de Lannoy et al. (2022): 136M mots -> +2 EMEA seulement
+  \item Dura et al. (2022): 21M docs APHP -> +3\% mais donnees privees
+\end{itemize}
+
+Question ouverte: pourquoi des resultats contradictoires? DrBERT dit que continual PT marche pas. CamemBERT-bio (cette these) montre que si, avec le bon corpus.
+
+-> ok on sait ce qu'est le continual PT, maintenant quels modeles existent?
+
+
+\section{Modeles pretrained biomed}
+\label{sec:lm-biomedical}
+
+\subsection{Encoders biomed anglais}
+
+\begin{itemize}
+  \item BioBERT (Lee et al., 2019): PubMed+PMC 18B mots, continual -> +0.62\% NER, +2.80\% RE
+  \item SciBERT (Beltagy et al., 2019): Semantic Scholar 1.14M papers, from scratch -> 42\% vocab overlap avec BERT
+  \item PubMedBERT (Gu et al., 2022): PubMed only, from scratch -> introduit BLURB benchmark
+  \item ClinicalBERT (Alsentzer et al., 2019): MIMIC-III, continual -> acces restreint
+  \item BioLinkBERT (Yasunaga et al., 2022): PubMed + citation links, from scratch -> +7\% BioASQ
+\end{itemize}
+
+SOTA 2025: BioClinical ModernBERT, cf section architectures modernes.
+
+% TODO tableau
+
+\subsection{Modeles francais}
+
+General:
+\begin{itemize}
+  \item CamemBERT (Martin et al., 2020): RoBERTa sur OSCAR 138GB
+    -> resultat interessant: 4GB donne a peu pres la meme perf que 138GB
+  \item FlauBERT (Le et al., 2020)
+  \item CamemBERT 2.0 / CamemBERTa (2024): architecture DeBERTaV3, nouveau tokenizer
+\end{itemize}
+
+Biomedical francais:
+\begin{itemize}
+  \item DrBERT (Labrak et al., 2023): from scratch, public + prive
+    -> pretend que continual PT marche pas pour le francais biomed
+  \item AliBERT (Berhe et al., 2023): from scratch, Unigram regularise
+    -> pas disponible publiquement
+\end{itemize}
+
+-> tension: DrBERT dit from-scratch necessaire, CamemBERT-bio (cette these) montre le contraire
+
+\subsection{Decoders biomed}
+
+\begin{itemize}
+  \item BioMistral (Labrak et al., 2024): 3B tokens PMC, 32x A100 20h, base Mistral
+  \item Meditron (Chen et al., 2023): 46B tokens, 128x A100 332h, base Llama-2
+  \item PMC-LLaMA (Wu et al., 2024): 75B tokens, massif
+\end{itemize}
+
+Continual PT pour decoders = resultats mitiges:
+\begin{itemize}
+  \item BioMistral: $-$0.9 points, recupere seulement via model merging
+  \item Dorfner et al. (2024): ``Biomedical LLMs Seem not to be Superior to Generalist Models''
+  \item -> contraste avec les encoders, voir Ch.5
+\end{itemize}
+
+% TODO tableau
+
+-> les modeles existent mais les archis ont evolue, quoi de neuf?
+
+
+\section{Architectures modernes}
+\label{sec:lm-modern}
+
+\subsection{Modernisation des encoders}
+
+DeBERTa (He et al., ICLR 2021):
+\begin{itemize}
+  \item Disentangled attention: separe contenu et position
+  \item Premier a battre l'humain sur SuperGLUE
+  \item -> influence sur ModernBERT, CamemBERT 2.0
+\end{itemize}
+
+MosaicBERT (Portes et al., NeurIPS 2023):
+\begin{itemize}
+  \item 30\% masking au lieu de 15\% BERT
+  \item FlashAttention + ALiBi + GLU + unpadding
+  \item BERT-base en 1.13h sur 8x A100 (\~{}\$20)
+  \item -> fondation directe de ModernBERT
+\end{itemize}
+
+\subsection{Efficient Attention}
+
+FlashAttention (Dao et al., 2022):
+\begin{itemize}
+  \item Reorganise le calcul pour la hierarchie memoire GPU (tiling, kernel fusion)
+  \item Meme $O(L^2)$ mais 2-4x plus rapide en pratique
+  \item Standard maintenant
+\end{itemize}
+
+Autres:
+\begin{itemize}
+  \item GQA (Ainslie et al., 2023): partage de KV-heads -> Llama-2, Mistral
+  \item RMSNorm (Zhang \& Sennrich, 2019): LayerNorm simplifie
+\end{itemize}
+
+\subsection{Long context}
+
+Le probleme: BERT = 512 tokens, comptes-rendus cliniques = souvent 2000+. Tronquer = perdre de l'info diagnostique.
+
+\begin{itemize}
+  \item Longformer (Beltagy et al., 2020): 4096 tokens, sliding window + global attention
+  \item BigBird (Zaheer et al., 2020): 4096, sparse attention
+  \item Clinical Longformer (Li et al., 2022): 4096, Longformer continue pretrained sur MIMIC-III
+  \item ModernBERT (Warner et al., 2024): 8192 tokens
+    \begin{itemize}
+      \item FlashAttention v2/v3
+      \item RoPE
+      \item Alternance local/global attention
+      \item 30\% masking (de MosaicBERT)
+      \item -> 16x le contexte de BERT
+    \end{itemize}
+\end{itemize}
+
+Adaptations cliniques 2025:
+\begin{itemize}
+  \item Clinical ModernBERT (Lee et al., 2025): PubMed + MIMIC-IV + ontologies
+  \item BioClinical ModernBERT (2025): 53.5B tokens, 20 datasets cliniques -> SOTA actuel
+\end{itemize}
+
+% TODO tableau
+
+
+\section{Tokenization}
+\label{sec:lm-tokenization}
+
+\subsection{Methodes subword}
+
+\begin{itemize}
+  \item BPE (Sennrich et al., 2016): merge les paires les plus frequentes
+  \item SentencePiece (Kudo \& Richardson, 2018): language-independent
+  \item Unigram (Kudo, 2018): selection probabiliste
+\end{itemize}
+
+\subsection{Domain mismatch}
+
+SciBERT: vocab general vs scientifique = 42\% intersection seulement.
+
+Exemple biomed francais:
+\begin{itemize}
+  \item Tokenizer general: ``echocardiographie'' -> [``echo'', ``\#\#cardi'', ``\#\#ographie'']
+  \item Tokenizer domaine: ``echocardiographie'' -> [``echocardiographi'', ``e'']
+\end{itemize}
+
+Tradeoff:
+\begin{itemize}
+  \item From-scratch = vocab custom mais cher
+  \item Continual PT = tokenizer sous-optimal mais efficient
+\end{itemize}
+
+
+\section{Limites et transition}
+\label{sec:lm-limitations}
+
+\begin{itemize}
+  \item Rarete des donnees: texte clinique prive (CNIL), modeles hospitaliers pas partageables
+    -> besoin d'alternatives publiques -> Ch.3 Corpus Annotation
+  \item Knowledge gap: LMs captent des patterns, pas la structure des ontologies. Codage medical = connaissances hierarchiques
+    -> approches knowledge-enhanced -> Ch.4 Clinical IE
+  \item Documents longs: comptes-rendus hospitaliers depassent les limites de BERT. Longformer et ModernBERT aident mais faut adapter au domaine
+\end{itemize}
+
+-> ce chapitre a couvert les fondations techniques du language modeling. Le chapitre suivant traite de comment construire et annoter des corpus pour entrainer ces modeles.
+
+% TODO rediger la transition proprement
