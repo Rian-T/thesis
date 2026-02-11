@@ -1,4 +1,462 @@
-\chapter{Corpus Annotation and Quality}
-\label{chap:rw-annotation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Pretraining Data: Corpora and Knowledge}
+\label{chap:rw-corpus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: Related works - Corpus Annotation and Quality
+% TODO rediger proprement
+% TODO: le titre du chapitre est provisoire, a discuter
+
+
+\section{Introduction}
+\label{sec:corpus-intro}
+
+Le chapitre precedent couvrait les modeles. Maintenant faut les nourrir.
+
+Les LMs modernes sont data-hungry:
+\begin{itemize}
+  \item GPT-3 (Brown et al., 2020): 300B tokens
+  \item LLaMA (Touvron et al., 2023): 1-2T tokens
+  \item Chinchilla (Hoffmann et al., 2022): compute-optimal = plus de data, modele plus petit
+\end{itemize}
+
+La qualite et la composition du corpus de pretraining determinent largement les capacites du modele. "Data is the new bottleneck."
+
+Deux types de donnees de pretraining:
+\begin{itemize}
+  \item Texte brut: web crawls, articles scientifiques, livres
+  \item Connaissances structurees: ontologies medicales, knowledge graphs
+\end{itemize}
+
+Pourquoi c'est central pour la these:
+\begin{itemize}
+  \item Part 1 = construire un corpus biomed francais a partir de sources publiques
+  \item Ch.6 = injecter des connaissances d'ontologies medicales pendant le pretraining
+  \item Triple rarete: francais + biomedical + clinique
+\end{itemize}
+
+-> plan du chapitre: on part des corpus web generalistes, on zoome sur le filtrage qualite, puis sur les sources biomed specifiques, et enfin sur les ontologies medicales et comment les integrer dans le pretraining
+
+% TODO rediger l'annonce du plan
+
+
+\section{Web-Scale Pretraining Corpora}
+\label{sec:corpus-web}
+
+\subsection{Common Crawl}
+
+Source de base de presque tous les grands corpus de pretraining:
+\begin{itemize}
+  \item Web crawl ouvert, ~2.5B pages par snapshot mensuel, ~250-400 TiB non compresse
+  \item Snapshots mensuels depuis 2008, petaoctets cumules
+  \item Contenu tres heterogene: articles, forums, spam, code, pubs, boilerplate...
+  \item Pas utilisable directement -> necessite des pipelines de nettoyage lourdes
+\end{itemize}
+
+\subsection{Premiers grands corpus}
+
+C4 (Raffel et al., 2020):
+\begin{itemize}
+  \item Colossal Clean Crawled Corpus, ~750GB d'anglais extrait d'un seul snapshot CC (avril 2019)
+  \item Filtres: langdetect >= 99\% anglais, suppression phrases incompletes, dedup
+  \item Dodge et al. (2021) documentent le contenu: brevets, sites militaires US, texte machine-generated, exemples de benchmarks
+  \item Blocklist filtering retire disproportionnellement du texte de/sur les minorites
+\end{itemize}
+
+The Pile (Gao et al., 2020):
+\begin{itemize}
+  \item 800GB anglais, 22 sources diversifiees (PubMed, ArXiv, GitHub, StackExchange, Wikipedia, livres, etc.)
+  \item Idee: diversite des sources > volume brut d'une seule source
+  \item Open-source (EleutherAI)
+\end{itemize}
+
+OSCAR (Ortiz Suarez et al., 2019):
+\begin{itemize}
+  \item Pipeline asynchrone pour classifier CC par langue
+  \item Optimise pour infra moyenne/basse ressource (I/O-bound)
+  \item Produit le corpus de CamemBERT: 138GB de texte francais
+  \item Shuffled au niveau ligne pour eviter les problemes de copyright (ironiquement)
+\end{itemize}
+
+\subsection{Corpus modernes (2024-2025)}
+
+FineWeb (Penedo et al., 2024):
+\begin{itemize}
+  \item 15T tokens, 96 snapshots CC
+  \item Documentation detaillee des strategies de dedup et filtrage
+  \item Pipeline: extraction texte, filtrage langue, heuristiques qualite, dedup URL + MinHash
+  \item FineWeb-Edu: sous-ensemble 1.3T tokens filtre pour contenu educatif (cf section suivante)
+\end{itemize}
+
+RedPajama-V2 (Weber et al., 2024):
+\begin{itemize}
+  \item Dataset ouvert pour entrainer des LLMs
+  \item Inclut subset francais (RPv2-Fr)
+  \item Metriques de qualite pre-calculees pour faciliter le filtrage
+\end{itemize}
+
+TxT360 (Tang et al., 2024):
+\begin{itemize}
+  \item "Perfect blend" de sources
+  \item Dedup globale sur 99 snapshots CC: 20TB -> 4.83T tokens (reduction 80\%)
+  \item Pipeline similaire a FineWeb + near-dedup globale additionnelle
+\end{itemize}
+
+Autres:
+\begin{itemize}
+  \item Dolma (Soldaini et al., 2024): 3T tokens, corpus ouvert pour recherche (OLMo)
+  \item ROOTS (Laurencon et al., 2023): 1.6TB, multilingue composite (BigScience/BLOOM)
+\end{itemize}
+
+% TODO tableau comparatif des grands corpus
+
+-> on a des milliards de tokens de texte web, mais la qualite varie enormement -> comment selectionner les bons documents?
+
+
+\section{Data Quality and Curation}
+\label{sec:corpus-quality}
+
+\subsection{Filtrage heuristique}
+
+Approches classiques, devenues standard depuis Gopher (Rae et al., 2022):
+\begin{itemize}
+  \item Regles: longueur min/max du document, ratio mots/symboles, proportion de majuscules, lignes dupliquees
+  \item Filtrage par perplexite: KenLM entraine sur Wikipedia, documents a perplexite trop haute = bruit
+  \item Language ID: fastText pour filtrer par langue
+  \item Ces heuristiques sont reprises par presque tous les pipelines modernes (FineWeb, C4, Dolma)
+\end{itemize}
+
+Limites: les heuristiques sont necessaires mais insuffisantes. Elles retirent le bruit evident mais ne distinguent pas la qualite du contenu.
+
+\subsection{Classifieurs de qualite}
+
+Paradigme recent: LLM-as-annotator -> distillation vers petit classifieur -> filtrage a grande echelle.
+
+FineWeb-Edu (Penedo et al., 2024):
+\begin{itemize}
+  \item Llama-3-70B-Instruct annote 460K pages web sur "educational value" (echelle 0-5)
+  \item Echelle additive: le LLM evalue chaque critere et construit le score pas a pas
+  \item Prompt cible le niveau primaire/college pour eviter de favoriser les papiers trop techniques
+  \item Distillation vers classifieur de regression (Snowflake-arctic-embed, F1 = 82\% en binaire avec seuil >= 3)
+  \item Classification de 15T tokens: 6K heures H100
+  \item Retire 92\% des donnees, bat quand meme le corpus complet sur MMLU, ARC, OpenBookQA
+\end{itemize}
+
+DCLM / DataComp-LM (Li et al., 2024):
+\begin{itemize}
+  \item Classifieur FastText entraine pour separer instructions synthetiques (Open Hermes 2.5) du web general
+  \item Favorise les structures Q\&A resolues: question courte + reponse directe + raisonnement bref
+  \item Utilise dans le mix de pretraining d'OLMo2
+\end{itemize}
+
+Nemotron-CC (NVIDIA, 2024):
+\begin{itemize}
+  \item Classifieur de qualite multi-criteres (accuracy, clarity, coherence, etc.)
+  \item Approche plus granulaire que le score educatif unique de FineWeb-Edu
+\end{itemize}
+
+% TODO verifier les details de Nemotron-CC vs Nemotron-4 15B
+
+\subsection{Organisation par domaine}
+
+WebOrganizer (Wettig et al., 2025):
+\begin{itemize}
+  \item Organise le web en taxonomies par topic et par format
+  \item Annotations LLM distillees vers classifieurs efficaces
+  \item Montre que FineWeb-Edu a un biais implicite vers Science \& Technology et Academic Writing
+  \item L'efficacite de FineWeb-Edu vient en partie de preferences de domaine alignees avec les benchmarks (MMLU, HellaSwag)
+  \item Combiner organisation par domaine + filtrage qualite > qualite seule
+\end{itemize}
+
+\subsection{Deduplication}
+
+\begin{itemize}
+  \item URL-level: retirer les duplicats exacts d'URL
+  \item Document-level: MinHash + LSH pour near-duplicates
+  \item TxT360: dedup globale sur 99 snapshots CC, reduction de 80\%
+  \item Crucial: la duplication biaise le training vers les textes les plus copies (boilerplate, templates)
+\end{itemize}
+
+\subsection{Contamination}
+
+Le filtrage agressif pose un probleme de contamination des benchmarks:
+\begin{itemize}
+  \item Deng et al. (2024): ChatGPT et GPT-4 devinent 52\% et 57\% des options manquantes de MMLU -> les QA pairs sont sur le web
+  \item Xu et al. (2024): survey des techniques de detection de contamination dans les LLMs
+  \item InfiniGram (Liu et al., 2024): outil pour identifier des exact matches dans les training sets
+  %\item Les classifieurs entraines sur instructions/QA favorisent naturellement le format des benchmarks
+  %\item Probleme: est-ce que les gains de FineWeb-Edu/DCLM viennent de la qualite ou de la contamination?
+\end{itemize}
+
+Tension fondamentale: filtrer plus agressivement = meilleurs scores benchmarks, mais potentiellement via contamination implicite plutot que vraie qualite.
+
+% TODO: mentionner les approches de decontamination?
+
+-> ok le filtrage marche pour les corpus web generalistes, mais en biomedical c'est different: les corpus sont plus petits, le domaine est tres specifique, les criteres de qualite ne sont pas les memes -> quelles sources biomed existent?
+
+
+\section{Biomedical and Clinical Corpora}
+\label{sec:corpus-biomed}
+
+\subsection{Grandes sources anglophones}
+
+PubMed:
+\begin{itemize}
+  \item Base de donnees de la NLM (National Library of Medicine)
+  \item ~39M citations et abstracts d'articles biomedicaux
+  \item Texte structure, vocabulaire technique, qualite editoriale
+  \item Abstracts seulement (pas le full-text)
+  \item Utilise par BioBERT (Lee et al., 2019), PubMedBERT (Gu et al., 2022)
+\end{itemize}
+
+PMC Open Access:
+\begin{itemize}
+  \item ~4.5M articles full-text en acces libre
+  \item 98\% anglais (Labrak et al., 2024)
+  \item Contenu heterogene: articles de recherche, reviews, case reports, editoriaux, guidelines
+  \item Utilise par BioMistral (3B tokens), Meditron (46B tokens), PMC-LLaMA (75B tokens)
+  \item Probleme: granularite article. Un article de recherche peut contenir a la fois des cas cliniques pertinents et des sections methodologiques non pertinentes
+\end{itemize}
+
+MIMIC (Johnson et al., 2016/2023):
+\begin{itemize}
+  \item MIMIC-III, MIMIC-IV: notes cliniques du Beth Israel Deaconess Medical Center
+  \item Acces restreint (data use agreement, formation ethique)
+  \item Utilise par ClinicalBERT (Alsentzer et al., 2019), Clinical Longformer (Li et al., 2022), BioClinical ModernBERT (Sounack et al., 2025)
+  \item Gold standard pour le texte clinique anglais, mais un seul hopital americain -> pas generalizable
+\end{itemize}
+
+\subsection{Curation article-level pour le biomed}
+
+Meditron (Chen et al., 2023):
+\begin{itemize}
+  \item Score 0-1 par article base sur: MeSH tags, type de publication, reputation du journal, recence, nombre de citations
+  \item Upsampling des articles a haut score, filtrage des bas scores
+  \item 46B tokens au total, 128x A100, 332h pour le 70B
+  \item Limite: granularite article. Un article peut melanger contenu pertinent et non-pertinent
+\end{itemize}
+
+BioClinical ModernBERT (Sounack et al., 2025):
+\begin{itemize}
+  \item 169B tokens: PubMed + PMC + 20 datasets cliniques (MIMIC-III, MIMIC-IV, CheXpert Plus, etc.)
+  \item SOTA actuel sur les benchmarks biomed anglais
+  \item Mais: la plupart des sources cliniques necessitent des data use agreements -> pas vraiment "public"
+\end{itemize}
+
+\subsection{Sources francophones}
+
+Ressources publiques existantes:
+\begin{itemize}
+  \item ISTEX: base de 27M references scientifiques, permet d'extraire des documents francais bio/med
+  \item CLEAR (Grabar \& Cardon, 2018): notices medicamenteuses, articles d'encyclopedie medicale en francais technique et simplifie
+  \item E3C (Magnini et al., 2021): corpus multilingue de cas cliniques, notices, resumes de these medicale
+  \item HAL / Halvest (Kulumba et al., 2024): articles scientifiques francais et anglais extraits du depot HAL (Hyper Articles en Ligne)
+  \item Wikipedia biomedical: articles des portails medecine, pharmacie, biologie. Libre et multilingue
+\end{itemize}
+
+Modeles entraines from scratch sur corpus francais:
+\begin{itemize}
+  \item DrBERT (Labrak et al., 2023): corpus de 7GB, from scratch sur 128x V100
+    \begin{itemize}
+      \item Pretend que le continual PT ne marche pas pour le francais biomed
+      \item Mais: evaluation potentiellement biaisee (cf Ch.4 de la these)
+    \end{itemize}
+  \item AliBERT (Berhe et al., 2023): ScienceDirect + theses Sudoc, tokenizer Unigram regularise, 48x A100
+    \begin{itemize}
+      \item Modele non disponible publiquement
+    \end{itemize}
+\end{itemize}
+
+Tentatives de continual pretraining en francais biomed:
+\begin{itemize}
+  \item Copara et al. (2020): 31K articles seulement -> aucune amelioration sur CamemBERT-large
+  \item Le Clercq de Lannoy et al. (2022): PubMed + Cochrane + ISTEX + Wikipedia = 136M mots -> +2 F1 sur EMEA, rien sur MEDLINE
+  \item Dura et al. (2022): 21M documents cliniques APHP -> +3\% sur APMed (prive), mais donnees non partageables
+\end{itemize}
+
+Resultats décevants: DrBERT dit que continual PT marche pas, Copara et Le Clercq confirment. Mais le probleme est peut-etre le corpus (trop petit, pas assez cible), pas la methode.
+
+Triple rarete: francais + biomedical + clinique. Les textes cliniques sont prives (CNIL), les modeles hospitaliers ne sont pas partageables entre etablissements. Les sources publiques francophones sont fragmentees et petites comparees a PubMed/PMC.
+
+% TODO tableau comparatif des corpus biomed (EN vs FR, taille, acces)
+
+-> le texte biomedical aide pour le pretraining, mais les LMs captent des patterns statistiques, pas la structure des ontologies. Pour le codage medical (CIM-10, CCAM) il faut des connaissances hierarchiques explicites -> peut-on utiliser directement les ontologies comme donnees de pretraining?
+
+
+\section{Medical Ontologies and Knowledge Graphs}
+\label{sec:corpus-ontologies}
+
+\subsection{Principales ontologies medicales}
+
+UMLS (Lindberg et al., 1993):
+\begin{itemize}
+  \item Unified Medical Language System, meta-ontologie biomedical de la NLM
+  \item Integre ~189 vocabulaires sources (SNOMED-CT, MeSH, ICD, ATC, etc.)
+  \item ~3.4M concepts, ~16.7M noms de concepts uniques
+  \item Standard international pour la recherche en NLP biomed
+  \item Contient: synonymes, relations hierarchiques, relations associatives, definitions
+\end{itemize}
+
+SNOMED-CT:
+\begin{itemize}
+  \item ~371K concepts cliniques structures
+  \item Relations hierarchiques (is-a) + associatives (finding site, causative agent, etc.)
+  \item Standard pour les systemes d'information clinique internationaux
+  \item Couverture: diagnostics, procedures, anatomie, substances, organismes
+\end{itemize}
+
+CIM-10 / ICD-10 (OMS, 2019):
+\begin{itemize}
+  \item Classification internationale des maladies
+  \item Hierarchie: chapitres -> blocs -> categories -> sous-categories
+  \item Version francaise enrichie par l'ATIH avec: exclusions, inclusions, notes, libelles courts/longs
+  \item Utilise pour le codage PMSI (Programme de Medicalisation des Systemes d'Information) en France
+  \item ~19K codes dans la version ATIH
+\end{itemize}
+
+CCAM (ATIH):
+\begin{itemize}
+  \item Classification Commune des Actes Medicaux, ~8K codes
+  \item Specifique a la France, structure hierarchique
+  \item Relations: actes associes, incompatibilites, modificateurs
+\end{itemize}
+
+ATC (OMS):
+\begin{itemize}
+  \item Anatomical Therapeutic Chemical, ~6K codes au 5eme niveau
+  \item 5 niveaux: anatomique -> therapeutique -> pharmacologique -> chimique -> substance
+  \item Standard pour la classification des medicaments
+\end{itemize}
+
+\subsection{Representations formelles}
+
+\begin{itemize}
+  \item RDF (Resource Description Framework): triplets sujet-predicat-objet, standard W3C
+  \item OWL (Web Ontology Language): logique descriptive, raisonnement automatique, classes, proprietes
+  \item SKOS (Simple Knowledge Organization System): prefLabel, altLabel (synonymes), broader/narrower (hierarchie), related, exactMatch
+\end{itemize}
+
+Les ontologies codent explicitement ce que les LMs doivent apprendre implicitement:
+\begin{itemize}
+  \item Hierarchie: E11 (diabete type 2) $\subset$ E10-E14 (diabete sucre)
+  \item Exclusions: E11 $\neq$ E10 (diabete type 1) -- a ne pas confondre
+  \item Synonymes: un meme concept a plusieurs libelles (prefLabel + altLabel)
+  \item Relations associatives: complications, traitements, liens entre ontologies
+\end{itemize}
+
+-> les ontologies sont riches en connaissances structurees, mais sous forme de graphes: pas directement exploitables par les LMs qui attendent du texte en language natu -> comment les integrer dans le pretraining?
+
+
+\section{Knowledge-Enhanced Pretraining}
+\label{sec:corpus-knowledge}
+
+\subsection{Embeddings statiques de graphes}
+
+Approches qui produisent des vecteurs fixes (pas contextuels) a partir de graphes:
+\begin{itemize}
+  \item Node2Vec (Grover \& Leskovec, 2016): random walks sur graphe -> skip-gram, apprentissage de representations de noeuds
+  \item RDF2Vec (Ristoski \& Paulheim, 2016): adapte le paradigme walk + skip-gram aux graphes RDF. Fondation des approches de walks sur ontologies
+  \item Snomed2Vec (Agarwal et al., 2019): Node2Vec applique a SNOMED-CT, 5-6x amelioration sur concept similarity
+  \item OWL2Vec* (Chen et al., 2021): walks sur ontologies OWL (teste sur Gene Ontology)
+\end{itemize}
+
+Limite: embeddings statiques, pas integres dans un transformer. Un concept = un vecteur fixe quel que soit le contexte. Pas de contextualisation.
+
+-> on peut faire mieux en integrant les KG directement dans les transformers
+
+\subsection{Injection de connaissances dans les transformers}
+
+Premiere generation: injecter des entites dans l'architecture:
+\begin{itemize}
+  \item ERNIE (Zhang et al., 2019): aligne entity embeddings (TransE) avec representations textuelles pendant le pretraining. Entity linking implicite
+  \item KnowBERT (Peters et al., 2019): integre des entity linkers comme couches d'attention supplementaires dans BERT
+  \item K-BERT (Liu et al., 2020): injecte des triples de KG comme soft-position embeddings dans l'input. Modifie la sequence d'entree directement
+\end{itemize}
+
+Deuxieme generation: multi-task pretraining language + KG:
+\begin{itemize}
+  \item KEPLER (Wang et al., 2021): MLM + TransE knowledge embedding sur Wikidata simultanement. Les deux objectifs partagent le meme encoder
+  \item CoLAKE (Sun et al., COLING 2020): construit des word-knowledge graphs qui unifient contexte textuel et contexte KG, puis pretraine avec MLM modifie sur ces graphes
+  \item DRAGON (Yasunaga et al., NeurIPS 2022): joint pretraining bidirectionnel MLM + link prediction sur UMLS
+    \begin{itemize}
+      \item PubMed pour le texte, UMLS pour le KG
+      \item +3\% accuracy sur MedQA, +10\% sur raisonnement multi-step
+      \item Reference pour le multi-task MLM + KG
+    \end{itemize}
+\end{itemize}
+
+\subsection{Approches contrastives medicales}
+
+\begin{itemize}
+  \item SapBERT (Liu et al., NAACL 2021): self-alignment pretraining sur synonymes UMLS
+    \begin{itemize}
+      \item Contrastive learning: synonymes UMLS = positifs, non-synonymes = negatifs
+      \item Metric learning scalable sur 4M+ concepts UMLS
+      \item SOTA entity linking biomed sur 6 benchmarks
+      \item Un seul modele pour tous les types d'entites ("one-model-for-all")
+    \end{itemize}
+  \item CODER (Yuan et al., 2022): contrastive pretraining sur 87M triplets de relations UMLS
+    \begin{itemize}
+      \item Relations + synonymes dans l'objectif contrastif
+      \item Medical term normalization
+    \end{itemize}
+\end{itemize}
+
+\subsection{Graph-to-text pour le pretraining}
+
+Approche recente: transformer les graphes en texte lisible par les LMs.
+
+"Textbooks Are All You Need" (Gunasekar et al., 2023):
+\begin{itemize}
+  \item Donnees synthetiques de qualite textbook generees par GPT -> petits modeles tres performants
+  \item Montre que la qualite et la structure des donnees importent plus que le volume brut
+  \item Paradigme: generer des donnees synthetiques structurees plutot que crawler du texte brut
+\end{itemize}
+
+AntGLM-Med (Zhou et al., 2023):
+\begin{itemize}
+  \item Reecrit des sous-graphes de KG medical en prose naturelle
+  \item Utilise pour le continual pretraining de LLMs medicaux
+  \item Plus proche precedent de la generation de texte a partir d'ontologies pour pretraining
+\end{itemize}
+
+% TODO verifier les details d'AntGLM-Med (Omaha KG?)
+
+EntiGraph (Yang et al., ICLR 2025):
+\begin{itemize}
+  \item Algorithme d'augmentation entity-centric: decompose un corpus en entites puis genere du texte sur les relations entre entites
+  \item 1.3M tokens reels -> 600M tokens synthetiques via GPT-4-turbo
+  \item Scaling log-lineaire de l'accuracy avec le nombre de tokens synthetiques
+  \item Cible les decoders (Llama 3 8B), pas encore teste sur encoders
+\end{itemize}
+
+Limites actuelles du knowledge-enhanced pretraining:
+\begin{itemize}
+  \item La plupart des travaux sont en anglais et sur UMLS
+  \item Graph-to-text pour le pretraining est recent (2023-2025)
+  \item Pas encore explore pour les encoders bidirectionnels (DRAGON fait du link prediction, pas du graph-to-text)
+  \item Les ontologies nationales (CIM-10 ATIH, CCAM) n'ont jamais ete utilisees pour du pretraining
+  \item SapBERT et CODER exploitent UMLS mais uniquement via contrastive learning, pas via generation de texte
+\end{itemize}
+
+-> methodes prometteuses mais gap important: langues non-anglaises, ontologies nationales, pretraining d'encoders via graph-to-text
+
+
+\section{Limites et transition}
+\label{sec:corpus-limitations}
+
+\begin{itemize}
+  \item Rarete biomed non-anglais: PMC = 98\% anglais, les corpus francais biomed sont petits et fragmentes. Les pipelines de filtrage (FineWeb-Edu, DCLM) sont concus pour l'anglais
+    -> besoin de strategies de collection et de filtrage adaptees au domaine et a la langue
+  \item Granularite de filtrage: les approches existantes (Meditron, FineWeb-Edu) filtrent au niveau document ou article. Mais un article biomed peut contenir a la fois des cas cliniques pertinents et des sections non pertinentes
+    -> besoin de filtrage a granularite plus fine (paragraphe)
+  \item Criteres de qualite non adaptes: les criteres "educatifs" de FineWeb-Edu ne correspondent pas au texte biomedical (cas cliniques, notices medicamenteuses, protocoles). Les biais vers Science \& Technology identifies par WebOrganizer peuvent etre differents en biomed
+    -> besoin de criteres domaine-specifiques
+  \item Ontologies nationales sous-exploitees: UMLS domine la recherche, mais les systemes hospitaliers francais utilisent CIM-10/ATIH, CCAM, ATC. Aucun travail n'a integre ces ontologies dans le pretraining
+    -> gap pour le codage medical en francais
+  \item Graph-to-text naissant: AntGLM-Med et EntiGraph montrent la voie mais sont limites aux decoders en anglais. Pas encore explore pour les encoders bidirectionnels ni pour les ontologies non-anglophones
+    -> possibilite de generer du texte "textbook" a partir des ontologies ATIH
+\end{itemize}
+
+-> ce chapitre a couvert les donnees de pretraining: sources textuelles web et biomed, methodes de curation et filtrage, ontologies medicales et leurs integrations dans le pretraining. Le chapitre suivant traite de la tache finale: l'extraction d'information clinique, et de comment les modeles pretrained sont utilises pour cette tache.
+
+% TODO rediger la transition proprement
