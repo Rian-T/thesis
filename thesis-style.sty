@@ -1,0 +1,211 @@
+%% thesis-style.sty
+%% Centralized visual style for Rian's thesis.
+%% Change colors, bar/line/table/pipeline styles here — applies everywhere.
+%%
+%% Usage: \usepackage{thesis-style} in thesis.tex
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-style}[2026/03/05 Thesis visual style — Lavender Haze & Lime]
+
+%% ============================================================
+%% DEPENDENCIES
+%% ============================================================
+\RequirePackage{xcolor}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\RequirePackage{siunitx}
+\RequirePackage{threeparttable}
+\RequirePackage{array}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+
+%% ============================================================
+%% COLOR PALETTE — Change these to restyle the entire thesis
+%% ============================================================
+
+% Primary: Our model
+\definecolor{ThesisPrimary}{RGB}{166, 148, 232}       % Lavender
+\definecolor{ThesisPrimaryDark}{RGB}{90, 72, 160}      % Dark lavender (borders)
+
+% Secondary: Baseline 1
+\definecolor{ThesisSecondary}{RGB}{171, 204, 110}      % Lime
+\definecolor{ThesisSecondaryDark}{RGB}{95, 130, 40}    % Dark lime (borders)
+
+% Tertiary: Baseline 2
+\definecolor{ThesisTertiary}{RGB}{241, 184, 144}       % Peach
+\definecolor{ThesisTertiaryDark}{RGB}{180, 110, 60}    % Dark peach (borders)
+
+% Neutrals
+\definecolor{ThesisNeutral}{RGB}{102, 112, 130}        % Steel gray
+\definecolor{ThesisInk}{RGB}{45, 42, 60}               % Dark plum ink (text, axes)
+\definecolor{ThesisPaper}{RGB}{249, 247, 252}           % Lavender paper (backgrounds)
+\definecolor{ThesisTableSep}{RGB}{220, 218, 240}        % Table group header rows
+
+%% ============================================================
+%% TABLE STYLE
+%% ============================================================
+
+% Use in tables: \rowcolor{ThesisTableSep} for group headers
+% Standard setup: \small, \setlength{\tabcolsep}{10pt}, booktabs, siunitx S-columns
+% Bold best, underline second-best
+
+% Convenience command for table group headers
+\newcommand{\tablegroup}[2]{%
+  \rowcolor{ThesisTableSep}%
+  \multicolumn{#1}{c}{\rule{0pt}{9pt}\textbf{#2}} \\[1pt]%
+}
+
+%% ============================================================
+%% PGFPLOTS BAR CHART STYLE
+%% ============================================================
+
+\pgfplotsset{
+    thesis bar/.style={
+        ybar=3pt,
+        width=0.85\textwidth,
+        height=6cm,
+        ylabel style={font=\small},
+        tick label style={font=\small},
+        axis x line=bottom,
+        axis y line=left,
+        axis line style={ThesisInk!40},
+        ymajorgrids=true,
+        major grid style={ThesisInk!10, dashed},
+        xmajorgrids=false,
+        enlarge x limits=0.15,
+        clip mode=individual,
+        legend style={
+            at={(0.5,-0.22)}, anchor=north,
+            legend columns=-1, column sep=8pt,
+            font=\footnotesize,
+            draw=ThesisInk!15, fill=white,
+            legend cell align=left,
+        },
+        legend image code/.code={%
+            \draw[#1, draw=none] (0cm,-0.1cm) rectangle (0.35cm,0.2cm);%
+        },
+    },
+}
+
+% Convenience: bar plot styles for each series
+\pgfplotsset{
+    bar primary/.style={fill=ThesisPrimary, draw=ThesisPrimaryDark, line width=0.6pt, rounded corners=2pt},
+    bar secondary/.style={fill=ThesisSecondary, draw=ThesisSecondaryDark, line width=0.6pt, rounded corners=2pt},
+    bar tertiary/.style={fill=ThesisTertiary, draw=ThesisTertiaryDark, line width=0.6pt, rounded corners=2pt},
+}
+
+%% ============================================================
+%% PGFPLOTS LINE CHART STYLE
+%% ============================================================
+
+\pgfplotsset{
+    thesis line/.style={
+        width=0.85\textwidth,
+        height=7cm,
+        xlabel style={font=\small},
+        ylabel style={font=\small},
+        tick label style={font=\small},
+        axis x line=bottom,
+        axis y line=left,
+        axis line style={ThesisInk!40},
+        ymajorgrids=true,
+        major grid style={ThesisInk!10, dashed},
+        xmajorgrids=false,
+        clip=false,
+        legend style={
+            at={(0.5,-0.22)}, anchor=north,
+            legend columns=-1, column sep=10pt,
+            font=\footnotesize,
+            draw=ThesisInk!15, fill=white,
+            legend cell align=left,
+        },
+    },
+}
+
+% Convenience: line plot styles for each series
+% Markers have dark borders matching bar chart treatment
+\pgfplotsset{
+    line primary/.style={
+        ThesisPrimary!80!ThesisInk, line width=2.5pt,
+        mark=*, mark size=2pt,
+        mark options={solid, fill=ThesisPrimary, draw=ThesisPrimaryDark, line width=0.5pt},
+    },
+    line secondary/.style={
+        ThesisSecondaryDark, line width=1.5pt, dashed,
+        mark=square*, mark size=1.6pt,
+        mark options={solid, fill=ThesisSecondary, draw=ThesisSecondaryDark, line width=0.5pt},
+    },
+    line tertiary/.style={
+        ThesisTertiaryDark, line width=1.5pt, densely dotted,
+        mark=triangle*, mark size=2.2pt,
+        mark options={solid, fill=ThesisTertiary, draw=ThesisTertiaryDark, line width=0.5pt},
+    },
+}
+
+% Confidence band for primary model
+\pgfplotsset{
+    band primary/.style={fill=ThesisPrimary, fill opacity=0.18, draw=none},
+}
+
+%% ============================================================
+%% TIKZ PIPELINE / DIAGRAM STYLE
+%% ============================================================
+
+\tikzset{
+    % Box styles by role
+    pipe box/.style={
+        rectangle, rounded corners=4pt,
+        minimum height=1.4cm, minimum width=2.8cm,
+        align=center, font=\small\bfseries,
+        line width=0.7pt, inner xsep=10pt, inner ysep=6pt,
+    },
+    pipe input/.style={pipe box, draw=ThesisSecondaryDark, fill=ThesisSecondary!15},
+    pipe process/.style={pipe box, draw=ThesisTertiaryDark, fill=ThesisTertiary!15},
+    pipe result/.style={pipe box, draw=ThesisPrimaryDark, fill=ThesisPrimary!15},
+    pipe eval/.style={pipe box, draw=ThesisNeutral, fill=ThesisNeutral!8},
+    % Arrow style
+    pipe arrow/.style={->, line width=1.2pt, ThesisInk!35, >=stealth, shorten >=4pt, shorten <=4pt},
+    % Annotation style
+    pipe note/.style={font=\scriptsize, ThesisInk!50},
+}
+
+%% ============================================================
+%% VALUE LABELS FOR BAR CHARTS
+%% ============================================================
+
+\pgfplotsset{
+    thesis bar labels/.style={
+        nodes near coords,
+        nodes near coords align={vertical},
+        nodes near coords style={font=\footnotesize, color=ThesisInk!80, yshift=2pt},
+        every node near coord/.append style={/pgf/number format/.cd, fixed, precision=1},
+    },
+    thesis bar labels small/.style={
+        nodes near coords,
+        nodes near coords align={vertical},
+        nodes near coords style={font=\scriptsize, color=ThesisInk!80, yshift=2pt},
+        every node near coord/.append style={/pgf/number format/.cd, fixed, precision=1},
+    },
+    thesis bar labels errbar/.style={
+        nodes near coords,
+        nodes near coords align={vertical},
+        nodes near coords style={font=\scriptsize, color=ThesisInk!80, yshift=6pt},
+        every node near coord/.append style={/pgf/number format/.cd, fixed, precision=1},
+    },
+}
+
+%% ============================================================
+%% ERROR BAR STYLE
+%% ============================================================
+
+\pgfplotsset{
+    thesis error bars/.style={
+        error bars/y dir=both,
+        error bars/y explicit,
+        error bars/error bar style={line width=0.8pt, ThesisInk!50},
+        error bars/error mark options={rotate=90, ThesisInk!50, mark size=2.5pt},
+    },
+}
+
+\endinput
