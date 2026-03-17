@@ -2,6 +2,7 @@
 %!TEX encoding = UTF-8 Unicode
 %!BIB program = bibtex
 
+\PassOptionsToPackage{usenames,dvipsnames,table}{xcolor}
 \documentclass{mimosis}
 % \documentclass[draft]{mimosis}
 
@@ -114,7 +115,7 @@
 
 \renewcommand{\appendixname}{Appendix}
 
-\usetikzlibrary{positioning}
+\usetikzlibrary{positioning, backgrounds, fit, arrows.meta}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
@@ -196,10 +197,8 @@
 
 \printindex
 
-% Entries for the entire Anthology, followed by custom entries
-% TODO: Uncomment when adding \cite{} commands
-% \bibliography{thesis}
-% \bibliographystyle{acl_natbib}
+\bibliographystyle{acl_natbib}
+\bibliography{thesis}
 
 \part*{Appendix}
 \input{sources/appendix}

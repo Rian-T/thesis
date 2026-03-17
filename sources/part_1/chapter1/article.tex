@@ -1,1 +1,131 @@
-% TODO: Write chapter content
+% This chapter is based on the corpus contribution of:
+%   Rian Touchent, Laurent Romary, Éric de la Clergerie.
+%   CamemBERT-bio: Leveraging Continual Pre-training for
+%   Cost-Effective Models on French Biomedical Data.
+%   LREC-COLING, 2024.
+%
+% Pretraining and evaluation: \Cref{chap:encoders}.
+
+\section{Introduction}
+
+Hospitals produce millions of clinical documents every year. These can be used to train language models internally, but the resulting models inherit the legal constraints of their training data: they cannot be released publicly or exchanged between institutions. For a model that is truly open, the training data must come from somewhere else.
+
+Yet hospital records remain the richest source of medical information. Clinical data warehouses have made them increasingly accessible for research purposes. It is estimated that up to 80\% of entities are missing from structured modalities~\citep{raghavan_how_2014}, making clinical reports the richest source of medical information. Yet extracting this information requires high-performing language models adapted to the biomedical domain.
+
+BERT-based models~\citep{devlin_bert_2019} consistently demonstrate state-of-the-art results for a wide range of natural language processing tasks. The adaptation of BERT to the French language, particularly with the CamemBERT model~\citep{martin-etal-2020-camembert}, has replicated these performances in French natural language processing. However, the results of this model on biomedical data are disappointing~\citep{cardon_presentation_2020}, as it exhibits lower performance compared to heuristic models on certain evaluation datasets. These results are predictable because CamemBERT is trained on plain language, often sourced from web pages such as forums. Biomedical data, especially clinical data, are significantly different. They contain technical terms that are very rare or absent in everyday language, and they have a radically distinct style, often telegraphic, rarely consisting of complete sentences, with varying abbreviations.
+
+In this chapter, we address this gap by introducing \textit{biomed-fr}, a public French biomedical corpus of 413 million words assembled from three complementary sources. We describe the corpus construction, analyze the vocabulary mismatch between general and biomedical French tokenizers, and situate our effort among existing French biomedical corpora. The use of this corpus for continual pretraining of CamemBERT, yielding CamemBERT-bio, is presented in \Cref{chap:encoders}.
+
+
+\section{Existing French Biomedical Corpora}
+
+Several works have attempted to adapt CamemBERT to the biomedical domain, each relying on different training data. \Cref{tab:existing-corpora} summarizes these corpora.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrl}
+\toprule
+\textbf{Authors} & \textbf{Source} & \textbf{Size} & \textbf{Public} \\
+\midrule
+\citet{copara_contextualized_2020} & PubMed & 31K docs & Yes \\
+\citet{le_clercq_de_lannoy_strategies_2022} & Misc. & 136M words & Partial \\
+\citet{dura_learning_2022} & APHP CDW & 21M docs & No \\
+\citet{labrak2023drbert} & Misc. & 7.4\,GB & Partial \\
+\bottomrule
+\end{tabular}
+\caption{French biomedical corpora used for language model adaptation. Size units vary across works as reported by their respective authors.}
+\label{tab:existing-corpora}
+\end{table}
+
+\citet{copara_contextualized_2020} explored a second phase of pre-training on 31,000 French biomedical scientific articles. However, they did not observe a significant improvement on a clinical named entity recognition task using the large version of CamemBERT. This could be explained by the combination of a relatively small corpus (31K documents compared to the 18 billion words in BioBERT) and the large version of the CamemBERT model.
+
+\citet{le_clercq_de_lannoy_strategies_2022} also adapted CamemBERT to the biomedical domain. They aggregated documents from various sources, including PubMed, Cochrane, ISTEX, and Wikipedia, forming a larger partially public corpus of approximately 136 million words. They observed a 2-point improvement in F-measure on a named entity recognition evaluation set composed of drug notices (EMEA), but no significant improvement on a set composed of scientific article titles (MEDLINE).
+
+\citet{dura_learning_2022} continued the pre-training of CamemBERT on 21 million clinical documents from the APHP (Assistance Publique -- Hôpitaux de Paris) clinical data warehouse. They observed a significant 3\% improvement on APMed, a private clinical named entity recognition dataset owned by APHP. They also achieved similar scores to CamemBERT on EMEA and MEDLINE. Their new model performs better on clinical data, yet it obtains scores similar to CamemBERT in other biomedical domains.
+
+\citet{labrak2023drbert} introduced a public French biomedical model named DrBERT. Through their experiments, they explored both continual-pretraining and from-scratch training strategies. Their findings indicated a superior performance when training from scratch, suggesting that continual-pretraining with CamemBERT for French biomedical data may not be as effective. However, when applied to PubMedBERT, continual-pretraining yielded results nearly on par with the from-scratch approach.
+
+Finally, \citet{berhe:hal-03911564} introduced AliBERT, which was trained on a French biomedical corpus primarily comprising articles from ScienceDirect and theses collected through Sudoc. The model leverages a new regularized Unigram-based tokenizer and underwent extensive training on 48 GPUs for a total duration of 20 hours. Their pretrained model outperforms notable French non-domain-specific models, such as CamemBERT and FlauBERT, in two biomedical downstream tasks. Unfortunately, the model is not currently available.
+
+
+\section{The biomed-fr Corpus}
+\label{sec:biomed-fr}
+
+We built a French biomedical corpus composed exclusively of public documents to minimize the usage constraints mentioned earlier. The documents come from three different sources (see \Cref{tab:biomed-fr-composition}), the main one being ISTEX. This new corpus, named \textit{biomed-fr}, consists of 413 million words, equivalent to 2.7\,GB of data. \citet{martin-etal-2020-camembert} have shown that with only 4\,GB of data, it is possible to achieve performance almost comparable to the model trained with the 138\,GB OSCAR dataset~\citep{OrtizSuarezSagotRomary2019}. For an adaptation of CamemBERT to the biomedical domain, this amount of data can be considered sufficient.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l S[table-format=3] l}
+\toprule
+\textbf{Source} & {\textbf{Size (M words)}} & \textbf{Content} \\
+\midrule
+ISTEX & 276 & Scientific articles \\
+CLEAR & 73 & Drug leaflets \\
+E3C   & 64 & Clinical cases, leaflets \\
+\midrule
+\textbf{Total} & \textbf{413} & \\
+\bottomrule
+\end{tabular}
+\caption{Composition of the \textit{biomed-fr} corpus (in millions of words).}
+\label{tab:biomed-fr-composition}
+\end{table}
+
+\paragraph{ISTEX.} The ISTEX database contains references to 27 million scientific publications. We extracted 108,183 French documents published in a biology or medical journal since 1990. Articles published before this date often contain numerous typographical errors, as they are often scanned articles that require optical character recognition algorithms, resulting in a certain number of errors. Such errors are found to a lesser extent in articles published after 1990. Some documents, although in French, contain passages in English. Therefore, there is an indeterminate amount of English in this corpus. However, it is unlikely that this will significantly impact pre-training. Typographical errors and the presence of other languages are aspects that can be addressed in future versions of \textit{biomed-fr}.
+
+\paragraph{CLEAR.} The CLEAR corpus~\citep{grabar_clear_2018} consists of encyclopedia articles, drug leaflets, and abstracts of scientific articles. Each document is available in two versions: one in technical language and the other in simplified language. We retrieved all of these documents in both versions. Regarding the drug leaflets, we removed redundant sentences at the beginning and end of each document, such as the website navigation bar from which the documents were extracted or information about the company selling the documents.
+
+\paragraph{E3C.} This corpus~\citep{magnini_e3c_2021} is composed of three layers. The first two layers are annotated or semi-annotated and will be used for evaluation in \Cref{chap:encoders}. The last layer is not annotated, and that is the one we retrieved for \textit{biomed-fr}. It consists of medical specialty admission competitions, drug leaflets, and medical thesis abstracts. There may be duplicates of some leaflets found in the CLEAR corpus.
+
+\paragraph{biomed-fr-small.} By randomly selecting 10\% of content from \textit{biomed-fr}, we created a smaller corpus called \textit{biomed-fr-small}. This subset allows us to study the impact of corpus size on downstream performance. Results of this comparison are presented in \Cref{chap:encoders}.
+
+
+\section{Vocabulary Analysis}
+\label{sec:vocab-analysis}
+
+CamemBERT-bio is a biomedical-adapted model based on CamemBERT. Unlike a new model trained from scratch, it shares the same vocabulary. The vocabulary of CamemBERT was constructed using SentencePiece~\citep{kudo_sentencepiece_2018} on an OSCAR sample. Therefore, it is a general-purpose vocabulary designed for everyday language. We can hypothesize that the tokenization of CamemBERT may result in oversplitting of biomedical technical terms.
+
+To investigate this possibility, we trained a specialized tokenizer on \textit{biomed-fr-small} and calculated the intersection of the two vocabularies.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Term} & \textbf{General} & \textbf{Specialized} \\
+\midrule
+échocardiographie & écho-cardi-ographie & échocardiographi-e \\
+transthoracique   & trans-thorac-ique    & trans-thoracique \\
+glimépiride       & g-lim-épi-ride       & gli-m-épi-ride \\
+cardiopathie      & cardio-pathie        & cardiopathie \\
+diastoliques      & dia-s-tol-iques      & diastolique-s \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of tokenization between a general-purpose tokenizer and a specialized tokenizer for some biomedical technical terms. Hyphens indicate subword boundaries.}
+\label{tab:tokenization}
+\end{table}
+
+We find a 45\% intersection between the two vocabularies (\Cref{tab:tokenization}), which is quite close to the 42\% intersection found by \citet{beltagy_scibert_2019} between the vocabulary of BERT and SciBERT. Therefore, there is a significant difference in the most frequent terms.
+
+The relatively modest performance gain of PubMedBERT compared to BioBERT and the similar performance of DrBERT compared to CamemBERT-bio despite their specialized vocabulary, together with the over-segmentation of technical terms and the low intersection rate, demonstrate the value of investigating vocabulary adaptation. However, taking into account the comparable performance levels and the significant difference in computational cost (see \Cref{chap:encoders}), we advocate for the continual-pretraining method as the preferred adaptation approach.
+
+
+\section{Limitations}
+
+It is important to discuss some limitations of our corpus.
+
+Firstly, \textit{biomed-fr} is limited in its diversity. This is because we chose to only use publicly available materials, which tend to lean towards scientific content. As a result, models trained on this corpus may not fully represent performances on real private clinical data. The gap between scientific and clinical text is a recurring challenge that we address in \Cref{chap:content-types}.
+
+Furthermore, we did not explore any potential biases in our data and some parts of the dataset would benefit from further cleaning. These aspects could impact the outputs of models trained on this corpus and should be investigated.
+
+Third, all documents from the selected sources were included indiscriminately, without assessing whether individual passages were genuinely useful for pretraining. Whether such filtering would improve downstream performance is an open question that we explore in \Cref{chap:quality,chap:content-types}.
+
+
+\section*{Conclusion}
+
+More than half of the most frequent biomedical subwords are absent from CamemBERT's general vocabulary. A mismatch this large raises a natural question: should we abandon the general tokenizer entirely and train a new model from scratch? The answer, perhaps surprisingly, is no, as we show in \Cref{chap:encoders}.
+
+\vspace{2em}
+
+Before we get there, however, a more immediate question deserves attention. We included all 413 million words of \textit{biomed-fr} without filtering. Not all of this text is equally useful. In the next chapter, we investigate whether selecting data by quality can improve upon including everything indiscriminately.

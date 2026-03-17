@@ -153,11 +153,6 @@ Acknowledgements
 Table of Contents
 
 Introduction (Chapter)
-  - Broad context (clinical NLP, privacy constraints)
-  - Problem statement
-  - Motivations / research questions
-  - Contributions (bulleted list, one per chapter)
-  - Thesis outline (one paragraph per part)
 
 Part I: Related Works
   Chapter: Language Modeling
@@ -165,19 +160,31 @@ Part I: Related Works
   Chapter: Clinical Information Extraction
 
 Part II: Building a Biomedical Corpus
-  Chapter 1: CamemBERT-bio (corpus + continual pretraining)
-  Chapter 2: GAPeron (quality filtering)
-  Chapter 3: Biomed-Enriched (content type detection)
+  Ch 1: Collecting Biomedical Text          — CamemBERT-bio corpus    (1st author)
+  Ch 2: Filtering by Quality Signals        — GAPeron / BiaHS         (3rd author)
+  Ch 3: Detecting Content Types             — Biomed-Enriched         (1st author)
 
-Part III: Pretraining & Adaptation
-  Chapter 4: ModernCamemBERT-bio (modern architectures)
-  Chapter 5: OntoBook (knowledge-enriched pretraining)
-  Chapter 6: MCB-bio-gliner (zero-shot clinical IE)
+Part III: Pretraining Language Models
+  Ch 4: Encoder Models for French Biomedicine — CamemBERT-bio pretraining (1st author)
+  Ch 5: When Decoder Continue-Pretraining Stops Working — discussion chapter
+  Ch 6: Beyond Masked Language Modeling       — ModernCamemBERT-bio    (1st author)
+
+Part IV: Adapting to Clinical Tasks
+  Ch 7: Limits of Direct Fine-Tuning         — discussion chapter
+  Ch 8: Architectures for Low-Resource Extraction — frenchmed-gliner   (1st author)
+  Ch 9: Synthetic Data for Task Adaptation    — OntoBook               (1st author)
 
 Conclusion & Perspectives
 Appendices
 Bibliography
 ```
+
+**Chapter types:**
+- **Article chapters** (1st author): based directly on a published paper. Preserve the paper's original text. Add only thesis framing (hook, transitions, cross-references to other chapters).
+- **Article chapters** (not 1st author): open with "This chapter is based on [citation]. Our personal contribution includes..." and focus on your contribution.
+- **Discussion chapters** (Ch 5, 7): no underlying paper. These set up the problem that the following chapter(s) solve. More freedom in writing style.
+
+**Splitting a paper across chapters:** CamemBERT-bio is split into Ch 1 (corpus) and Ch 4 (pretraining + evaluation). Each chapter is self-contained but cross-references the other with `\Cref{}`.
 
 ### 2.2 Introduction Structure
 
@@ -212,11 +219,26 @@ Each research chapter follows the paper structure, wrapped in thesis framing:
 % Transition paragraph to next chapter (2-3 sentences)
 ```
 
-**Chapter introduction**: Not a copy of the paper intro. Reframe the work within the thesis narrative. Reference what was established in previous chapters. State what gap this chapter addresses.
+**Preserving original text:** For chapters based on published papers, keep the paper's original sentences as much as possible. Only apply writing guide rules where strictly necessary: transitions, thesis framing, cross-references, or cases where the text genuinely violates a rule. Do not rewrite functional prose.
 
-**Chapter conclusion**: Summarize findings (3-4 sentences), state limitations (1-2 sentences), then transition to the next chapter's topic.
+**Chapter introduction**: Not a copy of the paper intro. Restructure to avoid repeating what the thesis introduction already covers. The chapter intro should:
+- Start with a **short hook** (2-3 sentences max): a concrete observation or paradox that frames the chapter's problem. Not a broad context paragraph.
+- Flow naturally from the hook into the specific gap this chapter addresses.
+- **Never repeat the hook's content** in a later paragraph. If the hook establishes a constraint (e.g., data confidentiality), don't re-state it in a dedicated paragraph.
+- Watch pronoun clarity after hooks: avoid "These documents..." when the previous sentence ended with a different referent.
 
-**Transition paragraph** (after `\vspace{2em}`): Bridge to the next chapter. Pattern: "In this chapter, we showed X. However, Y remains open. In the next chapter, we address this by Z."
+**Chapter conclusion**: Do NOT start with "We have introduced X" or "In this chapter, we presented Y". The reader just read the chapter, they know what was introduced. Instead, conclude on what was *learned*, what *question remains open*, or set up a *cliffhanger* for a later chapter. If a finding raises a natural question answered in a future chapter, pose it here and point to where the answer comes. Then transition to the immediate next chapter.
+
+**Cliffhanger pattern** (when the next chapter in narrative order is not the one answering the open question):
+```latex
+\section*{Conclusion}
+[Open question / cliffhanger pointing to a later chapter via \Cref{}]
+
+\vspace{2em}
+[Transition to the immediate next chapter]
+```
+
+**Transition paragraph** (after `\vspace{2em}`): Bridge to the next chapter. Pattern: "In this chapter, we showed X. However, Y remains open. In the next chapter, we explore [topic] to address [gap]."
 
 ### 2.4 Related Works Chapters
 
@@ -291,19 +313,18 @@ Template:
 ```latex
 \section*{Conclusion}
 
-% 1. Summary (3-4 sentences)
-In this chapter, we introduced [X]. We showed that [key finding 1]
-and [key finding 2]. Our model achieves [metric] on [benchmark].
-
-% 2. Limitations (1-2 sentences)
-However, [limitation]. This suggests that [implication].
+% 1. Key takeaway or open question (NOT "we introduced X")
+% State what was learned, or pose a cliffhanger answered later.
+[Key finding or surprising open question → \Cref{later chapter}]
 
 \vspace{2em}
 
-% 3. Transition (2-3 sentences)
-While [what this chapter achieved], [what remains open].
-In the next chapter, we explore [topic] to address [gap].
+% 2. Transition to the immediate next chapter (2-3 sentences)
+Before we get there, [more immediate question].
+In the next chapter, we [topic of next chapter].
 ```
+
+**Avoid:** "We have introduced...", "In this chapter, we presented...", "We showed that..." — these are paper-style summaries. In a thesis, the reader just finished the chapter. Conclude on insight, not inventory.
 
 ### 3.6 Thesis Introduction
 
@@ -371,11 +392,15 @@ Orchestration files (`analysis_lm.tex`, `extensions_lm.tex`) include chapters wi
 
 3. **No redundancy between research chapter intros and RW chapters.** If the RW already covers the background, the research chapter intro should reference it, not repeat it.
 
-4. **Always report numbers with context.** "+2.54 F1 on average across 5 benchmarks" not just "+2.54 F1".
+4. **No redundancy within a chapter.** If a hook or intro paragraph establishes a point, don't re-state it in a later paragraph. If two tables show overlapping information, merge or deduplicate.
 
-5. **English body, French abstract/résumé only.** Follow Sorbonne convention.
+5. **Always report numbers with context.** "+2.54 F1 on average across 5 benchmarks" not just "+2.54 F1".
 
-6. **Never use "novel" or "state-of-the-art" as adjectives without evidence.** Say "new" instead of "novel". Say "achieves the best results on X" instead of "state-of-the-art".
+6. **English body, French abstract/résumé only.** Follow Sorbonne convention.
+
+7. **Never use "novel" or "state-of-the-art" as adjectives without evidence.** Say "new" instead of "novel". Say "achieves the best results on X" instead of "state-of-the-art".
+
+8. **Preserve original paper text in article chapters.** Do not rewrite sentences from the published paper. Add thesis framing (hooks, transitions, `\Cref{}` cross-references) but leave the core prose intact.
 
 ### Soft rules (follow unless there's a good reason not to)
 
@@ -386,3 +411,51 @@ Orchestration files (`analysis_lm.tex`, `extensions_lm.tex`) include chapters wi
 11. Prefer active voice ("We trained the model") over passive ("The model was trained").
 12. When citing a number of works in sequence, order chronologically.
 13. Don't start consecutive paragraphs with the same word.
+
+---
+
+## 6. Lessons Learned (accumulated during writing)
+
+### Hooks
+
+- **A hook is not an abstract.** Don't summarize the chapter's results in the hook. Build tension, pose a question, or present a paradox. The results come later.
+- **A hook is not meta-commentary.** Never start with "The previous part of this thesis was concerned with..." or "In this chapter, we present...". Start with a concrete observation about the world.
+- **Follow the narrative thread.** If a previous chapter left a cliffhanger, the hook should pick it up. Don't re-introduce context the reader already has.
+- **Hook and figure should complement, not repeat.** If a TikZ figure shows the contrast visually, the text should explain *why* it matters, not describe what the figure already shows.
+- **Specificity builds tension.** "DrBERT reported losses of up to 20 F₁ points" is more compelling than "previous work reported that continual pretraining was ineffective." Use names, numbers, and stakes.
+
+### Introductions
+
+- **Don't spoil results in the intro.** The intro states what the chapter does and why, not the punchline. "We show that..." is OK. "We achieve 73.94 F₁ which is..." is too much.
+- **Don't repeat the thesis introduction.** If the thesis intro already explains CDWs and privacy constraints, the chapter intro should not re-explain them. Reference with `\Cref{}` or just skip.
+- **Bullet-point contributions belong in the thesis intro, not chapter intros.** In a chapter, weave the contributions into a flowing paragraph.
+
+### Tables
+
+- **No redundant columns.** If colored row headers (`\rowcolor{ThesisTableSep}`) already indicate the group (Clinical, Leaflets, Scientific), don't also have a "Style" column repeating the same info. Choose one.
+- **No redundant tables.** If two tables show overlapping data (e.g., corpus overview + corpus breakdown), deduplicate.
+- **Split wide tables.** A 12+ column table will overflow or be unreadable when scaled. Split into 2-4 narrower tables with sub-averages.
+- **Side-by-side for small tables.** Two hyperparameter tables → use `minipage` + `\subcaption`.
+- **Use `threeparttable` for footnotes.** Don't use inline `$^\dagger$`; use `\tnote{}` with `\begin{tablenotes}`.
+- **`\rowcolor` needs `\PassOptionsToPackage{table}{xcolor}` before `\documentclass`.** Without this, colors silently don't render.
+
+### Figures
+
+- **Don't use TikZ for heatmaps.** Manual coordinate positioning doesn't scale. Use Python/matplotlib for data-driven figures, TikZ for diagrams (pipelines, architecture).
+- **Python plots: set `figsize` to match thesis width.** A 15-inch figure scaled to 6-inch column = tiny fonts. Either reduce the source width or increase font sizes proportionally.
+- **For multi-panel plots:** only show xlabel on the middle/bottom panel, ylabel on the leftmost. Don't repeat axis labels on every panel.
+- **`\includegraphics[width=0.55\columnwidth]` for single-panel plots.** `\columnwidth` is too wide for a single small plot; it becomes half a page.
+- **Centralize plot style.** All Python scripts import from `plots/thesis_style.py`. Never hardcode colors.
+- **Copy figures into the codebase.** Don't reference `publications/` paths in chapter .tex files. Copy to `sources/part_X/chapterY/imgs/` or generate into `plots/chapterY/`.
+
+### Conclusions
+
+- **Never start with "We have introduced X."** The reader just read the chapter. Conclude on what was *learned* or what *question remains open*.
+- **Use cliffhangers.** If a finding raises a question answered in a later chapter, pose it explicitly. "The answer, perhaps surprisingly, is no, as we show in \Cref{chap:X}."
+- **Separate cliffhanger from transition.** The cliffhanger points to a future chapter; the transition (after `\vspace{2em}`) introduces the *next* chapter, which may be different.
+
+### Word choice
+
+- **Avoid "wholesale".** Use "indiscriminately" or "without filtering."
+- **Avoid "novel".** Use "new."
+- **No mid-sentence em dashes.** Use commas, colons, periods, or parentheses.

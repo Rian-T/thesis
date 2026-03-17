@@ -1,1 +1,202 @@
-% TODO: Write chapter content
+% This chapter is based on the pretraining contribution of:
+%   Rian Touchent, Laurent Romary, Éric de la Clergerie.
+%   CamemBERT-bio: Leveraging Continual Pre-training for
+%   Cost-Effective Models on French Biomedical Data.
+%   LREC-COLING, 2024.
+%
+% The corpus construction is presented in \Cref{chap:collecting}.
+
+\section{Introduction}
+
+In \Cref{chap:collecting}, we found that 55\% of biomedical subwords are absent from CamemBERT's vocabulary. PubMedBERT~\citep{gu_domain-specific_2022} turned this kind of observation into a principle: for domains with enough unlabeled text, training a language model from scratch with a specialized vocabulary outperforms continual pretraining. The gain over BioBERT~\citep{lee_biobert_2019} was modest, but the conclusion was adopted widely.
+
+For French, \citet{labrak2023drbert} went further. They reported that continual pretraining from CamemBERT led to $F_1$ losses of up to 20 points, and released DrBERT, trained from scratch on 128 V100 GPUs for 20 hours. The claim was strong, the compute was expensive, and the implication was clear: continual pretraining does not work for French biomedical models. Yet the size of the reported loss is difficult to reconcile with what we know about continual pretraining. A model that has already seen 138\,GB of French text should not lose 20 points from seeing additional biomedical text. Something in the evaluation deserves closer examination.
+
+In this chapter, we show that continual pretraining on \textit{biomed-fr} (\Cref{chap:collecting}) yields an average improvement of +2.54 $F_1$ across five biomedical NER benchmarks, using 2 V100 GPUs for 39 hours. We also identify the methodological differences that led to the contradictory conclusion.
+
+
+\section{Pre-training}
+
+For the adaptation of CamemBERT to the biomedical domain, we conducted a second phase of pre-training on both versions of the \textit{biomed-fr} corpus, starting from the weights and configuration of the camembert-base model. We applied the Masked Language Modeling (MLM) task with whole-word masking, following the method of \citet{martin-etal-2020-camembert}. We used the Adam optimizer~\citep{kingma_adam_2017} with $\beta_1 = 0.9$ and $\beta_2 = 0.98$, and a learning rate of $5 \times 10^{-5}$. We performed 50,000 steps over 39 hours using two Tesla V100 GPUs. A batch size of 8 per GPU and gradient accumulation over 16 steps were used to achieve an effective batch size of 256.
+
+
+\section{Fine-tuning and Evaluation}
+
+Regarding model evaluation, we collected three named entity recognition evaluation datasets. These datasets cover various styles, allowing us to assess the model's versatility across different subdomains of biomedicine.
+
+\paragraph{QUAERO.} The QUAERO corpus~\citep{neveol14quaero} consists of two evaluation sets: EMEA, containing drug leaflets, and MEDLINE, containing scientific article titles. The entities are manually annotated following 10 semantic groups from the UMLS~\citep{lindberg_unified_1993}. As some of these entities are nested, we kept only the entities with the coarsest granularity.
+
+\paragraph{E3C.} For evaluation, unlike the \textit{biomed-fr} corpus, we use layers 1 and 2. These layers contain documents of different types, including clinical cases extracted from scientific articles. Layer 2 is semi-annotated, and it is used as the training set for fine-tuning, with 10\% dedicated to the validation set. We evaluate on layer 1, which is fully manually annotated. There is only one class, and the objective is to find clinical entities in the text, regardless of their type.
+
+\paragraph{CAS.} The CAS corpus~\citep{grouin_clinical_2019} also consists of clinical cases from scientific articles. We focus on task 3 of DEFT 2020~\citep{cardon_presentation_2020}, which is an information extraction task based on CAS. It includes two subtasks, and thus two sets of annotations. In the first subtask, two classes need to be identified: \textit{pathology} and \textit{signs or symptoms}. The second subtask concerns associated information, including \textit{anatomy}, \textit{dose}, \textit{examination}, \textit{mode}, \textit{timing}, \textit{substance}, \textit{treatment}, and \textit{value}. These two tasks will be referred to as CAS1 and CAS2, respectively.
+
+\paragraph{Fine-tuning.} For fine-tuning, we used Optuna~\citep{akiba_optuna_2019} for hyperparameter selection. We set the learning rate to $5 \times 10^{-5}$, the warmup ratio to 0.224, and the batch size to 16. We performed 2000 steps. Predictions were made using a simple linear layer on top of the model. None of the CamemBERT layers were frozen.
+
+\paragraph{Evaluation.} Scores are measured using the seqeval tool~\citep{seqeval} in strict mode with micro-average and the IOB2 scheme. For each evaluation, the best fine-tuned model on the validation set is selected to measure the final score on the test set. We average the results over 10 evaluations with different seeds.
+
+
+\section{Results and Discussion}
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\sisetup{detect-weight=true}
+\begin{threeparttable}[b]
+\begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
+\toprule
+& & \multicolumn{2}{c}{\textbf{CamemBERT-bio}} \\
+\cmidrule(lr){3-4}
+\textbf{Dataset} & {\textbf{CamemBERT}} & {\textbf{biomed-fr-small}} & {\textbf{biomed-fr}} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Clinical}} \\[1pt]
+CAS1 & 70.50 & \underline{72.94} & \bfseries 73.03 \\
+CAS2 & 79.02 & \underline{80.00} & \bfseries 81.66 \\
+E3C  & 67.63 & \underline{67.96} & \bfseries 69.85 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Leaflets}} \\[1pt]
+EMEA & 74.14 & \underline{75.93} & \bfseries 76.71 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Scientific}} \\[1pt]
+MEDLINE & \underline{65.73} & 65.48 & \bfseries 68.47 \\
+\midrule
+\textbf{Average} & 71.40 & \underline{72.46} & \bfseries 73.94 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+  \item $F_1$ scores (micro-average, seqeval strict, IOB2). Mean over 10 seeds. biomed-fr-s = biomed-fr-small (10\% subset).
+\end{tablenotes}
+\end{threeparttable}
+\caption{\textbf{CamemBERT vs CamemBERT-bio} on five biomedical NER benchmarks. Continual pretraining on \textit{biomed-fr} yields +2.54 $F_1$ on average.}
+\label{tab:bioVSbase}
+\end{table}
+
+\paragraph{CamemBERT vs CamemBERT-bio.} We observe a significant performance gain on all evaluation datasets with our new model (\Cref{tab:bioVSbase}). On average, we achieve a 2.54-point improvement in F-score. This gain is observed across all styles, demonstrating the model's versatility for both clinical and scientific domains.
+
+\paragraph{biomed-fr-small vs biomed-fr.} We observe a decrease in performance with the biomed-fr-small dataset, but there is still a significant gain on certain datasets compared to CamemBERT. This confirms that the size of the corpus positively influences the performance, even in a specialized domain like biomedicine.
+
+\paragraph{Comparison with the state of the art.} We compared the performance of CamemBERT-bio with various previously mentioned approaches (\Cref{tab:compare}). CamemBERT-bio achieves the best results for almost all evaluation datasets. \citet{dura_learning_2022} did not observe improvement on EMEA and MEDLINE compared to CamemBERT because their pre-training corpus consists of documents from APHP, making it a less diverse corpus. However, they gain several points on their evaluation dataset, which is also based on APHP documents. \citet{mulligen_erasmus_2016} presents the highest score on MEDLINE and the best recall on EMEA. Their approach is based on a knowledge-based model, allowing them to achieve the best recall on both QUAERO evaluation datasets. Furthermore, their approach is the only one in this table capable of handling nested entities, giving them an advantage.
+
+It is important to note that these different CamemBERT-based approaches have various experimental setups. The presence of CRF layers instead of a simple linear layer after CamemBERT, freezing CamemBERT layers, and variations in hyperparameters are examples of differences observed in addition to the pre-training corpus, which makes the comparison more challenging.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\sisetup{detect-weight=true}
+\begin{threeparttable}[b]
+\begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
+\toprule
+\textbf{Authors} & {\textbf{CAS1}} & {\textbf{CAS2}} & {\textbf{EMEA}} & {\textbf{MEDLINE}} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{seqeval}} \\[1pt]
+\citet{dura_learning_2022} & {--} & {--} & \underline{72.90} & 59.70 \\
+Ours & \bfseries 73.03 & \bfseries 81.66 & \bfseries 76.71 & \bfseries 68.47 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{BRATeval}} \\[1pt]
+\citet{le_clercq_de_lannoy_strategies_2022} & {--} & {--} & 67.40 & 55.30 \\
+\citet{mulligen_erasmus_2016} & {--} & {--} & \underline{74.90} & \bfseries 69.80 \\
+\citet{copara_contextualized_2020} & \underline{61.53} & \underline{73.70} & {--} & {--} \\
+Ours & \bfseries 84.97 & \bfseries 83.25 & \bfseries 77.80 & \underline{56.16} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+  \item $F_1$ scores. BRATeval is the evaluation tool from the CLEF eHealth 2016 campaign~\citep{neveol_clinical_2016}.
+\end{tablenotes}
+\end{threeparttable}
+\caption{\textbf{Comparison with existing approaches} on four NER tasks, using two evaluation tools.}
+\label{tab:compare}
+\end{table}
+
+
+\section{Evaluating Models: Methodology Matters}
+
+In a recent work, \citet{labrak2023drbert} introduced a new French biomedical language model named DrBERT. The authors contend that performing continual-pretraining on biomedical data from CamemBERT leads to reduced performance. They used a different methodology for the evaluation of named entity recognition, prompting us to examine the implications of each approach on the interpretation of the results.
+
+Our evaluation approach is centered around micro $F_1$, which is measured using seqeval in strict mode with the IOB2 scheme. Their approach is based on weighted $F_1$ with independent token classification. Every token has a label and the model is evaluated for each of them, whereas with seqeval, the model is evaluated for each entity. Notably, the ``O'' token, representing non-entity, is the most frequent token and thus holds significant weight in the evaluation process. As all tokens are labeled, the number of predictions depends on the tokenizer, thereby influencing the final score.
+
+In order to explore the impact of token labeling variations on the evaluation, we conducted an additional experiment on EMEA and MEDLINE where we reproduced the DrBERT methodology that we named \textit{token-with-O}, and another one where we excluded the ``O'' token and only labeled the first token of each entity, referred to as \textit{entity-without-O}.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\sisetup{detect-weight=true}
+\begin{threeparttable}[b]
+\begin{tabular}{ll S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
+\toprule
+& & \multicolumn{2}{c}{\textbf{EMEA}} & \multicolumn{2}{c}{\textbf{MEDLINE}} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6}
+\textbf{Method} & \textbf{Model} & {\textbf{w-$F_1$}} & {\textbf{m-$F_1$}} & {\textbf{w-$F_1$}} & {\textbf{m-$F_1$}} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{token-with-O}} \\[1pt]
+& DrBERT-7GB & 87.45 & 34.95 & 75.52 & \bfseries 15.07 \\
+& CamemBERT-bio & \bfseries 90.37 & \underline{36.27} & \bfseries 77.89 & \underline{14.82} \\
+& CamemBERT & \underline{88.33} & \bfseries 47.45 & \underline{76.20} & 11.92 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{entity-without-O}} \\[1pt]
+& DrBERT-7GB & 66.72 & \bfseries 24.72 & 60.70 & \bfseries 10.80 \\
+& CamemBERT-bio & \bfseries 73.53 & \underline{24.15} & \bfseries 62.04 & 8.70 \\
+& CamemBERT & \underline{71.85} & 22.71 & \underline{60.95} & \underline{9.41} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+  \item w-$F_1$ = weighted $F_1$, m-$F_1$ = macro $F_1$. Averaged over 10 runs.
+\end{tablenotes}
+\end{threeparttable}
+\caption{\textbf{Impact of evaluation methodology.} The best model varies depending on the metric and the treatment of the ``O'' token.}
+\label{tab:compare-meth}
+\end{table}
+
+We observe significant differences in scores between the two methodologies (\Cref{tab:compare-meth}). The methodology \textit{token-with-O} consistently reports higher scores across all tasks compared to the alternative method, \textit{entity-without-O}. Notably, the best-performing model varies depending on the chosen methodology for one metric. CamemBERT achieves the highest macro $F_1$ score on the EMEA dataset, whereas with \textit{entity-without-O}, DrBERT-7GB emerges as the top model. This observation underscores the influential role of the ``O'' class in determining the best-performing model.
+
+In terms of macro $F_1$, DrBERT consistently outperforms CamemBERT-bio when evaluated using the \textit{entity-without-O} methodology. On the other hand, CamemBERT-bio exhibits better performance across all other metrics. This indicates that DrBERT demonstrates a more balanced performance across different classes.
+
+Furthermore, \citet{labrak2023drbert} suggested that continual-pretraining from a French model on French biomedical data is not effective, as it results in an $F_1$-score loss of up to 20 points. However, considering our success with continual-pretraining and the points we raised about the methodology, we suggest a reassessment of these findings.
+
+
+\section{Environmental Impact}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r l r r}
+\toprule
+\textbf{Model} & \textbf{Time} & \textbf{Hardware} & \textbf{GPU-h} & \textbf{kg CO$_2$} \\
+\midrule
+DrBERT & 20h & 128$\times$ V100 & 2,560 & 26.11 \\
+AliBERT & 20h & 48$\times$ A100 & 960 & 8.16 \\
+CamemBERT-bio & 39h & 2$\times$ V100 & 78 & \bfseries 0.80 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Carbon emissions during training.} CamemBERT-bio emits 32$\times$ less CO$_2$ than DrBERT. Estimation based on 34g CO$_2$eq.\ per kWh (France, 2022--2023).}
+\label{tab:carbon}
+\end{table}
+
+Considering estimated carbon emissions during training, AliBERT emits 10 times the amount of CamemBERT-bio, while DrBERT releases 32 times more (\Cref{tab:carbon}). While a direct comparison with AliBERT was not possible, the minor performance variance with DrBERT, set against the pronounced disparities in computational and environmental costs, leads us to advocate for continual-pretraining as the preferred adaptation method for biomedical language models.
+
+
+\section{Limitations}
+
+Our evaluation focused on one task, named entity recognition. This might mean our understanding of how well our model performs is restricted. Future studies should aim to assess our model across a wider range of tasks and datasets to get a clearer picture of its strengths and weaknesses.
+
+Additionally, the corpus limitations discussed in \Cref{chap:collecting} apply here as well: \textit{biomed-fr} is dominated by scientific literature and does not contain genuine clinical notes. Models pretrained on this corpus may still underperform on real hospital data compared to models trained on private clinical corpora~\citep{dura_learning_2022}.
+
+
+\section*{Conclusion}
+
+The vocabulary mismatch identified in \Cref{chap:collecting} is real, but it does not prevent effective adaptation: +2.54 $F_1$ at 32$\times$ less CO$_2$ than the from-scratch alternative. The 20-point loss reported by \citet{labrak2023drbert} turns out to be an artifact of the evaluation protocol, not a property of continual pretraining itself.
+
+\vspace{2em}
+
+Continual pretraining works for encoders. The bidirectional nature of MLM may make these models particularly robust to domain shifts. But the field has moved toward autoregressive decoders, where the dynamics of continual pretraining are different, and the results, as the next chapter discusses, are less encouraging.

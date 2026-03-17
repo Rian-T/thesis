@@ -289,7 +289,6 @@ TSWLatexianTemp*
 .DS_Store
 
 # Claude Code
-CLAUDE.md
 thesis.pdf
 
 # Publications (separate repos)
