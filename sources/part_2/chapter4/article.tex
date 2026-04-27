@@ -197,6 +197,11 @@ Additionally, the corpus limitations discussed in \Cref{chap:collecting} apply h
 
 The vocabulary mismatch identified in \Cref{chap:collecting} is real, but it does not prevent effective adaptation: +2.54 $F_1$ at 32$\times$ less CO$_2$ than the from-scratch alternative. The 20-point loss reported by \citet{labrak2023drbert} turns out to be an artifact of the evaluation protocol, not a property of continual pretraining itself.
 
+% TODO verify exact figures and target benchmarks before final submission:
+%   - BioMistral: approximately -0.9 pts vs base \citep{labrak-etal-2024-biomistral}
+%   - Meditron: 332 GPU-h for +1.8 pts on MedQA \citep{chen2023meditron}
+The picture is less favorable for autoregressive decoders. \citet{labrak-etal-2024-biomistral} find that BioMistral underperforms its general-purpose base by 0.9 points on average across biomedical evaluations, and \citet{chen2023meditron} report a 1.8-point gain on MedQA at the cost of 332 GPU-hours of continued pretraining. Two factors plausibly explain the contrast with encoders. First, modern decoders are pretrained on web-scale corpora that already include large amounts of biomedical text, leaving less room for additional adaptation. Second, continued pretraining tends to erase the instruction-following capabilities acquired during alignment, which themselves drive a substantial share of downstream performance. The bidirectional pretraining of encoders, by contrast, leaves no such alignment to lose, and the smaller pretraining corpora of French general-purpose encoders leave a wider domain gap for biomedical text to fill.
+
 \vspace{2em}
 
-Continual pretraining works for encoders. The bidirectional nature of MLM may make these models particularly robust to domain shifts. But the field has moved toward autoregressive decoders, where the dynamics of continual pretraining are different, and the results, as the next chapter discusses, are less encouraging.
+The case for encoder continual pretraining holds, but CamemBERT-bio inherits the architectural choices of its 2019 backbone: a 512-token context, absolute position embeddings, no Flash Attention. Clinical documents are routinely longer than that, and more efficient encoder architectures have appeared since. In the next chapter, we revisit continual pretraining on a modern encoder backbone and ask whether the training objective itself can be improved.

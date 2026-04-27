@@ -27,17 +27,20 @@ The build uses **LuaLaTeX** with `--shell-escape`. On locale issues, prefix with
 ### Chapters Done (draft)
 - **Ch 1: Collecting Biomedical Text** — CamemBERT-bio corpus (biomed-fr). Hook, tables, vocab analysis, conclusion with cliffhanger to Ch 4.
 - **Ch 2: Detecting Content Types** — Biomed-Enriched + BiaHS. Hook with TikZ figure, full method/results/discussion, 4 results tables, 5 figures, BiaHS as footnoted section.
+- **Ch 4: Encoder Models for French Biomedicine** — CamemBERT-bio pretraining/evaluation. Conclusion absorbs the decoder-CPT discussion (BioMistral, Meditron) that justifies staying on encoders, then transitions to Ch 5.
+- **Ch 5: Beyond Masked Language Modeling** — ModernCamemBERT-bio / CLM Detour. Full method, results, analysis (CKA, freeze, transplant). Ends with transition to OntoBook.
 
 ### Next Steps
 - **Ch 3: MC-Bio Corpus** — quality signals at scale for ModernCamemBERT-bio (from plan.tex slides Ch.3)
-- **Ch 4: Encoder Models for French Biomedicine** — CamemBERT-bio pretraining/evaluation (the other half of the paper, split from Ch 1)
-- **Ch 5-9** — placeholders
+- **Ch 6: Knowledge-Enriched Pretraining** — OntoBook (skeleton with paper header + key bullets, prose TODO)
+- **Ch 7-9** — placeholders (Ch 9 topic to be defined later, no longer OntoBook)
 - **Remaining TODOs in Ch 1-2:** real PMC paragraph examples, annotation prompt in appendix, pipeline.pdf and curve_triple.pdf not yet restyled, BiaHS figure is PNG not PDF
 
 ### Key Decisions Made
 - CamemBERT-bio paper split: corpus → Ch 1, pretraining/eval → Ch 4
 - BiaHS is a section within Ch 2 (not its own chapter), footnoted as contribution to GAPeron
-- Discussion chapters (Ch 5, Ch 7) have no underlying paper — they set up problems
+- Part 2 holds three article chapters (Ch 4-6, no discussion chapter); the decoder-CPT discussion is folded into Ch 4's conclusion. Ch 7 remains the only discussion chapter.
+- OntoBook moved from Part 4 to Part 2 (Ch 6) because it is a pretraining-side contribution; Ch 9 is now a placeholder for a different first-author work.
 - Preserve original paper text in article chapters; only add thesis framing
 - No "We have introduced X" in conclusions — conclude on insight, use cliffhangers
 - Bibliography is active (`\bibliography{thesis}` uncommented)
@@ -66,14 +69,14 @@ sources/
 │   └── chapter3/article.tex     # TODO — MC-Bio corpus
 ├── part_2/                      # Pretraining Language Models
 │   ├── extensions_lm.tex        # Orchestration file
-│   ├── chapter4/article.tex     # NEXT — CamemBERT-bio pretraining
-│   ├── chapter5/article.tex     # TODO — decoder PT discussion
-│   └── chapter6/article.tex     # TODO — ModernCamemBERT-bio
+│   ├── chapter4/article.tex     # DRAFT — CamemBERT-bio pretraining (decoder-CPT discussion folded into conclusion)
+│   ├── chapter5/article.tex     # DRAFT — ModernCamemBERT-bio (CLM Detour)
+│   └── chapter6/article.tex     # TODO — OntoBook (skeleton only)
 ├── part_3/                      # Adapting to Clinical Tasks
 │   ├── clinical_tasks.tex       # Orchestration file
 │   ├── chapter7/article.tex     # TODO — fine-tuning limits discussion
 │   ├── chapter8/article.tex     # TODO — frenchmed-gliner
-│   └── chapter9/article.tex     # TODO — OntoBook
+│   └── chapter9/article.tex     # TODO — topic TBD
 ├── conclusion.tex
 └── appendix.tex
 ```

@@ -166,13 +166,13 @@ Part II: Building a Biomedical Corpus
 
 Part III: Pretraining Language Models
   Ch 4: Encoder Models for French Biomedicine — CamemBERT-bio pretraining (1st author)
-  Ch 5: When Decoder Continue-Pretraining Stops Working — discussion chapter
-  Ch 6: Beyond Masked Language Modeling       — ModernCamemBERT-bio    (1st author)
+  Ch 5: Beyond Masked Language Modeling       — ModernCamemBERT-bio    (1st author)
+  Ch 6: Knowledge-Enriched Pretraining        — OntoBook               (1st author)
 
 Part IV: Adapting to Clinical Tasks
   Ch 7: Limits of Direct Fine-Tuning         — discussion chapter
   Ch 8: Architectures for Low-Resource Extraction — frenchmed-gliner   (1st author)
-  Ch 9: Synthetic Data for Task Adaptation    — OntoBook               (1st author)
+  Ch 9: Synthetic Data for Task Adaptation    — TBD                    (1st author)
 
 Conclusion & Perspectives
 Appendices
@@ -182,7 +182,7 @@ Bibliography
 **Chapter types:**
 - **Article chapters** (1st author): based directly on a published paper. Preserve the paper's original text. Add only thesis framing (hook, transitions, cross-references to other chapters).
 - **Article chapters** (not 1st author): open with "This chapter is based on [citation]. Our personal contribution includes..." and focus on your contribution.
-- **Discussion chapters** (Ch 5, 7): no underlying paper. These set up the problem that the following chapter(s) solve. More freedom in writing style.
+- **Discussion chapters** (Ch 7): no underlying paper. These set up the problem that the following chapter(s) solve. More freedom in writing style.
 
 **Splitting a paper across chapters:** CamemBERT-bio is split into Ch 1 (corpus) and Ch 4 (pretraining + evaluation). Each chapter is self-contained but cross-references the other with `\Cref{}`.
 
