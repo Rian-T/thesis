@@ -1,1 +1,128 @@
-% TODO: Write chapter content
+% This chapter covers two synthetic-data approaches for clinical task adaptation:
+%
+% (1) OntoBook: synthetic textbooks generated from medical ontologies (LREC 2026).
+%     Method and results are presented in detail in \Cref{chap:ontobook}.
+%     This chapter focuses on the data details (walk types, generation pipeline).
+%
+% (2) Synthetic clinical reports: reformulation of clinical case paragraphs from
+%     Biomed-Enriched (\Cref{chap:quality}) into structured clinical reports.
+%     The project exists but the paper is in progress — this section is a
+%     placeholder TODO.
+
+% Local macro for OntoBook (matches publications/OntoBook/main.tex)
+\providecommand{\method}{OntoBook\xspace}
+
+\section{Introduction}
+
+% TODO: refine hook to tie back to clinical adaptation challenges raised in Ch 7-8.
+
+Clinical text is scarce, but structured medical knowledge is not. France maintains medical ontologies that span tens of thousands of codes (CIM-10 for diagnoses, CCAM for procedures, ATC for medications), and PubMed Central contains millions of clinical case descriptions embedded in scientific articles. Both are publicly available, both are richly structured, and neither can be used directly to train a language model. The question is whether we can convert them into synthetic training data that is closer to what clinical applications actually need.
+
+This chapter presents two instances of this idea. The first, \method, generates synthetic medical textbooks from ontology graphs by reformulating random walks with a large language model. The second, currently in progress, reformulates the clinical case paragraphs extracted in \Cref{chap:quality} into synthetic clinical reports. Both share the same recipe: take a structured source, hand it to an LLM with a tight prompt, and get back fluent medical text that preserves the structure. They differ in input (graph vs.\ paragraph) and target (encoder pretraining vs.\ task adaptation). The full method and downstream results for \method are presented in \Cref{chap:ontobook}; here we focus on the data artifacts themselves.
+
+
+\section{Synthetic Textbooks from Medical Ontologies}
+\label{sec:ontobook-data}
+
+\subsection{Walk Generation}
+
+We generate random walks through ontology graphs to capture relational structure in a sequential format suitable for language model pretraining. We sample walks starting from each code in the ontology. At each step, the next node is selected via weighted sampling where edge type weights depend on the walk type. This biased sampling is necessary because semantic edges are rare (\Cref{tab:ontology_stats} in \Cref{chap:ontobook}), and a uniform walk would rarely traverse them. Each walk records the traversed codes along with their labels and the relation types connecting them. Walk length is sampled uniformly between 8 and 20 steps. We track visited nodes to avoid cycles, with a fallback that allows revisiting nodes when all neighbors have been explored.
+
+For CIM-10, we define five walk types, each emphasizing different aspects of medical knowledge:
+
+\begin{itemize}
+\item \textbf{\'Etiologie} (causal chains): traverses \textsc{causes} and \textsc{caused\_by} edges to follow disease etiology.
+\item \textbf{Diagnostic Diff\'erentiel}: traverses \textsc{exclusion} edges to enumerate codes to distinguish clinically.
+\item \textbf{Codage Double}: follows mandatory code pairs linking etiology to manifestation, encoding the dual-coding rules of CIM-10.
+\item \textbf{Syndrome}: traverses \textsc{manifestation} edges to follow multi-system manifestations of a single underlying condition.
+\item \textbf{Cross-Chapter}: connects different ICD chapters, e.g., a metabolic diagnosis (E11, type~2 diabetes) and its renal complication (N08.3, diabetic glomerulopathy).
+\end{itemize}
+
+We generate 402{,}328 walks for CIM-10 (average 4{,}830 characters), 762{,}958 for CCAM, and 138{,}980 for ATC, totaling 1{,}304{,}266 walks across all three ontologies.
+
+\subsection{Walk-to-Textbook Reformulation}
+
+Raw walks contain structured markers (e.g., \texttt{>> \`A distinguer de:}) that are useful for parsing but not natural for language model pretraining. We use a large language model to reformulate walks into fluent medical prose resembling textbook paragraphs.
+
+We prompt Qwen3-235B-A22B-Instruct~\citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. This ensures the textbook content remains grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4~NVIDIA~H100 GPUs using vLLM~\citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies.
+
+\Cref{chap:ontobook} shows one walk-to-textbook transformation in detail (\Cref{fig:textbook_example}). The same LLM prompt structure is used for CCAM and ATC, with ontology-specific terminology substituted for medical-coding domain terms.
+
+% TODO: add a few more walk-to-textbook examples, one per walk type for CIM-10,
+% and one for CCAM and one for ATC. The Ch 6 example only covers Cross-Chapter
+% on CIM-10 (F02.0 → G31.0 → F02.02).
+
+\subsection{The Role of Alignment}
+
+The key result of \method, presented in \Cref{chap:ontobook}, is that aligned multi-task training (MLM and relation prediction on the same textbook data) produces a $+3.86$ $F_1$ improvement on French medical coding, while misaligned training (different data per task) causes a $-30.50$ point degradation. The synthetic textbooks themselves are necessary but not sufficient: training MLM on raw structured walks (without LLM reformulation) yields nearly the same downstream performance as training on the reformulated textbooks ($+0.59$ $F_1$). The reformulation matters specifically for the relation prediction objective, where structural markers in raw walks would let the classifier exploit formatting shortcuts rather than medical semantics.
+
+
+\section{Synthetic Clinical Reports from Case Paragraphs}
+\label{sec:synthetic-reports}
+
+% TODO: This section is a placeholder. The project exists but the paper is in
+% progress. Outline of what will go here:
+%
+% Motivation: Biomed-Enriched (\Cref{chap:quality}) extracted 2 million clinical
+% case paragraphs from PubMed Central. These are short, scattered across
+% scientific articles, and lack the structure of real hospital reports
+% (admission, history, examination, diagnosis, treatment plan, discharge
+% summary). Real hospital reports are private and cannot be shared. The
+% question is whether we can reformulate the public case paragraphs into
+% structured synthetic reports that approximate the style and structure of
+% real clinical documents.
+%
+% Method (TODO):
+%   - Input: Biomed-Enriched clinical case paragraphs (2M total)
+%   - LLM reformulation prompt that asks for structured report sections
+%     (admission summary, history of present illness, examination, etc.)
+%   - Quality control: schema validation, completeness checks
+%   - Synthetic report dataset for downstream task adaptation
+%
+% Comparison with OntoBook:
+%   - Input: text paragraph (vs.\ ontology graph)
+%   - Target: clinical report style (vs.\ educational textbook style)
+%   - Use case: task adaptation / fine-tuning data (vs.\ encoder pretraining)
+%   - Same paradigm: structured source → LLM reformulation → synthetic training data
+%
+% Evaluation (TODO):
+%   - Downstream tasks where real clinical reports would help: ICD coding on
+%     hospital reports, NER on discharge summaries, etc.
+%   - Compare against direct fine-tuning on Biomed-Enriched cases
+%   - Measure how close the synthetic reports get to closing the gap with
+%     models trained on private hospital data (e.g., BioClinical-ModernBERT)
+
+This section is a placeholder. The project that motivates it exists, but the paper is still in progress.
+
+
+\section{Two Instances, One Pattern}
+\label{sec:synthetic-pattern}
+
+% TODO: Discussion section comparing the two approaches once the synthetic
+% clinical reports section is filled in.
+%
+% Common pattern:
+%   1. Identify a structured public source (ontology / clinical case paragraph)
+%   2. Define a target text format (educational textbook / clinical report)
+%   3. Use an LLM with a strict prompt to map source → target
+%   4. Apply quality filters (length, structural completeness, code preservation)
+%   5. Train downstream models on the resulting synthetic corpus
+%
+% Differences:
+%   - Input modality: graph vs.\ free text
+%   - Output style: educational vs.\ clinical
+%   - Training role: pretraining objective vs.\ adaptation data
+%
+% Key lesson from OntoBook (alignment) likely applies to clinical reports too:
+% if the synthetic reports are used jointly with another objective (e.g.,
+% structured prediction of report fields), the two objectives should share
+% the same data.
+
+
+\section*{Conclusion}
+
+% TODO: write conclusion once §Synthetic Clinical Reports section is filled in.
+% Should pose: when is synthetic data useful? what does it not solve?
+% Transition to thesis conclusion (this is the last research chapter).
+
+This is the last chapter of Part~3. The thesis conclusion revisits the research questions raised in the introduction and discusses what remains open.
