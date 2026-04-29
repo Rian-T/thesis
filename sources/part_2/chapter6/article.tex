@@ -1,390 +1,470 @@
 % This chapter is based on:
-%   Rian Touchent et al.
-%   The CLM Detour: Computational Hysteresis Improves
-%   Encoder Continued Pretraining.
-%   COLM, 2026.
+%   Rian Touchent, Éric de La Clergerie.
+%   OntoBook: Ontology-Grounded Synthetic Textbooks for Medical Encoder Pretraining.
+%   LREC 2026.
+%
+% Source: publications/OntoBook/
+% Sections concatenated verbatim from the paper:
+%   introduction.tex, related.tex, method.tex, experiments.tex, discussion.tex
+% TODO: adapt tables and figures to thesis-style.sty (visual-style.md)
+% TODO: rewrite intro as a thesis-contextualized hook (not the paper's intro)
+% TODO: integrate \Cref{} cross-references to other chapters
 
-\section{Introduction}
-
-Masked language modeling sees only 15\% of its input. At every training step, 85\% of the tokens receive no gradient signal. Causal language modeling, by contrast, predicts every token from its predecessors: every position contributes, every position learns. The price is that it can only look backward. The question is whether an encoder can benefit from this dense training signal without permanently losing its ability to look in both directions.
-
-In this chapter, we show that it can. We introduce a two-phase pretraining strategy for ModernCamemBERT-bio: first, continual pretraining with a causal language modeling objective, then a short ``decay'' phase that converts the model back to masked language modeling. The resulting encoder outperforms the standard MLM-only approach by +2.9 $F_1$ on average across 8 French biomedical tasks (Base) and +1.5 $F_1$ (Large), winning on all 8. The effect transfers to English at three scales, with gains of +0.3 to +0.8 $F_1$ depending on model size.
-
-The CLM phase leaves a lasting imprint on low transformer layers. CKA analysis shows that layers 0--7 diverge 5--44$\times$ more between CLM and MLM models than seed noise alone, and this divergence persists through extended MLM decay. Freeze interventions establish a double dissociation: freezing low layers during CLM eliminates the downstream benefit; freezing mid layers preserves it. The advantage cannot be localized post hoc: transplanting layer groups from CLM to MLM recovers at most 35\% of the gap. The effect is emergent, requiring the coordinated interaction between all layers.
-
-
-\section{Motivation}
-
-CamemBERT-bio (\Cref{chap:encoders}) demonstrated that continual pretraining works for biomedical encoders. However, it used the original CamemBERT architecture: 512-token context, absolute position embeddings, no Flash Attention. Clinical documents are often longer than 512 tokens, and the architecture has not kept pace with recent advances.
-
-ModernBERT~\citep{modernbert} addresses these limitations with Flash Attention, RoPE position embeddings, alternating local/global attention, and an 8,192-token context window. For biomedical adaptation, we start from ModernCamemBERT (French) and ModernBERT (English), in both Base (150M) and Large (350M) sizes.
-
-The standard approach would be to continue MLM pretraining on biomedical data, as we did for CamemBERT-bio. But MLM has a structural limitation: only 15\% of tokens are masked and receive gradient signal at each step. Causal language modeling does not have this limitation: every token predicts the next, and every position contributes to the loss. The idea is to use CLM for the compute-intensive pretraining phase, and switch back to MLM only at the end, to recover bidirectional attention. The key question is whether this switch erases the benefits of CLM or preserves them.
-
-\paragraph{Related approaches.} A handful of recent works explore objective switching for encoder pretraining. \citet{gisserot2025clm} pretrain encoders \emph{from scratch} (210M--1B parameters, 100B tokens) and find that a biphasic CLM-then-MLM schedule outperforms pure MLM under fixed compute. \citet{ettin2025} train matched encoder/decoder pairs (up to 1B parameters, 1.7T tokens) and show that continued pretraining on the reverse objective does not bridge the encoder-decoder performance gap. AntLM~\citep{antlm2024} alternates between CLM and MLM epochs at small scale (10M words). Our approach differs in three ways: we study the round-trip MLM$\to$CLM$\to$MLM with continued pretraining (not from scratch); we focus on the lasting effect of the CLM phase after returning to MLM; and we provide causal evidence via freeze interventions of where the benefit comes from. As \citet{gisserot2025clm} note, understanding how training objectives transfer to downstream tasks ``remains largely unexplored.''
-
-
-\section{Method}
-\label{sec:clm-detour}
-
-\subsection{The CLM Detour}
-
-Our approach consists of two phases, illustrated in \Cref{fig:clm-pipeline}.
+% Local macro for OntoBook (matches publications/OntoBook/main.tex)
+\providecommand{\method}{OntoBook\xspace}
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[node distance=1.8cm, >=Stealth, scale=0.85, transform shape,
-  box/.style={rectangle, rounded corners=3pt, draw=ThesisNeutral, minimum height=0.9cm, minimum width=2.4cm, align=center, font=\small\sffamily}
+\begin{tikzpicture}[scale=0.78, transform shape,
+  stage/.style={font=\scriptsize\sffamily\bfseries, text=#1},
+  frame/.style={rounded corners=5pt, draw=ThesisNeutral!40, minimum height=2.6cm},
 ]
-  \node[box, fill=ThesisPrimary!20] (base) {MLM encoder\\(ModernBERT)};
-  \node[box, fill=ThesisTertiary!30, right=of base] (clm) {CLM phase\\(10--50B tokens)};
-  \node[box, fill=ThesisSecondary!30, right=of clm] (decay) {MLM decay\\(10\% of Phase 1)};
-  \node[box, fill=ThesisPrimary!30, right=of decay] (out) {ModernCamem-\\BERT-bio};
 
-  \draw[->, thick, ThesisNeutral] (base) -- (clm) node[midway, above, font=\tiny\sffamily] {causal mask};
-  \draw[->, thick, ThesisNeutral] (clm) -- (decay) node[midway, above, font=\tiny\sffamily] {bidir.\ mask};
-  \draw[->, thick, ThesisNeutral] (decay) -- (out);
+  % === THREE FRAMES ===
+  \node[frame, minimum width=2.5cm]  (f1) at (1.25, 1.0) {};
+  \node[frame, minimum width=5.0cm]  (f2) at (6.5,  1.0) {};
+  \node[frame, minimum width=4.5cm]  (f3) at (12.75,1.0) {};
+
+  % === STAGE LABELS ===
+  \node[stage=ThesisPrimaryDark]   at (f1.north) [above=2pt] {Ontology};
+  \node[stage=ThesisSecondaryDark] at (f2.north) [above=2pt] {Textbook {\scriptsize(1.3B tokens)}};
+  \node[stage=ThesisTertiaryDark]  at (f3.north) [above=2pt] {Aligned training};
+
+  % === F1: mini ontology graph ===
+  \node[rectangle, rounded corners=3pt, draw=ThesisPrimaryDark, fill=ThesisPrimary!15, inner sep=2.5pt,
+        font=\scriptsize\ttfamily, minimum width=0.7cm] (e11) at ([xshift=-8mm,yshift=5mm]f1.center) {E11};
+  \node[rectangle, rounded corners=3pt, draw=ThesisPrimaryDark, fill=ThesisPrimary!15, inner sep=2.5pt,
+        font=\scriptsize\ttfamily, minimum width=0.7cm] (n08) at ([xshift=7mm,yshift=5mm]f1.center) {N08};
+  \node[rectangle, rounded corners=3pt, draw=ThesisPrimaryDark, fill=ThesisPrimary!15, inner sep=2.5pt,
+        font=\scriptsize\ttfamily, minimum width=0.7cm] (n083) at ([xshift=7mm,yshift=-5mm]f1.center) {N08.3};
+  \draw[-{Stealth[length=1.5mm]}, ThesisPrimary!70, thick]
+    (e11) -- node[above=-1pt, font=\tiny\sffamily, text=ThesisInk] {\textsc{causes}} (n08);
+  \draw[-{Stealth[length=1.5mm]}, ThesisPrimary!70, thick]
+    (n08) -- node[left=-1pt, font=\tiny\sffamily, text=ThesisInk] {\textsc{parent}} (n083);
+
+  % === F2: textbook paragraph ===
+  \node[draw=ThesisSecondaryDark, fill=ThesisSecondary!10, rounded corners=3pt,
+        text width=4.4cm, font=\scriptsize, inner sep=4pt, align=justify] (para) at (f2.center)
+    {Le diab\`ete (\textcolor{ThesisPrimaryDark}{\textbf{E11}}) peut entra\^iner
+     une glom\'erulopathie (\textcolor{ThesisPrimaryDark}{\textbf{N08}}),
+     notamment la forme diab\'etique (\textcolor{ThesisPrimaryDark}{\textbf{N08.3}})\ldots};
+
+  % === F3: two objectives ===
+  \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
+        text width=3.6cm, font=\scriptsize, inner sep=4pt] (mlmex) at ([yshift=5.2mm]f3.center)
+    {$\mathcal{L}_{\text{MLM}}$:\; Le \colorbox{ThesisTertiary!30}{[MASK]} (E11) peut
+     \colorbox{ThesisTertiary!30}{[MASK]} une n\'ephropathie\ldots};
+  \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
+        text width=3.6cm, font=\scriptsize, inner sep=4pt] (relex) at ([yshift=-6.8mm]f3.center)
+    {$\mathcal{L}_{\text{rel}}$:\qquad E11 $\xrightarrow{\;\colorbox{ThesisTertiary!30}{\textbf{?}}\;}$ N08};
+
+  % === ARROWS ===
+  \draw[-{Stealth[length=2.5mm]}, line width=1.2pt, draw=ThesisNeutral]
+    (f1.east) -- node[above, font=\tiny\sffamily, text=ThesisInk] {Qwen3-235B} (f2.west);
+  \draw[-{Stealth[length=2mm]}, line width=1pt, draw=ThesisNeutral]
+    (f2.east) -- node[above, font=\tiny\sffamily, text=ThesisInk] {Multi-task} (f3.west);
+
 \end{tikzpicture}
-\caption{\textbf{The CLM detour pipeline.} Starting from a pretrained MLM encoder, we continue pretraining with a causal objective (Phase~1), then decay back to MLM (Phase~2). The model does not return to an MLM-like state.}
-\label{fig:clm-pipeline}
+\caption{\textbf{\method pipeline.} An ontology subgraph is converted into a random walk, then reformulated into textbook prose by Qwen3-235B. The encoder trains on this text with two aligned objectives: masked language modeling and relation prediction between code pairs.}
+\label{fig:ontobook-pipeline}
 \end{figure}
 
-\paragraph{Phase 1: CLM pretraining.} Starting from a pretrained ModernBERT encoder, we replace the bidirectional attention mask with a causal mask and train with next-token prediction. The model architecture is unchanged: only the attention mask and loss computation differ. This forces the model to compress information into each token representation, since it cannot look ahead.
+\section{Introduction}
+\label{sec:intro}
 
-\paragraph{Phase 2: MLM decay.} After CLM pretraining, we restore bidirectional attention and train with MLM at 15\% masking for approximately 10\% of the Phase~1 budget. The optimizer state is kept between phases; only the learning rate scheduler resets. Phase~2 decays the learning rate from peak to 10\% of peak.
+Medical coding is the task of assigning standardized codes from medical ontologies to clinical documents. It is central to hospital billing, epidemiological surveillance, and clinical research. In France, over 30 million hospital stays per year require accurate coding using the CIM-10 classification (the French adaptation of ICD-10), CCAM procedure codes, and ATC medication codes. This task requires understanding not only medical vocabulary but also the relational structure of medical ontologies: hierarchical links between codes, causal associations, differential diagnoses, and exclusion rules. These relationships are explicitly encoded in ontology graphs but are absent from clinical text corpora.
 
-\paragraph{Controlled comparison.} The MLM baseline follows the same two-phase structure with 30\% masking in Phase~1 and 15\% in Phase~2, identical schedule and optimizer. Both trajectories use identical architecture, data, and total compute:
-\begin{align*}
-\theta_A &= T_{\text{MLM}}(T_{\text{CLM}}(\theta_0, n), 0.1n) && \text{(CLM detour)} \\
-\theta_B &= T_{\text{MLM}}(\theta_0, 1.1n) && \text{(MLM baseline)}
-\end{align*}
-The only difference is the Phase~1 objective. Any performance gap is attributable to the training objective alone.
+Pretrained biomedical language models such as BioBERT \citep{lee2020biobert}, PubMedBERT \citep{gu2021pubmedbert}, and CamemBERT-bio \citep{touchent2023camembertbio} learn medical vocabulary from large text corpora. However, they do not capture the relational structure of medical ontologies, since this structure is not expressed in running text. Knowledge graph approaches such as RDF2Vec \citep{ristoski2016rdf2vec} and Snomed2Vec \citep{agarwal2019snomed2vec} encode ontology structure through random walks, but produce static, non-contextualized embeddings that cannot benefit from transformer pretraining. Knowledge-enhanced transformers such as DRAGON \citep{yasunaga2022dragon} and KEPLER \citep{wang2021kepler} integrate knowledge graph structure into language model pretraining, but they rely on existing text-graph alignment rather than generating new training data from ontology structure alone.
 
-\subsection{Freeze Interventions}
-\label{sec:freeze}
+We propose \method, a pretraining method that converts medical ontology structure into training signal for encoder language models. Our approach proceeds in three stages. First, we generate random walks through ontology graphs to produce sequences that capture hierarchical, causal, and differential relationships between medical codes. Second, we reformulate these walks into fluent medical prose using a large language model, creating synthetic textbooks grounded in ontology structure. Third, we train an encoder with two objectives on the same textbook data: masked language modeling and relation prediction between code pairs. We refer to this co-training on shared data as \emph{alignment}, and our experiments show that it is a necessary condition for the method to work.
 
-To test which layers carry the CLM benefit, we run three freeze experiments on the 22-layer French Base model, where the CLM-MLM gap is largest (+2.9pp):
+We evaluate \method on three French medical coding benchmarks and present ablation studies on the contribution of each component. We release 1.3 million LLM-reformulated medical textbooks across three French ontologies (CIM-10, CCAM, ATC) and all pretrained model checkpoints.
+\section{Related Work}
+\label{sec:related}
 
+This section reviews three research directions: biomedical language model pretraining, knowledge-enhanced language models, and automatic medical coding.
+
+\subsection{Biomedical Pretrained Language Models}
+
+Domain-specific pretraining has proven essential for biomedical NLP. BioBERT \citep{lee2020biobert} further pretrained BERT on PubMed abstracts and PMC full-text articles, improving named entity recognition and relation extraction. PubMedBERT \citep{gu2021pubmedbert} demonstrated that pretraining from scratch on in-domain text outperforms mixed-domain initialization. ClinicalBERT \citep{huang2019clinicalbert} targeted clinical notes from MIMIC-III. For French, CamemBERT-bio \citep{touchent2023camembertbio} adapted CamemBERT \citep{martin2020camembert} to biomedical text, while DrBERT \citep{labrak2023drbert} was trained on French biomedical and clinical text from the NACHOS corpus. These models learn from flat text corpora and do not capture the hierarchical structure of medical ontologies.
+
+\subsection{Knowledge-Enhanced Language Models}
+
+Random walks on knowledge graphs generate sequences capturing relational structure. RDF2Vec \citep{ristoski2016rdf2vec} adapted the walk-then-embed paradigm to RDF graphs. In the biomedical domain, Snomed2Vec \citep{agarwal2019snomed2vec} applied random walk and Poincar\'e embeddings to SNOMED-CT for clinical prediction tasks. OWL2Vec* \citep{chen2021owl2vec} combined random walk sequences with lexical and logical features from OWL ontologies. These methods produce static embeddings (Word2Vec-style) and cannot be used for transformer pretraining.
+
+Several approaches inject knowledge graph structure into transformers. ERNIE \citep{zhang2019ernie} aligns entity embeddings with text representations. K-BERT \citep{liu2020kbert} injects knowledge triples into the input sequence using soft-position indices and a visibility mask. For multi-task pretraining, KEPLER \citep{wang2021kepler} combines MLM with TransE-style knowledge embedding on Wikidata. DRAGON \citep{yasunaga2022dragon} jointly trains MLM and knowledge graph link prediction, with a biomedical variant on UMLS achieving +3\% on MedQA. CODER \citep{yuan2021coder} uses UMLS relation triplets for contrastive pretraining, and SAPBERT \citep{liu2021sapbert} uses contrastive learning on UMLS synonyms for biomedical entity linking. Closest to the present work, BioOntoBERT \citep{shashikumar2023bioontobert} generates sentences from biomedical ontologies using Onto2Sen templates and pretrains BERT with MLM on the resulting corpus. However, the template-based generation produces formulaic sentences (e.g., ``X is a type of Y'') rather than fluent prose, and the method uses only MLM without multi-task relation prediction.
+
+Recent work has explored synthetic data generation from knowledge sources. The Phi series \citep{gunasekar2023phi} demonstrated that LLM-generated textbook-quality data enables strong small-model performance. EntiGraph \citep{yang2025entigraph} generates entity-centric synthetic data from knowledge sources but targets decoder language models rather than encoder pretraining.
+
+\subsection{Automatic Medical Coding}
+
+Medical coding assigns ICD, procedure, or medication codes to clinical text. CAML \citep{mullenbach2018explainable} introduced label-wise attention for explainable predictions. PLM-ICD \citep{huang2022plmicd} showed that fine-tuning pretrained encoders with label attention directly improves coding performance. \citet{kirchler2026grasp} recently demonstrated that LLM embeddings improve transferability of EHR-based predictions across countries and coding systems, highlighting the importance of encoding medical knowledge structure for cross-system generalization. These methods improve the classification head or the input representations but rely on generic encoders pretrained on flat text corpora.
+
+Table~\ref{tab:related_comparison} summarizes how \method combines components not jointly present in prior work.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{Walks} & \textbf{LLM} & \textbf{MLM+Rel} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Prior work}} \\[1pt]
+Snomed2Vec & \checkmark & & \\
+BioOntoBERT & \checkmark & & \\
+DRAGON & & & \checkmark \\
+KEPLER & & & \checkmark \\
+Phi-1 & & \checkmark & \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Ours}} \\[1pt]
+\textbf{\method} & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Comparison with related approaches.} \method uniquely combines all three components for biomedical encoder pretraining.}
+\label{tab:related_comparison}
+\end{table}
+\section{Method}
+\label{sec:method}
+
+\method converts medical ontology structure into pretraining signal through three stages: (1) generating random walks through ontology graphs, (2) reformulating these walks into fluent textbook prose using a large language model, and (3) training an encoder with multi-task learning combining masked language modeling and relation prediction. We first describe the ontologies used, then detail each stage. Figure~\ref{fig:ontobook-pipeline} illustrates the full pipeline.
+
+\subsection{Medical Ontologies}
+\label{sec:ontologies}
+
+We use three French medical ontologies published by the Agence du Num\'erique en Sant\'e (ANS) through its terminology server (SMT) in RDF/OWL format. CIM-10 FR PMSI is the French adaptation of the WHO's ICD-10, enriched by the Agence Technique de l'Information sur l'Hospitalisation (ATIH) for the French hospital information system (Programme de M\'edicalisation des Syst\`emes d'Information, PMSI). It contains 19,161 diagnostic codes organized in a 5-level hierarchy (chapters, blocks, categories, subcategories), with textual annotations including 23,282 synonyms, 8,171 inclusion notes, and 381 definitions. CIM-10 is the only ontology with semantic edges beyond the hierarchy: 1,317 causal edges (e.g., E11 type 2 diabetes \textit{causes} N08.3 diabetic glomerulopathy), 5,739 exclusion edges, and 341 manifestation edges, yielding a mean node degree of 2.77 compared to 2.00 for the purely hierarchical ontologies.
+
+CCAM (Classification Commune des Actes M\'edicaux) is the French procedure classification maintained by the Caisse Nationale d'Assurance Maladie (CNAM), containing 38,191 procedure codes in a 4-level hierarchy with 8,991 synonyms and 1,188 disjointness constraints between mutually exclusive procedures. ATC (Anatomical Therapeutic Chemical) is the WHO medication classification with 6,950 substance codes in a strict 5-level hierarchy from anatomical group to chemical substance, with no semantic edges, no synonyms, and no definitions beyond labels. This contrast in relational richness directly shapes the walk generation strategy: CIM-10 walks can follow causal and differential diagnosis paths, whereas CCAM and ATC walks are limited to hierarchical and sibling traversals. Table~\ref{tab:ontology_stats} summarizes the structural properties of the three ontologies.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+& \textbf{CIM-10} & \textbf{CCAM} & \textbf{ATC} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Graph structure}} \\[1pt]
+Codes & 19,161 & 38,191 & 6,950 \\
+Hierarchy depth & 5 & 4 & 5 \\
+Hierarchical edges & 19,139 & 38,191 & 6,950 \\
+Causal edges & 1,317 & --- & --- \\
+Manifestation edges & 341 & --- & --- \\
+Exclusion edges & 5,739 & --- & --- \\
+Disjoint edges & --- & 1,188 & --- \\
+Mean degree & 2.77 & 2.06 & 2.00 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Textual attributes}} \\[1pt]
+Synonyms & 23,282 & 8,991 & 0 \\
+Inclusion notes & 8,171 & --- & --- \\
+Definitions & 381 & 151 & 0 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Structural properties} of the three French medical ontologies used for walk generation. CIM-10 is the only ontology with semantic edges beyond the hierarchy.}
+\label{tab:ontology_stats}
+\end{table}
+
+\subsection{Ontology Walk Generation}
+\label{sec:walks}
+
+We generate random walks through ontology graphs to capture relational structure in a sequential format suitable for language model pretraining. We sample walks starting from each code in the ontology. At each step, the next node is selected via weighted sampling where edge type weights depend on the walk type. This biased sampling is necessary because semantic edges are rare (Table~\ref{tab:ontology_stats}), and a uniform walk would rarely traverse them. Each walk records the traversed codes along with their labels and the relation types connecting them. Walk length is sampled uniformly between 8 and 20 steps. We track visited nodes to avoid cycles, with a fallback that allows revisiting nodes when all neighbors have been explored.
+
+For CIM-10, we define five walk types, each emphasizing different aspects of medical knowledge: \textit{Etiologie} (causal chains), \textit{Diagnostic Diff\'erentiel} (codes to distinguish clinically), \textit{Codage Double} (mandatory code pairs linking etiology to manifestation), \textit{Syndrome} (multi-system manifestations), and \textit{Cross-Chapter} (connections between different ICD chapters, e.g., diabetes E11 to its renal complication N08). We generate 402,328 walks for CIM-10 (average 4,830 characters), 762,958 for CCAM, and 138,980 for ATC, totaling 1,304,266 walks.
+
+\subsection{Textbook Generation}
+\label{sec:textbook}
+
+Raw walks contain structured markers (e.g., ``\texttt{>> \`A distinguer de:}'') that are useful for parsing but not natural for language model pretraining. We use a large language model to reformulate walks into fluent medical prose resembling textbook paragraphs.
+
+We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. This ensures the textbook content remains grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4 NVIDIA H100 GPUs using vLLM \citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies. Figure~\ref{fig:textbook_example} shows an example transformation.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=0.3cm]
+  \node[draw=ThesisPrimaryDark, fill=ThesisPrimary!10, rounded corners=3pt,
+        text width=6.5cm, align=left, inner sep=6pt,
+        font=\scriptsize\ttfamily] (walk) {
+    \textcolor{ThesisPrimaryDark}{\textbf{[F02.0]}} D\'emence de la maladie de Pick\\[2pt]
+    \textcolor{ThesisNeutral}{>>} Cette pathologie peut provoquer:\\
+    \textcolor{ThesisPrimaryDark}{\textbf{[G31.0]}} Atrophie c\'er\'ebrale circonscrite\\[2pt]
+    \textcolor{ThesisNeutral}{>>} Parmi les causes possibles:\\
+    \textcolor{ThesisPrimaryDark}{\textbf{[F02.02]}} ...avec sympt\^omes hallucinatoires
+  };
+  \node[above=0.1cm of walk, font=\scriptsize\sffamily\bfseries, text=ThesisPrimaryDark] {Structured Walk};
+  \node[below=0.4cm of walk, font=\small] (arrow) {$\downarrow$ \textit{Qwen3-235B}};
+  \node[draw=ThesisSecondaryDark, fill=ThesisSecondary!10, rounded corners=3pt,
+        text width=6.5cm, align=justify, inner sep=6pt,
+        font=\scriptsize, below=0.4cm of arrow] (textbook) {
+    Le code \textcolor{ThesisSecondaryDark}{\textbf{F02.0}}, d\'esignant la d\'emence de la maladie de Pick,
+    s'inscrit dans un r\'eseau de connexions inter-syst\`emes entre les troubles mentaux et les
+    affections neurologiques. Ce code entretient une relation \'etroite avec
+    \textcolor{ThesisSecondaryDark}{\textbf{G31.0}} (atrophie c\'er\'ebrale circonscrite), \'etablissant
+    un lien \'etiologique r\'eciproque...
+  };
+  \node[above=0.1cm of textbook, font=\scriptsize\sffamily\bfseries, text=ThesisSecondaryDark] {Medical Textbook};
+\end{tikzpicture}
+\caption{\textbf{Walk-to-textbook transformation.} The structured walk is reformulated into fluent medical prose while preserving all codes and relations.}
+\label{fig:textbook_example}
+\end{figure}
+
+Figure~\ref{fig:prompt} shows the system prompt used for CIM-10 walks (translated from French for readability; prompts for CCAM and ATC follow the same structure with ontology-specific terminology).
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=4pt,
+      text width=0.9\columnwidth, inner sep=10pt, font=\scriptsize, align=left] {%
+\textbf{\sffamily Reformulation Prompt (CIM-10, translated)}\\[6pt]
+You are an expert medical writer specializing in high-quality educational material.\\[3pt]
+Reformulate the provided CIM-10 walk into fluent, textbook-quality medical prose.\\[3pt]
+\textbf{Strict rules:}\\
+(1) \textbf{No invention}: never add information not in the source.\\
+(2) \textbf{Total fidelity}: preserve all definitions, codes, clinical notes, exclusions.\\
+(3) \textbf{Completeness}: do not omit any source information.\\
+(4) \textbf{Ignore metadata}: never mention walk types or structural headers.\\[3pt]
+\textbf{Style:} Continuous narrative prose, no bullet points or markdown. Integrate CIM-10 codes naturally. Preserve exact medical terminology.\\[3pt]
+\textbf{Goal:} Transform the walk into text suitable for a medical nosology textbook chapter while remaining 100\% faithful to the original content.%
+};
+\end{tikzpicture}
+\caption{System prompt for LLM-based walk reformulation. Temperature is set to 0 for deterministic, faithful output.}
+\label{fig:prompt}
+\end{figure}
+
+\subsection{\method Training}
+\label{sec:training}
+
+We train a ModernCamemBERT-base encoder \citep{music2025moderncamembert}, initialized from a French checkpoint trained on 1 trillion tokens.
+
+The model optimizes two objectives jointly. The first, $\mathcal{L}_{\text{MLM}}$, follows standard masked language modeling \citep{devlin2019bert}: we mask 15\% of tokens from textbook paragraphs and train to predict them. The second, $\mathcal{L}_{\text{rel}}$, classifies the relationship between pairs of medical codes. Our main model uses CIM-10; we explore transfer from CCAM and ATC in Section~\ref{sec:multi_onto}. We extract 282,907 code pairs from the CIM-10 ontology across 6 relation types: \textsc{Parent}, \textsc{Child}, \textsc{Sibling}, \textsc{Differential Diagnosis}, \textsc{Causes}, and \textsc{Caused\_By}. For each pair, we retrieve the corresponding textbook descriptions generated in Section~\ref{sec:textbook}. The input format is "$[\texttt{CLS}]~\text{text}_A~[\texttt{SEP}]~\text{text}_B~[\texttt{SEP}]$", where $\text{text}_A$ and $\text{text}_B$ are the textbook descriptions of the two codes, and a separate linear classification head on the $[\texttt{CLS}]$ token predicts the relation type, trained with cross-entropy loss over the 6 classes.
+
+The combined loss is:
+\begin{equation}
+\mathcal{L} = \mathcal{L}_{\text{MLM}} + \lambda \mathcal{L}_{\text{rel}}
+\end{equation}
+where $\lambda = 1.0$. We train for 4 epochs with learning rate $2 \times 10^{-5}$, batch size 128, and AdamW optimizer with weight decay 0.01 and 1,000 warmup steps. Training takes approximately 4 hours per epoch on one NVIDIA H100 GPU. The key design choice is that both objectives operate on the \emph{same textbook data}. We call this property \emph{alignment}, and we show in Section~\ref{sec:ablations} that it is essential for performance.
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Evaluation Benchmarks.}
+We evaluate on the standard French medical coding evaluation suite:
 \begin{itemize}
-    \item \textbf{Experiment~1} (low freeze, CLM phase): Layers 0--7 frozen during CLM, then normal decay. Tests whether low-layer modification during CLM is necessary.
-    \item \textbf{Experiment~2} (low freeze, decay phase): Normal CLM, then layers 0--7 frozen during decay. Tests whether low-layer CLM changes persist without further updates.
-    \item \textbf{Experiment~3} (mid freeze, CLM phase): Layers 8--14 frozen during CLM, then normal decay. Together with Experiment~1, tests selectivity: if freezing low layers eliminates the benefit while freezing mid layers preserves it, this constitutes a double dissociation.
+\item \textbf{FRACCO} \citep{pignat2024fracco}: a native French oncology corpus with 1,301 clinical cases annotated with ICD-O-3.1 codes, framed as multi-label classification over the top 100 codes.
+\item \textbf{Cantemist-FR} \citep{zaghir2023frasimed}: the French adaptation of the Spanish tumor coding task \citep{miranda2020cantemist}, with 2,051 clinical documents.
+\item \textbf{Distemist-FR} \citep{zaghir2023frasimed}: the French adaptation of the disease mention coding task \citep{miranda2022distemist}.
 \end{itemize}
+Cantemist-FR and Distemist-FR are cross-lingual projections from Spanish. FRACCO is the only native French benchmark. All results are micro-F1 scores averaged over 3 random seeds.
 
-\subsection{Data}
+\paragraph{Baselines.}
+We compare against French biomedical language models: CamemBERT-bio \citep{touchent2023camembertbio}, DrBERT \citep{labrak2023drbert}, and ModernCamemBERT \citep{music2025moderncamembert} (which serves as our initialization checkpoint). We also report results for three ablations of our method: MLM-only (trained with $\mathcal{L}_{\text{MLM}}$ only on our textbooks), Rel-only (trained with $\mathcal{L}_{\text{rel}}$ only), and CodeInfill+MLM, which replaces relation prediction with a code infilling objective that masks medical code tokens (e.g., ``E11'', ``N08.3'') in textbook text and trains the model to predict them. We do not compare against knowledge-enhanced models such as DRAGON \citep{yasunaga2022dragon} or SAPBERT \citep{liu2021sapbert} as they are English encoders that cannot be applied to French text.
 
-\paragraph{French.} We compile 10B tokens (Base) or 25B tokens (Large) from four sources. The main source (7B tokens) is French biomedical literature (scientific articles, clinical guidelines, medical theses), where each paragraph is scored for educational value using Qwen3-235B and articles are upsampled based on their proportion of high-scoring paragraphs, following the Biomed-Enriched approach (\Cref{chap:quality}). The remaining sources are synthetic medical QA from French coding systems (2B), clinical cases from the European Clinical Case Corpus (E3C, 400M), and drug package inserts from the European Medicines Agency (600M).
+\paragraph{Fine-tuning.}
+For downstream evaluation, each pretrained encoder receives a clinical document as input and predicts a set of medical codes (multi-label classification over the top 100 codes per benchmark). We fine-tune with a linear classification head for 10 epochs, learning rate $2 \times 10^{-5}$, and batch size 16. External baselines (CamemBERT-bio, DrBERT, ModernCamemBERT) are averaged over 9 seeds; our models over 3 seeds due to the large number of configurations evaluated.
 
-\paragraph{English.} For the 50B scale, we mix three components: 60\% biomedical literature from Biomed-Enriched (PMC Open Access articles filtered by educational value $\geq 3.0$), 20\% medical instruction-following datasets (MedS-Ins, ReasonMed, MediFlow, UltraMedical, EHR-Ins-Reasoning), and 20\% MIMIC-III discharge summaries and clinical notes. The smaller 10B variant uses Biomed-Enriched with clinical case paragraphs upsampled 100$\times$ and other clinical documents 10$\times$ (80\%), plus MediFlow medical instructions (20\%), without MIMIC.
+\subsection{Main Results}
+\label{sec:ontobook-results}
 
-\subsection{Training Details}
-
-All runs use decoupled AdamW with peak lr $2 \times 10^{-4}$, $\beta_1 = 0.9$, $\beta_2 = 0.98$, weight decay $10^{-5}$, and a global batch size of 384 sequences ($\sim$3.1M tokens). Phase~1 uses linear warmup over 100M tokens then constant learning rate. Documents are packed into 8,192-token sequences with end-of-sequence tokens between documents. Training uses bf16 mixed precision on 4$\times$H100 GPUs.
-
-\subsection{Fine-tuning Protocol}
-
-\paragraph{French tasks.} Classification (DiaMED) and multilabel tasks (MedDialog, FrACCO, CANTEMIST, DisTEMIST) use a linear head on the CLS token, trained for 15 epochs with lr $= 2 \times 10^{-5}$, batch size 4, and 10\% warmup. Multilabel tasks use max sequence length 4096 with weighted BCEWithLogitsLoss; classification uses 2048. NER tasks (EMEA, Medline) use a span-based architecture with BiLSTM, CRF, and biaffine scorer, trained for 4000 steps with lr $= 5 \times 10^{-5}$ for the encoder and $10^{-3}$ for the head, batch size 16, max length 1024. All tasks use AdamW with weight decay 0.01 and select the best checkpoint by validation $F_1$.
-
-\paragraph{English tasks.} We follow the BioClinical-ModernBERT evaluation protocol~\citep{sounack2025bioclinicalmodernbert}: lr $= 5 \times 10^{-5}$, weight decay 0.01, batch size 16, 10 epochs for most tasks (20 for NER). All models are fine-tuned with the same hyperparameters per task.
-
-\subsection{Evaluation}
-
-We evaluate on 8 French and 11 English biomedical tasks (\Cref{tab:eval-tasks}), using 9 seeds for French and 5 for English. French baselines include ModernCamemBERT, DrBERT~\citep{labrak2023drbert}, CamemBERT-bio, and CamemBERT~\citep{martin-etal-2020-camembert}. English baselines include ModernBERT, PubMedBERT~\citep{gu_domain-specific_2022}, BioBERT~\citep{lee_biobert_2019}, and BioClinical-ModernBERT~\citep{sounack2025bioclinicalmodernbert}.
+Table~\ref{tab:main_results} compares \method against French biomedical baselines.
 
 \begin{table}[t]
 \centering
 \small
-\caption{\textbf{Evaluation tasks.} Max sequence length reflects the fine-tuning configuration; longer values indicate tasks with longer input documents.}
-\label{tab:eval-tasks}
-\begin{tabular}{llcc}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Task} & \textbf{Type} & \textbf{Lang} & \textbf{Max len.} \\
+\textbf{Model} & \textbf{FRACCO} & \textbf{Cant.} & \textbf{Dist.} & \textbf{Avg.} \\
 \midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{French}} \\[1pt]
-DiaMED & Classification & FR & 2048 \\
-MedDialog-FR & Multilabel & FR & 4096 \\
-FrACCO (30/100) & Multilabel & FR & 4096 \\
-CANTEMIST & Multilabel & FR & 4096 \\
-DisTEMIST & Multilabel & FR & 4096 \\
-QUAERO (EMEA/Medline) & NER & FR & 1024 \\
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{External baselines}} \\[1pt]
+CamemBERT-bio & 20.2{\scriptsize$\pm$0.2} & 12.1{\scriptsize$\pm$0.4} & 9.0{\scriptsize$\pm$0.2} & 13.8 \\
+DrBERT & 36.3{\scriptsize$\pm$0.7} & 37.7{\scriptsize$\pm$1.0} & 22.5{\scriptsize$\pm$0.7} & 32.1 \\
+ModernCamemBERT & 56.4{\scriptsize$\pm$1.0} & 63.5{\scriptsize$\pm$1.3} & 23.4{\scriptsize$\pm$1.7} & 47.7 \\
 \midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{English}} \\[1pt]
-ChemProt & Relation Extr. & EN & 512 \\
-Phenotyping & Classification & EN & 8192 \\
-COS & NER & EN & 512 \\
-Social History & NER & EN & 512 \\
-De-identification & NER & EN & 8192 \\
-AnatEM & NER & EN & 512 \\
-BC5CDR & NER & EN & 512 \\
-JNLPBA & NER & EN & 512 \\
-NCBI Disease & NER & EN & 512 \\
-GAD & Classification & EN & 512 \\
-HoC & Classification & EN & 512 \\
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Our models}} \\[1pt]
+CodeInfill+MLM & 56.5{\scriptsize$\pm$0.2} & 66.4{\scriptsize$\pm$1.9} & 20.0{\scriptsize$\pm$0.9} & 47.6 \\
+MLM-only & 55.8{\scriptsize$\pm$0.4} & 66.0{\scriptsize$\pm$1.1} & 24.2{\scriptsize$\pm$5.8} & 48.7 \\
+\textbf{\method} & \textbf{58.3}{\scriptsize$\pm$0.3} & \textbf{67.1}{\scriptsize$\pm$1.1} & \textbf{32.2}{\scriptsize$\pm$1.1} & \textbf{52.5} \\
 \bottomrule
 \end{tabular}
+\caption{\textbf{Main results} on French medical coding (micro-$F_1$ \%). External baselines averaged over 9 seeds; our models over 3 seeds. Best results in \textbf{bold}.}
+\label{tab:main_results}
 \end{table}
 
+\method outperforms all baselines on all three benchmarks. The improvement over MLM-only pretraining is significant on FRACCO (+2.5 micro-F1, $p<0.001$) and Distemist (+8.0 micro-F1, $p<0.001$), with consistent but not individually significant gains on Cantemist ($p=0.11$). The gain is largest on Distemist, suggesting that ontology-aware pretraining particularly helps with fine-grained disease coding. \method also reduces variance on Distemist from $\pm$5.8 (MLM-only) to $\pm$1.1.
 
-\section{Results}
+\subsection{Ablation Study}
+\label{sec:ablations}
 
-\subsection{French Biomedical Tasks}
-
-\begin{table*}[t]
-\centering
-\small
-\caption{\textbf{French biomedical results} (macro $F_1$, 9 seeds). Bold: best per column; underline: second best.}
-\label{tab:french-results}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{lcccccccccc}
-\toprule
-& & \multicolumn{5}{c}{\textbf{Multilabel Classification}} & {\textbf{CLS}} & \multicolumn{2}{c}{\textbf{NER}} & \\
-\cmidrule(lr){3-7} \cmidrule(lr){8-8} \cmidrule(lr){9-10}
-& \textbf{Ctx} & \textbf{FrACCO-30} & \textbf{FrACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
-ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 63.4 & 55.3 & 55.6 \\
-DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & \textbf{68.0} & \textbf{62.3} & 49.9 \\
-CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & 61.6 & 56.6 & 36.1 \\
-CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 61.5 & 54.7 & 34.5 \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Base, 150M)}} \\[1pt]
-MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 65.4 & 56.8 & 57.9 \\
-CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 65.9 & 58.2 & 60.8 \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Large, 350M)}} \\[1pt]
-MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & 66.1 & 58.0 & \underline{61.8} \\
-CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & \underline{67.0} & \underline{59.5} & \textbf{63.3} \\
-\bottomrule
-\end{tabular}
-}
-\end{table*}
-
-\Cref{tab:french-results} presents the French results. For Base, the CLM detour achieves 60.8\% average $F_1$, outperforming the MLM baseline on all 8 tasks (+2.9pp). For Large, CLM reaches 63.3\% versus 61.8\% for MLM (+1.5pp). CamemBERT-bio and CamemBERT average 36\% and 35\% overall, limited by their 512-token context on long clinical documents. We release the CLM-detour models as ModernCamemBERT-bio (Base and Large).
-
-\subsection{English Biomedical Tasks}
-
-\begin{table*}[t]
-\centering
-\small
-\caption{\textbf{English biomedical results} across 11 benchmarks (5 seeds). Base at 10B and 50B scales; Large at 50B. Bold: best; underline: second best.}
-\label{tab:english-results}
-\resizebox{\textwidth}{!}{
-\sisetup{detect-weight=true}
-\begin{tabular}{ll S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1] S[table-format=2.1]}
-\toprule
-& & \multicolumn{5}{c}{\textbf{Clinical Tasks}} & \multicolumn{6}{c}{\textbf{BigBIO Tasks}} & \\
-\cmidrule(lr){3-7} \cmidrule(lr){8-13}
-& \textbf{Ctx} & {\textbf{ChemPr}} & {\textbf{Pheno}} & {\textbf{COS}} & {\textbf{Social}} & {\textbf{DEID}} & {\textbf{AnatEM}} & {\textbf{BC5CDR}} & {\textbf{JNLPBA}} & {\textbf{NCBI}} & {\textbf{GAD}} & {\textbf{HoC}} & {\textbf{Avg}} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{14}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
-ModernBERT-base & 8192 & 89.5 & 48.4 & 94.0 & 53.1 & 78.3 & 77.2 & 87.9 & 74.3 & 77.7 & 76.8 & 66.6 & 74.9 \\
-PubMedBERT & 512 & 90.2 & 52.0 & 95.0 & 48.7 & 80.4 & \bfseries 83.3 & \underline{89.7} & 74.9 & \bfseries 82.1 & \underline{79.3} & \bfseries 71.0 & 77.0 \\
-BioClinical-MdnBERT & 8192 & 90.0 & 60.7 & 94.8 & \underline{56.0} & 81.8 & 79.2 & 88.7 & 74.8 & 78.7 & 75.8 & 67.0 & 77.0 \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{14}{c}{\rule{0pt}{10pt}\textbf{Base 150M (10B tokens)}} \\[1pt]
-MLM baseline & 8192 & 90.4 & 61.3 & 94.4 & 55.5 & 79.3 & 78.9 & 88.3 & 74.9 & 79.2 & 78.6 & 68.9 & 77.3 \\
-CLM detour & 8192 & 90.3 & 61.0 & 94.3 & 55.7 & 82.6 & 79.9 & 89.1 & 74.2 & 80.4 & \underline{79.3} & 69.4 & 77.8 \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{14}{c}{\rule{0pt}{10pt}\textbf{Base 150M (50B tokens)}} \\[1pt]
-MLM baseline & 8192 & \bfseries 90.5 & \underline{61.6} & \underline{95.1} & 55.7 & 81.6 & 80.0 & 88.7 & 74.9 & 80.3 & 78.7 & 67.1 & 77.7 \\
-CLM detour & 8192 & 90.1 & \bfseries 61.9 & \bfseries 95.2 & 54.2 & \underline{83.2} & 81.0 & 89.1 & 74.5 & 80.1 & 78.8 & \underline{70.0} & \underline{78.0} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{14}{c}{\rule{0pt}{10pt}\textbf{Large 350M (50B tokens)}} \\[1pt]
-MLM baseline & 8192 & \bfseries 90.5 & 61.0 & 94.9 & 55.0 & 82.3 & 82.0 & 89.4 & \bfseries 75.5 & \underline{81.8} & 76.4 & 67.8 & 77.9 \\
-CLM detour & 8192 & 90.4 & 61.3 & 94.7 & \bfseries 56.5 & \bfseries 84.2 & \underline{83.2} & \bfseries 89.8 & \underline{75.3} & 81.7 & \bfseries 79.7 & 69.3 & \bfseries 78.7 \\
-\bottomrule
-\end{tabular}
-}
-\end{table*}
-
-\Cref{tab:english-results} shows the English results at three scales. CLM outperforms MLM on average at all scales, with the gap widening at Large scale (+0.8pp, 7/11 task wins). The smaller English effect is expected: ModernBERT was pretrained on web data that commonly includes biomedical corpora such as PubMed, so its low layers already partially encode biomedical features. ModernCamemBERT, by contrast, was pretrained on general French web text without biomedical sources, leaving a larger domain gap and correspondingly stronger CLM benefit (+2.9pp vs +0.3pp). We release the English models as ModernBERT-bio.
-
-\subsection{Optimal Decay Ratio}
-
-We sweep the decay length from 2.5\% to 50\% of the CLM phase at two scales, evaluating on 3 French tasks (DiaMED, FrACCO-30, FrACCO-100; \Cref{tab:decay-sweep}). At both scales, 10\% decay gives the best performance; shorter decay (2.5--4\%) scores about 1.0pp below optimal, and longer decay (20--50\%) provides no additional benefit. This ratio matches the cooldown lengths used in language model pretraining.
+Table~\ref{tab:ablations} ablates the key components of \method.
 
 \begin{table}[t]
 \centering
 \small
-\caption{\textbf{Decay ratio sweep} on 3 French tasks (DiaMED, FrACCO-30, FrACCO-100; 9 seeds each). 10\% decay is optimal at both scales.}
-\label{tab:decay-sweep}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Configuration} & \textbf{FRACCO} & \textbf{Cant.} & \textbf{Dist.} & \textbf{Avg.} & $\boldsymbol{\Delta}$ \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{Loss ablations}} \\[1pt]
+\method (aligned) & \bfseries 58.33 & \bfseries 67.06 & \bfseries 32.24 & \bfseries 52.54 & --- \\
+\quad $-$ $\mathcal{L}_{\text{rel}}$ (MLM-only) & 55.81 & 66.01 & 24.23 & 48.68 & $-$3.86 \\
+\quad $-$ $\mathcal{L}_{\text{MLM}}$ (Rel-only) & 48.24 & 51.15 & 20.18 & 39.86 & $-$12.68 \\
+\quad $-$ Alignment (misaligned) & 33.39 & 20.11 & 12.63 & 22.04 & $-$30.50 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{Data ablation}} \\[1pt]
+MLM-only (raw walks) & 55.51 & 66.00 & 22.76 & 48.09 & $-$4.45 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Ablation study} (micro-$F_1$ \%). Misalignment degrades all benchmarks, with the largest drop on Cantemist ($-$46.95). All variants use the same base model and training budget.}
+\label{tab:ablations}
+\end{table}
+
+Alignment is the most critical factor. Training $\mathcal{L}_{\text{MLM}}$ and $\mathcal{L}_{\text{rel}}$ on different data causes catastrophic degradation across all benchmarks, with Cantemist dropping from 67.06 to 20.11 ($-$46.95). Relation prediction alone also fails ($-$12.68 average F1), confirming that $\mathcal{L}_{\text{rel}}$ cannot serve as a standalone pretraining objective. The last row trains MLM-only on raw structured walks, removing both reformulation and relation prediction. The raw walk model (48.09) is close to the textbook MLM-only model (48.68), indicating that reformulation alone contributes little to MLM pretraining ($+$0.59 F1). However, the gap to full \method is 4.45 points, reflecting the combined effect of adding both reformulation and relation prediction. This suggests that reformulation primarily benefits the relation prediction objective: on raw walks with structural markers (e.g., ``\texttt{>> \`A distinguer de:}''), the classifier can exploit formatting shortcuts rather than learning medical semantics, whereas fluent textbook prose forces the model to learn from content rather than format.
+
+\subsection{Training Dynamics and Hyperparameter Sensitivity}
+\label{sec:dynamics}
+
+Figure~\ref{fig:dynamics} shows training dynamics and hyperparameter sensitivity. Epoch 1 (51.98) and epoch 2 (52.54) both outperform MLM-only pretraining (dashed line), but epoch 3 (49.43) degrades below it, possibly due to overfitting on the relation prediction task. All results in this paper use the epoch 2 checkpoint. The loss weight $\lambda$ is robust across $\{0.1, 0.5, 1.0, 2.0, 5.0\}$: all values achieve 57.7--59.1\% F1 on FRACCO. We use $\lambda=1.0$ as it achieves the lowest variance ($\pm$0.52\%). This robustness suggests that the exact balance between objectives matters less than ensuring both are present and aligned.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.48\columnwidth, height=3.5cm,
+  xlabel={\scriptsize Epoch},
+  ylabel={\scriptsize Avg F1},
+  xmin=0.5, xmax=3.5,
+  ymin=47, ymax=54,
+  xtick={1,2,3},
+  ytick={48,50,52},
+  grid=major,
+  grid style={gray!20},
+  mark size=2pt,
+  every axis label/.style={font=\scriptsize},
+  every tick label/.style={font=\scriptsize},
+  title={\scriptsize\textbf{(a) Training epochs}},
+  title style={at={(0.5,1.05)}},
+]
+\addplot[ThesisPrimaryDark, thick, mark=*, mark options={fill=ThesisPrimary}] coordinates {(1,51.98) (2,52.54) (3,49.43)};
+\addplot[dashed, ThesisNeutral, thick] coordinates {(0.5,48.68) (3.5,48.68)};
+\node[font=\tiny, ThesisNeutral] at (axis cs:2.9,47.8) {MLM-only};
+\end{axis}
+\end{tikzpicture}%
+\hfill%
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.48\columnwidth, height=3.5cm,
+  xlabel={\scriptsize $\lambda$},
+  ylabel={\scriptsize FRACCO F1},
+  xmode=log,
+  xmin=0.07, xmax=7,
+  ymin=56, ymax=61,
+  xtick={0.1,0.5,1,2,5},
+  xticklabels={0.1,0.5,1,2,5},
+  ytick={57,58,59,60},
+  grid=major,
+  grid style={gray!20},
+  mark size=2pt,
+  every axis label/.style={font=\scriptsize},
+  every tick label/.style={font=\tiny},
+  title={\scriptsize\textbf{(b) Loss weight $\lambda$}},
+  title style={at={(0.5,1.05)}},
+]
+\addplot[ThesisSecondaryDark, thick, mark=square*, mark options={fill=ThesisSecondary}] coordinates {(0.1,58.95) (0.5,57.72) (1.0,58.66) (2.0,58.33) (5.0,59.08)};
+\addplot[ThesisSecondaryDark, thick, mark=none, name path=upper, draw=none] coordinates {(0.1,60.34) (0.5,58.78) (1.0,59.18) (2.0,58.99) (5.0,59.88)};
+\addplot[ThesisSecondaryDark, thick, mark=none, name path=lower, draw=none] coordinates {(0.1,57.56) (0.5,56.66) (1.0,58.14) (2.0,57.67) (5.0,58.28)};
+\addplot[ThesisSecondary!30, opacity=0.6] fill between[of=upper and lower];
+\end{axis}
+\end{tikzpicture}
+\caption{\textbf{Training dynamics.} (a) Average $F_1$ peaks at epoch 2 then degrades. (b) Performance is stable across $\lambda$ values (shaded: $\pm$1 std).}
+\label{fig:dynamics}
+\end{figure}
+
+\subsection{Multi-Ontology Transfer}
+\label{sec:multi_onto}
+
+The main \method model uses CIM-10 walks (Table~\ref{tab:main_results}). To test whether other ontologies also provide useful pretraining signal, we train separate models on walks from each ontology individually and on all three combined.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Ontology source} & \textbf{FRACCO} & \textbf{Cant.} & \textbf{Dist.} & \textbf{Avg.} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Main configuration}} \\[1pt]
+CIM-10 (\method) & 58.33 & 67.06 & 32.24 & 52.54 \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Other ontology sources}} \\[1pt]
+All (CIM-10+CCAM+ATC) & 59.31 & \textbf{67.64} & 31.44 & 52.80 \\
+CCAM only & 58.59 & 66.54 & 34.26 & \textbf{53.13} \\
+ATC only & \textbf{59.66} & 63.03 & \textbf{36.05} & 52.91 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Effect of ontology source} on downstream performance (micro-$F_1$ \%). Each row trains a separate model using walks and relations from only that ontology. All models use the same training procedure and base checkpoint.}
+\label{tab:ontology_results}
+\end{table}
+
+All three individual ontologies improve over the MLM-only baseline, indicating that the pipeline generalizes across different medical knowledge structures. ATC (medications) yields the best Distemist score (+3.81 over CIM-10), despite Distemist being a disease coding task, suggesting that drug-disease relationships transfer well to disease understanding. CCAM (procedures) achieves the best average micro-F1 (53.13). Combining all three ontologies does not outperform the best individual ontologies. We hypothesize that this is because the relation prediction head must accommodate heterogeneous edge types across ontologies.
+
+\subsection{Probing Analysis}
+\label{sec:probing}
+
+To understand how \method organizes code representations, we evaluate with three probing tasks on CIM-10 code embeddings (mean-pooled over code descriptions): chapter classification (26 classes), hierarchy depth prediction (4 levels), and distance correlation (Spearman $\rho$ between cosine distances and ontology tree distances). We compare against a code infilling variant (CodeInfill+MLM) that masks and predicts code tokens during pretraining.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{10pt}
 \begin{tabular}{lccc}
 \toprule
-\textbf{Decay tokens} & \textbf{Decay / Phase~1} & \textbf{CLM+decay $F_1$} & \textbf{MLM+decay $F_1$} \\
+\textbf{Model} & \textbf{Chapter} & \textbf{Depth} & \textbf{Dist.\ $\rho$} \\
 \midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{10B Phase~1 (Base, 150M)}} \\[1pt]
-0.25B & 2.5\% & 71.6\% & 69.1\% \\
-\textbf{1.0B} & \textbf{10\%} & \textbf{72.6\%} & 70.4\% \\
-2.0B & 20\% & 71.9\% & 70.4\% \\
-3.0B & 30\% & 72.1\% & 69.7\% \\
-5.0B & 50\% & 71.7\% & 70.4\% \\
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
+Base & 97.5 & 99.3 & 0.195 \\
+MLM-only & 98.9 & 99.4 & 0.287 \\
+CodeInfill+MLM & \bfseries 99.0 & \bfseries 99.8 & \bfseries 0.397 \\
+Rel-only & 98.0 & 98.2 & 0.203 \\
 \midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{25B Phase~1 (Large, 350M)}} \\[1pt]
-1.0B & 4\% & 73.2\% & 70.1\% \\
-\textbf{2.5B} & \textbf{10\%} & \textbf{73.5\%} & 70.5\% \\
-5.0B & 20\% & 72.7\% & 70.1\% \\
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Ours}} \\[1pt]
+\method & 98.7 & 99.7 & 0.073 \\
 \bottomrule
 \end{tabular}
+\caption{\textbf{Probing analysis} on CIM-10 code embeddings (\% accuracy for Chapter and Depth, Spearman $\rho$ for Distance). CodeInfill+MLM achieves the best geometric organization but \method achieves the best downstream performance (\Cref{tab:main_results}).}
+\label{tab:probing}
 \end{table}
 
-\subsection{Needle-in-a-Haystack}
+CodeInfill+MLM achieves the best probing metrics ($\rho=0.397$) but the worst downstream performance among our models (47.6 average micro-F1, Table~\ref{tab:main_results}), while \method has lower distance correlation ($\rho=0.073$) despite achieving the best downstream performance (52.5 micro-F1). This inverse relationship suggests that for encoder pretraining, representational flexibility is more valuable than strict geometric preservation of ontology structure.\section{Discussion}
+\label{sec:ontobook-discussion}
 
-% TODO: include needle figure from figures/output/fig2_needle.pdf
+The 30.50-point gap between aligned and misaligned training highlights the central role of objective alignment. When $\mathcal{L}_{\text{MLM}}$ trains on textbooks while $\mathcal{L}_{\text{rel}}$ trains on unrelated data, the model receives conflicting gradient signals: the MLM objective pushes representations toward textbook language patterns, while the relation objective pushes them toward a different data distribution. Aligned training avoids this conflict by ensuring both objectives reinforce the same semantic structure. Relation prediction guides attention toward ontologically meaningful patterns in the textbook text, while MLM ensures the model builds coherent representations of that text. This explains why relation prediction alone fails ($-$12.68 F1): it is a discriminative task that can exploit surface-level shortcuts, as demonstrated by the small gap between raw-walk and textbook MLM-only models (+0.59 F1). Combined with aligned MLM, however, it provides a complementary signal that improves downstream coding performance.
 
-Long-context encoding is critical in biomedical NLP, where clinical documents routinely span thousands of tokens and key information (diagnoses, coding labels) can appear anywhere in the document. We design a synthetic needle-in-a-haystack task in French to evaluate long-context retrieval without entity-type confounds.
+The cross-ontology transfer results suggest that our approach generalizes beyond CIM-10: training on CCAM or ATC alone also improves over the baseline despite targeting different medical domains. However, combining all ontologies does not outperform individual ones, possibly because the relation prediction head must accommodate heterogeneous edge types.
 
-\paragraph{Protocol.} A medical fact (the ``needle'') is inserted into a clinical document (the ``haystack'') at a controlled position, and the model must determine whether a given query fact is present (binary classification). Negative examples use the same template with different slot values, so the task requires precise retrieval rather than shallow pattern matching. We define 8 French medical fact templates covering drugs, vital signs, lab results, diagnoses, procedures, allergies, treatment duration, and symptoms. Each template has 2--4 slots filled from small lexicons:
+The probing analysis reveals a tension between geometric organization and downstream performance. CodeInfill+MLM achieves the best probing metrics ($\rho=0.397$) but the worst downstream scores among our models (47.6 micro-F1), while \method achieves the opposite ($\rho=0.073$, 52.5 micro-F1). This suggests that for downstream coding tasks, flexible representations adapt better than rigid geometric structure that must be partially unlearned during fine-tuning.
 
-\begin{itemize}
-  \item \textit{Le patient a re\c{c}u 200\,mg de morphine par voie intraveineuse.}\\
-        \textbf{Distractor:} \textit{Le patient a re\c{c}u 500\,mg de tramadol par voie orale.}
-  \item \textit{La tension art\'erielle mesur\'ee \'etait de 160/90\,mmHg.}
-  \item \textit{Le diagnostic retenu est cirrhose h\'epatique de stade~III.}
-  \item \textit{Le patient rapporte une dyspn\'ee \'evoluant depuis une semaine.}
-\end{itemize}
+LLM reformulation plays a dual role. For MLM alone, the effect is modest ($+$0.59 F1), but reformulation is essential for relation prediction: on raw walks, structural markers provide formatting shortcuts that the classifier can exploit without learning medical semantics, whereas fluent prose forces the model to learn from content rather than format. The full gap between \method and MLM-only on raw walks is 4.45 points.
 
-We generate 1,500 balanced positive/negative pairs across 5 lengths (512--8,192 tokens) and 3 positions (start, middle, end), split 70/15/15 for train/validation/test. We freeze each encoder and train a 2-layer MLP probe (Dropout $\to$ Linear $\to$ GELU $\to$ Dropout $\to$ Linear) on CLS representations for 3 epochs (lr $= 2 \times 10^{-5}$, batch size 4, AdamW), selecting the best checkpoint by validation accuracy.
+\paragraph{Limitations.}
+All experiments use French medical coding. Extending to English ontologies such as ICD-11 and SNOMED-CT is left for future work. The reformulation step requires significant compute for LLM inference, and sensitivity to the choice of LLM has not been evaluated. Cantemist-FR and Distemist-FR are cross-lingual projections from Spanish \citep{zaghir2023frasimed}, which may introduce translation artifacts; FRACCO is the only native French benchmark. All experiments use ModernCamemBERT; generalization to other architectures remains untested.
 
-\paragraph{Results.} CLM outperforms MLM at every context length and position (+10.7pp overall: 62.2\% vs 51.6\%). MLM accuracy degrades monotonically with document length (57\% at 512 tokens to 43\% at 8,192), while CLM degrades more slowly and remains above MLM throughout. The CLM advantage is largest at mid-document positions, where the inserted fact is farthest from both sequence boundaries. This is consistent with the downstream pattern: the French tasks with the largest CLM gains (FrACCO, CANTEMIST) use sequence lengths of 4,096 tokens during fine-tuning.
+\paragraph{Future Work.}
+Future work will extend \method to English medical coding using UMLS and SNOMED-CT ontologies. A promising direction is cross-ontology walks that traverse edges between different ontologies (e.g., from a CIM-10 diagnosis to its ATC treatment to the CCAM procedure), generating richer walks that capture inter-ontology relationships in a single sequence.
 
+\section{Conclusion}
+\label{sec:conclusion}
 
-\section{Analysis: Why Does the CLM Detour Work?}
-\label{sec:analysis}
-
-\subsection{CKA Methodology}
-\label{sec:cka_method}
-
-We measure representational similarity with linear Centered Kernel Alignment~\citep{kornblith2019similarity}. Given two representation matrices $X \in \mathbb{R}^{n \times p}$ and $Y \in \mathbb{R}^{n \times q}$ (one per model, $n$ samples, mean-pooled over tokens), we center each column, compute Gram matrices $K = XX^\top$ and $L = YY^\top$, and define:
-\[
-\text{CKA}(X, Y) = \frac{\text{tr}(KL)}{\sqrt{\text{tr}(K^2)\,\text{tr}(L^2)}}
-\]
-We report divergence $d = 1 - \text{CKA}$, so higher values indicate greater representational difference. CKA equals 1 when representations are identical up to invertible linear transformation, 0 when there is no linear relationship. All computations use float64 arithmetic. For French we use 500 held-out texts from DiaMED and FrACCO; for English, PubMed abstracts. Results are averaged over 3 seeds.
-
-\subsection{The CLM Imprint Persists in Low Layers}
-\label{sec:persistence}
-
-% TODO: include CKA figure from figures/output/fig10_cka_combined.pdf
-
-Comparing layer-by-layer CKA between CLM-detour and MLM-only models, the CLM phase modifies low-layer representations in a way that subsequent MLM training does not undo, even when the decay budget matches the CLM phase. CKA divergence reaches approximately 56.5\% after 1.5B tokens of MLM decay and remains stable, with only 0.6pp variation over 8B additional tokens.
-
-To isolate where CLM differs from MLM \emph{specifically} rather than just from training noise, we normalize each layer's CLM-MLM divergence by a seed-noise control (two MLM models trained with different random seeds on identical data):
-\[
-r_\ell = \frac{1 - \text{CKA}(\text{CLM}_\ell,\; \text{MLM}^{s_1}_\ell)}{1 - \text{CKA}(\text{MLM}^{s_2}_\ell,\; \text{MLM}^{s_1}_\ell)}
-\]
-A ratio of 1 means no CLM-specific effect. Low layers (0--7) show ratios of 5--44$\times$: CLM changes them far more than random seed variation does. Mid and deep layers are near 1$\times$: both objectives modify them similarly, so CKA cannot distinguish CLM from MLM there.
-
-\subsection{Causal Evidence: Freeze Interventions}
-\label{sec:freeze-results}
-
-% TODO: include freeze figure from figures/tikz_figure1.tex
-
-Do these low-layer changes actually drive the downstream improvement? We answer with the freeze interventions described in \S\ref{sec:freeze}, summarized in \Cref{tab:freeze}.
-
-\begin{table}[t]
-\centering
-\small
-\caption{\textbf{Freeze intervention results} (French Base, 8 tasks, 9 seeds). Freezing low layers during CLM eliminates the benefit ($p=0.36$ vs MLM baseline). Freezing mid layers preserves it. Freezing low layers during decay has negligible effect.}
-\label{tab:freeze}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Condition} & \textbf{Avg $F_1$} & $\boldsymbol{\Delta}$ \textbf{vs MLM} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{3}{c}{\rule{0pt}{9pt}\textbf{References}} \\[1pt]
-MLM baseline & 57.9 & --- \\
-CLM detour & \bfseries 60.8 & +2.9 \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{3}{c}{\rule{0pt}{9pt}\textbf{Freeze interventions}} \\[1pt]
-Freeze L0--7 (CLM phase) & 58.4 & +0.5 \\
-Freeze L8--14 (CLM phase) & 60.3 & +2.4 \\
-Freeze L0--7 (decay phase) & 60.3 & +2.4 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Freezing low layers (0--7) during CLM drops $F_1$ from 60.8\% to 58.4\%. We cannot reject the null hypothesis that the resulting model matches the MLM baseline ($p = 0.36$, paired bootstrap across 8 tasks $\times$ 9 seeds). Freezing mid layers (8--14) during CLM preserves the full benefit (60.3\%). Together, these two experiments establish a double dissociation: low layers are necessary and mid layers are not. Freezing low layers during decay has negligible effect ($-$0.5pp, 60.3\%), confirming that MLM decay preserves the CLM imprint in low layers.
-
-\subsection{Non-Localizability}
-
-The freeze experiments show that low layers are necessary \emph{during training}. We now ask whether the resulting benefit can be localized \emph{after training}, by copying full parameter blocks from the CLM model into the MLM model.
-
-\begin{table}[t]
-\centering
-\small
-\caption{\textbf{Layer transplantation} on DiaMED (3 seeds, linear probing). No transplant recovers more than 35\% of the 7.1pp gap.}
-\label{tab:transplant}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Transplant} & \textbf{$F_1$ (\%)} & $\boldsymbol{\Delta}$ & \textbf{Recovery} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{References}} \\[1pt]
-MLM baseline & 32.8 & --- & 0\% \\
-CLM detour & 39.9 & +7.1 & 100\% \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{Layer group transplants}} \\[1pt]
-Low (0--7) & 31.9 & $-$0.9 & $-$12\% \\
-Mid (8--14) & 35.3 & +2.5 & +35\% \\
-Late (15--21) & 32.4 & $-$0.4 & $-$6\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-No transplant recovers more than 35\% of the gap (\Cref{tab:transplant}). Low and late layer transplants hurt performance. Inserting CLM low layers into an MLM model creates a mismatch with the mid and deep layers that co-adapted under MLM, yielding representations worse than either pure model.
-
-Component-level transplants (\Cref{tab:transplant-comp}) confirm the same pattern. Replacing all attention modules from CLM into MLM recovers only 15\% of the gap; replacing all MLP blocks recovers 35\%. No single component type captures the full benefit.
-
-\begin{table}[t]
-\centering
-\small
-\caption{\textbf{Component-level transplants} on DiaMED (3 seeds, linear probing). Neither attention nor MLP modules alone recover the full gap.}
-\label{tab:transplant-comp}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Transplant} & \textbf{$F_1$ (\%)} & $\boldsymbol{\Delta}$ & \textbf{Recovery} \\
-\midrule
-All attention & 33.9 & +1.1 & +15\% \\
-All MLP & 35.3 & +2.5 & +35\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Unlike freeze interventions, which act during training, transplants replace already-trained weights and cannot reconstruct the cross-layer co-adaptation that developed during CLM. The freeze experiments show low layers are necessary during training; the transplant experiments show the resulting benefit cannot be isolated post hoc.
-
-\subsection{Scaling and Architectural Asymmetry}
-\label{sec:asymmetry}
-
-\begin{table}[t]
-\centering
-\small
-\caption{\textbf{CKA divergence scales with model size and is asymmetric.} The encoder-decoder comparison uses different model families (see text).}
-\label{tab:asymmetry}
-\begin{tabular}{llcc}
-\toprule
-\textbf{Model} & \textbf{Params} & \textbf{Div.} & \textbf{CI} \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{Encoders (MLM$\to$CLM$\to$MLM)}} \\[1pt]
-ModernCamemBERT Base & 150M & 56.5\% & $\pm$0.7\% \\
-ModernCamemBERT Large & 350M & 67.2\% & $\pm$0.3\% \\
-\midrule
-\rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{Decoder (CLM$\to$MLM$\to$CLM)}} \\[1pt]
-Gemma-3 & 270M & 26.3\% & $\pm$1.0\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The CLM imprint increases with model capacity (\Cref{tab:asymmetry}): Large (350M) reaches 67.2\% $\pm$ 0.3\% divergence versus 56.5\% $\pm$ 0.7\% for Base (150M). Testing the reverse on Gemma-3 (270M decoder), MLM-then-CLM retains only 26.3\% $\pm$ 1.0\% divergence versus 67.2\% for an encoder of similar scale. One explanation is the density of the decay signal: MLM decay at 15\% masking provides weak erasure, while CLM decay at 100\% provides strong erasure. This comparison is exploratory: it is confounded by model family and language, and a controlled comparison using encoder and decoder variants of the same family would be needed to confirm the asymmetry.
-
-
-\section{Limitations}
-
-Our freeze interventions use French Base models only. The CKA patterns that motivate them (low-layer divergence well above seed noise) are consistent across French Base, French Large, and English Base, but replication of the freeze interventions on English and Large models would strengthen the causal claim. The encoder-decoder asymmetry comparison is confounded by model family. The position trade-off at 2048+ tokens means that the approach may not be suitable for tasks requiring very long context, such as full discharge summary coding.
-
-
-\section*{Conclusion}
-
-Training an encoder like a decoder, then converting it back, produces stronger representations than training with MLM alone. The CLM detour reshapes low transformer layers in ways that subsequent MLM decay does not undo: a lasting imprint that scales with model capacity and produces consistent downstream gains across 8 French and 11 English biomedical tasks.
-
-The practical implication is straightforward: for biomedical encoder pretraining, the CLM detour is a free lunch. Same data, same compute, better results. MLM decay of roughly 10\% of the detour length suffices, and the effect is strongest when the domain gap between pretraining and target data is large.
-
-\vspace{2em}
-
-Parts~1 and 2 of this thesis have focused on data and pretraining: how to collect biomedical text, how to filter it, and how to train encoder models on it. But a pretrained model is only useful if it can be deployed on real tasks. In the next part, we turn to adaptation: how to extract clinical information when labeled data is scarce, labels number in the thousands, and the only available text is public.
+We presented \method, a method that converts medical ontology structure into pretraining signal for encoder language models through random walks, LLM-based textbook reformulation, and multi-task learning combining masked language modeling and relation prediction. Our key finding is that alignment between objectives is essential: both tasks must train on the same data, as misalignment causes a 30-point degradation. On French medical coding benchmarks, \method improves over MLM-only pretraining by +2.5 micro-F1 on FRACCO and +8.0 on Distemist. We release 1.3 million LLM-reformulated medical textbooks across three French ontologies (CIM-10, CCAM, ATC) and pretrained model checkpoints.

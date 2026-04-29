@@ -27,20 +27,27 @@ The build uses **LuaLaTeX** with `--shell-escape`. On locale issues, prefix with
 ### Chapters Done (draft)
 - **Ch 1: Collecting Biomedical Text** — CamemBERT-bio corpus (biomed-fr). Hook, tables, vocab analysis, conclusion with cliffhanger to Ch 4.
 - **Ch 2: Detecting Content Types** — Biomed-Enriched + BiaHS. Hook with TikZ figure, full method/results/discussion, 4 results tables, 5 figures, BiaHS as footnoted section.
+- **Ch 4: Encoder Models for French Biomedicine** — CamemBERT-bio pretraining (DrBERT 128 GPUs vs CamemBERT-bio 2 GPUs hook, 3 results tables, methodology debate, carbon emissions, cliffhanger to Ch 5).
+- **Ch 6: Beyond Masked Language Modeling** — ModernCamemBERT-bio (CLM detour). Full content from COLM 2026 paper integrated into chapter body: hook, motivation with related work (Gisserot, Ettin, AntLM), method with TikZ pipeline, freeze interventions, French + English results tables, CKA analysis with formula, transplants (layer + component), needle-in-haystack with templates, decay sweep, scaling/asymmetry, fine-tuning protocol.
 
 ### Next Steps
-- **Ch 3: MC-Bio Corpus** — quality signals at scale for ModernCamemBERT-bio (from plan.tex slides Ch.3)
-- **Ch 4: Encoder Models for French Biomedicine** — CamemBERT-bio pretraining/evaluation (the other half of the paper, split from Ch 1)
-- **Ch 5-9** — placeholders
-- **Remaining TODOs in Ch 1-2:** real PMC paragraph examples, annotation prompt in appendix, pipeline.pdf and curve_triple.pdf not yet restyled, BiaHS figure is PNG not PDF
+- **Ch 3: MC-Bio Corpus** — quality signals at scale for ModernCamemBERT-bio. Material from `publications/TALN2026_MB-BIO/`.
+- **Ch 5: When Decoder Continue-Pretraining Stops Working** — discussion chapter (BioMistral -0.9, Meditron 332 GPU-h, forgetting, data overlap with LLM pretraining). Placeholder with notes in `chapter5/article.tex`.
+- **Ch 7: Limits of Direct Fine-Tuning** — discussion chapter setting up Ch 8-9
+- **Ch 8: Architectures for Low-Resource Extraction** — frenchmed-gliner / MedEmbed
+- **Ch 9: Synthetic Data for Task Adaptation** — OntoBook (LREC 2026)
+- **Remaining TODOs:** real PMC paragraph examples (Ch 2), annotation prompt in appendix (Ch 2), figures CKA + freeze for Ch 6 not yet generated as plots
 
 ### Key Decisions Made
 - CamemBERT-bio paper split: corpus → Ch 1, pretraining/eval → Ch 4
 - BiaHS is a section within Ch 2 (not its own chapter), footnoted as contribution to GAPeron
 - Discussion chapters (Ch 5, Ch 7) have no underlying paper — they set up problems
 - Preserve original paper text in article chapters; only add thesis framing
+- Paper appendices go INTO the chapter body (no manuscript-wide appendix for paper details)
+- Related work for chapter-specific topics stays IN the chapter, not promoted to the manuscript-wide RW
 - No "We have introduced X" in conclusions — conclude on insight, use cliffhangers
 - Bibliography is active (`\bibliography{thesis}` uncommented)
+- `publications/` contains live git clones of paper repos (kept up-to-date by re-cloning)
 
 ## Document Structure
 
@@ -66,16 +73,30 @@ sources/
 │   └── chapter3/article.tex     # TODO — MC-Bio corpus
 ├── part_2/                      # Pretraining Language Models
 │   ├── extensions_lm.tex        # Orchestration file
-│   ├── chapter4/article.tex     # NEXT — CamemBERT-bio pretraining
-│   ├── chapter5/article.tex     # TODO — decoder PT discussion
-│   └── chapter6/article.tex     # TODO — ModernCamemBERT-bio
+│   ├── chapter4/article.tex     # DONE — CamemBERT-bio pretraining
+│   ├── chapter5/article.tex     # PLACEHOLDER — decoder PT discussion
+│   └── chapter6/article.tex     # DONE — ModernCamemBERT-bio (CLM detour)
 ├── part_3/                      # Adapting to Clinical Tasks
 │   ├── clinical_tasks.tex       # Orchestration file
 │   ├── chapter7/article.tex     # TODO — fine-tuning limits discussion
 │   ├── chapter8/article.tex     # TODO — frenchmed-gliner
-│   └── chapter9/article.tex     # TODO — OntoBook
+│   └── chapter9/article.tex     # TODO — OntoBook (LREC 2026)
 ├── conclusion.tex
 └── appendix.tex
+```
+
+### Publications (live clones)
+
+```
+publications/
+├── CamemBERT_bio___LREC_COLING_2024/   # static — published paper
+├── Biomed-Enriched---ACL-2026/         # git clone, pull to update
+├── Gaperon_paper/                      # GAPeron (BiaHS section in Ch 2)
+├── ModernCamemBERT-bio/                # git clone of colm2026-clm-detour
+├── OntoBook/                           # git clone of kgllm2026 (LREC 2026)
+├── TALN2026_MB-BIO/                    # MC-Bio corpus paper (TALN 2026) — Ch 3 source
+├── frenchmed-gliner/                   # planning notes (paper TBD)
+└── Internship_report/                  # archive
 ```
 
 ### Plots (centralized)
