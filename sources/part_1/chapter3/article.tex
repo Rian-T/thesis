@@ -1,1 +1,181 @@
-% TODO: Write chapter content
+% This chapter is based on the corpus contribution of:
+%   Rian Touchent, Éric de la Clergerie.
+%   ModernCamemBERT-bio: un encodeur biomédical et clinique français à contexte long.
+%   TALN 2026.
+%
+% Source: publications/TALN2026_MB-BIO/
+% This chapter covers only the corpus (biomed-fr-v2). The pretraining and evaluation
+% are presented in \Cref{chap:objectives}.
+
+\section{Introduction}
+
+Here is one passage as it came out of an ISTEX PDF:
+
+\begin{quote}\small\ttfamily
+\dots{} vise \textasciitilde{} remonter l\&apos;organe prolab6 (correction de la pt6se) et h le soutenir dans sa position id6ale plus qu\&apos;/\textasciitilde{} le fixer (fixation). Ce sout\textasciitilde{}nement est assur6 par le renforcement du p6rin6e grace aux tissus naturels que l\&apos;on r6pare (rapphie) ou que l\&apos;on consolide avec du mat6riel local (plastie, ligamentopexie)\dots{}
+\end{quote}
+
+\noindent And here is what it should read:
+
+\begin{quote}\small
+\dots{} la chirurgie vise à remonter l'organe prolapsé (correction de la ptose) et à le soutenir dans sa position idéale plus qu'à le fixer (fixation). Ce soutien est assuré par le renforcement du périnée grâce aux tissus naturels que l'on répare (raphie) ou que l'on consolide avec du matériel local (plastie, ligamentopexie)\dots{}
+\end{quote}
+
+\noindent OCR had read every \emph{é} as a \emph{6}, apostrophes came as \texttt{l\&apos;}, and tildes had drifted into the middle of words. Multiply this by the hundreds of thousands of similar PDFs in HAL and ISTEX, and assembling a 10-billion-token biomedical training mixture stops being a collection problem and becomes a repair problem.
+
+\Cref{chap:collecting} introduced \textit{biomed-fr}, a 413-million-word public French biomedical corpus. \Cref{chap:quality} showed that paragraph-level annotation by a large language model can identify content types and educational quality more precisely than document-level filters, and that neural quality classifiers carry contamination risks. This chapter applies these lessons at scale. We assemble \textit{biomed-fr-v2}, a 10-billion-token mixture from six French sources, and ask which quality signals actually improve downstream performance once the dust settles. The corpus is the training data for ModernCamemBERT-bio, presented in \Cref{chap:objectives}.
+
+The contributions of this chapter are: (1) a multi-source French biomedical corpus 25 times larger than \textit{biomed-fr}, including a curation pipeline that handles the OCR artifacts, boilerplate, and structural noise of HAL and ISTEX; (2) an LLM-based annotation of 2.16 million paragraphs along four quality signals and nine content types; (3) ablation studies that quantify the effect of each signal and each type on downstream performance, with one notable surprise: writing-quality and terminological-precision filters \emph{degrade} performance.
+
+
+\section{Sources}
+\label{sec:corpus-sources}
+
+We assemble \textit{biomed-fr-v2} from six complementary French-language sources. HAL, ISTEX, and FineWiki-bio cover scientific biomedical literature. EMEA contributes drug package inserts. E3C contributes clinical case reports. Synthetic textbooks generated from medical ontologies complete the mixture with the vocabulary of French administrative nomenclatures. The final composition is summarized in \Cref{tab:mcbio-corpus}.
+
+\begin{itemize}
+\item \textbf{HAL.} Medical theses, research articles, and reports deposited on the HAL open archive, filtered to the biomedicine section.
+\item \textbf{ISTEX.} French scientific articles from the ISTEX corpus, filtered to biology and medicine.
+\item \textbf{FineWiki-bio.} Biomedical subset of FineWiki, the Wikipedia counterpart to FineWeb~\citep{penedo2024fineweb}, restricted to French and filtered for the biomedical domain.
+\item \textbf{EMEA}~\citep{neveol14quaero}. Drug package inserts published in French by the European Medicines Agency.
+\item \textbf{E3C}~\citep{magnini_e3c_2021}. Multilingual clinical corpus (layer 3, French partition), composed of clinical cases extracted from medical journals and theses.
+\item \textbf{Synthetic ontology textbooks.} Educational text generated from three French medical ontologies published by the Agence du Numérique en Santé in RDF/OWL format: CIM-10 (diagnoses, 19{,}161 codes), CCAM (procedures, 38{,}191 codes), and ATC (medications, 6{,}950 codes). Random walks through the ontology graph (1.3 million walks total) traverse hierarchical relations and, for CIM-10, causal and exclusion relations. A large language model (Qwen3-235B-A22B-Instruct) reformulates each walk into a paragraph of medical prose while preserving the original codes and relations. The full pipeline is described in \Cref{chap:ontobook}.
+\end{itemize}
+
+HAL and ISTEX are distributed in heterogeneous formats: some documents come with structured XML, others only as PDFs, sometimes scans of printed material. For documents without clean XML, we apply the extraction and cleaning pipeline described in \Cref{sec:corpus-pipeline}. FineWiki-bio, EMEA, E3C, and the synthetic textbooks are already of high quality and are integrated directly into the final mixture, bypassing this pipeline.
+
+
+\section{Curation Pipeline}
+\label{sec:corpus-pipeline}
+
+A portion of HAL and ISTEX documents come with clean XML and proceed directly to annotation. The other portion is available only as PDFs, sometimes scans of printed material (particularly for articles published before the 1990s). Once converted to text, these PDFs contain OCR artifacts (incorrect ligatures, character substitutions, fragmented words), bibliographic references, repeated headers, and irrelevant content. We therefore apply an LLM-based extraction and cleaning pipeline, described below. The other sources (FineWiki-bio, EMEA, E3C, synthetic textbooks) are already clean and bypass this pipeline entirely.
+
+\paragraph{Extraction and cleaning.} Each document is split into segments of approximately 5{,}000 tokens at paragraph boundaries. A large language model (Qwen3-Next-80B-A3B-Instruct) receives each segment and produces structured JSON output containing semantically complete passages, with references, metadata, headers, and captions removed, and OCR errors corrected (ligatures, encoding). Extracted passages must contain between 30 and 600 words and at least 60\% alphabetic characters. We then apply Jaccard-similarity deduplication (threshold 0.80, sliding window of 5 passages), followed by the FineWeb-2 filter chain for French: encoding correction, repetition filters, and Gopher and FineWeb quality filters.
+
+\paragraph{Fidelity verification.} To ensure the LLM does not introduce content absent from the source, we measure character-level overlap between each extracted passage and its source document on 300 ISTEX passages (after typographic normalization). 94.4\% of passages have $\geq 90$\% overlap and 84.1\% have $\geq 99$\% overlap; the median rate of words absent from the source is zero (mean: 3.4\%). Manual inspection of edge cases shows that divergences come from OCR corrections (such as the surgical passage shown at the start of this chapter) or from converting tables into prose. The opposite case is also common: a clean 1{,}143-character passage on cancer-related depression is extracted with 100\% character overlap and no additional words introduced. These two cases bracket the typical behavior of the pipeline: it cleans aggressively when the source is corrupted by OCR, and copies verbatim when the source is already clean.
+
+\paragraph{LLM quality annotation.} The same LLM annotates each passage along four quality signals scored from 1 to 10: educational value (\texttt{edu}, mean 6.5), content richness (\texttt{cont}, 6.8), writing quality (\texttt{writ}, 7.6), and terminological precision (\texttt{term}, 7.6). The codes in parentheses are the abbreviations used in ablation tables. A content type is also assigned among nine categories: \texttt{research\_findings} (526k passages), \texttt{medical\_knowledge} (388k), \texttt{clinical\_guidance} (218k), \texttt{research\_methodology}, \texttt{drug\_information}, \texttt{background\_review}, \texttt{policy\_administrative}, \texttt{patient\_case} (36k), and \texttt{other}. In total, 2.16 million passages are annotated.
+
+
+\section{Content-Type Ablation}
+
+We measure the effect of each content type by ablation: we remove one type and compare against the full corpus on three evaluation tasks (DiaMed, FrACCO-30, and EMEA, 9 seeds). \Cref{tab:mcbio-content-type} shows that removing \texttt{drug\_information} \emph{improves} performance by $+0.67$pp, while removing \texttt{medical\_knowledge} degrades it by $-0.13$pp. A random control (removing the same amount of text at random) gives $+0.04$pp, confirming that the effect is specific to the content type.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Type removed} & \textbf{Avg $F_1$} & $\boldsymbol{\Delta}$ \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Removal helps}} \\[1pt]
+\texttt{drug\_information} & 64.35 & $+$0.67pp \\
+\texttt{research\_findings} & 64.24 & $+$0.56pp \\
+\texttt{policy\_administrative} & 64.07 & $+$0.39pp \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Controls}} \\[1pt]
+Random (same volume) & 63.72 & $+$0.04pp \\
+Full corpus (reference) & 63.68 & ref. \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Removal hurts}} \\[1pt]
+\texttt{medical\_knowledge} & 63.55 & $-$0.13pp \\
+\texttt{research\_methodology} & 63.51 & $-$0.17pp \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Content-type ablation.} We remove one type and measure $\Delta$ relative to the full corpus.}
+\label{tab:mcbio-content-type}
+\end{table}
+
+We exclude \texttt{drug\_information} from the final corpus (redundant with the EMEA source already included separately) and \texttt{other}. Paragraphs shorter than 50 tokens are also excluded.
+
+
+\section{Quality Filtering and Upsampling}
+\label{sec:upsampling}
+
+We then test the effect of thresholding on the quality signals (\Cref{tab:mcbio-quality-signals}). Joint filtering with \texttt{edu}$\geq 7$ and \texttt{cont}$\geq 7$ produces a $+0.48$pp gain; a stricter threshold (\texttt{edu}$\geq 8$ and \texttt{cont}$\geq 8$) reaches $+0.55$pp. By contrast, the writing-quality and terminological-precision signals \emph{degrade} performance when used as filters ($-0.26$ and $-0.33$pp). This degradation likely comes from the fact that these filters eliminate informal but informative clinical documents, such as case notes and lightly edited reports.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Filter} & \textbf{Avg $F_1$} & $\boldsymbol{\Delta}$ \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Helpful filters}} \\[1pt]
+\texttt{edu}$\geq 8$ AND \texttt{cont}$\geq 8$ & \bfseries 59.37 & $+$0.55pp \\
+\textbf{\texttt{edu}$\geq 7$ AND \texttt{cont}$\geq 7$} & \underline{59.30} & \textbf{$+$0.48pp} \\
+\texttt{edu}$\geq 6$ AND \texttt{cont}$\geq 6$ & 58.95 & $+$0.13pp \\
+\midrule
+No filter (reference) & 58.82 & ref. \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Harmful filters}} \\[1pt]
+\texttt{term}$\geq 7$ & 58.57 & $-$0.26pp \\
+\texttt{writ}$\geq 7$ & 58.49 & $-$0.33pp \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Quality-signal ablation.} Educational value and content richness improve performance; writing quality and terminological precision degrade it.}
+\label{tab:mcbio-quality-signals}
+\end{table}
+
+Rather than applying a strict filter, we adopt a quality-weighted upsampling inspired by FineWeb~\citep{penedo2024fineweb}. Each article receives a quality ratio, defined as the proportion of its paragraphs satisfying \texttt{edu}$\geq 7$ AND \texttt{cont}$\geq 7$. Articles are then upsampled in proportion to this ratio (\Cref{tab:mcbio-upsampling}). Articles with 0\% high-quality paragraphs are excluded from the final corpus.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{12pt}
+\begin{tabular}{lr}
+\toprule
+\textbf{Ratio of \texttt{edu}$\geq 7$ AND \texttt{cont}$\geq 7$ paragraphs} & \textbf{Coefficient} \\
+\midrule
+0\% & excluded \\
+1--25\% & 4.3$\times$ \\
+26--50\% & 8.5$\times$ \\
+51--75\% & 12.8$\times$ \\
+76--99\% & 21.3$\times$ \\
+100\% & 34.1$\times$ \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Upsampling coefficients} per article-quality bucket.}
+\label{tab:mcbio-upsampling}
+\end{table}
+
+
+\section{Final Composition}
+
+The final training mixture, after cleaning and quality-weighted upsampling, contains 10 billion tokens (\Cref{tab:mcbio-corpus}). These 10 billion include the repetitions induced by upsampling (coefficients ranging from 4.3$\times$ to 34.1$\times$ depending on quality, see \Cref{sec:upsampling}); the underlying unique content is more limited. HAL and ISTEX articles (passed through the pipeline of \Cref{sec:corpus-pipeline}) and FineWiki-bio (integrated as-is) are grouped under ``curated biomedical articles.'' The three other sources (EMEA, E3C, synthetic textbooks) are also integrated as-is.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Source} & \textbf{Tokens} & \textbf{\%} & \textbf{Content} \\
+\midrule
+Curated biomedical articles & 7B & 70\% & HAL + ISTEX + FineWiki-bio \\
+Synthetic ontology textbooks & 2B & 20\% & CIM-10, CCAM, ATC \\
+EMEA (drug inserts) & 600M & 6\% & Pharmacology \\
+E3C (clinical sentences) & 400M & 4\% & Patient cases \\
+\midrule
+\textbf{Total} & \textbf{10B} & \textbf{100\%} & \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Composition of the \textit{biomed-fr-v2} training mixture} after quality-weighted upsampling.}
+\label{tab:mcbio-corpus}
+\end{table}
+
+
+\section*{Conclusion}
+
+Two findings emerge from the ablations. First, not all content types contribute equally: removing drug information actually improves downstream performance, while removing medical knowledge degrades it. Second, not all quality signals work as filters: educational value and content richness help, but writing-quality and terminological-precision filters \emph{hurt} performance, likely because they remove the informal but informative clinical documents that ultimately matter most. The lesson, perhaps, is that curation should be guided by what is being said, not by how well it is written.
+
+\vspace{2em}
+
+The corpus is now ready. The next two chapters use it to train French biomedical encoders. \Cref{chap:encoders} starts with the simplest recipe (continual pretraining with MLM on \textit{biomed-fr}) and shows that even a modest public corpus produces a competitive model. \Cref{chap:objectives} returns to \textit{biomed-fr-v2} with a more ambitious recipe: a temporary detour through causal language modeling that, somewhat unexpectedly, leaves a permanent imprint on the encoder.

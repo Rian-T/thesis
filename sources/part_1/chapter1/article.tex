@@ -115,11 +115,11 @@ The relatively modest performance gain of PubMedBERT compared to BioBERT and the
 
 It is important to discuss some limitations of our corpus.
 
-Firstly, \textit{biomed-fr} is limited in its diversity. This is because we chose to only use publicly available materials, which tend to lean towards scientific content. As a result, models trained on this corpus may not fully represent performances on real private clinical data. The gap between scientific and clinical text is a recurring challenge that we address in \Cref{chap:content-types}.
+Firstly, \textit{biomed-fr} is limited in its diversity. This is because we chose to only use publicly available materials, which tend to lean towards scientific content. As a result, models trained on this corpus may not fully represent performances on real private clinical data. The gap between scientific and clinical text is a recurring challenge that we address in \Cref{chap:quality}.
 
 Furthermore, we did not explore any potential biases in our data and some parts of the dataset would benefit from further cleaning. These aspects could impact the outputs of models trained on this corpus and should be investigated.
 
-Third, all documents from the selected sources were included indiscriminately, without assessing whether individual passages were genuinely useful for pretraining. Whether such filtering would improve downstream performance is an open question that we explore in \Cref{chap:quality,chap:content-types}.
+Third, all documents from the selected sources were included indiscriminately, without assessing whether individual passages were genuinely useful for pretraining. Whether such filtering would improve downstream performance is an open question that we explore in \Cref{chap:quality,chap:mcbio}.
 
 
 \section*{Conclusion}
