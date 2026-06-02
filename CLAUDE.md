@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PhD thesis repository for Rian Touchent-Saad at Sorbonne Université / INRIA Paris (ALMAnaCH Team).
 
-**Title:** "Public-Data Pretraining for Clinical Information Extraction: Methods under Scarcity and Privacy Constraints"
+**Title (working, still being iterated):** "Improving Clinical Information Extraction with Public-Data Pretraining" (active title page). Note: `\title{}`/`pdftitle` in `thesis.tex` and the title page currently disagree — reconcile before submission.
 
 **Archive:** Nathan Godey's original thesis content is preserved in `_archive/` for reference.
 
@@ -91,7 +91,7 @@ Chapter↔label↔source map (labels are set in the part orchestration files, no
 ### Key Decisions Made
 - CamemBERT-bio paper split: corpus → Ch 1, pretraining/eval → Ch 4
 - BiaHS is a section within Ch 2 (not its own chapter), footnoted as contribution to GAPeron
-- Discussion chapters (Ch 5, Ch 7) have no underlying paper — they set up problems
+- Ch 7 is a discussion chapter with no underlying paper — it sets up Ch 8-9. (The old decoder-CPT discussion now lives inside Ch 5 §2.1, the CLM Detour chapter.)
 - Preserve original paper text in article chapters; only add thesis framing
 - Paper appendices go INTO the chapter body (no manuscript-wide appendix for paper details)
 - Related work for chapter-specific topics stays IN the chapter, not promoted to the manuscript-wide RW
@@ -112,7 +112,8 @@ sources/
 ├── title/title.tex              # Title page (French) - DONE
 ├── abstract.tex                 # Abstract - TODO
 ├── introduction.tex             # Introduction with Sutton quote - DRAFT
-├── related_works/               # Related works - DRAFTS in .md
+├── related_works.tex            # Orchestration file (\input the 3 RW chapters)
+├── related_works/               # live drafts in .tex (.md are older source drafts)
 │   ├── language_modeling.tex
 │   ├── corpus_annotation.tex
 │   └── clinical_ie.tex
