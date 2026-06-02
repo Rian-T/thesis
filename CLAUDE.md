@@ -22,21 +22,71 @@ latexmk -c
 
 The build uses **LuaLaTeX** with `--shell-escape`. On locale issues, prefix with `LC_ALL=C`.
 
+## Bibliography Hallucination Check
+
+A single hallucinated reference can cause a desk reject. `tools/verify_bib.py`
+resolves every **cited** bib entry against real databases (Crossref by DOI,
+arXiv by id, then OpenAlex / DBLP / Crossref by title) and flags any whose
+metadata does not match a real publication.
+
+```bash
+make checkbib          # cited entries only (default), non-blocking report
+make checkbib-all      # every entry in thesis.bib
+make checkbib-strict   # exit 1 if any MISMATCH/NOT_FOUND (pre-submission gate)
+```
+
+- Verdicts: `VERIFIED` / `MISMATCH` (found but a field diverges — likely
+  hallucination) / `NOT_FOUND` (possibly invented) / `SKIPPED` (whitelisted).
+- It is **non-blocking by design**: it flags for human review, never edits the
+  `.bib`. It validates that a reference is *real and accurate*, not that the
+  *right* paper is cited in the right place (that stays a human job).
+- False positives happen on poorly-indexed venues (French ATALA/TALN/DEFT
+  workshops, e.g. `cardon_presentation_2020`). Add genuinely-unverifiable keys
+  to `tools/bibcheck_whitelist.txt` — keep that list short and justified.
+- Results are cached in `tools/.bibcheck_cache.json`, so re-runs are fast/offline.
+- Run `make checkbib` after adding or editing any `\cite`d reference, and
+  `make checkbib-strict` before any submission.
+
+## Git Commit Conventions
+
+These OVERRIDE any default Claude Code commit behavior:
+
+- **Sole author is Rian.** Never add `Co-Authored-By` trailers (no Claude, no anyone). The git author config (`rian-t <rian.touchent@inria.fr>`) is already correct — do not change it.
+- **Messages: minimal, telegraphic, dense.** Lowercase, no filler, no marketing slop. State exactly what changed (and why, if non-obvious) in as few words as possible. One-line subject; add a terse body only when several distinct changes need listing.
+- Good: `dedup bib: drop 4 ontobook duplicate entries, ch6 -> canonical keys`
+- Bad: `This commit improves the bibliography by carefully removing some duplicate entries that were found...`
+
 ## Current Status
 
-### Chapters Done (draft)
-- **Ch 1: Collecting Biomedical Text** — CamemBERT-bio corpus (biomed-fr). Hook, tables, vocab analysis, conclusion with cliffhanger to Ch 4.
-- **Ch 2: Detecting Content Types** — Biomed-Enriched + BiaHS. Hook with TikZ figure, full method/results/discussion, 4 results tables, 5 figures, BiaHS as footnoted section.
-- **Ch 4: Encoder Models for French Biomedicine** — CamemBERT-bio pretraining (DrBERT 128 GPUs vs CamemBERT-bio 2 GPUs hook, 3 results tables, methodology debate, carbon emissions, cliffhanger to Ch 5).
-- **Ch 6: Beyond Masked Language Modeling** — ModernCamemBERT-bio (CLM detour). Full content from COLM 2026 paper integrated into chapter body: hook, motivation with related work (Gisserot, Ettin, AntLM), method with TikZ pipeline, freeze interventions, French + English results tables, CKA analysis with formula, transplants (layer + component), needle-in-haystack with templates, decay sweep, scaling/asymmetry, fine-tuning protocol.
+Chapter↔label↔source map (labels are set in the part orchestration files, not in `article.tex`):
 
-### Next Steps
-- **Ch 3: MC-Bio Corpus** — quality signals at scale for ModernCamemBERT-bio. Material from `publications/TALN2026_MB-BIO/`.
-- **Ch 5: When Decoder Continue-Pretraining Stops Working** — discussion chapter (BioMistral -0.9, Meditron 332 GPU-h, forgetting, data overlap with LLM pretraining). Placeholder with notes in `chapter5/article.tex`.
-- **Ch 7: Limits of Direct Fine-Tuning** — discussion chapter setting up Ch 8-9
-- **Ch 8: Architectures for Low-Resource Extraction** — frenchmed-gliner / MedEmbed
-- **Ch 9: Synthetic Data for Task Adaptation** — OntoBook (LREC 2026)
-- **Remaining TODOs:** real PMC paragraph examples (Ch 2), annotation prompt in appendix (Ch 2), figures CKA + freeze for Ch 6 not yet generated as plots
+| Ch | `\label` | Title | Source paper |
+|----|----------|-------|--------------|
+| 1 | `chap:collecting` | Collecting Biomedical Text | CamemBERT-bio (corpus part) |
+| 2 | `chap:quality` | Detecting Content Types | Biomed-Enriched + BiaHS (GAPeron) |
+| 3 | `chap:mcbio` | Which Quality Signals Matter? | MC-Bio / biomed-fr-v2 (TALN 2026) |
+| 4 | `chap:encoders` | Encoder Models for French Biomedicine | CamemBERT-bio (pretraining/eval) |
+| 5 | `chap:objectives` | Beyond Masked Language Modeling | CLM Detour (COLM 2026) |
+| 6 | `chap:ontobook` | Knowledge-Enriched Pretraining | OntoBook (LREC 2026) |
+| 7 | `chap:limits` | Limits of Direct Fine-Tuning | discussion (no paper) |
+| 8 | `chap:architectures` | Architectures for Low-Resource Extraction | frenchmed-gliner / MedEmbed (WIP) |
+| 9 | `chap:synthetic` | Synthetic Data for Task Adaptation | OntoBook data + synthetic clinical reports (WIP) |
+
+### Chapters Done (draft)
+- **Ch 1 (`chap:collecting`)** — biomed-fr corpus (413M words, ISTEX/CLEAR/E3C). Hook, tables, vocab analysis, cliffhanger to Ch 4.
+- **Ch 2 (`chap:quality`)** — Biomed-Enriched (paragraph-level annotation, 2M clinical case paragraphs) + BiaHS as footnoted section. Full method/results/discussion. TODO: real PMC paragraph examples in the motivation figure; annotation prompt in appendix.
+- **Ch 3 (`chap:mcbio`)** — biomed-fr-v2 (10B tokens, 6 sources). Content-type + quality-signal ablations (writing-quality/term filters *degrade* perf). Done.
+- **Ch 4 (`chap:encoders`)** — CamemBERT-bio pretraining (+2.54 F1, 32× less CO2; DrBERT 20-pt loss = eval artifact). Done.
+
+### Chapters Drafted But With Debt
+- **Ch 5 (`chap:objectives`)** — CLM Detour (COLM 2026). Body is integrated, BUT §2.1 "When Decoder Continue-Pretraining Stops Working" is **entirely a placeholder** (notes in comments: BioMistral -0.9, Meditron 332 GPU-h, Dorfner, forgetting, data overlap). 3 figures still TODO: needle-in-haystack, CKA combined, freeze interventions.
+- **Ch 6 (`chap:ontobook`)** — OntoBook (LREC 2026). Pasted verbatim, not yet thesis-ified: intro is the paper intro (not a hook); conclusion starts with "We presented…" (forbidden); uses `\section{Conclusion}` instead of `\section*`; tables/figures not yet on `thesis-style.sty`. Bib duplicates already fixed (now uses canonical keys: `lee_biobert_2019`, `gu_domain-specific_2022`, `martin-etal-2020-camembert`, `devlin_bert_2019`).
+
+### To Write
+- **Ch 7 (`chap:limits`)** — discussion chapter (no paper). Sets up why direct fine-tuning fails for clinical IE (label scarcity, thousands of classes, public-text-only) to motivate Ch 8-9.
+- **Ch 8 (`chap:architectures`)** — frenchmed-gliner / MedEmbed. **Very WIP** (notes dated 2026-01-29 in `publications/frenchmed-gliner/paper/`): GLiNER2 bi-encoder, MedEmbed label encoder (ModernCamemBERT-base, 8192 ctx), ~1.5M training pairs (RDF/synthetic/persona), OntoBench-FR benchmark, MedEmbed-v4 = 32.9% avg (vs Solon 32.5%). No stable results yet.
+- **Ch 9 (`chap:synthetic`)** — §OntoBook data (currently duplicates Ch 6's walk-generation prose — should `\Cref` to Ch 6 instead of repeating); §synthetic clinical reports is a placeholder (paper in progress).
+- **Front matter** — abstract/résumé, introduction (with research questions), conclusion. Not started.
 
 ### Key Decisions Made
 - CamemBERT-bio paper split: corpus → Ch 1, pretraining/eval → Ch 4
@@ -67,20 +117,20 @@ sources/
 │   ├── corpus_annotation.tex
 │   └── clinical_ie.tex
 ├── part_1/                      # Building a Biomedical Corpus
-│   ├── analysis_lm.tex          # Orchestration file
-│   ├── chapter1/article.tex     # DONE — CamemBERT-bio corpus
-│   ├── chapter2/article.tex     # DONE — Biomed-Enriched + BiaHS
-│   └── chapter3/article.tex     # TODO — MC-Bio corpus
+│   ├── analysis_lm.tex          # Orchestration file (sets chap labels)
+│   ├── chapter1/article.tex     # DONE — biomed-fr corpus (chap:collecting)
+│   ├── chapter2/article.tex     # DONE — Biomed-Enriched + BiaHS (chap:quality)
+│   └── chapter3/article.tex     # DONE — MC-Bio / biomed-fr-v2 (chap:mcbio)
 ├── part_2/                      # Pretraining Language Models
-│   ├── extensions_lm.tex        # Orchestration file
-│   ├── chapter4/article.tex     # DONE — CamemBERT-bio pretraining
-│   ├── chapter5/article.tex     # PLACEHOLDER — decoder PT discussion
-│   └── chapter6/article.tex     # DONE — ModernCamemBERT-bio (CLM detour)
+│   ├── extensions_lm.tex        # Orchestration file (sets chap labels)
+│   ├── chapter4/article.tex     # DONE — CamemBERT-bio pretraining (chap:encoders)
+│   ├── chapter5/article.tex     # DRAFT (debt) — CLM Detour, COLM 2026 (chap:objectives); §2.1 placeholder, 3 figs TODO
+│   └── chapter6/article.tex     # DRAFT (debt) — OntoBook, LREC 2026 (chap:ontobook); not thesis-ified yet
 ├── part_3/                      # Adapting to Clinical Tasks
-│   ├── clinical_tasks.tex       # Orchestration file
-│   ├── chapter7/article.tex     # TODO — fine-tuning limits discussion
-│   ├── chapter8/article.tex     # TODO — frenchmed-gliner
-│   └── chapter9/article.tex     # TODO — OntoBook (LREC 2026)
+│   ├── clinical_tasks.tex       # Orchestration file (sets chap labels)
+│   ├── chapter7/article.tex     # TODO — fine-tuning limits discussion (chap:limits)
+│   ├── chapter8/article.tex     # TODO — frenchmed-gliner / MedEmbed, WIP (chap:architectures)
+│   └── chapter9/article.tex     # DRAFT (partial) — OntoBook data + clinical reports placeholder (chap:synthetic)
 ├── conclusion.tex
 └── appendix.tex
 ```
