@@ -1,0 +1,17 @@
+# One per line: a bib KEY or an ENTRYTYPE to skip in verify_bib.py.
+# Use ONLY for entries that genuinely cannot be checked against public
+# databases (internal reports, personal communications, datasets without DOI).
+# Everything here is trusted blindly — keep it short and justified.
+#
+# examples:
+# touchent_internship_2022   # internship report, not published
+seqeval   # software (no venue/DOI), verified real on GitHub
+
+# Verified real by hand; venue poorly indexed by Crossref/OpenAlex/DBLP/S2:
+neveol14quaero                  # QUAERO French Medical Corpus, Névéol et al., LREC 2014
+touchent2023camembertbio        # CamemBERT-bio, Touchent et al., TALN 2023 (own paper)
+cardon_presentation_2020        # DEFT 2020 overview, ATALA workshop
+le_clercq_de_lannoy_strategies_2022  # TALN 2022
+miranda2022distemist            # DisTEMIST overview, BioASQ/CEUR 2022
+shashikumar2023bioontobert      # BioOntoBERT, ICBO/CEUR-WS Vol-3603, 2023 (verified via ceur-ws.org)
+lindberg_unified_1993           # UMLS, Lindberg et al., Methods Inf Med 1993
