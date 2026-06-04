@@ -1,0 +1,110 @@
+\chapter{Clinical Text}
+\label{chap:bt-clinical}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      text width=0.84\textwidth, inner sep=11pt, align=left,
+      font=\footnotesize, text=ThesisInk] {
+{\bfseries CENTRE HOSPITALIER DE SAINT-AUBIN}\hfill Dossier n\textsuperscript{o} 4471902\\[1pt]
+Service de Cardiologie --- Unité de Soins Intensifs\hfill Séjour : 03/11--08/11/2024\\[5pt]
+{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[5pt]
+\textbf{Patient :} CARON Julien, né le 14/03/1962 (62 ans).\quad\textbf{Destinataire :} D\textsuperscript{r} S.~Lemaire.\\[6pt]
+\textbf{Motif.} Douleur thoracique constrictive rétrosternale, irradiation bras G, depuis 2h.\\[5pt]
+\textbf{Antécédents.} HTA. DT2 sous metformine. Tabac 30 PA. Dyslipidémie.\\[5pt]
+\textbf{Examen.} TA 148/92, FC 98, SpO\textsubscript{2} 96\% AA, EVA 7/10. Pas de signe d'IVG.\\[5pt]
+\textbf{Paraclinique.} ECG : sus-décalage ST V1--V4. Tropo T 4520 ng/L (N $<$14).
+Coro : occlusion IVA proximale, angioplastie + stent actif, TIMI 3. ETT : FEVG 40\%.\\[5pt]
+\textbf{Au total.} SCA ST+ antérieur (I21.0).\\[5pt]
+\textbf{Ttt sortie.} Kardégic 75, ticagrélor 90x2, atorvastatine 80, bisoprolol 2,5, ramipril 5.\\[5pt]
+\textbf{CAT.} Réadaptation cardiaque. Consultation cardio à 1 mois.\hfill D\textsuperscript{r} C.~Després
+};
+\end{tikzpicture}
+\caption{A discharge summary for an acute myocardial infarction. The patient,
+hospital, and clinicians are fictitious; the telegraphic style reproduces a real
+note used only as a template. The same case returns later as scientific and lay
+text.}
+\label{fig:bt-clinical-note}
+\end{figure}
+
+% === P1 — HOOK ===
+\Cref{fig:bt-clinical-note} is a discharge summary, written by one cardiologist
+for another. It is also, to a reader of ordinary French, barely a text at all.
+Articles and verbs have dropped out, findings arrive as fragments, drugs are
+named by brand and dose, and the diagnosis is a code. Most of it would look, to
+an outsider, like careless writing: abbreviations without explanation, units
+fused to numbers, sentences that never finish. The natural reaction is to call
+it bad French and to clean it up. We argue the opposite. The note is not
+degraded general French but a different system, with its own grammar, written
+for readers who already know almost everything it leaves out.
+
+% === P2 ===
+This intuition has a precise name. In the 1960s, Zellig Harris observed that the
+language of a specialised field is not the general language with a smaller
+vocabulary, but a system in its own right \citep{harris_mathematical_1968}. He
+called it a \emph{sublanguage}: the sentences a community produces about a
+restricted domain, governed by co-occurrence constraints tighter than, and
+sometimes absent from, the language as a whole. The constraints are the point.
+In a sublanguage only certain word classes may combine, so its grammar lies
+partly outside ordinary usage rather than inside it as a subset. Harris and
+colleagues later made the claim concrete, deriving the grammar of an immunology
+subfield from its articles alone and showing that the field's information was, in
+effect, its sublanguage \citep{harris_immunology_1989}.
+
+% === P3 ===
+The clinical note is the best-documented case of this idea. Building a computer
+grammar of clinical English, Naomi Sager's Linguistic String Project found that
+the parser needed rules for elliptical fragments that standard English does not
+license, alongside word classes specific to the domain such as patient, finding,
+and treatment \citep{sager_nlip_1981, sager_mlp_1987}. A contemporary panel set
+out the conditions under which such a system arises: a restricted domain, a
+restricted purpose, a restricted mode of communication whose time and space
+limits favour compressed forms, and a community of experts who enforce the
+patterns \citep{kittredge_sublanguages_1982}. A sublanguage grammar, in this
+view, intersects the standard grammar without being contained in it. Sager's
+further step, mapping each sentence into a fixed template of slots, is the direct
+ancestor of clinical information extraction.
+
+% === P4 ===
+If the clinic runs its own grammar, so does the laboratory, and the two are not
+the same. Friedman and colleagues compared clinical reports with
+molecular-biology articles and described them as two distinct sublanguages, each
+with its own word classes and information structure, both derivable from Harris's
+theory \citep{friedman_two_2002}. The consequence matters here. ``Biomedical
+text'' is not a single object: its abundant, public part, the scientific
+literature, belongs to a different sublanguage from the rare, private target, the
+patient note. Friedman's clinical system, \textsc{MedLEE}, shows the practical
+end of the same idea, parsing radiology reports into a controlled, structured
+form \citep{friedman_medlee_1994}. Abundance is therefore not the same as
+relevance: more scientific text does not, on its own, supply the clinical
+language we ultimately need.
+
+% === P5 ===
+The claim is measurable, not merely descriptive. \citet{temnikova_closure_2013}
+quantify a sublanguage through its closure: as a corpus grows, the count of new
+word types levels off toward a ceiling for a true sublanguage, whereas general
+language keeps growing. Scientific corpora reach this ceiling far sooner than a
+general reference corpus does. The same instruments let us test, later in this
+thesis, whether clinical and scientific French are distinct sublanguages rather
+than assume it.
+
+% === P6 ===
+
+% === P7 ===
+
+% === P8 ===
+
+% === P9 ===
+
+% === P10 ===
+
+% === P11 ===
+
+% === P12 ===
+
+% === P13 ===
+
+% === P14 ===
+
+% === P15 ===

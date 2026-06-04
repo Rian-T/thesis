@@ -297,3 +297,5 @@ tools/.bibcheck_cache.json
 tools/bibcheck_report.json
 build/
 logs/
+research/
+sources/drafts/
