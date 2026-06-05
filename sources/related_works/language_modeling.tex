@@ -284,44 +284,52 @@ of this thesis (\Cref{fig:lm-objectives}).
 
 \begin{figure}[t]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[font=\scriptsize\sffamily,
-  cell/.style={draw=ThesisInk!20, rounded corners=1.5pt, minimum width=1.0cm,
-    minimum height=0.55cm, text=ThesisInk},
+  cell/.style={draw=ThesisInk!22, rounded corners=1.5pt, minimum width=1.25cm,
+    minimum height=0.55cm, text=ThesisInk, inner sep=2pt},
   on/.style={fill=ThesisPrimary!30, draw=ThesisPrimaryDark},
-  onm/.style={fill=ThesisSecondary!38, draw=ThesisSecondaryDark},
-  tgt/.style={rounded corners=1.5pt, minimum width=1.0cm, minimum height=0.46cm,
-    font=\tiny, text=ThesisNeutral, fill=ThesisInk!4, draw=ThesisInk!12},
-  pred/.style={->, ThesisInk!40, shorten >=1.5pt, shorten <=1.5pt},
+  msk/.style={fill=ThesisSecondary!38, draw=ThesisSecondaryDark},
+  tgt/.style={rounded corners=1.5pt, minimum width=1.25cm, minimum height=0.5cm,
+    text=ThesisInk, fill=ThesisPrimary!16, draw=ThesisPrimaryDark!60, inner sep=2pt},
+  tgtm/.style={tgt, fill=ThesisSecondary!22, draw=ThesisSecondaryDark!70},
+  up/.style={->, ThesisInk!45, shorten >=1.5pt, shorten <=1.5pt},
 ]
-% --- Causal language modeling ---
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (0,1.78) {Causal language modeling};
-\node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=west] at (0,1.46) {every position predicts the next (dense)};
+\def\sx{1.6}
+% ===== Causal language modeling =====
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.0,0.5)
+  {Causal language\\modeling};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,1.0) {target};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,0.0) {input};
 \foreach \i/\w/\n in {0/The/cat,1/cat/sat,2/sat/on,3/on/the,4/the/mat,5/mat/{$\langle$eos$\rangle$}}{
-  \node[cell,on] (c\i) at (\i*1.15,0) {\w};
-  \node[tgt] (t\i) at (\i*1.15,0.92) {\n};
-  \draw[pred] (c\i) -- (t\i);
+  \node[cell,on] (c\i) at (\i*\sx,0) {\w};
+  \node[tgt] (t\i) at (\i*\sx,1.0) {\n};
+  \draw[up] (c\i) -- (t\i);
 }
-% --- Masked language modeling ---
-\begin{scope}[yshift=-2.95cm]
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (0,1.78) {Masked language modeling};
-\node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=west] at (0,1.46) {about 15\% of positions predict (sparse)};
+% ===== Masked language modeling =====
+\begin{scope}[yshift=-2.4cm]
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.0,0.5)
+  {Masked language\\modeling};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,1.0) {target};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,0.0) {input};
 \foreach \i/\w/\n/\m in {0/The//0,1/{[MASK]}/cat/1,2/sat//0,3/on//0,4/{[MASK]}/the/1,5/mat//0}{
   \ifnum\m=1
-    \node[cell,onm] (m\i) at (\i*1.15,0) {\w};
-    \node[tgt] (s\i) at (\i*1.15,0.92) {\n};
-    \draw[pred] (m\i) -- (s\i);
+    \node[cell,msk] (m\i) at (\i*\sx,0) {\w};
+    \node[tgtm] (s\i) at (\i*\sx,1.0) {\n};
+    \draw[up] (m\i) -- (s\i);
   \else
-    \node[cell] (m\i) at (\i*1.15,0) {\w};
+    \node[cell] (m\i) at (\i*\sx,0) {\w};
   \fi
 }
 \end{scope}
-\end{tikzpicture}
-\caption{The same sentence under the two objectives. Causal language modeling
-predicts the next token at every position, so all six contribute to the loss
-(dense). Masked language modeling hides about 15\% of the tokens and predicts only
-those, using context from both sides, so most positions contribute nothing
-(sparse). How much signal each token carries is the difference the encoder
-pretraining of \Cref{chap:objectives} turns to its advantage.}
+\end{tikzpicture}}
+\caption{The same sentence under the two objectives. The bottom row is the input
+and the boxes above are the targets the model must predict, one arrow per predicted
+position. Causal language modeling predicts the next token at every position, so
+every token gives a training signal (dense). Masked language modeling hides about
+15\% of the tokens, here two, and predicts only those from the context on both
+sides, so most positions give no signal (sparse). This gap in how much signal each
+token carries is what the encoder pretraining of \Cref{chap:objectives} exploits.}
 \label{fig:lm-objectives}
 \end{figure}
 
