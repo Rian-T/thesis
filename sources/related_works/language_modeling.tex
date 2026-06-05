@@ -473,16 +473,124 @@ this recipe scales.
 
 \subsection{Scaling}
 
-\begin{itemize}
-  \item GPT-3 (Brown et al., 2020): 175B params, few-shot emergent, prompting remplace le finetuning
-  \item Chinchilla (Hoffmann et al., 2022):
-    $$
-    L(N,D) = \frac{A}{N^\alpha} + \frac{B}{D^\beta} + E
-    $$
-    -> compute-optimal: smaller model + more data bat larger model + less data
-  \item LLaMA (Touvron et al., 2023): 7B rivalise avec bcp plus gros via 1T tokens
-    -> open weights, democratisation
-\end{itemize}
+Up to here, a better language model meant a lower loss. Around 2020 it became clear
+that scale changes something more basic: a large enough model can be steered by its
+prompt alone, with no extra training. \citet{gpt3} trained GPT-3, a decoder with 175
+billion parameters, and showed that it can perform a new task from a short
+description and a handful of examples placed directly in its input, without any
+change to its weights. They call this \emph{in-context learning}, and they are blunt
+about the mechanism: the model is ``applied without any gradient updates or
+fine-tuning, with tasks and few-shot demonstrations specified purely via text''
+\citep{gpt3}.
+
+Their vocabulary has stuck. In the \emph{zero-shot} setting the model is given only
+an instruction; in \emph{one-shot} it also sees a single worked example; in
+\emph{few-shot} it sees several, typically ten to a hundred, as many as fit in the
+context window. \Cref{fig:lm-fewshot} shows what such a prompt looks like: an
+instruction, a solved example, then the query the model must finish. Nothing is
+trained, the demonstrations are simply text the model reads before it answers.
+
+\medskip
+\begin{center}
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      text width=0.66\textwidth, inner sep=11pt, align=left,
+      font=\footnotesize\ttfamily, text=ThesisInk] {
+Please unscramble the letters into a word,\\
+and write that word:\\[5pt]
+skicts = sticks\\
+asinoc = {\color{ThesisSecondaryDark}\bfseries casino}
+};
+\end{tikzpicture}
+\vspace{5pt}
+\captionof{figure}{A prompt for GPT-3. An instruction and a worked example condition
+the model, which then completes the final query (its answer in green); few-shot
+learning simply stacks several such examples. The text is verbatim from
+\citet{gpt3} and no weights are changed.}
+\label{fig:lm-fewshot}
+\end{center}
+\medskip
+
+The striking part is that more demonstrations help, and they help more as the model
+grows. On two-digit addition GPT-3 goes from 76.9\% with no example to 99.6\% with
+one and 100\% with a few; on the TriviaQA question-answering benchmark it goes from
+64.3\% to 68.0\% to 71.2\% (\Cref{tab:lm-fewshot}). The same trend holds across many
+tasks, and \citet{gpt3} note that ``the gap between zero-, one-, and few-shot
+performance often grows with model capacity'', which they read as a sign that larger
+models are better at learning from their context. A capability that is weak or absent
+in small models and strengthens with scale is what later work called \emph{emergent}.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l S[table-format=3.1] S[table-format=3.1] S[table-format=3.1]}
+\toprule
+\textbf{Task} & {\textbf{Zero-shot}} & {\textbf{One-shot}} & {\textbf{Few-shot}} \\
+\midrule
+Two-digit addition    & 76.9 & 99.6 & 100.0 \\
+Two-digit subtraction & 58.0 & 86.4 & 98.9 \\
+TriviaQA (open QA)     & 64.3 & 68.0 & 71.2 \\
+\bottomrule
+\end{tabular}
+\caption{GPT-3 (175B) accuracy as the number of in-context examples grows, with no
+weight updates. Numbers are verbatim from \citet{gpt3}.}
+\label{tab:lm-fewshot}
+\end{table}
+
+Why should scale be so reliable? \citet{kaplan_scaling} had shown that the loss of a
+Transformer follows a smooth power law in two quantities: the number of parameters
+$N$ and the number of training tokens $D$. The loss falls predictably as either
+grows, which turns model design into a forecast, since one can pick a compute budget
+and read off the loss to expect. Their estimate, though, placed the optimum at large
+models trained on relatively little data.
+
+\citet{chinchilla_scaling} revisited this and found the trade-off was wrong. Fitting,
+on over 400 trained models, a loss law of the form
+\[
+  L(N, D) = E + \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}},
+\]
+they estimated $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$ and
+$\beta = 0.28$. Here $E$ is the loss that would remain with unlimited data and
+parameters, a floor set by the language itself, while the two fractions measure how
+far a finite model and a finite dataset still sit above it. Reading the law for a
+fixed compute budget, where training cost is about $6ND$, gives the best split
+between size and data, and the answer is that the two should grow together: each time
+the model doubles, the data should double with it (\Cref{fig:lm-chinchilla}). By
+their own projection this means roughly twenty training tokens per parameter, far
+more data than earlier models had used. To prove the point they trained Chinchilla, a
+70-billion-parameter model, on 1.4 trillion tokens, and it beat Gopher, a
+280-billion model trained on the same compute, scoring 67.6\% against 60.0\% on the
+MMLU exam benchmark. Most large models before it had simply been undertrained.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\textwidth]{plots/related_works/chinchilla_scaling.pdf}
+\caption{The compute-optimal model size and the compute-optimal number of training
+tokens rise together with the training budget, as the parallel lines show. Points are
+verbatim from Table 3 of \citet{chinchilla_scaling}; the paper's loss curves are not
+reproduced here.}
+\label{fig:lm-chinchilla}
+\end{figure}
+
+Chinchilla optimises the cost of \emph{training}. \citet{touvron2023llama} pointed
+out that this ignores the cost of \emph{use}: a model that will be run many times
+should be cheap at inference, and ``a smaller one trained longer will ultimately be
+cheaper at inference''. They pushed small models well past the compute-optimal point,
+finding that a 7-billion model keeps improving even after a trillion tokens. The
+resulting LLaMA models, trained only on publicly available data, make the case
+plainly: the 13-billion model outperforms GPT-3 (175B) on most benchmarks ``despite
+being 10$\times$ smaller'' (\Cref{fig:lm-llama}), and the 65-billion model is
+competitive with Chinchilla and the 540-billion PaLM. Because their weights were
+released, they also brought capable models within reach of ordinary research budgets.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\textwidth]{plots/related_works/llama_vs_gpt3.pdf}
+\caption{A 13-billion-parameter model trained on more tokens matches or beats GPT-3,
+which is more than ten times larger, on most of these zero-shot reasoning tasks.
+Numbers are verbatim from Table 4 of \citet{touvron2023llama}.}
+\label{fig:lm-llama}
+\end{figure}
 
 \subsection{Post-ChatGPT}
 
