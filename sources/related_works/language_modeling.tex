@@ -78,7 +78,7 @@ text factorises exactly into a product of next-symbol predictions,
 \[
   P(w_1,\dots,w_T) = \prod_{t=1}^{T} P(w_t \mid w_{<t}),
 \]
-so modelling language reduces to estimating a single conditional distribution: the
+so modeling language reduces to estimating a single conditional distribution: the
 probability of the next token given those before it (\Cref{fig:lm-nexttoken}).
 Every model in this chapter is an estimator of that one quantity, and the history
 of the field is the history of estimating it better.
@@ -108,7 +108,7 @@ Estimating that conditional is harder than it sounds. The simplest idea, the one
 Markov and the early n-gram models used, is to count: see how often each short
 sequence is followed by each next word. But counting runs out almost at once. Most
 word sequences never appear twice, even in a large corpus, so the counts are zero
-exactly where we need them. Much of the history of language modelling is the search
+exactly where we need them. Much of the history of language modeling is the search
 for estimators that get around this problem, and the rest of this chapter follows
 that search, from n-gram counts to neural networks to the Transformer.
 
@@ -293,18 +293,18 @@ of this thesis (\Cref{fig:lm-objectives}).
     font=\tiny, text=ThesisNeutral, fill=ThesisInk!4, draw=ThesisInk!12},
   pred/.style={->, ThesisInk!40, shorten >=1.5pt, shorten <=1.5pt},
 ]
-% --- Causal LM ---
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (-3.0,0.5) {Causal LM};
-\node[font=\tiny, text=ThesisNeutral, anchor=west] at (-3.0,0.12) {every position};
+% --- Causal language modeling ---
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (0,1.78) {Causal language modeling};
+\node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=west] at (0,1.46) {every position predicts the next (dense)};
 \foreach \i/\w/\n in {0/The/cat,1/cat/sat,2/sat/on,3/on/the,4/the/mat,5/mat/{$\langle$eos$\rangle$}}{
   \node[cell,on] (c\i) at (\i*1.15,0) {\w};
   \node[tgt] (t\i) at (\i*1.15,0.92) {\n};
   \draw[pred] (c\i) -- (t\i);
 }
-% --- Masked LM ---
-\begin{scope}[yshift=-1.95cm]
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (-3.0,0.5) {Masked LM};
-\node[font=\tiny, text=ThesisNeutral, anchor=west] at (-3.0,0.12) {$\approx$15\% of positions};
+% --- Masked language modeling ---
+\begin{scope}[yshift=-2.95cm]
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (0,1.78) {Masked language modeling};
+\node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=west] at (0,1.46) {about 15\% of positions predict (sparse)};
 \foreach \i/\w/\n/\m in {0/The//0,1/{[MASK]}/cat/1,2/sat//0,3/on//0,4/{[MASK]}/the/1,5/mat//0}{
   \ifnum\m=1
     \node[cell,onm] (m\i) at (\i*1.15,0) {\w};
@@ -316,43 +316,51 @@ of this thesis (\Cref{fig:lm-objectives}).
 }
 \end{scope}
 \end{tikzpicture}
-\caption{The same sentence under the two objectives. Causal language modelling
+\caption{The same sentence under the two objectives. Causal language modeling
 predicts the next token at every position, so all six contribute to the loss
-(dense). Masked language modelling hides about 15\% of the tokens and predicts only
+(dense). Masked language modeling hides about 15\% of the tokens and predicts only
 those, using context from both sides, so most positions contribute nothing
 (sparse). How much signal each token carries is the difference the encoder
 pretraining of \Cref{chap:objectives} turns to its advantage.}
 \label{fig:lm-objectives}
 \end{figure}
 
-\subsection{Causal language modelling}
+\subsection{Causal language modeling}
 
-The most direct objective is the one the chain rule suggests: predict the next
-token. A causal model is trained to make each token as likely as possible given the
-ones before it, by minimising
+The most direct objective follows the chain rule: predict the next token. The model
+reads the sequence once and, at each position $t$, produces a probability
+distribution over the vocabulary for the token that should come next. Training
+lowers the negative log-probability it assigns to the token that actually follows,
+summed over the whole sequence,
 \[
-  \mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t}).
+  \mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t}),
 \]
-Every position produces a prediction, and therefore a gradient, so the supervision
-is dense. This is the objective behind GPT \citep{Radford2018ImprovingLU} and the
-modern decoder models, and it is the natural fit for generation: the model is
-trained to do exactly what it does at inference, continue the text.
+where $w_{<t}$ is the tokens before position $t$. A causal mask is what lets this
+happen in a single pass: each position may look only to its left, so the model can
+be scored at every position at once without seeing the very token it must predict.
+Every position therefore yields a prediction and a gradient, so the supervision is
+dense. This is the objective behind GPT \citep{Radford2018ImprovingLU} and the
+modern decoder models, and it fits generation naturally: at inference the model does
+exactly what it was trained to do, continue the text.
 
-\subsection{Masked language modelling}
+\subsection{Masked language modeling}
 
 Understanding a text, rather than continuing it, calls for a different objective.
-BERT \citep{devlin_bert_2019} hides a fraction of the tokens and trains the model to
-recover them from both sides at once,
+BERT \citep{devlin_bert_2019} corrupts the input by replacing some tokens with a
+special \texttt{[MASK]} symbol, then trains the model to put the originals back. At
+each masked position the model predicts the missing token from the context on both
+sides, and the loss counts only those positions,
 \[
   \mathcal{L}_{\text{MLM}} = -\sum_{t \in \mathcal{M}} \log P(w_t \mid \mathbf{w}_{\setminus t}),
 \]
-where $\mathcal{M}$ is the set of masked positions. About 15\% of the tokens are
-masked, in practice 80\% replaced by a special \texttt{[MASK]} token, 10\% by a
-random word, and 10\% left unchanged. Because the model sees the whole sequence, its
-representations are bidirectional, which is what makes encoders strong at
-classification and entity recognition. The cost is that only the masked positions
-carry a gradient, about one token in seven, against every token under the causal
-objective.
+where $\mathcal{M}$ is the set of masked positions and $\mathbf{w}_{\setminus t}$ is
+the rest of the (corrupted) sequence. About 15\% of the tokens are chosen; of those,
+80\% become \texttt{[MASK]}, 10\% are swapped for a random word, and 10\% are left
+as they are, a mix that stops the model from only ever reacting to the
+\texttt{[MASK]} symbol. Seeing the whole sequence at once makes the representations
+bidirectional, which is what makes encoders strong at classification and entity
+recognition. The price is that only the masked positions produce a gradient, about
+one token in seven, against every token under the causal objective.
 
 \subsection{Mixing the two}
 
