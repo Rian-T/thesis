@@ -38,22 +38,25 @@ degraded general French but a different system, with its own grammar, written
 for readers who already know almost everything it leaves out.
 
 % === P2 ===
-This intuition has a precise name. In the 1960s, Zellig Harris observed that the
-language of a specialised field is not the general language with a smaller
-vocabulary, but a system in its own right \citep{harris_mathematical_1968}. He
-called it a \emph{sublanguage}: the sentences a community produces about a
-restricted domain, governed by co-occurrence constraints tighter than, and
-sometimes absent from, the language as a whole. The constraints are the point.
-In a sublanguage only certain word classes may combine, so its grammar lies
-partly outside ordinary usage rather than inside it as a subset. Harris and
-colleagues later made the claim concrete, deriving the grammar of an immunology
-subfield from its articles alone and showing that the field's information was, in
-effect, its sublanguage \citep{harris_immunology_1989}.
+This intuition has a precise name. Studying how specialised communities write,
+the linguist Zellig Harris observed in the 1960s that the language of a technical
+field is not the general language with a smaller vocabulary, but a system in its
+own right \citep{harris_mathematical_1968}. He called it a \emph{sublanguage}: the
+sentences a community produces about a narrow domain, held together by rules about
+which words may go together that are tighter than, and sometimes absent from, the
+wider language. Those rules are what matters, because in a sublanguage only
+certain classes of words combine, so its grammar sits partly outside ordinary
+usage rather than inside it as a subset. Harris and his colleagues later made this
+concrete, reconstructing the grammar of a small immunology literature from its
+articles alone and showing that the field's knowledge was, in effect, carried by
+its sublanguage \citep{harris_immunology_1989}.
 
 % === P3 ===
-The clinical note is the best-documented case of this idea. When Naomi Sager and
-her group built a program to read clinical notes, they found the notes already
-followed a grammar of their own \citep{sager_nlip_1981, sager_mlp_1987}. To read
+The clinical note is the best-documented case of this idea. One of the earliest
+attempts to make computers read medical records, Naomi Sager's Linguistic String
+Project at New York University, set out to turn free-text clinical reports into
+structured data, and in the process found that the notes already followed a
+grammar of their own \citep{sager_nlip_1981, sager_mlp_1987}. To read
 them, the program needed rules for the short, verbless phrases that notes use but
 everyday language does not, together with categories taken from medicine itself,
 such as patient, finding, and treatment. A line like \emph{afebrile, chest clear}
