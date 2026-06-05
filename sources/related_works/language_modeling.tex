@@ -227,38 +227,36 @@ Mistral, and ModernBERT.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[
-  tok/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
-    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
-  foc/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!55, rounded corners=2pt,
-    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
-  hid/.style={draw=ThesisNeutral!50, fill=ThesisNeutral!8, rounded corners=2pt,
-    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisNeutral},
-  att/.style={->, ThesisInk!45, shorten >=2pt, shorten <=2pt},
-]
-% Encoder
-\node[font=\footnotesize\sffamily\bfseries, text=ThesisInk] at (-2.05,0.6) {Encoder};
-\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (-2.05,0.25) {bidirectional};
-\node[tok] (e1) at (0,0.45) {The};
-\node[tok] (e2) at (1.25,0.45) {cat};
-\node[foc] (e3) at (2.5,0.45) {sat};
-\node[tok] (e4) at (3.75,0.45) {down};
-\draw[att] (e3) to[bend left=35] (e1);
-\draw[att] (e3) to[bend left=32] (e2);
-\draw[att] (e3) to[bend right=32] (e4);
-% Decoder
-\node[font=\footnotesize\sffamily\bfseries, text=ThesisInk] at (-2.05,-1.1) {Decoder};
-\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (-2.05,-1.45) {causal};
-\node[tok] (d1) at (0,-1.25) {The};
-\node[tok] (d2) at (1.25,-1.25) {cat};
-\node[foc] (d3) at (2.5,-1.25) {sat};
-\node[hid] (d4) at (3.75,-1.25) {down};
-\draw[att] (d3) to[bend right=35] (d1);
-\draw[att] (d3) to[bend right=32] (d2);
+\begin{tikzpicture}[font=\scriptsize\sffamily]
+\def\s{0.52}
+\foreach \name/\dx/\causal in {{Encoder (full)}/0/0, {Decoder (causal)}/4.4/1}{
+  \begin{scope}[xshift=\dx cm]
+    \node[font=\footnotesize\sffamily, text=ThesisInk] at (2*\s,0.92) {\name};
+    \foreach \j/\t in {0/The,1/cat,2/sat,3/down}
+      \node[text=ThesisNeutral] at (\j*\s+0.5*\s,0.42) {\t};
+    \foreach \i/\t in {0/The,1/cat,2/sat,3/down}{
+      \node[text=ThesisNeutral, anchor=east] at (-0.06,-\i*\s-0.5*\s) {\t};
+      \foreach \j in {0,1,2,3}{
+        \draw[draw=ThesisInk!15, line width=0.3pt]
+          (\j*\s,-\i*\s) rectangle (\j*\s+\s,-\i*\s-\s);
+        \pgfmathtruncatemacro{\on}{(\causal==0) || (\j<=\i)}
+        \ifnum\on=1
+          \fill[ThesisPrimary!70]
+            (\j*\s+0.06,-\i*\s-0.06) rectangle (\j*\s+\s-0.06,-\i*\s-\s+0.06);
+        \fi
+      }
+    }
+    \node[text=ThesisNeutral, font=\tiny] at (2*\s,-4.6*\s) {key $j\rightarrow$};
+    \node[text=ThesisNeutral, font=\tiny, rotate=90, anchor=south]
+      at (-0.62,-2*\s) {query $i\downarrow$};
+  \end{scope}
+}
 \end{tikzpicture}
-\caption{The same block, two masks. In an encoder, the token \emph{sat} attends to
-the whole sequence; in a decoder, only to the tokens before it, so the later one
-stays hidden.}
+\caption{Attention masks as matrices. Row $i$ is a query token and column $j$ a key
+token; a filled cell means token $i$ may attend to token $j$. The encoder allows
+every pair, so the matrix is full; the decoder allows only $j \le i$, the lower
+triangle, so each token sees itself and the tokens before it but none of those that
+follow.}
 \label{fig:lm-attention}
 \end{figure}
 
@@ -279,52 +277,100 @@ objective, the subject of the next section.
 \section{Pretraining Objectives}
 \label{sec:lm-objectives}
 
-\subsection{CLM (Causal Language Modeling)}
+The architecture fixes how a model reads its context; the pretraining objective
+fixes what it is asked to predict, and that choice shapes the representations it
+learns. Two objectives dominate, and they differ in a way that matters for the rest
+of this thesis (\Cref{fig:lm-objectives}).
 
-GPT (Radford et al., 2018).
-$$
-\mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t})
-$$
-\begin{itemize}
-  \item Tous les tokens contribuent au gradient
-  \item Supervision dense
-  \item Naturel pour la generation
-\end{itemize}
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\scriptsize\sffamily,
+  cell/.style={draw=ThesisInk!20, rounded corners=1.5pt, minimum width=1.0cm,
+    minimum height=0.55cm, text=ThesisInk},
+  on/.style={fill=ThesisPrimary!30, draw=ThesisPrimaryDark},
+  onm/.style={fill=ThesisSecondary!38, draw=ThesisSecondaryDark},
+  tgt/.style={rounded corners=1.5pt, minimum width=1.0cm, minimum height=0.46cm,
+    font=\tiny, text=ThesisNeutral, fill=ThesisInk!4, draw=ThesisInk!12},
+  pred/.style={->, ThesisInk!40, shorten >=1.5pt, shorten <=1.5pt},
+]
+% --- Causal LM ---
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (-3.0,0.5) {Causal LM};
+\node[font=\tiny, text=ThesisNeutral, anchor=west] at (-3.0,0.12) {every position};
+\foreach \i/\w/\n in {0/The/cat,1/cat/sat,2/sat/on,3/on/the,4/the/mat,5/mat/{$\langle$eos$\rangle$}}{
+  \node[cell,on] (c\i) at (\i*1.15,0) {\w};
+  \node[tgt] (t\i) at (\i*1.15,0.92) {\n};
+  \draw[pred] (c\i) -- (t\i);
+}
+% --- Masked LM ---
+\begin{scope}[yshift=-1.95cm]
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=west] at (-3.0,0.5) {Masked LM};
+\node[font=\tiny, text=ThesisNeutral, anchor=west] at (-3.0,0.12) {$\approx$15\% of positions};
+\foreach \i/\w/\n/\m in {0/The//0,1/{[MASK]}/cat/1,2/sat//0,3/on//0,4/{[MASK]}/the/1,5/mat//0}{
+  \ifnum\m=1
+    \node[cell,onm] (m\i) at (\i*1.15,0) {\w};
+    \node[tgt] (s\i) at (\i*1.15,0.92) {\n};
+    \draw[pred] (m\i) -- (s\i);
+  \else
+    \node[cell] (m\i) at (\i*1.15,0) {\w};
+  \fi
+}
+\end{scope}
+\end{tikzpicture}
+\caption{The same sentence under the two objectives. Causal language modelling
+predicts the next token at every position, so all six contribute to the loss
+(dense). Masked language modelling hides about 15\% of the tokens and predicts only
+those, using context from both sides, so most positions contribute nothing
+(sparse). How much signal each token carries is the difference the encoder
+pretraining of \Cref{chap:objectives} turns to its advantage.}
+\label{fig:lm-objectives}
+\end{figure}
 
-\subsection{MLM (Masked Language Modeling)}
+\subsection{Causal language modelling}
 
-BERT (Devlin et al., 2019).
-$$
-\mathcal{L}_{\text{MLM}} = -\sum_{t \in \mathcal{M}} \log P(w_t \mid \mathbf{w}_{\setminus t})
-$$
-\begin{itemize}
-  \item 15\% tokens masked (80\% [MASK], 10\% random, 10\% unchanged)
-  \item Contexte bidirectionnel -> representations plus riches
-  \item Mais: seulement 15\% contribuent -> gradient sparse
-  \item Contraste avec CLM ou chaque token compte
-\end{itemize}
+The most direct objective is the one the chain rule suggests: predict the next
+token. A causal model is trained to make each token as likely as possible given the
+ones before it, by minimising
+\[
+  \mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t}).
+\]
+Every position produces a prediction, and therefore a gradient, so the supervision
+is dense. This is the objective behind GPT \citep{Radford2018ImprovingLU} and the
+modern decoder models, and it is the natural fit for generation: the model is
+trained to do exactly what it does at inference, continue the text.
 
-\subsection{Objectifs hybrides (2024-2025)}
+\subsection{Masked language modelling}
 
-Important pour le Ch.5 de la these.
+Understanding a text, rather than continuing it, calls for a different objective.
+BERT \citep{devlin_bert_2019} hides a fraction of the tokens and trains the model to
+recover them from both sides at once,
+\[
+  \mathcal{L}_{\text{MLM}} = -\sum_{t \in \mathcal{M}} \log P(w_t \mid \mathbf{w}_{\setminus t}),
+\]
+where $\mathcal{M}$ is the set of masked positions. About 15\% of the tokens are
+masked, in practice 80\% replaced by a special \texttt{[MASK]} token, 10\% by a
+random word, and 10\% left unchanged. Because the model sees the whole sequence, its
+representations are bidirectional, which is what makes encoders strong at
+classification and entity recognition. The cost is that only the masked positions
+carry a gradient, about one token in seven, against every token under the causal
+objective.
 
-Approche CLM puis MLM:
-\begin{itemize}
-  \item CLM d'abord puis decay vers MLM = meilleur que MLM seul
-  \item CLM: gradients denses (tous les tokens), MLM: sparse (15\%)
-  \item Hypothese: CLM ``compresse'' la connaissance, MLM restaure la bidirectionnalite
-\end{itemize}
+\subsection{Mixing the two}
 
-Refs:
-\begin{itemize}
-  \item ``Should We Still Pretrain Encoders with MLM?'' (arXiv:2507.00994, 2025) -> biphasic CLM vers MLM bat pure MLM
-  \item GPT-BERT (arXiv:2410.24159, 2024) -> unifie CLM+MLM
-  \item AntLM (CoNLL 2024) -> alternance CLM/MLM
-\end{itemize}
+The two objectives trade the same quantity against itself: causal training gives a
+signal at every token but only looks left, while masked training looks both ways but
+learns from few tokens. Recent work tries to get both at once. Some encoders are
+pretrained with a causal phase followed by a short masked phase, which beats masked
+pretraining alone \citep{gisserot2025clm}; others alternate the two objectives during
+training \citep{antlm2024}. This line is central to the thesis: \Cref{chap:objectives}
+shows that a temporary detour through causal pretraining leaves a lasting and useful
+mark on an encoder. An earlier idea, ELECTRA's replaced-token detection
+\citep{electra}, also sought a denser signal, by training the model to spot tokens a
+small generator had swapped in, though recent encoders such as ModernBERT
+\citep{modernbert} show that a good architecture with plain masking is already
+enough.
 
-Note: ELECTRA (Clark et al., 2020) avait propose RTD pour signal plus dense, mais ModernBERT montre que bonne archi + MLM suffit (bat DeBERTaV3 qui utilise RTD).
-
--> on a les archis et les objectifs, question maintenant: est-ce que ca scale?
+With both the architecture and the objective settled, the next question is how far
+this recipe scales.
 
 
 \section{Scaling Laws \& LLMs}
