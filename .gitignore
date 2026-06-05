@@ -299,3 +299,7 @@ build/
 logs/
 research/
 sources/drafts/
+
+# Python bytecode
+__pycache__/
+*.pyc
