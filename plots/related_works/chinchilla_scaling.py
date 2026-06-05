@@ -37,8 +37,8 @@ ax.plot(flops, tokens, "-o", color=COLORS["secondary_dark"], lw=1.7, ms=4.5,
 
 # Gopher compute budget (the "1 Gopher unit" row, 5.76e23 FLOPs) — verbatim reference
 ax.axvline(5.76e23, color=COLORS["neutral"], lw=0.7, ls=(0, (4, 3)), zorder=1)
-ax.text(5.76e23, 4e14, "Gopher\nbudget", color=COLORS["neutral"], fontsize=8.5,
-        ha="center", va="top", linespacing=1.0)
+ax.text(8.5e23, 4.5e14, "Gopher budget", color=COLORS["neutral"], fontsize=8.5,
+        ha="left", va="center")
 
 ax.set_xscale("log")
 ax.set_yscale("log")

@@ -473,40 +473,55 @@ this recipe scales.
 
 \subsection{Scaling}
 
-Up to here, a better language model meant a lower loss. Around 2020 it became clear
-that scale changes something more basic: a large enough model can be steered by its
-prompt alone, with no extra training. \citet{gpt3} trained GPT-3, a decoder with 175
-billion parameters, and showed that it can perform a new task from a short
-description and a handful of examples placed directly in its input, without any
-change to its weights. They call this \emph{in-context learning}, and they are blunt
-about the mechanism: the model is ``applied without any gradient updates or
-fine-tuning, with tasks and few-shot demonstrations specified purely via text''
-\citep{gpt3}.
+The Transformer settled how a model reads its context, and the pretraining objective
+settled what it learns from raw text. The remaining lever is size. The natural
+question is how far performance keeps improving as we add parameters and data, and
+whether anything new appears along the way. The answer, found around 2020, changed
+both how the field builds models and how it uses them.
 
-Their vocabulary has stuck. In the \emph{zero-shot} setting the model is given only
-an instruction; in \emph{one-shot} it also sees a single worked example; in
-\emph{few-shot} it sees several, typically ten to a hundred, as many as fit in the
-context window. \Cref{fig:lm-fewshot} shows what such a prompt looks like: an
-instruction, a solved example, then the query the model must finish. Nothing is
-trained, the demonstrations are simply text the model reads before it answers.
+Until then, a pretrained model was put to work by \emph{fine-tuning}. After
+pretraining, each new task needed a further round of supervised training on labelled
+examples, producing a separate specialised copy of the model. \citet{gpt3} showed a
+different route. Their model, GPT-3, a decoder with 175 billion parameters, can carry
+out a task from nothing more than a description and a few examples written into its
+input, with no change to its weights. They call this \emph{in-context learning}, and
+the abstract states the mechanism plainly: the model is ``applied without any
+gradient updates or fine-tuning, with tasks and few-shot demonstrations specified
+purely via text'' \citep{gpt3}. The practical shift is large. Instead of collecting
+labelled data and training a classifier for every task, one writes a prompt.
+
+How much help the prompt carries defines three settings. In the \emph{zero-shot}
+setting the model is given only an instruction; in \emph{one-shot} it also sees one
+worked example; in \emph{few-shot} it sees several, typically ten to a hundred, as
+many as fit in the 2048-token context window. \Cref{fig:lm-fewshot} places the three
+side by side on a simple arithmetic task. The examples are not training data, they
+are text the model reads before answering, and the same idea works across very
+different tasks: unscrambling letters (\texttt{skicts} $\to$ \texttt{sticks}),
+SAT-style analogies (\emph{lull is to trust as cajole is to compliance}), or
+translating a sentence into French.
 
 \medskip
 \begin{center}
-\begin{tikzpicture}
-\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
-      text width=0.66\textwidth, inner sep=11pt, align=left,
-      font=\footnotesize\ttfamily, text=ThesisInk] {
-Please unscramble the letters into a word,\\
-and write that word:\\[5pt]
-skicts = sticks\\
-asinoc = {\color{ThesisSecondaryDark}\bfseries casino}
-};
-\end{tikzpicture}
-\vspace{5pt}
-\captionof{figure}{A prompt for GPT-3. An instruction and a worked example condition
-the model, which then completes the final query (its answer in green); few-shot
-learning simply stacks several such examples. The text is verbatim from
-\citet{gpt3} and no weights are changed.}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  pbox/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+    line width=0.5pt, inner sep=8pt, align=left, font=\scriptsize\ttfamily,
+    text=ThesisInk, anchor=north west, text width=3.9cm},
+  ttl/.style={font=\footnotesize\sffamily\bfseries, text=ThesisInk, anchor=south west},
+]
+\node[ttl] at (0,0) {zero-shot};
+\node[pbox] at (0,-0.12) {Q: What is 98 plus 45?\\A:};
+\node[ttl] at (4.7,0) {one-shot};
+\node[pbox] at (4.7,-0.12) {Q: What is 12 plus 7?\\A: 19\\Q: What is 98 plus 45?\\A:};
+\node[ttl] at (9.4,0) {few-shot};
+\node[pbox] at (9.4,-0.12) {Q: What is 12 plus 7?\\A: 19\\Q: What is 31 plus 6?\\A: 37\\Q: What is 98 plus 45?\\A: {\color{ThesisSecondaryDark}\bfseries 143}};
+\end{tikzpicture}}
+\vspace{6pt}
+\captionof{figure}{The same question put to GPT-3 in three ways. With no example
+(zero-shot) the model sees only the question; with one or a few solved examples in
+the prompt (one- and few-shot) it picks up the pattern and answers (in green). No
+weights are updated; the examples are just text. The format and the final example are
+from \citet{gpt3}.}
 \label{fig:lm-fewshot}
 \end{center}
 \medskip
