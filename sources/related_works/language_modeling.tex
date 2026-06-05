@@ -180,8 +180,8 @@ the hidden state is passed from one step to the next (\Cref{fig:lm-rnn}), a
 prediction can in principle depend on the whole history rather than the last $n-1$
 tokens.
 
-\begin{figure}[t]
-\centering
+\medskip
+\begin{center}
 \begin{tikzpicture}[font=\scriptsize\sffamily,
   box/.style={rounded corners=2pt, minimum width=1.0cm, minimum height=0.6cm,
     inner sep=2pt, text=ThesisInk},
@@ -206,12 +206,14 @@ tokens.
 \node[text=ThesisNeutral, anchor=east] at (-0.85,1.2) {hidden state};
 \node[text=ThesisNeutral, anchor=east] at (-0.85,0)   {input};
 \end{tikzpicture}
-\caption{A recurrent language model, drawn one step per token. At each position the
-network combines the current input with the hidden state carried over from the
-previous step (the horizontal arrows) and predicts the next token, so the running
-state lets a prediction depend on the whole past rather than a fixed window.}
+\vspace{6pt}
+\captionof{figure}{A recurrent language model, drawn one step per token. At each
+position the network combines the current input with the hidden state carried over
+from the previous step (the horizontal arrows) and predicts the next token, so the
+running state lets a prediction depend on the whole past rather than a fixed window.}
 \label{fig:lm-rnn}
-\end{figure}
+\end{center}
+\medskip
 
 In practice this memory is short. The network is trained by propagating the error
 back through every step, and over a long sequence that signal either shrinks toward
@@ -386,6 +388,7 @@ of this thesis (\Cref{fig:lm-objectives}).
 }
 \end{scope}
 \end{tikzpicture}}
+\vspace{8pt}
 \caption{The same sentence under the two objectives. The bottom row is the input
 and the boxes above are the targets the model must predict, one arrow per predicted
 position. Causal language modeling predicts the next token at every position, so
