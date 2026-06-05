@@ -158,50 +158,64 @@ was built to solve.
 \section{Transformer}
 \label{sec:lm-transformer}
 
-\subsection{Self-Attention}
+\subsection{Self-attention}
 
-Vaswani et al. (2017).
-$$
-Q = XW_Q, \quad K = XW_K, \quad V = XW_V
-$$
-$$
-\mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
-$$
+The Transformer \citep{vaswani2017attention} keeps the goal, predicting the next
+token, and changes how context is read. Its core operation is \emph{self-attention},
+which lets every token look directly at every other. From the input representations
+$X$, the model computes three projections, a set of queries, keys, and values:
+\[
+  Q = XW_Q, \quad K = XW_K, \quad V = XW_V.
+\]
+Each token's query is compared with every key through a dot product, which measures
+how relevant the other tokens are to it. These scores are turned into weights with a
+softmax, and the token's new representation is the weighted average of the values:
+\[
+  \mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V.
+\]
+The division by $\sqrt{d_k}$, the size of the key vectors, keeps the dot products
+from growing too large, which would push the softmax to put almost all the weight on
+a single token.
 
-\begin{itemize}
-  \item Interactions directes cross-position (vs RNN indirect via hidden state)
-  \item $O(L^2)$ temps et memoire
-  \item Parallelisable
-  \item Multi-head: $h$ tetes, chacune specialise (syntaxe, semantique, position)
-\end{itemize}
+Two things follow. Any two tokens now interact in a single step, however far apart
+they are, whereas a recurrent network had to pass information through every position
+in between. And since the scores for all positions are computed together as matrix
+products, the whole sequence is processed at once, which is what made training on
+very large corpora practical. The price is cost: every token is compared with every
+other, so time and memory grow with the square of the sequence length, $O(L^2)$. In
+practice the operation runs in several \emph{heads} side by side, each with its own
+projections, so that different heads can follow different things, such as syntax,
+meaning, or position.
 
-% TODO reprendre les details de Nathan ou version plus courte?
-% cf \_archive/related\_works/language\_modeling.tex
+\subsection{Positional encodings}
 
-\subsection{Positional Encodings}
+Self-attention has one blind spot: it treats its input as a set, with no sense of
+order. \emph{The cat sat} and \emph{sat the cat} look the same to it, so position
+has to be supplied separately. The original Transformer added fixed sinusoidal
+signals to the embeddings \citep{vaswani2017attention}, and BERT instead learned a
+vector for each position \citep{devlin_bert_2019}; both encode an \emph{absolute}
+position and cope badly with sequences longer than those seen in training. Later
+methods encode \emph{relative} position. ALiBi adds a small penalty that grows with
+the distance between two tokens \citep{alibi}, and RoPE rotates the queries and keys
+by an angle that depends on their position, so that their dot product ends up
+depending only on how far apart they are \citep{rope}. RoPE handles long and
+variable lengths well and is now the default in recent models such as LLaMA,
+Mistral, and ModernBERT.
 
-\begin{itemize}
-  \item APE sinusoidal (Vaswani 2017) -> extrapolation limitee
-  \item APE learned (Devlin 2019) -> pas d'extrapolation
-  \item ALiBi (Press et al. 2022) -> bias lineaire, mieux
-  \item RoPE (Su et al. 2021) -> matrices de rotation, le meilleur
-\end{itemize}
+\subsection{Encoders and decoders}
 
-RoPE = standard maintenant: LLaMA, Mistral, ModernBERT.
-
-% TODO tableau
-
-\subsection{Encoder vs Decoder}
-
-\begin{itemize}
-  \item Encoder: attention bidirectionnelle, MLM, classification/NER (BERT, RoBERTa)
-  \item Decoder: attention causale, CLM, generation (GPT, LLaMA)
-  \item Encoder-decoder: T5 (Raffel et al., 2020), seq2seq, plus trop utilise
-\end{itemize}
-
-% TODO tableau
-
--> maintenant qu'on a l'archi, question: quel objectif de pretraining?
+The same Transformer block can be wired in two ways, and the only difference is
+which tokens each one is allowed to see. In an \emph{encoder}, every token attends
+to the whole sequence, left and right. This two-sided view suits tasks that read a
+text and label it, such as classification or entity recognition, and it underlies
+BERT \citep{devlin_bert_2019} and RoBERTa \citep{roberta}. In a \emph{decoder}, a
+token may attend only to the tokens before it, a restriction imposed by a causal
+mask. This is what makes generation possible, one token at a time, as in GPT
+\citep{Radford2018ImprovingLU} and LLaMA. A third design keeps both: an encoder to
+read an input and a decoder to write an output, as in T5 \citep{raffel2020t5},
+which is natural for translation and other input-to-output tasks but less common
+today. The two are built the same way. What really separates them is the training
+objective, the subject of the next section.
 
 
 \section{Pretraining Objectives}
