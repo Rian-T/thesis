@@ -85,6 +85,32 @@ Rian has actually made; do not make him repeat them.
 - Follow `visual-style.md` and the `thesis-style.sty` colours
   (`ThesisInk`, `ThesisPaper`, `ThesisNeutral`, …); build diagrams in TikZ.
 
+### TikZ concept schemas — the corrections Rian actually made
+
+(Full playbook in `visual-style.md §2bis`. These are the live corrections so you
+don't repeat them.)
+
+- **"trop simpliste, c'est un manuscrit, sois précis."** A 3-box doodle is not
+  acceptable. Draw the real structure: a real attention mask matrix, real
+  next-token arrows. Detailed-but-clean, never minimal-but-vague. "Respecte
+  Tufte": high data-ink, no chartjunk, small multiples for the contrast.
+- **"les tokens se touchent."** Cells were too tight. Widen the horizontal step
+  (`\def\sx{1.6}`) and min width (`1.25cm`) until boxes clearly separate.
+- **"le schéma CLM n'est pas clair."** Use a two-row input/target layout: bottom
+  = input tokens, top = targets, short up-arrows between. CLM = a target over
+  every position (dense); MLM = a target only over `[MASK]` (sparse).
+- **Spell out the labels in full inside the figure** ("Causal language modeling",
+  not "CLM"), placed to the **left** of the rows.
+- **Label placement is finicky and Rian notices it.** The big two-line block
+  label ("Causal language modeling") must sit **further left**, NOT vertically
+  aligned under the small `target`/`input` row tags. Put the block label at a more
+  negative x (anchor east), and the row tags closer to the cells. Verify by
+  rendering.
+- **Color carries meaning, reused across the part:** lavender = input/active,
+  lime = masked/predicted. Don't recolor per figure.
+- **Always render the page and look at it before committing a figure.** Every one
+  of the above was invisible in the LaTeX source and only obvious in the PDF.
+
 ## 5. Punctuation & rhythm
 
 - Prefer a **colon** to join when it flows better than a full stop; avoid ending

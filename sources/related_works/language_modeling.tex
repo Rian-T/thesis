@@ -297,10 +297,10 @@ of this thesis (\Cref{fig:lm-objectives}).
 ]
 \def\sx{1.6}
 % ===== Causal language modeling =====
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.0,0.5)
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.9,0.5)
   {Causal language\\modeling};
-\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,1.0) {target};
-\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,0.0) {input};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-0.78,1.0) {target};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-0.78,0.0) {input};
 \foreach \i/\w/\n in {0/The/cat,1/cat/sat,2/sat/on,3/on/the,4/the/mat,5/mat/{$\langle$eos$\rangle$}}{
   \node[cell,on] (c\i) at (\i*\sx,0) {\w};
   \node[tgt] (t\i) at (\i*\sx,1.0) {\n};
@@ -308,10 +308,10 @@ of this thesis (\Cref{fig:lm-objectives}).
 }
 % ===== Masked language modeling =====
 \begin{scope}[yshift=-2.4cm]
-\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.0,0.5)
+\node[font=\footnotesize\sffamily, text=ThesisInk, anchor=east, align=right] at (-1.9,0.5)
   {Masked language\\modeling};
-\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,1.0) {target};
-\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-1.0,0.0) {input};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-0.78,1.0) {target};
+\node[font=\scriptsize, text=ThesisNeutral, anchor=east] at (-0.78,0.0) {input};
 \foreach \i/\w/\n/\m in {0/The//0,1/{[MASK]}/cat/1,2/sat//0,3/on//0,4/{[MASK]}/the/1,5/mat//0}{
   \ifnum\m=1
     \node[cell,msk] (m\i) at (\i*\sx,0) {\w};

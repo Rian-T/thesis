@@ -439,9 +439,29 @@ Orchestration files (`analysis_lm.tex`, `extensions_lm.tex`) include chapters wi
 - **Use `threeparttable` for footnotes.** Don't use inline `$^\dagger$`; use `\tnote{}` with `\begin{tablenotes}`.
 - **`\rowcolor` needs `\PassOptionsToPackage{table}{xcolor}` before `\documentclass`.** Without this, colors silently don't render.
 
+### Math & formulas
+
+- **Keep the LaTeX math, but never "drop and run".** Rian's words: *"oublie pas
+  les formules latex math mais bien expliqué, pas juste drop en mode débrouillez
+  vous avec ça."* Every formula gets prose around it that names each symbol and
+  says what it means. A reader should understand the equation from the sentence,
+  not have to decode the notation alone.
+- **Intuition before the formula.** State the idea in words first, then give the
+  equation as the precise form of what you just said.
+- **Define every symbol the first time it appears**, in-line, right after the
+  equation. Example pattern used for the CLM/MLM losses:
+  `where $w_{<t}$ is the tokens before position $t$` / `where $\mathcal{M}$ is the
+  set of masked positions and $\mathbf{w}_{\setminus t}$ the sentence with token
+  $t$ removed`.
+- **Pair the formula with a schema when it helps.** The chain rule, attention
+  masks, and the CLM/MLM objectives each have both a one-line equation and a TikZ
+  schema; the schema carries the intuition, the equation the precision.
+
 ### Figures
 
 - **Don't use TikZ for heatmaps.** Manual coordinate positioning doesn't scale. Use Python/matplotlib for data-driven figures, TikZ for diagrams (pipelines, architecture).
+- **TikZ for *concept* schemas (chain rule, attention mask, objectives).** Hand-built diagrams that teach a concept have their own detailed playbook in `visual-style.md §2bis` (thesis-color styles, Tufte small-multiples, spell-out left labels, token spacing, `\resizebox`, `\foreach`+`\pgfmathtruncatemacro`). Read it before drawing one.
+- **Always verify a figure by rendering the PDF page and looking at it**, not by reading the TikZ source. Touching cells, overflow, and unclear schemas are only visible in the pixels. Every figure correction Rian made was something invisible in the source.
 - **Python plots: set `figsize` to match thesis width.** A 15-inch figure scaled to 6-inch column = tiny fonts. Either reduce the source width or increase font sizes proportionally.
 - **For multi-panel plots:** only show xlabel on the middle/bottom panel, ylabel on the leftmost. Don't repeat axis labels on every panel.
 - **`\includegraphics[width=0.55\columnwidth]` for single-panel plots.** `\columnwidth` is too wide for a single small plot; it becomes half a page.

@@ -129,7 +129,24 @@ Clean, minimal, with a consistent color palette. Two approaches depending on fig
 
 ### 2.1 Color Palette
 
-Primary palette (for bar charts, lines, highlights):
+> **The source of truth is `thesis-style.sty`, not this table.** Never hardcode
+> hex colors in a chapter `.tex`. Use the named macros below (and their Python
+> mirrors in `plots/thesis_style.py`). The hexes here are only for reference.
+>
+> | Macro | Role | approx. RGB |
+> |-------|------|-------------|
+> | `ThesisPrimary` / `ThesisPrimaryDark` | main / active / input — lavender | `166,148,232` |
+> | `ThesisSecondary` / `ThesisSecondaryDark` | second series / masked / predicted — lime | green |
+> | `ThesisTertiary` | third series / contrast — peach | peach |
+> | `ThesisNeutral` | borders, grid, secondary info — steel gray | gray |
+> | `ThesisInk` | text, labels — dark plum | near-black |
+> | `ThesisPaper` | text-box / panel background — pale lavender | very light |
+>
+> The green/coral table just below is the **older Biomed-Enriched paper palette**
+> (Python/Altair plots in `plots/`). New thesis-native TikZ schemas use the
+> `Thesis*` macros above. Don't mix the two in one figure.
+
+Legacy palette (Biomed-Enriched bar charts, lines, highlights):
 
 | Role | Color | Hex | Usage |
 |------|-------|-----|-------|
@@ -210,6 +227,100 @@ Rules:
     \label{fig:results-bar}
 \end{figure}
 ```
+
+---
+
+## 2bis. Pedagogical TikZ schemas (thesis aesthetic + Tufte)
+
+The "What is Biomedical Text?" part and the Language Models RW chapter use a
+family of **hand-drawn TikZ schemas** (not data plots) to explain a concept:
+the chain rule, attention masks, the CLM-vs-MLM objectives. These are the most
+fiddly figures in the thesis. Rules that emerged from building them (and from
+Rian's corrections "trop simpliste", "respecte Tufte", "les tokens se touchent",
+"le schéma CLM n'est pas clair").
+
+### What "respect Tufte" means here
+
+- **Maximize data-ink, kill chartjunk.** No drop shadows, no 3D, no gratuitous
+  fills. A box has a 1pt rounded border and at most a light tint; color is used
+  *to carry meaning*, never decoration.
+- **Color = meaning, consistently.** Lavender (`ThesisPrimary`) = the input /
+  active / attended cell; lime (`ThesisSecondary`) = the special role (masked
+  token, predicted target); empty/white = inactive. Reuse the SAME mapping across
+  every schema in the part so the reader learns it once.
+- **Small multiples for contrast.** Show two regimes side by side built from the
+  *same* primitive so only the meaningful difference stands out: encoder (full
+  attention) vs decoder (lower-triangular causal mask); causal (dense targets) vs
+  masked (sparse targets). Same grid, same cell style, one variable changes.
+- **Precise, not cute.** This is a manuscript. A toy 3-box doodle reads as
+  simpliste; draw the real structure (a real mask matrix, real next-token
+  arrows). Detailed but clean beats minimal-but-vague.
+
+### Layout rules that fixed real problems
+
+- **Spell out labels, on the LEFT, anchored east.** Two-line block labels
+  (`Causal language\\modeling`) to the left of the rows, plus small row tags
+  `target` / `input`. Don't abbreviate to "CLM"/"MLM" inside the figure itself.
+- **Give cells room — tokens must not touch.** Set an explicit horizontal step
+  and a generous min width, e.g. `\def\sx{1.6}` with
+  `minimum width=1.25cm`. If boxes touch, widen `\sx` before anything else.
+- **Wrap wide schemas in `\resizebox{\textwidth}{!}{...}`.** Lets you design at a
+  comfortable absolute scale and have it shrink to the text block cleanly.
+- **Generate repetitive cells with `\foreach`**, and compute per-cell state with
+  `\pgfmathtruncatemacro`. The causal mask is one nested foreach with a
+  truncated boolean:
+
+  ```latex
+  \foreach \i in {0,...,5} \foreach \j in {0,...,5} {
+    \pgfmathtruncatemacro{\on}{(\causal==0) || (\j<=\i)} % full vs lower-triangular
+    \node[cell, \ifnum\on=1 on\else off\fi] at (\j*\sx,-\i*\sx) {};
+  }
+  ```
+
+- **Arrows: default `->` tip, thin, faded.** A target-above-input schema uses
+  short vertical `up/.style={->, ThesisInk!45, shorten >=1.5pt, shorten <=1.5pt}`.
+- **Two-row input/target layout** for objective figures: bottom row = the actual
+  input tokens (solid tint), top row = the targets (faint tint), arrow between.
+  Dense (CLM: a target over every position) vs sparse (MLM: a target only over
+  `[MASK]` positions) is then visually obvious.
+
+### Reusable styles (define once per figure, in thesis colors)
+
+```latex
+\begin{tikzpicture}[font=\scriptsize\sffamily,
+  cell/.style={draw=ThesisInk!22, rounded corners=1.5pt,
+               minimum width=1.25cm, minimum height=0.55cm,
+               text=ThesisInk, inner sep=2pt},
+  on/.style ={fill=ThesisPrimary!30,   draw=ThesisPrimaryDark},   % active/input
+  msk/.style={fill=ThesisSecondary!38, draw=ThesisSecondaryDark}, % masked
+  tgt/.style={cell, fill=ThesisPrimary!16,   draw=ThesisPrimaryDark!60}, % target (CLM)
+  tgtm/.style={cell, fill=ThesisSecondary!22, draw=ThesisSecondaryDark!70}, % target (MLM)
+  up/.style ={->, ThesisInk!45, shorten >=1.5pt, shorten <=1.5pt}]
+```
+
+### The in-text "example box" (used for every figure that shows a real text)
+
+Each chapter of the biomedical-text part opens on a real/synthetic text sample
+rendered as a single rounded panel, NOT a screenshot:
+
+```latex
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      text width=0.84\textwidth, inner sep=12pt, align=justify,
+      font=\footnotesize, text=ThesisInk] { \textit{ ... the text ... } };
+```
+
+Force it to the top of the chapter with a non-float block (see §2bis below /
+`working-with-rian.md`): `\begin{center} ... \captionof{figure}{...} ... \end{center}`,
+not `figure[t]`, so it stays exactly where intended.
+
+### Verify every schema by rendering, not by reading the source
+
+After editing a TikZ schema, **compile and look at the actual pixels** before
+committing: find the page (`pdftotext -layout` + grep the caption), render it
+(`pdftoppm -png -r 130 -f N -l N thesis.pdf out`), and Read the PNG. Check for
+overflow, touching cells, unreadable labels, broken arrows. The summary's
+"looks-right-in-source" is not enough; Rian's corrections were all things only
+visible in the rendered figure.
 
 ---
 
