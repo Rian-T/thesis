@@ -491,14 +491,15 @@ purely via text'' \citep{gpt3}. The practical shift is large. Instead of collect
 labelled data and training a classifier for every task, one writes a prompt.
 
 How much help the prompt carries defines three settings. In the \emph{zero-shot}
-setting the model is given only an instruction; in \emph{one-shot} it also sees one
-worked example; in \emph{few-shot} it sees several, typically ten to a hundred, as
-many as fit in the 2048-token context window. \Cref{fig:lm-fewshot} places the three
-side by side on a simple arithmetic task. The examples are not training data, they
-are text the model reads before answering, and the same idea works across very
-different tasks: unscrambling letters (\texttt{skicts} $\to$ \texttt{sticks}),
-SAT-style analogies (\emph{lull is to trust as cajole is to compliance}), or
-translating a sentence into French.
+setting the model is given only the task, at most a short instruction; in
+\emph{one-shot} it also sees one worked example; in \emph{few-shot} it sees several,
+typically ten to a hundred, as many as fit in the 2048-token context window (the most
+text the model can read at once). \Cref{fig:lm-fewshot} places the three side by side
+on a simple arithmetic task. The examples are not training data, they are text the
+model reads before answering, and the same idea works across very different tasks:
+unscrambling letters (\texttt{skicts} $\to$ \texttt{sticks}), word analogies
+(\emph{lull is to trust as cajole is to compliance}), or translating a sentence into
+French.
 
 \medskip
 \begin{center}
@@ -567,15 +568,16 @@ on over 400 trained models, a loss law of the form
 they estimated $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$ and
 $\beta = 0.28$. Here $E$ is the loss that would remain with unlimited data and
 parameters, a floor set by the language itself, while the two fractions measure how
-far a finite model and a finite dataset still sit above it. Reading the law for a
-fixed compute budget, where training cost is about $6ND$, gives the best split
-between size and data, and the answer is that the two should grow together: each time
-the model doubles, the data should double with it (\Cref{fig:lm-chinchilla}). By
-their own projection this means roughly twenty training tokens per parameter, far
-more data than earlier models had used. To prove the point they trained Chinchilla, a
-70-billion-parameter model, on 1.4 trillion tokens, and it beat Gopher, a
-280-billion model trained on the same compute, scoring 67.6\% against 60.0\% on the
-MMLU exam benchmark. Most large models before it had simply been undertrained.
+far a finite model and a finite dataset still sit above it. The total training cost
+grows with both, roughly as $6ND$, so for a fixed budget the law gives the best split
+between model size and data, the \emph{compute-optimal} point. Its answer is that the
+two should grow together: each time the model doubles, the data should double with it
+(\Cref{fig:lm-chinchilla}). By their own projection this means roughly twenty
+training tokens per parameter, far more data than earlier models had used. To prove
+the point they trained Chinchilla, a 70-billion-parameter model, on 1.4 trillion
+tokens, and it beat Gopher, a 280-billion model trained on the same compute, scoring
+67.6\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven subjects.
+Most large models before it had simply been undertrained.
 
 \begin{figure}[t]
 \centering
