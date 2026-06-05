@@ -36,36 +36,34 @@ curves = [
     (1.3,  "exploding", COLORS["tertiary_dark"]),
 ]
 
-fig, ax = plt.subplots(figsize=(5.4, 3.4))
+fig, ax = plt.subplots(figsize=(5.6, 3.4))
 
-# shade the stable line region lightly
-ax.axhline(1.0, color=COLORS["neutral"], lw=0.6, ls=(0, (4, 3)), zorder=1)
-
+handles = []
 for eta, kind, color in curves:
     y = eta ** d
     ls = (0, (4, 3)) if kind == "stable" else "-"
     lw = 1.0 if kind == "stable" else 1.7
-    ax.plot(d, y, color=color, lw=lw, ls=ls, zorder=3)
-    # direct end-of-line label (Tufte: no legend box); quiet ink text
-    xi = d[-1]
-    ax.annotate(rf"$\eta={eta}$",
-                xy=(xi, eta ** xi), xytext=(4, 0),
-                textcoords="offset points", va="center", ha="left",
-                color=COLORS["ink"], fontsize=8.5)
+    (line,) = ax.plot(d, y, color=color, lw=lw, ls=ls, zorder=3,
+                      label=rf"$\eta={eta}$")
+    handles.append(line)
 
 ax.set_yscale("log")
-ax.set_xlim(0, 47)
+ax.set_xlim(0, 40)
 ax.set_ylim(1e-7, 1e6)
 ax.set_xlabel(r"backprop steps into the past $\;(t-k)$")
 ax.set_ylabel(r"relative gradient norm $\;\eta^{\,t-k}$")
-
-# regime words: quiet gray, no saturated color (color stays on the data)
-ax.text(40, 6e-6, "vanishing", color=COLORS["neutral"],
-        fontsize=9.5, style="italic", ha="right", va="bottom")
-ax.text(40, 1.5e5, "exploding", color=COLORS["neutral"],
-        fontsize=9.5, style="italic", ha="right", va="top")
-
 ax.tick_params(length=3)
+
+# clean legend OUTSIDE the data area, no frame; ordered top->bottom like the curves
+leg = ax.legend(handles=handles[::-1], loc="center left",
+                bbox_to_anchor=(1.02, 0.5), frameon=False,
+                handlelength=1.5, labelspacing=0.6, borderaxespad=0.0)
+# quiet regime cues in the legend margin, never over the plot
+ax.text(1.02, 0.98, "explodes", transform=ax.transAxes, color=COLORS["neutral"],
+        fontsize=9, style="italic", ha="left", va="top")
+ax.text(1.02, 0.02, "vanishes", transform=ax.transAxes, color=COLORS["neutral"],
+        fontsize=9, style="italic", ha="left", va="bottom")
+
 fig.tight_layout()
 
 out = os.path.join(os.path.dirname(__file__), "rnn_gradient.pdf")
