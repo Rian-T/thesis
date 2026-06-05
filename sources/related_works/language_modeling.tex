@@ -164,16 +164,79 @@ the pretrain-then-adapt recipe the rest of this thesis depends on.
 
 \subsection{Recurrent networks}
 
-All of these still read a fixed window of context. A recurrent network removes that
-limit by processing a sequence one token at a time and carrying a hidden state
-forward, so that in principle each prediction can depend on everything before it.
-Recurrent language models \citep{mikolov10_interspeech} improved over n-grams, and
-the LSTM \citep{hochreiter1997long} was designed to keep information over longer
-spans. Two problems remained. The gradient that trains these models tends to vanish
-over long sequences, so distant context is hard to learn, and the step-by-step
-processing cannot be parallelised, which makes training on large corpora slow.
-Long-range dependencies and parallelism are the two limits the next architecture
-was built to solve.
+All of the models so far read a fixed window of context. A \emph{recurrent neural
+network} removes that limit by reading the sequence one token at a time and carrying
+a running summary forward. The idea goes back to \citet{rnn_origins} and was first
+made to work as a language model by \citet{mikolov10_interspeech}. At each step $t$
+the network takes the current token $x_t$ and the previous hidden state $h_{t-1}$,
+and combines them into a new hidden state,
+\[
+  h_t = f(x_t,\, h_{t-1}),
+\]
+where $f$ is a small learned function and $h_t$ is a fixed-size vector that
+summarises everything read up to position $t$. The next token is predicted from
+$h_t$ with a softmax over the vocabulary, just as in the neural model above. Because
+the hidden state is passed from one step to the next (\Cref{fig:lm-rnn}), a
+prediction can in principle depend on the whole history rather than the last $n-1$
+tokens.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\scriptsize\sffamily,
+  box/.style={rounded corners=2pt, minimum width=1.0cm, minimum height=0.6cm,
+    inner sep=2pt, text=ThesisInk},
+  inp/.style={box, fill=ThesisPrimary!22, draw=ThesisPrimaryDark!70},
+  hid/.style={box, fill=ThesisTertiary!30, draw=ThesisTertiary!90!black},
+  pred/.style={box, fill=ThesisPrimary!10, draw=ThesisPrimaryDark!45},
+  fwd/.style={->, ThesisInk!55, shorten >=1pt, shorten <=1pt},
+  rec/.style={->, ThesisTertiary!85!black, thick, shorten >=1pt, shorten <=1pt},
+]
+\def\sx{2.05}
+\foreach \i/\w/\p/\hl in {0/The/cat/1, 1/cat/sat/2, 2/sat/down/3, 3/down/{$\langle$eos$\rangle$}/4}{
+  \node[inp] (x\i) at (\i*\sx,0)   {\w};
+  \node[hid] (h\i) at (\i*\sx,1.2) {$h_{\hl}$};
+  \node[pred] (o\i) at (\i*\sx,2.4) {\p};
+  \draw[fwd] (x\i) -- (h\i);
+  \draw[fwd] (h\i) -- (o\i);
+}
+\draw[rec] (h0) -- (h1);
+\draw[rec] (h1) -- (h2);
+\draw[rec] (h2) -- (h3);
+\node[text=ThesisNeutral, anchor=east] at (-0.85,2.4) {prediction};
+\node[text=ThesisNeutral, anchor=east] at (-0.85,1.2) {hidden state};
+\node[text=ThesisNeutral, anchor=east] at (-0.85,0)   {input};
+\end{tikzpicture}
+\caption{A recurrent language model, drawn one step per token. At each position the
+network combines the current input with the hidden state carried over from the
+previous step (the horizontal arrows) and predicts the next token, so the running
+state lets a prediction depend on the whole past rather than a fixed window.}
+\label{fig:lm-rnn}
+\end{figure}
+
+In practice this memory is short. The network is trained by propagating the error
+back through every step, and over a long sequence that signal either shrinks toward
+zero or grows out of control, so the model cannot learn links between tokens that
+are far apart. \citet{bengio_longterm_1994} showed that this difficulty, the
+\emph{vanishing} and \emph{exploding gradient} problem, is inherent to plain
+recurrence.
+
+The \emph{long short-term memory} network, or LSTM, was built to ease it
+\citep{hochreiter1997long}. Alongside the hidden state it keeps a separate memory
+cell that runs along the sequence, controlled by a set of \emph{gates} that decide
+at each step what to erase from the cell, what to write into it, and what to read
+out. Because information can travel along the cell almost unchanged, useful facts
+survive over longer spans, and so does the gradient that carries them. A lighter
+variant, the gated recurrent unit, drops one of the gates and performs comparably
+\citep{rnn_eval}. LSTMs became the standard language model of the early 2010s.
+
+Two limits remained. Even with gates, very long dependencies are hard to capture,
+and the step-by-step processing cannot be parallelised, which makes training on
+large corpora slow. A related weakness showed up in translation, where an encoder
+had to compress a whole input sentence into its final hidden state before a decoder
+could read it. \citet{bahdanau_nmt} relieved this bottleneck by letting the decoder
+look back at all of the encoder's states through an early form of attention.
+Long-range dependencies, parallelism, and this idea of direct access between
+positions are what the next architecture was built around.
 
 
 \section{Transformer}
