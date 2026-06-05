@@ -89,9 +89,9 @@ single symbol; n-gram models keep the last few and still rely on counting.
 Counting runs out quickly, because most word sequences are never seen twice, so
 \citet{bengio2003neural} replaced the count tables with a neural network that maps
 each word to a vector, so that words used in similar ways come to sit close
-together and can pool their evidence. This distributed representation sidesteps the
-sparsity that defeats raw counting, and cut the perplexity of the best n-gram model
-by about a quarter. A decade later, the Transformer replaced
+together and can pool their evidence. This distributed representation gets around
+the sparsity that defeats plain counting, and cut the perplexity of the best n-gram
+model by about a quarter. A decade later, the Transformer replaced
 recurrence with self-attention, estimating the same conditional in parallel and at
 a scale that reset the state of the art \citep{vaswani2017attention}. From a pencil
 on \emph{Onegin} to self-attention, it is the same conditional throughout.
