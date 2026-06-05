@@ -44,19 +44,14 @@ ax.axhline(1.0, color=COLORS["neutral"], lw=0.6, ls=(0, (4, 3)), zorder=1)
 for eta, kind, color in curves:
     y = eta ** d
     ls = (0, (4, 3)) if kind == "stable" else "-"
-    lw = 1.2 if kind == "stable" else 1.8
+    lw = 1.0 if kind == "stable" else 1.7
     ax.plot(d, y, color=color, lw=lw, ls=ls, zorder=3)
-    # direct end-of-line label (Tufte: no legend box)
-    if eta != 1.0:
-        xi = d[-1]
-        ax.annotate(rf"$\eta={eta}$",
-                    xy=(xi, eta ** xi), xytext=(3, 0),
-                    textcoords="offset points", va="center", ha="left",
-                    color=color, fontsize=9)
-
-ax.annotate(r"$\eta=1$", xy=(d[-1], 1.0), xytext=(3, 0),
-            textcoords="offset points", va="center", ha="left",
-            color=COLORS["neutral"], fontsize=9)
+    # direct end-of-line label (Tufte: no legend box); quiet ink text
+    xi = d[-1]
+    ax.annotate(rf"$\eta={eta}$",
+                xy=(xi, eta ** xi), xytext=(4, 0),
+                textcoords="offset points", va="center", ha="left",
+                color=COLORS["ink"], fontsize=8.5)
 
 ax.set_yscale("log")
 ax.set_xlim(0, 47)
@@ -64,11 +59,11 @@ ax.set_ylim(1e-7, 1e6)
 ax.set_xlabel(r"backprop steps into the past $\;(t-k)$")
 ax.set_ylabel(r"relative gradient norm $\;\eta^{\,t-k}$")
 
-# region words, placed in the open space
-ax.text(0.5, 3e-6, "gradient vanishes", color=COLORS["primary_dark"],
-        fontsize=10, ha="left", va="bottom")
-ax.text(0.5, 2e5, "gradient explodes", color=COLORS["tertiary_dark"],
-        fontsize=10, ha="left", va="top")
+# regime words: quiet gray, no saturated color (color stays on the data)
+ax.text(40, 6e-6, "vanishing", color=COLORS["neutral"],
+        fontsize=9.5, style="italic", ha="right", va="bottom")
+ax.text(40, 1.5e5, "exploding", color=COLORS["neutral"],
+        fontsize=9.5, style="italic", ha="right", va="top")
 
 ax.tick_params(length=3)
 fig.tight_layout()
