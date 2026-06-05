@@ -188,6 +188,7 @@ _archive/
 
 | File | What it covers |
 |------|---------------|
+| `guidelines/working-with-rian.md` | **Read first.** Process (scribe model: voice-first, draft in buffers, paragraph-by-paragraph, show PDF pages), deep-research subagent approach, and the recurring corrections: simple academic English, no choppy/AI sentences, intuition before detail, respect altitude (don't compare "from nowhere"), data behind every quantitative claim, one-sentence captions, privacy/PII rules, no em dashes |
 | `guidelines/writing-guide.md` | Voice & tone (academic "we", measured, no hype), sentence structure, tense rules, hedging, precision with numbers, transitions, paragraph length, word choice, thesis structure (intro/RW/research chapters/conclusion anatomy), section-by-section templates, LaTeX formatting conventions (`\Cref{}`, `\paragraph{}`, `\section*{Conclusion}`), hard rules (no spoiling in RW, no redundancy, always back claims with numbers), chapter type rules (article vs discussion), hook patterns, conclusion patterns (no "we introduced X", use cliffhangers) |
 | `guidelines/visual-style.md` | Table style (booktabs, siunitx, colored group headers), figure style (bar charts, line plots, pipeline diagrams), color palette reference, do/don't quick reference |
 | `guidelines/style-proposals.pdf` | Visual reference PDF with validated styles: tables (A1/A2/A3), bar charts (A/B/D), line plots (A markers/B confidence band), pipelines (A horizontal/B vertical), all on Palette 4 (Lavender & Lime) |
