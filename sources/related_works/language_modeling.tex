@@ -216,11 +216,24 @@ running state lets a prediction depend on the whole past rather than a fixed win
 \medskip
 
 In practice this memory is short. The network is trained by propagating the error
-back through every step, and over a long sequence that signal either shrinks toward
-zero or grows out of control, so the model cannot learn links between tokens that
-are far apart. \citet{bengio_longterm_1994} showed that this difficulty, the
-\emph{vanishing} and \emph{exploding gradient} problem, is inherent to plain
-recurrence.
+back through every step, and \citet{pascanu_difficulty_2013} showed that this
+backward signal is scaled by a similar factor at each step, so it shrinks or grows
+geometrically as it travels into the past (\Cref{fig:lm-gradient}). When the factor
+is below one the gradient vanishes and the model cannot learn links between distant
+tokens; when it is above one the gradient explodes and training becomes unstable.
+\citet{bengio_longterm_1994} had already identified this \emph{vanishing} and
+\emph{exploding gradient} problem as inherent to plain recurrence.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.74\textwidth]{plots/related_works/rnn_gradient.pdf}
+\caption{How the gradient of a recurrent network scales as it is propagated $t-k$
+steps back in time, following the geometric bound $\eta^{\,t-k}$ of
+\citet{pascanu_difficulty_2013}: below one it vanishes and above one it explodes, so
+links across long spans are hard to learn. The curves are this analytical bound, not
+measured gradients.}
+\label{fig:lm-gradient}
+\end{figure}
 
 The \emph{long short-term memory} network, or LSTM, was built to ease it
 \citep{hochreiter1997long}. Alongside the hidden state it keeps a separate memory
@@ -388,7 +401,7 @@ of this thesis (\Cref{fig:lm-objectives}).
 }
 \end{scope}
 \end{tikzpicture}}
-\vspace{8pt}
+\vspace{3pt}
 \caption{The same sentence under the two objectives. The bottom row is the input
 and the boxes above are the targets the model must predict, one arrow per predicted
 position. Causal language modeling predicts the next token at every position, so
