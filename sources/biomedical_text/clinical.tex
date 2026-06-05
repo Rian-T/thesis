@@ -1,8 +1,8 @@
 \chapter{Clinical Text}
 \label{chap:bt-clinical}
 
-\begin{figure}[t]
-\centering
+\noindent
+\begin{center}
 \begin{tikzpicture}
 \node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
       text width=0.84\textwidth, inner sep=11pt, align=left,
@@ -21,12 +21,10 @@ Coro : occlusion IVA proximale, angioplastie + stent actif, TIMI 3. ETT : FEVG 4
 \textbf{CAT.} Réadaptation cardiaque. Consultation cardio à 1 mois.\hfill D\textsuperscript{r} C.~Després
 };
 \end{tikzpicture}
-\caption{A discharge summary for an acute myocardial infarction. The patient,
-hospital, and clinicians are fictitious; the telegraphic style reproduces a real
-note used only as a template. The same case returns later as scientific and lay
-text.}
+\captionof{figure}{A discharge summary for an acute myocardial infarction.}
 \label{fig:bt-clinical-note}
-\end{figure}
+\end{center}
+\medskip
 
 % === P1 — HOOK ===
 \Cref{fig:bt-clinical-note} is a discharge summary, written by one cardiologist
@@ -53,58 +51,103 @@ subfield from its articles alone and showing that the field's information was, i
 effect, its sublanguage \citep{harris_immunology_1989}.
 
 % === P3 ===
-The clinical note is the best-documented case of this idea. Building a computer
-grammar of clinical English, Naomi Sager's Linguistic String Project found that
-the parser needed rules for elliptical fragments that standard English does not
-license, alongside word classes specific to the domain such as patient, finding,
-and treatment \citep{sager_nlip_1981, sager_mlp_1987}. A contemporary panel set
-out the conditions under which such a system arises: a restricted domain, a
-restricted purpose, a restricted mode of communication whose time and space
-limits favour compressed forms, and a community of experts who enforce the
-patterns \citep{kittredge_sublanguages_1982}. A sublanguage grammar, in this
-view, intersects the standard grammar without being contained in it. Sager's
-further step, mapping each sentence into a fixed template of slots, is the direct
-ancestor of clinical information extraction.
+The clinical note is the best-documented case of this idea. When Naomi Sager and
+her group built a program to read clinical notes, they found the notes already
+followed a grammar of their own \citep{sager_nlip_1981, sager_mlp_1987}. To read
+them, the program needed rules for the short, verbless phrases that notes use but
+everyday language does not, together with categories taken from medicine itself,
+such as patient, finding, and treatment. A line like \emph{afebrile, chest clear}
+is not broken language; it follows rules, just not the ones taught at school.
+Those rules hold for a plain reason: a community of clinicians keeps writing this
+way, and newcomers are trained to do the same \citep{kittredge_sublanguages_1982}.
+The grammar lives inside the hospital, among the people who share it.
 
 % === P4 ===
-If the clinic runs its own grammar, so does the laboratory, and the two are not
-the same. Friedman and colleagues compared clinical reports with
-molecular-biology articles and described them as two distinct sublanguages, each
-with its own word classes and information structure, both derivable from Harris's
-theory \citep{friedman_two_2002}. The consequence matters here. ``Biomedical
-text'' is not a single object: its abundant, public part, the scientific
-literature, belongs to a different sublanguage from the rare, private target, the
-patient note. Friedman's clinical system, \textsc{MedLEE}, shows the practical
-end of the same idea, parsing radiology reports into a controlled, structured
-form \citep{friedman_medlee_1994}. Abundance is therefore not the same as
-relevance: more scientific text does not, on its own, supply the clinical
-language we ultimately need.
+Seen up close, the strangeness of the note is not carelessness but compression.
+Sager and colleagues showed that clinical shorthand follows a small set of
+deletion rules: the writer drops a subject here, a verb there, a tense elsewhere,
+but only when the reader can put it back \citep{anderson_compression_1975}.
+\emph{Chest films normal} stands for \emph{the chest films were normal};
+\emph{no bone pain} stands for \emph{the patient has no bone pain}. What
+disappears is the part the reader least needs spelled out. The note is short on
+purpose, and short by rule.
 
 % === P5 ===
-The claim is measurable, not merely descriptive. \citet{temnikova_closure_2013}
-quantify a sublanguage through its closure: as a corpus grows, the count of new
-word types levels off toward a ceiling for a true sublanguage, whereas general
-language keeps growing. Scientific corpora reach this ceiling far sooner than a
-general reference corpus does. The same instruments let us test, later in this
-thesis, whether clinical and scientific French are distinct sublanguages rather
-than assume it.
+This works because the reader is an expert. Writing for a colleague, the
+clinician leaves out whatever that colleague can already supply, following the
+ordinary logic of cooperative communication: say what is needed, and no more
+\citep{grice_logic_1975, sperber_relevance_1995}. The same words behave
+differently depending on who reads them. \emph{Afebrile, vitals stable, continue
+antibiotics} is complete for a physician and almost empty for anyone else. The
+note is not written to stand on its own; it is written to be finished by a reader
+who already knows the rest.
 
 % === P6 ===
+That shared background has a name. The note records only the update to a large
+body of assumptions the writer and reader already hold in common: medical
+training, the patient's history, the routines of the ward
+\citep{stalnaker_common_2002}. None of it appears on the page. This is worth
+pausing on, because the compression that makes the note efficient is the same
+thing that makes it opaque from outside. A model trained on public text is not
+merely missing a few words; it is missing the shared ground that gives the words
+their meaning.
 
 % === P7 ===
+The note does more than describe the patient; much of it acts. The plan gives
+orders and makes commitments, and a few entries change the world simply by being
+written, such as \emph{DNR}, \emph{discharge}, or \emph{transfer to intensive
+care} \citep{austin_words_1962, searle_speech_1969}. Written by an authorised
+clinician, the three letters \emph{DNR} do not report a fact so much as create
+one. A record that
+carries acts of this weight is signed, audited, and legally binding, which is one
+more reason it is kept under lock.
 
 % === P8 ===
+Even the shape of the note has a history. Its habit of pinning each finding to a
+site in the body, of reading the patient as a map of localised lesions, descends
+from the clinical gaze that took form with the modern hospital
+\citep{foucault_clinique_1963}.
 
 % === P9 ===
+There is a blunter reason the note stays inside the hospital: it is saturated with
+personal data. A single report can carry the patient's name, age, and dates, a
+home address, a family situation, and a diagnosis rare enough to identify someone
+on its own. Stripping the obvious identifiers is not enough, since a pseudonymised
+note is still not anonymous, and a model trained on such text can memorise and
+later surface what it read \citep{tannier_parhaf_2026}. Confidentiality here is
+not a rule added on top of the text; it is part of what the text is made of.
 
 % === P10 ===
+For French, this scarcity is sharper still. There is no shareable corpus of real
+French hospital records to match the large English ones, and there has not been
+one for a decade \citep{neveol_clinical_2018}. What is public stands in for the
+real thing: published case reports, drug package leaflets, article abstracts. A
+case report, though, is written to teach, and it reads as a small narrative in
+full sentences and past tense, as in this opening from a French clinical-case
+corpus: \emph{``B.A., âgé de 36 ans, sans antécédents notables, a été admis en
+février 1994 pour des douleurs lombaires droites''} \citep{grabar_cas_2020}. Set
+beside the clipped admission lines of \Cref{fig:bt-clinical-note}, the change of
+register is immediate.
+
+Whether such proxies can stand for true hospital notes is openly disputed, and
+the disagreement runs deep. The authors of that case-report corpus argue the two
+are very close, since the same physicians write both \citep{grabar_cas_2020}; a
+more recent corpus of expert-written reports holds the opposite, that the style
+of case reports is in fact quite different from that of electronic health records
+\citep{tannier_parhaf_2026}. The field cannot yet agree on whether the text it is
+allowed to share even resembles the text it cannot. The text we most want to
+model is the text we can least obtain.
 
 % === P11 ===
+Taken together, these properties explain why the clinical note is so hard to
+obtain. It is rare because it is private, and private because of what it is: a
+closed sublanguage, written in compressed form for an expert in-group, dense with
+personal data, and performing acts that carry legal weight. Its scarcity is not an
+accident of collection that more effort would remove; it follows from the nature
+of the text itself.
 
 % === P12 ===
-
-% === P13 ===
-
-% === P14 ===
-
-% === P15 ===
+And yet medicine produces text in vast quantities. Most of it is not the clinical
+note at all, but the published literature, abundant and free to read. This raises
+the question the next chapter takes up: can that abundance stand in for the
+language of the clinic?
