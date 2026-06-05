@@ -21,16 +21,23 @@ symbol, as
   H = -\sum_i p_i \log_2 p_i,
 \]
 measured in bits \citep{shannon_mi}. The quantity is largest when every symbol is
-equally likely and shrinks as some symbols become predictable. Shannon also showed
-that sampling text from richer statistics makes it look more like English: drawn
-independently, letters give gibberish; respect digram and then trigram
-frequencies, and recognisable fragments of words appear. The more context a model
-uses, the better it captures the language.
+equally likely and shrinks as some symbols become predictable.
+
+Shannon also made the role of context vivid. Generate letters independently and the
+result is noise, \emph{xfoml rxkhrjffjuj zlpwcfwkcyj}. Keep three-letter
+statistics and the output is already pronounceable and nearly English, \emph{in no
+ist lat whey cratict froure birs}. Stitch whole words together by pairs and the
+fragments begin to scan as sentences, \emph{the head and in frontal attack on an
+english writer that the character of this point}. Each step uses a little more
+context, and each step looks more like the language.
 
 How predictable is English, then? Shannon answered with an experiment in which a
 person guessed the next letter of a text one symbol at a time
-\citep{shannon_prediction_1951}. An alphabet of 27 symbols, the 26 letters and a
-space, could in principle carry $\log_2 27 \approx 4.76$ bits per character. Yet
+\citep{shannon_prediction_1951}. Shown the preceding text, his reader guessed
+correctly about two times in three, usually on the first try; from how the guesses
+fell, Shannon derived bounds on the entropy. An alphabet of 27
+symbols, the 26 letters and a space, could in principle carry $\log_2 27 \approx
+4.76$ bits per character. Yet
 given enough preceding text, Shannon estimated the true entropy of English at
 about one bit per character, somewhere between roughly 0.6 and 1.3
 (\Cref{fig:lm-entropy}). Nearly four of every five nominal bits are redundant,
@@ -81,8 +88,10 @@ The estimators have changed beyond recognition. Markov truncated the history to 
 single symbol; n-gram models keep the last few and still rely on counting.
 Counting runs out quickly, because most word sequences are never seen twice, so
 \citet{bengio2003neural} replaced the count tables with a neural network that maps
-words to vectors and lets similar words share evidence, cutting the perplexity of
-the best n-gram model by about a quarter. A decade later, the Transformer replaced
+each word to a vector, so that words used in similar ways come to sit close
+together and can pool their evidence. This distributed representation sidesteps the
+sparsity that defeats raw counting, and cut the perplexity of the best n-gram model
+by about a quarter. A decade later, the Transformer replaced
 recurrence with self-attention, estimating the same conditional in parallel and at
 a scale that reset the state of the art \citep{vaswani2017attention}. From a pencil
 on \emph{Onegin} to self-attention, it is the same conditional throughout.

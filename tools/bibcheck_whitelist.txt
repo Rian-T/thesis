@@ -15,3 +15,5 @@ le_clercq_de_lannoy_strategies_2022  # TALN 2022
 miranda2022distemist            # DisTEMIST overview, BioASQ/CEUR 2022
 shashikumar2023bioontobert      # BioOntoBERT, ICBO/CEUR-WS Vol-3603, 2023 (verified via ceur-ws.org)
 lindberg_unified_1993           # UMLS, Lindberg et al., Methods Inf Med 1993
+ec_directive_2001_83             # EU legal act (EUR-Lex CELEX 32001L0083), no DOI
+ema_qrd_template                 # EMA web resource (QRD template), no DOI

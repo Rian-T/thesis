@@ -37,6 +37,21 @@ becomes the public's \emph{doctors have shown}; the careful technical term becom
 an everyday word. Writing for patients is not watered-down science, then, but a
 different layer of the same knowledge, with its own form.
 
+% === P2b — the drug leaflet: official, mandated vulgarisation ===
+Not all of this lay writing is unofficial. The most systematic patient-facing text
+of all is the humble drug leaflet, the \emph{notice} folded inside every box of
+medicine. In the European Union it is not optional: by law every authorised drug
+carries one, in the official language of each market, written ``in clear and
+understandable terms for the users'' \citep{ec_directive_2001_83}. A common
+template fixes the same six headings everywhere, from \emph{what the medicine is
+and what it is used for} to \emph{possible side effects}, and a draft must be
+tested on real patients for readability before it can be approved
+\citep{ema_qrd_template}. Here the move from specialist to public that Fleck
+described is not left to chance but codified and quality-checked. The leaflet also
+stages the variation in names directly, since regulation requires it to print the
+brand name beside the common one, \emph{Doliprane} next to \emph{paracétamol}, so
+that a single substance wears its several names side by side on one page.
+
 % === P3 — naming varies (Wüster foil, Cabré, Gaudin) ===
 What changes most, for our purpose, is the naming. The founding ideal of
 terminology, set out by the engineer Eugen Wüster, was one concept and one term,
@@ -50,6 +65,13 @@ of the clinical note, \emph{infarctus du myocarde}, coded \emph{I21}, is the sam
 event the patient calls a \emph{crise cardiaque}. One concept, several names, and
 the public register invents the most of them.
 
+% === P3b — Temmerman: concepts are fuzzy too ===
+The trouble runs deeper than names. Rita Temmerman showed that many medical
+categories have no sharp edges at all: they are built around prototypes, shift over
+time, and are often grasped through metaphor, the heart as a pump that can fail
+\citep{temmerman_towards_2000}. Normalisation therefore meets a double difficulty:
+a single concept wears many names, and the concept itself has soft boundaries.
+
 % === P4 — UMLS, measured ===
 Medicine has not resolved this multiplicity so much as catalogued it. The Unified
 Medical Language System, described by Bodenreider, gathers more than sixty
@@ -59,6 +81,16 @@ held about 2.5 million names for some 900{,}000 concepts. The field's central
 resource does not impose one name per concept, it records every name there is. The
 dream of one concept and one term did not come true, and the infrastructure we
 built around medical language is the admission that it did not.
+
+% === P4b — ontology vs running text ===
+This is why a formal ontology does not simply replace the text. An ontology is
+built to state what exists, in clean and consistent terms \citep{smith_ceusters_2010};
+a clinical note states what a clinician believes at one moment, with its hedges,
+its timeline, and everything left unsaid. The two are complementary, not
+interchangeable: the UMLS can list every name for a heart attack, but it cannot
+record that this patient's was \emph{probable}, \emph{three days ago}, and now
+\emph{resolved}. Linking the running text to the codes is a translation between the
+two, not a lookup in a table.
 
 % === P5 — Hacking + register, brief ===
 Naming in medicine is not even a neutral act. As Ian Hacking observed, classifying
