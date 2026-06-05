@@ -96,7 +96,7 @@ entirely on these models: they are pretrained on large corpora and then adapted 
 a task. Adaptation is the hard part, because the target combines three scarcities
 at once, French, biomedical, and clinical, and, as the previous part showed, the
 text we can gather most easily is the least like the text we need. This chapter
-surveys the machinery that makes such adaptation possible: the architectures and
+reviews the methods that make this adaptation possible: the architectures and
 pretraining objectives, how they scale, how they are specialised to a domain
 through continual pretraining, and the tokenization and long-context choices that
 matter for clinical documents. Continual pretraining, the mechanism at the heart of
@@ -108,7 +108,7 @@ this thesis, is treated last and in the most detail.
 
 \subsection{N-gram models}
 
-The first estimators make the history short. Markov's assumption is that the next
+The first estimators keep only a short history. Markov's assumption is that the next
 token depends only on the last few, so the full conditional $P(w_t \mid w_{<t})$ is
 approximated by $P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$, the probability of a token
 given the $n-1$ before it. These probabilities are read straight from counts in a
@@ -133,8 +133,8 @@ vectors and can pool their evidence. A sequence never seen in training is no lon
 a dead end, because its words resemble others the model has seen. This alone cut
 the perplexity of the best n-gram models by about a quarter. The embeddings turned
 out to be useful on their own: word2vec \citep{mikolov-etal-2013-linguistic} showed
-that simple arithmetic on them captures regularities of meaning, the textbook case
-being that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}.
+that simple arithmetic on them captures regularities of meaning; the textbook
+example is that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}.
 These early vectors were still \emph{static}: one vector per word, whatever the
 sentence. ELMo \citep{peters-etal-2018-deep} made them contextual, giving a word a
 different vector in each sentence, and showed that representations pretrained on
