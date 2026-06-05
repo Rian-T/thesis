@@ -3,29 +3,100 @@
 \label{chap:rw-lm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO rediger proprement
-
-
 \section{Introduction}
 \label{sec:lm-intro}
 
-Un language model c'est un modele probabiliste sur des sequences de tokens:
-$$
-P(\mathbf{w}) = \prod_{t=1}^{L} P(w_t \mid w_{<t})
-$$
+Long before there were computers, there was the idea that the next symbol in a
+text can be guessed from the ones before it. In 1913 the mathematician Andrei
+Markov tested it by hand. He took twenty thousand letters from Pushkin's
+\emph{Eugene Onegin}, reduced each to a vowel or a consonant, and counted: a vowel
+followed another vowel only 13\% of the time, but followed a consonant 66\% of the
+time \citep{markov_onegin_1913}. Letters are not independent. The past constrains
+the future, and the constraint can be measured.
 
-Factorisation autoregressive (chain rule). Fondation de tout le NLP moderne.
+Claude Shannon turned this counting into a theory. He modelled a text as a random
+source and defined its \emph{entropy}, the average information carried by each
+symbol, as
+\[
+  H = -\sum_i p_i \log_2 p_i,
+\]
+measured in bits \citep{shannon_mi}. The quantity is largest when every symbol is
+equally likely and shrinks as some symbols become predictable. Shannon also showed
+that sampling text from richer statistics makes it look more like English: drawn
+independently, letters give gibberish; respect digram and then trigram
+frequencies, and recognisable fragments of words appear. The more context a model
+uses, the better it captures the language.
 
-Pourquoi c'est important pour la these:
-\begin{itemize}
-  \item Clinical IE repose sur des LMs pretrained
-  \item Domain adaptation = defi central
-  \item French + biomedical + clinical = triple rarete de donnees
-\end{itemize}
+How predictable is English, then? Shannon answered with an experiment in which a
+person guessed the next letter of a text one symbol at a time
+\citep{shannon_prediction_1951}. An alphabet of 27 symbols, the 26 letters and a
+space, could in principle carry $\log_2 27 \approx 4.76$ bits per character. Yet
+given enough preceding text, Shannon estimated the true entropy of English at
+about one bit per character, somewhere between roughly 0.6 and 1.3
+(\Cref{fig:lm-entropy}). Nearly four of every five nominal bits are redundant,
+already fixed by what came before. That redundancy is the whole opportunity: a
+model that predicts the next symbol well has, in effect, learned the structure of
+the language.
 
--> plan du chapitre: on remonte des n-grams jusqu'aux archis modernes, puis on zoome sur le continual pretraining qui est au coeur de la these
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.74\columnwidth, height=4.8cm,
+  ybar, bar width=15pt,
+  ymin=0, ymax=5.3,
+  ylabel={bits per character},
+  ylabel style={font=\small},
+  symbolic x coords={0,1,2,{$\approx$100}},
+  xtick=data,
+  xlabel={letters of preceding context},
+  xlabel style={font=\small},
+  tick label style={font=\small},
+  axis lines=left,
+  enlarge x limits=0.20,
+  every axis plot/.style={fill=ThesisPrimary, draw=ThesisPrimaryDark, line width=0.6pt},
+]
+\addplot+[error bars/.cd, y dir=both, y explicit]
+  coordinates {(0,4.76) +- (0,0) (1,4.14) +- (0,0) (2,3.56) +- (0,0) ({$\approx$100},0.95) +- (0,0.35)};
+\end{axis}
+\end{tikzpicture}
+\caption{The entropy of printed English falls as more preceding context is used,
+from $\log_2 27 \approx 4.76$ bits per character with no context to about one bit
+(between 0.6 and 1.3) once roughly a hundred letters are taken into account
+\citep{shannon_prediction_1951}.}
+\label{fig:lm-entropy}
+\end{figure}
 
-% TODO rediger l'annonce du plan
+This is what a language model is. By the chain rule, the probability of a whole
+text factorises exactly into a product of next-symbol predictions,
+\[
+  P(w_1,\dots,w_T) = \prod_{t=1}^{T} P(w_t \mid w_{<t}),
+\]
+so modelling language reduces to estimating a single conditional distribution: the
+probability of the next token given those before it. Every model in this chapter
+is an estimator of that one quantity, and the history of the field is the history
+of estimating it better.
+
+The estimators have changed beyond recognition. Markov truncated the history to a
+single symbol; n-gram models keep the last few and still rely on counting.
+Counting runs out quickly, because most word sequences are never seen twice, so
+\citet{bengio2003neural} replaced the count tables with a neural network that maps
+words to vectors and lets similar words share evidence, cutting the perplexity of
+the best n-gram model by about a quarter. A decade later, the Transformer replaced
+recurrence with self-attention, estimating the same conditional in parallel and at
+a scale that reset the state of the art \citep{vaswani2017attention}. From a pencil
+on \emph{Onegin} to self-attention, it is the same conditional throughout.
+
+For this thesis the point is practical. Clinical information extraction rests
+entirely on these models: they are pretrained on large corpora and then adapted to
+a task. Adaptation is the hard part, because the target combines three scarcities
+at once, French, biomedical, and clinical, and, as the previous part showed, the
+text we can gather most easily is the least like the text we need. This chapter
+surveys the machinery that makes such adaptation possible: the architectures and
+pretraining objectives, how they scale, how they are specialised to a domain
+through continual pretraining, and the tokenization and long-context choices that
+matter for clinical documents. Continual pretraining, the mechanism at the heart of
+this thesis, is treated last and in the most detail.
 
 
 \section{From Statistical to Neural Language Models}
