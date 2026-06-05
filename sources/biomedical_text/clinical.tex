@@ -45,8 +45,8 @@ own right \citep{harris_mathematical_1968}. He called it a \emph{sublanguage}: t
 sentences a community produces about a narrow domain, with their own rules about
 which words may combine, rules that are stricter than those of the wider language
 and sometimes absent from it. Those rules are the point. In a sublanguage only
-certain kinds of words may follow one another, so its grammar is not a smaller copy
-of ordinary grammar but partly lies outside it. Harris and his colleagues later made this
+certain kinds of words may follow one another, so its grammar is partly its own,
+not just a smaller copy of everyday grammar. Harris and his colleagues later made this
 concrete, reconstructing the grammar of a small immunology literature from its
 articles alone and showing that the field's knowledge was, in effect, carried by
 its sublanguage \citep{harris_immunology_1989}.
@@ -72,8 +72,8 @@ deletion rules: the writer drops a subject here, a verb there, a tense elsewhere
 but only when the reader can put it back \citep{anderson_compression_1975}.
 \emph{Chest films normal} stands for \emph{the chest films were normal};
 \emph{no bone pain} stands for \emph{the patient has no bone pain}. What
-disappears is the part the reader least needs spelled out. The note is short on
-purpose, and short by rule.
+disappears is the part the reader least needs spelled out. So the note is short on
+purpose, and the cuts follow rules.
 
 % === P5 ===
 This works because the reader is an expert. Writing for a colleague, the
@@ -89,21 +89,19 @@ who already knows the rest.
 That shared background has a name. The note records only the update to a large
 body of assumptions the writer and reader already hold in common: medical
 training, the patient's history, the routines of the ward
-\citep{stalnaker_common_2002}. None of it appears on the page. This is worth
-pausing on, because the compression that makes the note efficient is the same
-thing that makes it opaque from outside. A model trained on public text is not
-merely missing a few words; it is missing the shared ground that gives the words
-their meaning.
+\citep{stalnaker_common_2002}. None of it appears on the page. This matters: the
+same compression that makes the note efficient also makes it hard to read from
+outside. A model trained on public text is missing more than a few words. It is
+missing the shared ground that makes the words mean anything.
 
 % === P7 ===
 The note does more than describe the patient; much of it acts. The plan gives
 orders and makes commitments, and a few entries change the world simply by being
 written, such as \emph{DNR}, \emph{discharge}, or \emph{transfer to intensive
 care} \citep{austin_words_1962, searle_speech_1969}. Written by an authorised
-clinician, the three letters \emph{DNR} do not report a fact so much as create
-one. A record that
-carries acts of this weight is signed, audited, and legally binding, which is one
-more reason it is kept under lock.
+clinician, the three letters \emph{DNR} do not describe a fact; they create one. A
+record that carries acts of this weight is signed, audited, and legally binding,
+which is one more reason it is kept under lock.
 
 % === P8 ===
 Even the shape of the note has a history. Its habit of pinning each finding to a
@@ -131,21 +129,27 @@ sans antécédents notables, a été admis en février 1994 pour des douleurs lo
 droites''} \citep{grabar_cas_2020}. Next to the clipped lines of the note in
 \Cref{fig:bt-clinical-note}, the difference is obvious.
 
-Whether these stand-ins really match hospital notes is disputed. The authors of
-that case-report corpus argue the two are very close, since the same doctors write
-both \citep{grabar_cas_2020}; a more recent corpus of expert-written reports finds
-the opposite, that case reports read quite differently from real records
-\citep{tannier_parhaf_2026}. The field cannot yet agree on whether the text it is
-allowed to share even looks like the text it cannot. The text we most want to
-model is the text we can least obtain.
+Whether these stand-ins really match hospital notes is disputed. The team behind
+the case-report corpus is optimistic: the clinical part of a published case, they
+argue, can be close enough to a real note that tools built on it still work on
+hospital text \citep{grabar_cas_2020}. They also admit the gaps. Real notes are
+full of misspellings, carry administrative boilerplate, and list examinations and
+lab values in tables, where a published case smooths all of that into clean
+sentences. A more recent effort disagrees. Building PARHAF, a corpus of 7{,}394
+fictitious reports hand-written by 104 medical residents, its authors state plainly
+that ``the style of case reports [\ldots] is quite different from that of
+electronic health records'' \citep{tannier_parhaf_2026}. They wrote fake reports
+from scratch precisely because the real ones, even pseudonymised, cannot be shared.
+The field cannot yet agree on whether the text it is allowed to share even looks
+like the text it cannot, and the text we most want to model stays the text we can
+least obtain.
 
 % === P11 ===
 Taken together, these properties explain why the clinical note is so hard to
 obtain. It is rare because it is private, and private because of what it is: a
 closed sublanguage, written in compressed form for an expert in-group, dense with
-personal data, and performing acts that carry legal weight. Its scarcity is not an
-accident of collection that more effort would remove; it follows from the nature
-of the text itself.
+personal data, and performing acts that carry legal weight. The note is not scarce
+by accident. It is scarce because of what it is.
 
 % === P12 ===
 And yet medicine produces text in vast quantities. Most of it is not the clinical

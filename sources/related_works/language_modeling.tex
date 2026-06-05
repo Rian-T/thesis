@@ -11,8 +11,8 @@ text can be guessed from the ones before it. In 1913 the mathematician Andrei
 Markov tested it by hand. He took twenty thousand letters from Pushkin's
 \emph{Eugene Onegin}, reduced each to a vowel or a consonant, and counted: a vowel
 followed another vowel only 13\% of the time, but followed a consonant 66\% of the
-time \citep{markov_onegin_1913}. Letters are not independent. The past constrains
-the future, and the constraint can be measured.
+time \citep{markov_onegin_1913}. Letters are not independent. What comes before
+shapes what comes next, and that can be measured.
 
 Claude Shannon turned this counting into a theory. He modelled a text as a random
 source and defined its \emph{entropy}, the average information carried by each
@@ -23,13 +23,13 @@ symbol, as
 measured in bits \citep{shannon_mi}. The quantity is largest when every symbol is
 equally likely and shrinks as some symbols become predictable.
 
-Shannon also made the role of context vivid. Generate letters independently and the
-result is noise, \emph{xfoml rxkhrjffjuj zlpwcfwkcyj}. Keep three-letter
+Shannon showed this with a simple demonstration. Generate letters independently and
+the result is noise, \emph{xfoml rxkhrjffjuj zlpwcfwkcyj}. Keep three-letter
 statistics and the output is already pronounceable and nearly English, \emph{in no
 ist lat whey cratict froure birs}. Stitch whole words together by pairs and the
-fragments begin to scan as sentences, \emph{the head and in frontal attack on an
-english writer that the character of this point}. Each step uses a little more
-context, and each step looks more like the language.
+fragments start to read like real sentences, \emph{the head and in frontal attack
+on an english writer that the character of this point}. Each step uses a little
+more context, and each step looks more like the language.
 
 How predictable is English, then? Shannon answered with an experiment in which a
 person guessed the next letter of a text one symbol at a time
@@ -40,10 +40,9 @@ symbols, the 26 letters and a space, could in principle carry $\log_2 27 \approx
 4.76$ bits per character. Yet
 given enough preceding text, Shannon estimated the true entropy of English at
 about one bit per character, somewhere between roughly 0.6 and 1.3
-(\Cref{fig:lm-entropy}). Nearly four of every five nominal bits are redundant,
+(\Cref{fig:lm-entropy}). Nearly four of every five possible bits are redundant,
 already fixed by what came before. That redundancy is the whole opportunity: a
-model that predicts the next symbol well has, in effect, learned the structure of
-the language.
+model that predicts the next symbol well has learned how the language works.
 
 \begin{figure}[t]
 \centering
@@ -84,17 +83,13 @@ probability of the next token given those before it. Every model in this chapter
 is an estimator of that one quantity, and the history of the field is the history
 of estimating it better.
 
-The estimators have changed beyond recognition. Markov truncated the history to a
-single symbol; n-gram models keep the last few and still rely on counting.
-Counting runs out quickly, because most word sequences are never seen twice, so
-\citet{bengio2003neural} replaced the count tables with a neural network that maps
-each word to a vector, so that words used in similar ways come to sit close
-together and can pool their evidence. This distributed representation gets around
-the sparsity that defeats plain counting, and cut the perplexity of the best n-gram
-model by about a quarter. A decade later, the Transformer replaced
-recurrence with self-attention, estimating the same conditional in parallel and at
-a scale that reset the state of the art \citep{vaswani2017attention}. From a pencil
-on \emph{Onegin} to self-attention, it is the same conditional throughout.
+Estimating that conditional is harder than it sounds. The simplest idea, the one
+Markov and the early n-gram models used, is to count: see how often each short
+sequence is followed by each next word. But counting runs out almost at once. Most
+word sequences never appear twice, even in a large corpus, so the counts are zero
+exactly where we need them. Much of the history of language modelling is the search
+for estimators that get around this problem, and the rest of this chapter follows
+that search, from n-gram counts to neural networks to the Transformer.
 
 For this thesis the point is practical. Clinical information extraction rests
 entirely on these models: they are pretrained on large corpora and then adapted to
@@ -111,42 +106,53 @@ this thesis, is treated last and in the most detail.
 \section{From Statistical to Neural Language Models}
 \label{sec:lm-stat-neural}
 
-\subsection{N-gram Models}
+\subsection{N-gram models}
 
-Hypothese de Markov: $P(w_t \mid w_{<t}) \approx P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$.
-\begin{itemize}
-  \item Kneser-Ney smoothing
-  \item Probleme: curse of dimensionality, $|\mathcal{V}|^n$ explose
-\end{itemize}
+The first estimators make the history short. Markov's assumption is that the next
+token depends only on the last few, so the full conditional $P(w_t \mid w_{<t})$ is
+approximated by $P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$, the probability of a token
+given the $n-1$ before it. These probabilities are read straight from counts in a
+training corpus. The trouble is the one raised above, only sharper: the number of
+possible $n$-grams grows as $|\mathcal{V}|^{n}$, so for any real vocabulary most
+$n$-grams are never seen and their counts are zero. Smoothing methods, of which
+Kneser-Ney smoothing \citep{kneser_ney} is the best known, move some probability
+onto unseen sequences and fall back to shorter contexts when a longer one is
+missing. They made n-gram models good enough to be the state of the art for years.
+But they cannot share what they learn between similar words: \emph{heart attack}
+and \emph{cardiac arrest} are two separate entries in the table, with nothing in
+common.
 
-\subsection{Neural LMs}
+\subsection{Neural language models}
 
-\begin{itemize}
-  \item Bengio et al. (2003): neural probabilistic LM
-    \begin{itemize}
-      \item Embeddings denses, resout la sparsity
-      \item Mots similaires -> vecteurs proches
-    \end{itemize}
-  \item Word2Vec (Mikolov et al., 2013): skip-gram / CBOW
-    \begin{itemize}
-      \item $\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}$
-    \end{itemize}
-  \item ELMo (Peters et al., 2018): embeddings contextuels via biLSTM
-    \begin{itemize}
-      \item Meme mot, contextes differents -> vecteurs differents
-      \item Precurseur du pretrain-then-finetune
-    \end{itemize}
-\end{itemize}
+The neural language model fixes exactly that. \citet{bengio2003neural} replace the
+count table with a small neural network. Each word is first mapped to a vector, its
+\emph{embedding}; the network reads the embeddings of the context and predicts the
+next word with a softmax over the vocabulary. Because it learns the embeddings at
+the same time as the prediction, words used in similar ways end up with similar
+vectors and can pool their evidence. A sequence never seen in training is no longer
+a dead end, because its words resemble others the model has seen. This alone cut
+the perplexity of the best n-gram models by about a quarter. The embeddings turned
+out to be useful on their own: word2vec \citep{mikolov-etal-2013-linguistic} showed
+that simple arithmetic on them captures regularities of meaning, the textbook case
+being that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}.
+These early vectors were still \emph{static}: one vector per word, whatever the
+sentence. ELMo \citep{peters-etal-2018-deep} made them contextual, giving a word a
+different vector in each sentence, and showed that representations pretrained on
+plain text and then reused improve a wide range of tasks. This is an early form of
+the pretrain-then-adapt recipe the rest of this thesis depends on.
 
-\subsection{RNNs}
+\subsection{Recurrent networks}
 
-\begin{itemize}
-  \item LSTM (Hochreiter \& Schmidhuber, 1997)
-  \item En theorie: long-range dependencies
-  \item En pratique: vanishing gradients, pas parallelisable
-\end{itemize}
-
--> bottleneck pour scaler -> besoin d'une nouvelle archi
+All of these still read a fixed window of context. A recurrent network removes that
+limit by processing a sequence one token at a time and carrying a hidden state
+forward, so that in principle each prediction can depend on everything before it.
+Recurrent language models \citep{mikolov10_interspeech} improved over n-grams, and
+the LSTM \citep{hochreiter1997long} was designed to keep information over longer
+spans. Two problems remained. The gradient that trains these models tends to vanish
+over long sequences, so distant context is hard to learn, and the step-by-step
+processing cannot be parallelised, which makes training on large corpora slow.
+Long-range dependencies and parallelism are the two limits the next architecture
+was built to solve.
 
 
 \section{Transformer}

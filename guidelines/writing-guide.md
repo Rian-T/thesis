@@ -459,3 +459,32 @@ Orchestration files (`analysis_lm.tex`, `extensions_lm.tex`) include chapters wi
 - **Avoid "wholesale".** Use "indiscriminately" or "without filtering."
 - **Avoid "novel".** Use "new."
 - **No mid-sentence em dashes.** Use commas, colons, periods, or parentheses.
+
+---
+
+## 7. Plain style — write like the CamemBERT-bio chapter (the recurring correction)
+
+The single most repeated correction in this thesis: the prose keeps drifting into
+clever, constructed, or over-complex phrasing. **Default to the plainest wording
+that says the same thing.** The reference register is the CamemBERT-bio chapter
+(`sources/part_2/chapter4/article.tex`): short declarative sentences, common
+words, numbers, no flourish. When unsure, put a paragraph of that chapter next to
+your draft and match its plainness.
+
+### Patterns to avoid (they read as un-human / AI / over-clever)
+
+- **Constructed antithesis / "not X but Y" / "X, not Y" / "not merely X; it is Y" / "do not X so much as Y".** Split into plain sentences instead.
+  - BAD: "the three letters DNR do not report a fact so much as create one." → GOOD: "the three letters DNR do not describe a fact; they create one."
+  - BAD: "everything the clinical note is not: public where the note is private, expansive where it is compressed, and careful to grade every claim where the note simply acts." → GOOD: "It is public, not private. It spells things out, where the note leaves them unsaid. It weighs each claim, where the note simply acts."
+  - BAD: "Same medicine, two ways of thinking on the page, and neither is a lesser form of the other." → GOOD: "Both are about the same medicine, but they reason in different ways, and one is not a worse version of the other."
+  - BAD: "Writing for patients is not watered-down science, then, but a different layer…" → GOOD: "Writing for patients is not watered-down science. It is a different layer…"
+- **Choppy ultra-short "punch" sentences dropped mid-paragraph** ("Much of it acts.", "These threads pull together.") — merge into the surrounding sentence.
+- **Fancy words where a plain one exists.** Real fixes made here: "tidy" → "better-written"; "this scarcity is sharper still" → "the shortage is worse"; "stance-laden" → "personal"; "the far informational end of the range" → "about as far from everyday conversation as written English gets"; "built around prototypes" → "cluster around typical cases"; "reads as a small narrative" → "reads like a short story".
+- **Over-built closers.** BAD: "Its scarcity is not an accident of collection that more effort would remove; it follows from the nature of the text itself." → GOOD: "The note is not scarce by accident. It is scarce because of what it is."
+- **"not only … but …"** to pile up contrasts. Break into separate short sentences.
+
+### The test
+Read the sentence aloud. If it sounds like it is performing, or a plain reader
+would stumble, rewrite it shorter and plainer. Better simple and a little less
+elegant than precise and opaque. Occasional plain antithesis is fine; the problem
+is *frequency* and *cleverness* — when in doubt, say it straight.
