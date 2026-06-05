@@ -79,9 +79,30 @@ text factorises exactly into a product of next-symbol predictions,
   P(w_1,\dots,w_T) = \prod_{t=1}^{T} P(w_t \mid w_{<t}),
 \]
 so modelling language reduces to estimating a single conditional distribution: the
-probability of the next token given those before it. Every model in this chapter
-is an estimator of that one quantity, and the history of the field is the history
-of estimating it better.
+probability of the next token given those before it (\Cref{fig:lm-nexttoken}).
+Every model in this chapter is an estimator of that one quantity, and the history
+of the field is the history of estimating it better.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  ctx/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
+    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
+  pred/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!28, rounded corners=2pt,
+    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
+]
+\node[ctx] (w1) at (0,0) {The};
+\node[ctx] (w2) at (1.1,0) {cat};
+\node[ctx] (w3) at (2.2,0) {sat};
+\node[pred] (w4) at (3.55,0) {?};
+\draw[->, ThesisInk!45, shorten >=2pt, shorten <=2pt] (w3.east) -- (w4.west);
+\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (1.1,-0.72) {context $w_{<t}$};
+\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (3.55,-0.72) {next token $w_t$};
+\end{tikzpicture}
+\caption{A language model predicts each token from the ones before it. The
+probability of a whole text is the product of these next-token predictions.}
+\label{fig:lm-nexttoken}
+\end{figure}
 
 Estimating that conditional is harder than it sounds. The simplest idea, the one
 Markov and the early n-gram models used, is to count: see how often each short
@@ -204,8 +225,45 @@ Mistral, and ModernBERT.
 
 \subsection{Encoders and decoders}
 
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  tok/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
+    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
+  foc/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!55, rounded corners=2pt,
+    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisInk},
+  hid/.style={draw=ThesisNeutral!50, fill=ThesisNeutral!8, rounded corners=2pt,
+    minimum width=0.95cm, minimum height=0.6cm, font=\small\sffamily, text=ThesisNeutral},
+  att/.style={->, ThesisInk!45, shorten >=2pt, shorten <=2pt},
+]
+% Encoder
+\node[font=\footnotesize\sffamily\bfseries, text=ThesisInk] at (-2.05,0.6) {Encoder};
+\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (-2.05,0.25) {bidirectional};
+\node[tok] (e1) at (0,0.45) {The};
+\node[tok] (e2) at (1.25,0.45) {cat};
+\node[foc] (e3) at (2.5,0.45) {sat};
+\node[tok] (e4) at (3.75,0.45) {down};
+\draw[att] (e3) to[bend left=35] (e1);
+\draw[att] (e3) to[bend left=32] (e2);
+\draw[att] (e3) to[bend right=32] (e4);
+% Decoder
+\node[font=\footnotesize\sffamily\bfseries, text=ThesisInk] at (-2.05,-1.1) {Decoder};
+\node[font=\scriptsize\sffamily, text=ThesisNeutral] at (-2.05,-1.45) {causal};
+\node[tok] (d1) at (0,-1.25) {The};
+\node[tok] (d2) at (1.25,-1.25) {cat};
+\node[foc] (d3) at (2.5,-1.25) {sat};
+\node[hid] (d4) at (3.75,-1.25) {down};
+\draw[att] (d3) to[bend right=35] (d1);
+\draw[att] (d3) to[bend right=32] (d2);
+\end{tikzpicture}
+\caption{The same block, two masks. In an encoder, the token \emph{sat} attends to
+the whole sequence; in a decoder, only to the tokens before it, so the later one
+stays hidden.}
+\label{fig:lm-attention}
+\end{figure}
+
 The same Transformer block can be wired in two ways, and the only difference is
-which tokens each one is allowed to see. In an \emph{encoder}, every token attends
+which tokens each one is allowed to see (\Cref{fig:lm-attention}). In an \emph{encoder}, every token attends
 to the whole sequence, left and right. This two-sided view suits tasks that read a
 text and label it, such as classification or entity recognition, and it underlies
 BERT \citep{devlin_bert_2019} and RoBERTa \citep{roberta}. In a \emph{decoder}, a
