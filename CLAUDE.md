@@ -72,6 +72,26 @@ Chapter↔label↔source map (labels are set in the part orchestration files, no
 | 8 | `chap:architectures` | Architectures for Low-Resource Extraction | frenchmed-gliner / MedEmbed (WIP) |
 | 9 | `chap:synthetic` | Synthetic Data for Task Adaptation | OntoBook data + synthetic clinical reports (WIP) |
 
+### NEW conceptual part "What is Biomedical Text?" (drafted June 2026, sits BEFORE Related Works)
+
+`\part{What is Biomedical Text?}` in `thesis.tex`, between the Introduction and the Related Works part. Orchestration `sources/biomedical_text/biomedical_text.tex` `\input`s three short chapters that form ONE argument (a triptych), arc **RARITY → ABUNDANCE**. The same case (a myocardial infarction) opens each chapter as a figure, in three registers, with parallel one-sentence captions ("... myocardial infarction"):
+
+- `clinical.tex` (`chap:bt-clinical`, "Clinical Text"): the note is a sublanguage (Harris→Sager→Friedman), optimally compressed (Anderson-Sager + Grice/Sperber-Wilson + Stalnaker common ground), performative (Austin/Searle, "DNR"), one-line Foucault; then the French reality (no shareable real corpus; CAS-vs-PARHAF register dispute) and the personal-data reason for privacy; bridges to scientific. Figure = synthetic de-identified discharge note.
+- `scientific.tex` (`chap:bt-scientific`, "Scientific Text"): genre as social action (Miller), CARS/gap (Swales), IMRAD is recent + real data (Sollaci 1297 articles), SOAP contrast (Weed), metadiscourse/hedges (Hyland), quantitative register (Biber) + phraseology (Nwogu/Luzón), one-line Latour, Friedman punchline (abundance ≠ substitutability). Figure = real HAL passage on post-infarction mitral insufficiency (from `rntc/mc-bio-corpus`).
+- `web.tex` (`chap:bt-web`, "Lay and Web Text"): Fleck (esoteric→exoteric), drug leaflets / *notices* (Directive 2001/83/EC, EMA QRD template), naming variation (Wüster foil / Cabré / Gaudin), Temmerman (fuzzy concepts), UMLS many-to-many (Bodenreider, 2.5M names / 900k concepts), ontology-vs-text gap (Smith & Ceusters), one-line Hacking + Biber; synthesis closes the part ("public data for the clinic = crossing register + resolving names").
+
+**Related Works ch "Language Models" (`chap:rw-lm`, `sources/related_works/language_modeling.tex`):** the **Introduction is now prose** — historical arc Markov (1913, *Onegin*) → Shannon (1948 entropy + n-gram samples; 1951 ~1 bit/char, figure `fig:lm-entropy`) → chain rule → Bengio (2003 neural) → Vaswani (2017). **The rest of the chapter is still a telegraphic French outline** (n-grams, neural, RNN, transformer, objectives, scaling, continual PT, biomed models, modern archis, tokenization) — TO PROSIFY next.
+
+**Research substrate (gitignored `research/`).** Deep-research notes to READ before writing more: `clinical.md`, `scientific.md`, `web.md`, `french_clinical.md`, `lay_leaflets.md`, `rw_language_modeling.md`, plus `*_outline.md`. Built by Opus subagents from primary sources (curl). `research/` also holds PII screenshots + downloaded PDFs → **never commit it**. Scratch LaTeX buffers live in gitignored `sources/drafts/` (e.g. `example_clinical_note.tex` = the synthetic note source).
+
+**Pending / next steps for this part:**
+- **Figure 4.1 (lay panel) must be replaced**: the current Doctissimo dictionary excerpt is too encyclopedic/scientific for "lay". Use a genuinely lay text on "crise cardiaque" (de-identified patient forum post, or a prevention page in *vous* form). Options proposed; awaiting Rian's pick.
+- Prosify the rest of the Language Models chapter (only the Introduction is prose so far).
+- Other RW chapters (`corpus_annotation.tex`, `clinical_ie.tex`) are still telegraphic drafts.
+- Run `make checkbib`: ~20 refs added this session; legal/web (`ec_directive_2001_83`, `ema_qrd_template`) and many books are whitelisted or will flag — review before submission.
+
+**Conventions used here (follow them):** figures are forced to open the chapter via a non-float `\begin{center}…\captionof{figure}{…}\end{center}` (not `figure[t]`); text examples are TikZ boxes in thesis colours (`ThesisNeutral`/`ThesisPaper`/`ThesisInk`); captions are ONE sentence; new bib appended with `@comment` group headers; and `guidelines/working-with-rian.md` is the binding style/process guide (simple academic English, intuition before detail, introduce every name, data behind every number, no choppy/AI sentences, no em dashes).
+
 ### Chapters Done (draft)
 - **Ch 1 (`chap:collecting`)** — biomed-fr corpus (413M words, ISTEX/CLEAR/E3C). Hook, tables, vocab analysis, cliffhanger to Ch 4.
 - **Ch 2 (`chap:quality`)** — Biomed-Enriched (paragraph-level annotation, 2M clinical case paragraphs) + BiaHS as footnoted section. Full method/results/discussion. TODO: real PMC paragraph examples in the motivation figure; annotation prompt in appendix.
