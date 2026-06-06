@@ -618,13 +618,16 @@ Numbers are verbatim from Table 4 of \citet{touvron2023llama}.}
 
 \subsection{Instruction Following and the Assistant Era}
 
-The models of the previous section are powerful but raw. A base model trained only to
-predict the next token will continue a text, but it does not reliably do what a user
-asks: given a question it may produce another question, or drift off topic. What
-turned these scaled models into a usable ecosystem was a second stage of training on
-top of pretraining. \emph{Instruction tuning} fine-tunes the model on many tasks
-phrased as instructions, after which it follows instructions it was never explicitly
-trained on \citep{flan_t5}. \emph{Reinforcement learning from human feedback} (RLHF)
+The previous section showed that a large base model can already perform a task from a
+few examples placed in its prompt. That ability, though, is fragile. It leans on
+well-chosen demonstrations and on phrasing the task as a text to be continued, and it
+is weakest in the zero-shot case, with no examples at all. Asked a plain question, a
+base model may answer it, but it may equally continue with another question or drift
+off topic, because it was only ever trained to predict the next token, not to follow
+an instruction. What turned these scaled models into a usable ecosystem was a second
+stage of training on top of pretraining. \emph{Instruction tuning} fine-tunes the
+model on many tasks phrased as instructions, after which it follows instructions it
+was never explicitly trained on, even with no example given \citep{flan_t5}. \emph{Reinforcement learning from human feedback} (RLHF)
 then optimises the model's outputs against human preferences, rewarding answers that
 people judge more helpful \citep{ouyang2022instructgpt}. This is the recipe behind
 ChatGPT and the assistants that followed it, and it is what let a non-expert simply
