@@ -553,11 +553,14 @@ weight updates. Numbers are verbatim from \citet{gpt3}.}
 \label{tab:lm-fewshot}
 \end{table}
 
-Why should scale be so reliable? \citet{kaplan_scaling} had shown that the loss of a
-Transformer follows a smooth power law in two quantities: the number of parameters
-$N$ and the number of training tokens $D$. The loss falls predictably as either
-grows, which turns model design into a forecast, since one can pick a compute budget
-and read off the loss to expect. Their estimate, though, placed the optimum at large
+These gains are not a fluke, and they rest on something the model is trained to do
+directly. Below the downstream abilities sits the loss, the model's average surprise
+on held-out text, and the loss falls with scale in a strikingly regular way.
+\citet{kaplan_scaling} showed that it follows a smooth \emph{power law} in two
+quantities, the number of parameters $N$ and the number of training tokens $D$, which
+is a straight line when plotted on logarithmic axes. The loss drops predictably as
+either grows, so model design becomes a forecast: pick a budget of computation and
+read off the loss to expect. Their estimate, though, placed the optimum at large
 models trained on relatively little data.
 
 \citet{chinchilla_scaling} revisited this and found the trade-off was wrong. Fitting,
@@ -568,16 +571,19 @@ on over 400 trained models, a loss law of the form
 they estimated $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$ and
 $\beta = 0.28$. Here $E$ is the loss that would remain with unlimited data and
 parameters, a floor set by the language itself, while the two fractions measure how
-far a finite model and a finite dataset still sit above it. The total training cost
-grows with both, roughly as $6ND$, so for a fixed budget the law gives the best split
-between model size and data, the \emph{compute-optimal} point. Its answer is that the
-two should grow together: each time the model doubles, the data should double with it
-(\Cref{fig:lm-chinchilla}). By their own projection this means roughly twenty
-training tokens per parameter, far more data than earlier models had used. To prove
-the point they trained Chinchilla, a 70-billion-parameter model, on 1.4 trillion
-tokens, and it beat Gopher, a 280-billion model trained on the same compute, scoring
-67.6\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven subjects.
-Most large models before it had simply been undertrained.
+far a finite model and a finite dataset still sit above it. The cost of training,
+counted in arithmetic operations (FLOPs), grows with both, roughly as $6ND$, so for a
+fixed budget the law gives the best split between model size and data, the
+\emph{compute-optimal} point. The answer is that the two should grow together: each
+time the model doubles, the data should double with it (\Cref{fig:lm-chinchilla}). By
+the authors' own projection this means about twenty training tokens per parameter,
+far more data than earlier models had used.
+
+To prove the point they trained Chinchilla, a 70-billion-parameter model, on 1.4
+trillion tokens, and it beat Gopher, a 280-billion model trained on the same compute,
+scoring 67.6\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven
+subjects. Most large models before it had simply been undertrained: built large, then
+fed too little data to fill them.
 
 \begin{figure}[t]
 \centering
@@ -589,10 +595,11 @@ reproduced here.}
 \label{fig:lm-chinchilla}
 \end{figure}
 
-Chinchilla optimises the cost of \emph{training}. \citet{touvron2023llama} pointed
-out that this ignores the cost of \emph{use}: a model that will be run many times
-should be cheap at inference, and ``a smaller one trained longer will ultimately be
-cheaper at inference''. They pushed small models well past the compute-optimal point,
+Chinchilla optimises the cost of \emph{training} a model once. \citet{touvron2023llama}
+pointed out that this ignores the cost of \emph{using} it afterwards: a model served
+to many users is run countless times, and each run costs computation too, its
+\emph{inference} cost. As they put it, ``a smaller one trained longer will ultimately
+be cheaper at inference''. They pushed small models well past the compute-optimal point,
 finding that a 7-billion model keeps improving even after a trillion tokens. The
 resulting LLaMA models, trained only on publicly available data, make the case
 plainly: the 13-billion model outperforms GPT-3 (175B) on most benchmarks ``despite
