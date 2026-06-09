@@ -713,115 +713,127 @@ lever for it is to keep pretraining on text from that domain.
 \section{Continual Pretraining}
 \label{sec:lm-continual}
 
-Section centrale pour la these. C'est le coeur de ce qu'on fait (CamemBERT-bio, ModernCamemBERT-bio).
+The pivot just reached, specialising a model to a domain by continuing its
+pretraining on in-domain text, is the mechanism this thesis turns on, so we look at
+it closely. This section asks three questions in turn: what continued pretraining is,
+why it is delicate, and how recent work makes it reliable. The biomedical models that
+put it into practice come in the next section.
 
-\subsection{Fondements et terminologie}
+\subsection{A Second Phase of Pretraining}
 
-``Don't Stop Pretraining'' (Gururangan et al., ACL 2020):
-\begin{itemize}
-  \item DAPT = Domain-Adaptive Pre-Training: 2eme phase sur corpus domaine
-  \item TAPT = Task-Adaptive Pre-Training: sur donnees non-annotees de la tache
-  \item DAPT + TAPT combine -> meilleurs resultats
-  \item Jusqu'a +3 F1 meme avec petit corpus
-\end{itemize}
+The idea is simple. Between the generic pretraining of \Cref{sec:lm-objectives} and
+fine-tuning on a labelled task, one inserts a further phase of self-supervised
+training on text closer to the target. \citet{gururangan2020dapt} studied this across
+four domains, including biomedicine, and eight classification tasks, and named two
+variants. \emph{Domain-adaptive pretraining} continues training on a large in-domain
+corpus; \emph{task-adaptive pretraining} continues it on the unlabelled text of the
+task itself. They found that the two help in both high- and low-resource settings,
+that task-adaptive pretraining helps even after the domain phase, and that it pays off
+even when the task corpus is small (\Cref{fig:lm-dapt}).
 
-Taxonomie moderne (Wang et al., CSUR 2025):
-\begin{itemize}
-  \item CPT = nouvelles donnees generales au fil du temps
-  \item DAP = specialisation domaine
-  \item CFT = adaptation sequentielle de taches
-\end{itemize}
+\medskip
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize\sffamily,
+  stage/.style={rounded corners=3pt, minimum width=2.8cm, minimum height=1.0cm,
+    align=center, text=ThesisInk, draw=ThesisPrimaryDark!70, fill=ThesisPrimary!18,
+    inner sep=4pt},
+  last/.style={stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!28},
+  dat/.style={font=\scriptsize, text=ThesisNeutral, align=center},
+  fl/.style={->, ThesisInk!55, thick, shorten >=2pt, shorten <=2pt}]
+\def\sx{3.85}
+\node[stage] (a) at (0,0)      {general\\pretraining};
+\node[stage] (b) at (\sx,0)    {domain-adaptive\\pretraining};
+\node[stage] (c) at (2*\sx,0)  {task-adaptive\\pretraining};
+\node[last]  (d) at (3*\sx,0)  {fine-tuning};
+\foreach \x/\y in {a/b,b/c,c/d} \draw[fl] (\x) -- (\y);
+\node[dat, below=4pt of a] {broad web text};
+\node[dat, below=4pt of b] {in-domain corpus};
+\node[dat, below=4pt of c] {task's unlabelled text};
+\node[dat, below=4pt of d] {labelled examples};
+\node[font=\scriptsize\sffamily\bfseries, text=ThesisPrimaryDark, above=2pt of b] {DAPT};
+\node[font=\scriptsize\sffamily\bfseries, text=ThesisPrimaryDark, above=2pt of c] {TAPT};
+\end{tikzpicture}}
+\vspace{6pt}
+\captionof{figure}{Continued pretraining inserts one or two self-supervised phases
+between general pretraining and fine-tuning: domain-adaptive pretraining on a large
+in-domain corpus, then task-adaptive pretraining on the task's own unlabelled text
+\citep{gururangan2020dapt}.}
+\label{fig:lm-dapt}
+\end{center}
+\medskip
+
+This second phase is one case of a broader topic. A recent survey organises continual
+learning for language models into continued pretraining, continual instruction
+tuning, and continual alignment, and groups the methods that protect earlier
+knowledge into replay, regularisation, and architecture-based families
+\citep{shi2025continual}. The rest of this section keeps to the first case, continued
+pretraining, since it is the one this thesis uses.
 
 \subsection{Catastrophic Forgetting}
 
-Le probleme (Kirkpatrick et al., 2017):
-\begin{itemize}
-  \item Les reseaux ecrasent les poids necessaires aux taches precedentes
-  \item EWC (Elastic Weight Consolidation): penaliser les changements sur les poids importants
-\end{itemize}
+Continuing to train a network has a cost. When a connectionist model is trained on new
+material, the weights that encoded the old material are overwritten, a failure named
+\emph{catastrophic interference} when it was first described \citep{mccloskey1989catastrophic}.
+The standard remedy keeps the new training from straying too far: elastic weight
+consolidation adds a penalty that, in the authors' words, works by ``selectively
+slowing down learning on the weights important for'' the earlier tasks
+\citep{kirkpatrick2017ewc}. For a model adapted to a domain the same risk applies in
+reverse: pushing it toward biomedical text can erode the general competence it began
+with. The danger is uneven. \citet{yildiz2024continual} report that smaller models are
+the most sensitive, showing the highest rates of both learning and forgetting, so a
+small domain encoder is more exposed than a large one.
 
-Pourquoi ca compte pour les LLMs:
-\begin{itemize}
-  \item Continual PT peut degrader les capacites generales
-  \item Capacite a suivre des instructions particulierement fragile
-  \item Petits modeles plus sensibles (Yildiz et al., 2024)
-\end{itemize}
+Not every drop in a benchmark score is true forgetting, however. \citet{zheng2025spurious}
+argue that the early steps of a new training phase often disturb a model's
+\emph{alignment}, its learned way of exposing what it knows, more than its knowledge,
+so that ``performance drops often reflect a decline in task alignment rather than true
+knowledge loss'' and much of the loss can be recovered. The lesson for what follows is
+to read a post-adaptation drop with care, and to design the adaptation so that it does
+not disturb more than it must.
 
-``Spurious forgetting'' (2024): les baisses de perf refletent peut-etre une perte d'alignement, pas une vraie perte de connaissance.
+\subsection{Making Continual Pretraining Work}
 
--> ok c'est un vrai probleme, quelles solutions?
+Recent work shows that, done carefully, continued pretraining need not forget and need
+not cost much. \citet{ibrahim2024simple} reduce the recipe to three ingredients:
+re-warming the learning rate, which has decayed to almost nothing by the end of
+pretraining, then re-decaying it, and replaying a small fraction of the original data
+alongside the new domain. This combination, they report, is ``sufficient to match the
+performance of fully re-training from scratch on all available data'' while ``using
+only a fraction of the compute'', and they verify it at both the 405-million and
+10-billion parameter scales. Continued pretraining, in other words, can reach the same
+place as starting over, far more cheaply.
 
-\subsection{Solutions recentes (2024-2025)}
+Two refinements sharpen this. First, less data can be better than more: choosing a
+small, relevant slice of the domain corpus rather than all of it can match or beat
+training on the whole. \citet{xie2024efficientcpt} report data-selection strategies
+that ``outperform vanilla continual pre-training's performance with just 10\% of
+corpus size and cost'', with no loss on general tasks. Second, the adaptation does not
+improve smoothly. \citet{guo2024efficient} document a \emph{stability gap}, a
+temporary fall in in-domain performance at the start of continued pretraining followed
+by a recovery, and show that training for several passes over a high-quality subset
+and mixing in pretraining-like data smooths it out, raising the average medical-task
+accuracy of a three-billion model from 36.2\% to 40.7\% while using only 40\% of the
+training budget. The common thread is that continued pretraining rewards care in the
+learning-rate schedule, the amount of replay, and the choice of data.
 
-Ibrahim et al. (2024), ``Simple and Scalable Strategies'':
-\begin{itemize}
-  \item LR re-warming: relancer le learning rate quand on ajoute des donnees
-  \item LR re-decaying: cosine decay apres warmup
-  \item Replay: mixer 1\% des donnees precedentes -> ca suffit
-  \item Valide a 405M et 10B
-  \item -> egalise from-scratch pour une fraction du compute
-\end{itemize}
+\subsection{From Scratch or Continue?}
 
-Stability gap (arXiv:2406.14833, 2024):
-\begin{itemize}
-  \item Chute temporaire au debut du continual PT, puis recovery
-  \item Solutions: subset propre, sous-corpus de qualite, data mixing
-  \item 36.2\% -> 40.7\% avec seulement 40\% du budget training
-\end{itemize}
+The alternative to continuing is to pretrain a specialised model from scratch on
+in-domain text. The trade-off is clear in principle. Training from scratch can fit a
+vocabulary to the domain and cannot forget what it never learned, but it is expensive
+and discards the general competence of an existing model; continuing is cheap and
+keeps that competence, but inherits a tokenizer and an initialisation built for
+general text. The evidence above suggests continuing should usually win, since it can
+match a from-scratch model at a fraction of the cost \citep{ibrahim2024simple}.
 
-Data selection:
-\begin{itemize}
-  \item Donnees non pertinentes = degradation
-  \item 10\% du corpus bien selectionne fait aussi bien que 100\% vanilla continual PT
-\end{itemize}
-
-\subsection{From scratch vs continual PT}
-
-\begin{itemize}
-  \item From scratch (PubMedBERT, DrBERT): vocab custom, pas de forgetting, mais tres cher
-  \item Continual (BioBERT, Gururangan): efficient, preserve le general, mais tokenizer sous-optimal
-\end{itemize}
-
-Cout compute:
-\begin{itemize}
-  \item DrBERT from scratch: 128x V100, 20h
-  \item AliBERT from scratch: 48x A100, 20h
-  \item BioBERT continual: 8x V100, \~{}10 jours
-  \item -> from-scratch coute \~{}30x plus de compute
-\end{itemize}
-
-% TODO tableau
-
-\subsection{Encoders vs decoders: dynamiques differentes}
-
-Decoders (LLMs), ca marche pas bien:
-\begin{itemize}
-  \item BioMistral: $-$0.9 points apres continual PT
-  \item Dorfner et al. (2024): biomedical LLMs sous-performent les generalistes
-  \item OpenBioLLM-8B: 30\% vs Llama-3-8B: 64.3\% sur cas NEJM
-  \item -> hypothese: perte de connaissances generales pendant la specialisation
-\end{itemize}
-
-Encoders, c'est different:
-\begin{itemize}
-  \item Contexte bidirectionnel peut-etre plus robuste au forgetting
-  \item MLM moins sujet au catastrophic forgetting?
-  \item -> voir Ch.5: approche CLM vers MLM sur les encoders
-\end{itemize}
-
--> tension narrative: continual PT marche pas pour les decoders, et pour les encoders? -> c'est la question de la these
-
-\subsection{Tentatives anterieures en francais biomedical}
-
-\begin{itemize}
-  \item Copara et al. (2020): 31K articles -> aucune amelioration (corpus trop petit)
-  \item Le Clercq de Lannoy et al. (2022): 136M mots -> +2 EMEA seulement
-  \item Dura et al. (2022): 21M docs APHP -> +3\% mais donnees privees
-\end{itemize}
-
-Question ouverte: pourquoi des resultats contradictoires? DrBERT dit que continual PT marche pas. CamemBERT-bio (cette these) montre que si, avec le bon corpus.
-
--> ok on sait ce qu'est le continual PT, maintenant quels modeles existent?
+In practice the picture is less settled, and it may differ by architecture. Continued
+pretraining has often disappointed for generative decoder models, where specialising
+on a domain can cost more in lost general ability than it gains, while the
+bidirectional, masked objective of encoders may behave differently. Whether continued
+pretraining reliably specialises a model, and how the answer depends on whether the
+model is an encoder or a decoder, is the open question that the next section takes up
+through the biomedical models built to answer it.
 
 
 \section{Modeles pretrained biomed}
