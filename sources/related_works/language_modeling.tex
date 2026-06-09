@@ -820,20 +820,29 @@ learning-rate schedule, the amount of replay, and the choice of data.
 \subsection{From Scratch or Continue?}
 
 The alternative to continuing is to pretrain a specialised model from scratch on
-in-domain text. The trade-off is clear in principle. Training from scratch can fit a
-vocabulary to the domain and cannot forget what it never learned, but it is expensive
-and discards the general competence of an existing model; continuing is cheap and
-keeps that competence, but inherits a tokenizer and an initialisation built for
-general text. The evidence above suggests continuing should usually win, since it can
-match a from-scratch model at a fraction of the cost \citep{ibrahim2024simple}.
+in-domain text. The two poles have canonical biomedical examples. BioBERT continued
+the pretraining of BERT on PubMed abstracts and full-text articles
+\citep{lee_biobert_2019}, the continued-pretraining route; PubMedBERT was instead
+pretrained from scratch on biomedical text, with a vocabulary built from that text
+rather than inherited \citep{gu_domain-specific_2022}. The trade-off is clear in
+principle. Training from scratch can fit a vocabulary to the domain and cannot forget
+what it never learned, but it is expensive and throws away the general competence of
+an existing model; continuing is cheap and keeps that competence, but inherits a
+tokenizer and an initialisation built for general text.
 
-In practice the picture is less settled, and it may differ by architecture. Continued
-pretraining has often disappointed for generative decoder models, where specialising
-on a domain can cost more in lost general ability than it gains, while the
-bidirectional, masked objective of encoders may behave differently. Whether continued
-pretraining reliably specialises a model, and how the answer depends on whether the
-model is an encoder or a decoder, is the open question that the next section takes up
-through the biomedical models built to answer it.
+Which wins is contested. \citet{gu_domain-specific_2022} found that pretraining from
+scratch on in-domain text, with an in-domain vocabulary, outperformed continued
+pretraining from a general model across a suite of biomedical tasks, and argued that
+the general-text vocabulary of a continued model holds it back. The general-purpose
+evidence above points the other way: with the right learning-rate schedule and a
+little replay, continued pretraining can match a from-scratch model at a fraction of
+the cost \citep{ibrahim2024simple}. The disagreement is not settled, and it may depend
+on the architecture. Continued pretraining has often disappointed for generative
+decoder models, where specialising on a domain can cost more in lost general ability
+than it gains, while the bidirectional, masked objective of encoders may behave
+differently. Whether continued pretraining reliably specialises a model, and how the
+answer depends on whether the model is an encoder or a decoder, is the open question
+that the next section takes up through the biomedical models built to answer it.
 
 
 \section{Modeles pretrained biomed}
