@@ -204,249 +204,208 @@ raises the prior question of what biomedical sources exist in the first place.
 \section{Biomedical and Clinical Corpora}
 \label{sec:corpus-biomed}
 
-\subsection{Grandes sources anglophones}
+The data-quality criteria of the previous section were developed for general web text. The
+biomedical setting is different, and the corpora used to train biomedical models come from a
+small number of recurring sources. We review those sources here, separating the large
+English collections, the article-level curation built on top of them, and the more
+fragmented French resources. The models trained on these corpora were described earlier in
+\Cref{sec:lm-biomedical}; this section is about the corpora themselves.
 
-PubMed:
-\begin{itemize}
-  \item Base de donnees de la NLM (National Library of Medicine)
-  \item ~39M citations et abstracts d'articles biomedicaux
-  \item Texte structure, vocabulaire technique, qualite editoriale
-  \item Abstracts seulement (pas le full-text)
-  \item Utilise par BioBERT (Lee et al., 2019), PubMedBERT (Gu et al., 2022)
-\end{itemize}
+\subsection{Large English Sources}
 
-PMC Open Access:
-\begin{itemize}
-  \item ~4.5M articles full-text en acces libre
-  \item 98\% anglais (Labrak et al., 2024)
-  \item Contenu heterogene: articles de recherche, reviews, case reports, editoriaux, guidelines
-  \item Utilise par BioMistral (3B tokens), Meditron (46B tokens), PMC-LLaMA (75B tokens)
-  \item Probleme: granularite article. Un article de recherche peut contenir a la fois des cas cliniques pertinents et des sections methodologiques non pertinentes
-\end{itemize}
+The most widely used source is PubMed, the database maintained by the United States National
+Library of Medicine. It contains about 39 million biomedical citations and abstracts,
+written in technical vocabulary and edited to a consistent standard. Its main limit is that
+it provides abstracts only, without the full text of the articles. PubMed Central (PMC) Open
+Access addresses this by providing full text: about 4.5 million articles, of which roughly
+98\% are in English \citep{labrak-etal-2024-biomistral}. The collection is heterogeneous,
+mixing research articles, reviews, case reports, editorials, and clinical guidelines. A
+practical difficulty is its article-level granularity, because a single research article can
+combine clinically relevant case material with methodological sections that are of little
+clinical use.
 
-MIMIC (Johnson et al., 2016/2023):
-\begin{itemize}
-  \item MIMIC-III, MIMIC-IV: notes cliniques du Beth Israel Deaconess Medical Center
-  \item Acces restreint (data use agreement, formation ethique)
-  \item Utilise par ClinicalBERT (Alsentzer et al., 2019), Clinical Longformer (Li et al., 2022), BioClinical ModernBERT (Sounack et al., 2025)
-  \item Gold standard pour le texte clinique anglais, mais un seul hopital americain -> pas generalizable
-\end{itemize}
+Clinical text is harder to obtain. The main reference is MIMIC
+\citep{johnson2016mimiciii, johnson2023mimiciv}, a set of clinical notes from a single
+United States hospital, the Beth Israel Deaconess Medical Center. Access is restricted and
+requires a data use agreement and ethics training. MIMIC is treated as a gold standard for
+English clinical text, but coming from one hospital in one country limits how far models
+trained on it generalise to other settings.
 
-\subsection{Curation article-level pour le biomed}
+\subsection{Article-Level Curation for Biomedicine}
 
-Meditron (Chen et al., 2023):
-\begin{itemize}
-  \item Score 0-1 par article base sur: MeSH tags, type de publication, reputation du journal, recence, nombre de citations
-  \item Upsampling des articles a haut score, filtrage des bas scores
-  \item 46B tokens au total, 128x A100, 332h pour le 70B
-  \item Limite: granularite article. Un article peut melanger contenu pertinent et non-pertinent
-\end{itemize}
+Some work tries to improve these corpora by scoring articles before training. The corpus
+used for Meditron \citep{chen2023meditron} scores each article using its MeSH subject tags,
+its publication type, the reputation of the journal, its recency, and its citation count.
+High-scoring articles are upsampled and low-scoring ones are filtered out, which yields a
+corpus of about 46 billion tokens. The same limit returns here, because the scoring acts on
+whole articles and so still mixes relevant and non-relevant content within a single article.
 
-BioClinical ModernBERT (Sounack et al., 2025):
-\begin{itemize}
-  \item 169B tokens: PubMed + PMC + 20 datasets cliniques (MIMIC-III, MIMIC-IV, CheXpert Plus, etc.)
-  \item SOTA actuel sur les benchmarks biomed anglais
-  \item Mais: la plupart des sources cliniques necessitent des data use agreements -> pas vraiment "public"
-\end{itemize}
+A second example is the corpus used for BioClinical ModernBERT
+\citep{sounack2025bioclinicalmodernbert}, which combines PubMed, PMC, and around twenty
+clinical datasets into one large collection. Most of those clinical sources require their own
+data use agreements, so the assembled corpus cannot be considered truly public. The model
+built on it is discussed in \Cref{sec:lm-biomedical}; what matters here is that the access
+constraint sits in the clinical part of the corpus.
 
-\subsection{Sources francophones}
+\subsection{French Sources}
 
-Ressources publiques existantes:
-\begin{itemize}
-  \item ISTEX: base de 27M references scientifiques, permet d'extraire des documents francais bio/med
-  \item CLEAR (Grabar \& Cardon, 2018): notices medicamenteuses, articles d'encyclopedie medicale en francais technique et simplifie
-  \item E3C (Magnini et al., 2021): corpus multilingue de cas cliniques, notices, resumes de these medicale
-  \item HAL / Halvest (Kulumba et al., 2024): articles scientifiques francais et anglais extraits du depot HAL (Hyper Articles en Ligne)
-  \item Wikipedia biomedical: articles des portails medecine, pharmacie, biologie. Libre et multilingue
-\end{itemize}
+Public French biomedical resources exist, but they are scattered across several projects.
+ISTEX is a base of about 27 million scientific references from which French biomedical
+documents can be extracted. CLEAR provides French drug leaflets and medical encyclopaedia
+articles in both technical and simplified versions \citep{grabar_clear_2018}. E3C is a
+multilingual corpus of clinical cases, drug leaflets, and medical-thesis abstracts
+\citep{magnini_e3c_2021}. HAL, the French open repository, and its harvested version HALvest
+provide French and English scientific articles \citep{kulumba2024halvest}. Biomedical
+Wikipedia adds a free and multilingual source. Taken together these resources are useful, but
+each is partial, and none approaches the scale of PubMed or PMC.
 
-Modeles entraines from scratch sur corpus francais:
-\begin{itemize}
-  \item DrBERT (Labrak et al., 2023): corpus de 7GB, from scratch sur 128x V100
-    \begin{itemize}
-      \item Pretend que le continual PT ne marche pas pour le francais biomed
-      \item Mais: evaluation potentiellement biaisee (cf Ch.4 de la these)
-    \end{itemize}
-  \item AliBERT (Berhe et al., 2023): ScienceDirect + theses Sudoc, tokenizer Unigram regularise, 48x A100
-    \begin{itemize}
-      \item Modele non disponible publiquement
-    \end{itemize}
-\end{itemize}
+The French biomedical models, including the ones trained from scratch and the ones obtained
+by continual pretraining, were described in \Cref{sec:lm-biomedical}; here we note only the
+corpora they used and the pattern of results. The continual-pretraining attempts on French
+biomedical text relied on small or loosely targeted corpora. One used about 31{,}000 articles
+and reported no improvement \citep{copara_contextualized_2020}. Another assembled about 136
+million words from PubMed, Cochrane, ISTEX, and Wikipedia, and obtained a small gain on drug
+leaflets and no gain on scientific titles \citep{le_clercq_de_lannoy_strategies_2022}. A
+third used 21 million private hospital documents, which improved a private clinical benchmark
+but could not be shared with other researchers \citep{dura_learning_2022}.
 
-Tentatives de continual pretraining en francais biomed:
-\begin{itemize}
-  \item Copara et al. (2020): 31K articles seulement -> aucune amelioration sur CamemBERT-large
-  \item Le Clercq de Lannoy et al. (2022): PubMed + Cochrane + ISTEX + Wikipedia = 136M mots -> +2 F1 sur EMEA, rien sur MEDLINE
-  \item Dura et al. (2022): 21M documents cliniques APHP -> +3\% sur APMed (prive), mais donnees non partageables
-\end{itemize}
+These French results are mixed, and their cause is not settled. It is not clear whether the
+disappointing outcomes come from the corpora, which may be too small or not well targeted, or
+from the continual-pretraining method itself. The broader picture is one of scarcity on three
+fronts. Clinical text is private and in France is governed by the data-protection rules of the
+CNIL. Models trained inside one hospital cannot be shared between institutions. And the public
+French sources are fragmented and small next to PubMed and PMC.
 
-Resultats décevants: DrBERT dit que continual PT marche pas, Copara et Le Clercq confirment. Mais le probleme est peut-etre le corpus (trop petit, pas assez cible), pas la methode.
-
-Triple rarete: francais + biomedical + clinique. Les textes cliniques sont prives (CNIL), les modeles hospitaliers ne sont pas partageables entre etablissements. Les sources publiques francophones sont fragmentees et petites comparees a PubMed/PMC.
-
-% TODO tableau comparatif des corpus biomed (EN vs FR, taille, acces)
-
--> le texte biomedical aide pour le pretraining, mais les LMs captent des patterns statistiques, pas la structure des ontologies. Pour le codage medical (CIM-10, CCAM) il faut des connaissances hierarchiques explicites -> peut-on utiliser directement les ontologies comme donnees de pretraining?
-
+Biomedical corpora help models learn the vocabulary and style of medical text, but language
+models capture statistical patterns and not the explicit structure that tasks such as medical
+coding require, so we now turn to the medical ontologies that provide it.
 
 \section{Medical Ontologies and Knowledge Graphs}
 \label{sec:corpus-ontologies}
 
-\subsection{Principales ontologies medicales}
+\subsection{Main Medical Ontologies}
 
-UMLS (Lindberg et al., 1993):
-\begin{itemize}
-  \item Unified Medical Language System, meta-ontologie biomedical de la NLM
-  \item Integre ~189 vocabulaires sources (SNOMED-CT, MeSH, ICD, ATC, etc.)
-  \item ~3.4M concepts, ~16.7M noms de concepts uniques
-  \item Standard international pour la recherche en NLP biomed
-  \item Contient: synonymes, relations hierarchiques, relations associatives, definitions
-\end{itemize}
+An ontology is a structured vocabulary that records concepts, the names used to refer to
+them, and the relations between them, such as hierarchy, synonymy, and association. It
+therefore encodes explicitly the knowledge that a language model would otherwise have to
+learn implicitly from running text. A diagnosis, the procedures that treat it, and the drugs
+prescribed for it are written down as concepts and links rather than left to be inferred from
+word statistics. Several large ontologies of this kind cover the biomedical domain, and a few
+of them are central to clinical work in France.
 
-SNOMED-CT:
-\begin{itemize}
-  \item ~371K concepts cliniques structures
-  \item Relations hierarchiques (is-a) + associatives (finding site, causative agent, etc.)
-  \item Standard pour les systemes d'information clinique internationaux
-  \item Couverture: diagnostics, procedures, anatomie, substances, organismes
-\end{itemize}
+The Unified Medical Language System (UMLS) is the meta-ontology maintained by the United
+States National Library of Medicine (NLM). It integrates about 189 source vocabularies,
+including SNOMED-CT, the Medical Subject Headings (MeSH), the International Classification of
+Diseases (ICD), and the Anatomical Therapeutic Chemical classification (ATC). It contains
+roughly 3.4 million concepts and about 16.7 million unique concept names, and for each concept
+it provides synonyms, hierarchical and associative relations, and definitions
+\citep{lindberg_unified_1993}.
 
-CIM-10 / ICD-10 (OMS, 2019):
-\begin{itemize}
-  \item Classification internationale des maladies
-  \item Hierarchie: chapitres -> blocs -> categories -> sous-categories
-  \item Version francaise enrichie par l'ATIH avec: exclusions, inclusions, notes, libelles courts/longs
-  \item Utilise pour le codage PMSI (Programme de Medicalisation des Systemes d'Information) en France
-  \item ~19K codes dans la version ATIH
-\end{itemize}
+SNOMED-CT holds about 371{,}000 clinical concepts connected by hierarchical relations, of the
+is-a kind, and by associative relations such as finding site and causative agent. It is an
+international standard for clinical information systems and covers diagnoses, procedures,
+anatomy, substances, and organisms.
 
-CCAM (ATIH):
-\begin{itemize}
-  \item Classification Commune des Actes Medicaux, ~8K codes
-  \item Specifique a la France, structure hierarchique
-  \item Relations: actes associes, incompatibilites, modificateurs
-\end{itemize}
+The International Classification of Diseases, tenth revision (ICD-10, in French CIM-10), is
+the World Health Organization's (WHO) disease classification, organised as a hierarchy of
+chapters, blocks, categories, and subcategories. The French version, maintained by the Agence
+Technique de l'Information sur l'Hospitalisation (ATIH), adds inclusions, exclusions, and
+notes, and contains about 19{,}000 codes. It is used for hospital coding under the French
+case-mix system, the Programme de Médicalisation des Systèmes d'Information (PMSI).
 
-ATC (OMS):
-\begin{itemize}
-  \item Anatomical Therapeutic Chemical, ~6K codes au 5eme niveau
-  \item 5 niveaux: anatomique -> therapeutique -> pharmacologique -> chimique -> substance
-  \item Standard pour la classification des medicaments
-\end{itemize}
+The Classification Commune des Actes Médicaux (CCAM) is the French common classification of
+medical procedures. It is specific to France and arranges about 8{,}000 codes in a hierarchy.
 
-\subsection{Representations formelles}
+The Anatomical Therapeutic Chemical classification (ATC) is the WHO classification of drugs
+over five levels, from the anatomical group down to the individual substance. It contains
+about 6{,}000 codes at the fifth level.
 
-\begin{itemize}
-  \item RDF (Resource Description Framework): triplets sujet-predicat-objet, standard W3C
-  \item OWL (Web Ontology Language): logique descriptive, raisonnement automatique, classes, proprietes
-  \item SKOS (Simple Knowledge Organization System): prefLabel, altLabel (synonymes), broader/narrower (hierarchie), related, exactMatch
-\end{itemize}
+\subsection{Formal Representations}
 
-Les ontologies codent explicitement ce que les LMs doivent apprendre implicitement:
-\begin{itemize}
-  \item Hierarchie: E11 (diabete type 2) $\subset$ E10-E14 (diabete sucre)
-  \item Exclusions: E11 $\neq$ E10 (diabete type 1) -- a ne pas confondre
-  \item Synonymes: un meme concept a plusieurs libelles (prefLabel + altLabel)
-  \item Relations associatives: complications, traitements, liens entre ontologies
-\end{itemize}
+Ontologies are published in a small set of standard formats defined by the World Wide Web
+Consortium (W3C). The Resource Description Framework (RDF) stores facts as
+subject-predicate-object triples. The Web Ontology Language (OWL) adds description logic,
+which allows automatic reasoning over classes and properties. The Simple Knowledge
+Organization System (SKOS) provides a lighter vocabulary for thesauri, with prefLabel and
+altLabel for a concept's preferred and alternative names, and broader, narrower, and related
+links for hierarchy and association.
 
--> les ontologies sont riches en connaissances structurees, mais sous forme de graphes: pas directement exploitables par les LMs qui attendent du texte en language natu -> comment les integrer dans le pretraining?
+These formats let an ontology state explicitly what a language model must otherwise infer
+from text. They record hierarchy, so that type 2 diabetes is marked as a kind of diabetes
+mellitus. They record exclusions, so that type 2 diabetes is kept distinct from type 1 and is
+not confused with it. They record synonymy, so that one concept carries several labels at
+once. They also record associative relations, such as the complications of a disease, its
+treatments, and links that cross from one ontology to another.
 
+This structured knowledge is rich, but it is stored as graphs rather than as the running text
+that language models expect, which raises the question of how to bring it into pretraining.
 
 \section{Knowledge-Enhanced Pretraining}
 \label{sec:corpus-knowledge}
 
-\subsection{Embeddings statiques de graphes}
+The previous section left an open question. Ontologies hold curated knowledge, but they store
+it as graphs rather than the running text that language models read during pretraining.
+Several lines of work try to close this gap. They differ in how much of the graph they bring
+into the model and at what stage of training they do it.
 
-Approches qui produisent des vecteurs fixes (pas contextuels) a partir de graphes:
-\begin{itemize}
-  \item Node2Vec (Grover \& Leskovec, 2016): random walks sur graphe -> skip-gram, apprentissage de representations de noeuds
-  \item RDF2Vec (Ristoski \& Paulheim, 2016): adapte le paradigme walk + skip-gram aux graphes RDF. Fondation des approches de walks sur ontologies
-  \item Snomed2Vec (Agarwal et al., 2019): Node2Vec applique a SNOMED-CT, 5-6x amelioration sur concept similarity
-  \item OWL2Vec* (Chen et al., 2021): walks sur ontologies OWL (teste sur Gene Ontology)
-\end{itemize}
+\subsection{Static Graph Embeddings}
 
-Limite: embeddings statiques, pas integres dans un transformer. Un concept = un vecteur fixe quel que soit le contexte. Pas de contextualisation.
+The first family turns a graph into fixed vectors, one per node, without any context. Node2Vec
+learns node representations by running random walks on a graph and feeding the resulting
+sequences to a skip-gram model, the same kind of model used for word embeddings
+\citep{grover2016node2vec}. RDF2Vec adapts this walk-plus-skip-gram idea to RDF graphs, and it
+became the basis for later walk-based ontology methods \citep{ristoski2016rdf2vec}. Snomed2Vec
+applies Node2Vec to SNOMED-CT and reports a large improvement on concept similarity
+\citep{agarwal2019snomed2vec}. OWL2Vec* extends the approach by running walks over OWL
+ontologies \citep{chen2021owl2vec}. These methods share one limit. The embeddings are static
+and live outside any transformer, so a concept receives a single fixed vector whatever the
+surrounding text says.
 
--> on peut faire mieux en integrant les KG directement dans les transformers
+\subsection{Injecting Knowledge into Transformers}
 
-\subsection{Injection de connaissances dans les transformers}
+A second family puts entities inside the model. ERNIE aligns entity embeddings with text
+representations during pretraining \citep{zhang2019ernie}. KnowBERT inserts entity linkers as
+extra attention layers within BERT \citep{peters2019knowbert}. K-BERT injects knowledge-graph
+triples into the input using soft-position information so that the added triples do not
+disturb the sentence order \citep{liu2020kbert}. A later generation pretrains on language and
+knowledge together. KEPLER trains masked language modeling and a knowledge-embedding objective
+at the same time on Wikidata, with one shared encoder \citep{wang2021kepler}. CoLAKE builds
+word-knowledge graphs that unify text and knowledge context, then pretrains a modified masked
+objective on them \citep{sun2020colake}. DRAGON jointly pretrains, in both directions, masked
+language modeling and link prediction over PubMed text and the UMLS graph. It reports about
+3\% higher accuracy on a medical question-answering benchmark, with larger gains on questions
+that need several reasoning steps \citep{yasunaga2022dragon}.
 
-Premiere generation: injecter des entites dans l'architecture:
-\begin{itemize}
-  \item ERNIE (Zhang et al., 2019): aligne entity embeddings (TransE) avec representations textuelles pendant le pretraining. Entity linking implicite
-  \item KnowBERT (Peters et al., 2019): integre des entity linkers comme couches d'attention supplementaires dans BERT
-  \item K-BERT (Liu et al., 2020): injecte des triples de KG comme soft-position embeddings dans l'input. Modifie la sequence d'entree directement
-\end{itemize}
+\subsection{Medical Contrastive Approaches}
 
-Deuxieme generation: multi-task pretraining language + KG:
-\begin{itemize}
-  \item KEPLER (Wang et al., 2021): MLM + TransE knowledge embedding sur Wikidata simultanement. Les deux objectifs partagent le meme encoder
-  \item CoLAKE (Sun et al., COLING 2020): construit des word-knowledge graphs qui unifient contexte textuel et contexte KG, puis pretraine avec MLM modifie sur ces graphes
-  \item DRAGON (Yasunaga et al., NeurIPS 2022): joint pretraining bidirectionnel MLM + link prediction sur UMLS
-    \begin{itemize}
-      \item PubMed pour le texte, UMLS pour le KG
-      \item +3\% accuracy sur MedQA, +10\% sur raisonnement multi-step
-      \item Reference pour le multi-task MLM + KG
-    \end{itemize}
-\end{itemize}
+A third family uses contrastive learning to pull related medical terms together in the
+embedding space. SapBERT does self-alignment pretraining on UMLS synonyms. It treats synonyms
+as positive pairs and unrelated terms as negatives, scales to millions of concepts, and
+reaches strong biomedical entity-linking results with a single model for all entity types
+\citep{liu2021sapbert}. CODER extends this idea by adding relation triples from UMLS on top of
+synonyms, which helps with medical term normalization \citep{yuan2022coder}. Both methods read
+the graph through pairs of terms rather than through full sentences.
 
-\subsection{Approches contrastives medicales}
+\subsection{Graph-to-Text for Pretraining}
 
-\begin{itemize}
-  \item SapBERT (Liu et al., NAACL 2021): self-alignment pretraining sur synonymes UMLS
-    \begin{itemize}
-      \item Contrastive learning: synonymes UMLS = positifs, non-synonymes = negatifs
-      \item Metric learning scalable sur 4M+ concepts UMLS
-      \item SOTA entity linking biomed sur 6 benchmarks
-      \item Un seul modele pour tous les types d'entites ("one-model-for-all")
-    \end{itemize}
-  \item CODER (Yuan et al., 2022): contrastive pretraining sur 87M triplets de relations UMLS
-    \begin{itemize}
-      \item Relations + synonymes dans l'objectif contrastif
-      \item Medical term normalization
-    \end{itemize}
-\end{itemize}
+A recent direction turns the graph into text that a language model can read directly. The
+``Textbooks Are All You Need'' work showed that high-quality, textbook-like synthetic data
+lets small models perform well, which suggests that the structure and quality of the data can
+matter more than its raw volume \citep{gunasekar2023textbooks}. EntiGraph follows this line
+with an entity-centric augmentation method. It breaks a corpus into entities and generates
+text about the relations between them, turning about 1.3 million real tokens into about 600
+million synthetic tokens. Accuracy scales roughly log-linearly in the number of synthetic
+tokens. The method targets decoder models and has not yet been tested on encoders
+\citep{yang2025entigraph}.
 
-\subsection{Graph-to-text pour le pretraining}
-
-Approche recente: transformer les graphes en texte lisible par les LMs.
-
-"Textbooks Are All You Need" (Gunasekar et al., 2023):
-\begin{itemize}
-  \item Donnees synthetiques de qualite textbook generees par GPT -> petits modeles tres performants
-  \item Montre que la qualite et la structure des donnees importent plus que le volume brut
-  \item Paradigme: generer des donnees synthetiques structurees plutot que crawler du texte brut
-\end{itemize}
-
-AntGLM-Med (Zhou et al., 2023):
-\begin{itemize}
-  \item Reecrit des sous-graphes de KG medical en prose naturelle
-  \item Utilise pour le continual pretraining de LLMs medicaux
-  \item Plus proche precedent de la generation de texte a partir d'ontologies pour pretraining
-\end{itemize}
-
-% TODO verifier les details d'AntGLM-Med (Omaha KG?)
-
-EntiGraph (Yang et al., ICLR 2025):
-\begin{itemize}
-  \item Algorithme d'augmentation entity-centric: decompose un corpus en entites puis genere du texte sur les relations entre entites
-  \item 1.3M tokens reels -> 600M tokens synthetiques via GPT-4-turbo
-  \item Scaling log-lineaire de l'accuracy avec le nombre de tokens synthetiques
-  \item Cible les decoders (Llama 3 8B), pas encore teste sur encoders
-\end{itemize}
-
-Limites actuelles du knowledge-enhanced pretraining:
-\begin{itemize}
-  \item La plupart des travaux sont en anglais et sur UMLS
-  \item Graph-to-text pour le pretraining est recent (2023-2025)
-  \item Pas encore explore pour les encoders bidirectionnels (DRAGON fait du link prediction, pas du graph-to-text)
-  \item Les ontologies nationales (CIM-10 ATIH, CCAM) n'ont jamais ete utilisees pour du pretraining
-  \item SapBERT et CODER exploitent UMLS mais uniquement via contrastive learning, pas via generation de texte
-\end{itemize}
-
--> methodes prometteuses mais gap important: langues non-anglaises, ontologies nationales, pretraining d'encoders via graph-to-text
-
+Several gaps remain open across these families. Most of the work is in English and built on
+UMLS, so other languages and other knowledge sources stay unexplored. Graph-to-text for
+pretraining is recent, with the main results appearing between 2023 and 2025, and it has not
+been studied for bidirectional encoders, since DRAGON uses link prediction rather than
+generated text. National ontologies, such as the French ICD-10 maintained by the ATIH and the
+CCAM procedure coding, have not been used for pretraining. Contrastive methods such as SapBERT
+and CODER use UMLS through pairs of terms rather than by generating text from the graph. These
+open problems set up the limits we discuss next.
 
 \section{Limites et transition}
 \label{sec:corpus-limitations}
