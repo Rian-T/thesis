@@ -17,3 +17,5 @@ shashikumar2023bioontobert      # BioOntoBERT, ICBO/CEUR-WS Vol-3603, 2023 (veri
 lindberg_unified_1993           # UMLS, Lindberg et al., Methods Inf Med 1993
 ec_directive_2001_83             # EU legal act (EUR-Lex CELEX 32001L0083), no DOI
 ema_qrd_template                 # EMA web resource (QRD template), no DOI
+krallinger2017chemprot
+yang2024clinicalmamba
