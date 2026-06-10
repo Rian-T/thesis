@@ -3,6 +3,27 @@
 Last updated end of a long writing session. Read this, then `guidelines/working-with-rian.md`
 and `guidelines/writing-guide.md` (§7 especially), then `CLAUDE.md`.
 
+## ADDENDUM — session 2026-06-10/11 (Related Works finished + verified)
+- **All 3 RW chapters now full prose** (LM 5.8–5.10 + corpus_annotation 6.1–6.7 + clinical_ie
+  7.1–7.9 prosified this session via fable subagents, then 1 review pass + **3 simplification
+  passes** over 5.6→7.9, each merged with a Python `\cite`-key guard so no citation/number drifted).
+- **~80 exact refs added by curl** across the chapters; builds clean (0 undefined).
+- **Citation fact-check done** (Opus subagents, read-only, curl of original PDFs, no WebFetch):
+  reports in `research/factcheck/` with a consolidated `research/factcheck/INDEX.md`. Most claims
+  held; the real fixes were APPLIED (entigraph 455M, biosyn no cross-encoder, flashattention
+  ~3×, zheng quote, biomistral/meditron attribution, copara abstracts, UMLS "current releases",
+  txt360 drop 20TB/80%, plm-icd "competitively", drbenchmark soften, gliner up-to-300M, fracco
+  synthetic). Bib enriched (le_clercq ACL url — its pages 215–225 were actually CORRECT;
+  +arXiv ids snomed2vec/entigraph/universalner).
+- **Held on purpose (CamemBERT-bio wins in doubt):** CAS/DEFT-2020 CAS1/CAS2 split and
+  le_clercq "no gain on MEDLINE" — fact-checker disputes them but Rian's own paper asserts them.
+- **Still CANT-VERIFY for a human (not proven wrong):** Sollaci "1,297 articles", OSCAR 138 GB
+  (maybe re-cite CamemBERT), shi2025 CSUR vs arXiv taxonomy, the triptych "B.A., âgé de 36 ans…"
+  sample (synthetic or from corpus?). See INDEX.md.
+- Process note Rian gave: for small orchestrator fixes use the normal Edit tool, not a Python
+  splice (the splice is only for full-section merges that need the key-guard).
+- Git: 44 commits ahead of origin, still NOT pushed.
+
 ## Git state
 - **~27 commits ahead of `origin/main`, NOT pushed.** Rian pushes on his own signal — do
   not push unless he asks. Working tree is clean and compiles (`latexmk`, 0 fatal,
