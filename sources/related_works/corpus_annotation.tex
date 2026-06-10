@@ -15,13 +15,13 @@ they are trained on. The scale of that data is now very large. GPT-3 was trained
 \citep{touvron2023llama}. These numbers are not arbitrary. The Chinchilla scaling result
 showed that, for a fixed compute budget, the strongest models use far more data than
 earlier practice assumed, and that data and model size should grow together
-\citep{chinchilla_scaling}. Reaching good performance therefore depends on assembling
+\citep{chinchilla_scaling}. Good performance therefore depends on assembling
 corpora at this scale.
 
 Scale alone does not settle the matter. The quality and composition of a pretraining
 corpus shape what a model can later do. A corpus drawn mostly from web pages teaches a
 model the language of the web, and a corpus rich in scientific writing teaches it the
-language of science. Choices about what text to include, what to remove, and in what
+language of science. What to include, what to remove, and in what
 proportions are part of how the model is built. These choices receive less attention than
 model design, yet they account for much of the difference between models of similar size.
 
@@ -29,7 +29,7 @@ This chapter considers two kinds of resources used to pretrain language models. 
 is raw text, such as web crawls, scientific articles, and books. The second is structured
 knowledge, such as medical ontologies and knowledge graphs, where facts are stored as
 explicit relations rather than as running prose. Both have been used to train and adapt
-biomedical models, and they raise different questions about how they are collected and
+biomedical models, and each raises different questions about how it is collected and
 prepared.
 
 For a French clinical setting, the target data face a triple scarcity. The text must be
@@ -41,7 +41,7 @@ remains a standing difficulty for anyone building models for French clinical lan
 
 The chapter follows the path of the data. It starts from general web corpora and the
 methods used to collect them, then turns to quality filtering and how it changes what a
-corpus contains. It then moves to biomedical and clinical sources, where the scarcity above
+corpus contains. It then moves to biomedical and clinical sources, where this scarcity
 becomes concrete. Finally, it presents medical ontologies and discusses how such structured
 knowledge can be folded into the pretraining of language models.
 
@@ -95,10 +95,10 @@ FineWeb-Edu, that is filtered for educational content, which we discuss in the n
 \citep{penedo2024fineweb}.
 
 Other projects focus on making filtering easier for the people who reuse the corpus.
-RedPajama-V2 is an open dataset for training large language models that includes a French
-subset and ships pre-computed quality signals, so that users can apply their own filters
+RedPajama-V2 is an open dataset for training large language models, and it includes a French
+subset. It ships pre-computed quality signals, so that users can apply their own filters
 without recomputing those signals \citep{weber2024redpajama}. TxT360 instead emphasises
-global deduplication: it deduplicates across 99 Common Crawl snapshots at once, reducing
+global deduplication. It deduplicates across 99 Common Crawl snapshots at once, reducing
 about 20~TB of text to roughly 4.83 trillion tokens, a reduction of about 80\%
 \citep{tang2024txt360}.
 
@@ -117,7 +117,7 @@ good documents.
 The previous section showed that web text is abundant but uneven in quality. A monthly
 Common Crawl snapshot mixes clean articles with spam, boilerplate, and machine-generated
 pages. Training a model on this raw mixture wastes compute on text that teaches little. The
-question is therefore how to select the good documents and remove the rest. Two families of
+question is therefore how to keep the good documents and remove the rest. Two families of
 methods address this question. The first uses simple rules to drop obviously bad text. The
 second uses learned classifiers to judge the quality of the content.
 
@@ -127,25 +127,25 @@ The first family is rule-based filtering, which has been standard practice since
 pipeline \citep{rae2022gopher}. These rules look at surface properties of a document and
 discard it when a property falls outside an expected range. Common rules set minimum and
 maximum document lengths, limit the ratio of words to symbols, cap the proportion of
-uppercase characters, and remove documents with many duplicated lines. A second rule uses
-perplexity filtering, where a small n-gram model trained on Wikipedia scores each document,
-and documents with high perplexity are treated as noise and removed. Language identification
+uppercase characters, and remove documents with many duplicated lines. A second rule is
+perplexity filtering. A small n-gram model trained on Wikipedia scores each document, and
+documents with high perplexity are treated as noise and removed. Language identification
 with fastText keeps only documents in the target language. Almost every modern pipeline
 reuses these heuristics. They remove the obvious noise, but they do not judge whether the
 content is informative.
 
 \subsection{Quality Classifiers}
 
-The second family judges content quality with a learned classifier. The recent pattern is
-to have a large language model annotate a sample of documents, then distil a small and fast
-classifier from those annotations, and finally run that classifier over the whole corpus.
-This keeps the judgement of a strong model while making large-scale filtering affordable.
-FineWeb-Edu is a clear example \citep{penedo2024fineweb}. Its authors used Llama-3-70B-Instruct
-to score about 460{,}000 web pages for their educational value on a scale from 0 to 5,
-distilled a small regression classifier from these scores, and then classified the full 15
-trillion tokens at a cost of about 6{,}000 H100 hours. The filter removes about 92\% of the
-data, yet a model trained on the remaining fraction still beats one trained on the full
-corpus on benchmarks such as MMLU and ARC.
+The second family judges content quality with a learned classifier. The recent pattern has
+three steps. A large language model annotates a sample of documents, a small and fast
+classifier is distilled from those annotations, and that classifier is then run over the
+whole corpus. This keeps the judgement of a strong model while making large-scale filtering
+affordable. FineWeb-Edu is a clear example \citep{penedo2024fineweb}. Its authors used
+Llama-3-70B-Instruct to score about 460{,}000 web pages for their educational value on a
+scale from 0 to 5, distilled a small regression classifier from these scores, and then
+classified the full 15 trillion tokens at a cost of about 6{,}000 H100 hours. The filter
+removes about 92\% of the data, yet a model trained on the remaining fraction still beats one
+trained on the full corpus on benchmarks such as MMLU and ARC.
 
 Other pipelines change the target of the classifier. DataComp-LM, known as DCLM, trains a
 fastText classifier to separate instruction-style text from general web text, which favours
@@ -161,9 +161,8 @@ into efficient classifiers \citep{wettig2024weborganizer}. This view exposes wha
 scores leave implicit. The authors show that FineWeb-Edu carries a hidden bias toward
 science, technology, and academic writing, and that part of its measured gains come from a
 domain mix that happens to match the benchmarks. They also find that combining domain
-organisation with quality filtering works better than quality filtering alone. The lesson is
-that what a corpus contains depends on both how good its documents are and what they are
-about.
+organisation with quality filtering works better than quality filtering alone. What a corpus
+contains therefore depends on both how good its documents are and what they are about.
 
 \subsection{Deduplication}
 
@@ -178,7 +177,7 @@ its corpus by about 80\% \citep{tang2024txt360}.
 
 \subsection{Contamination}
 
-Aggressive filtering toward benchmark-like text raises a further concern, namely benchmark
+Aggressive filtering toward benchmark-like text raises a further concern, benchmark
 contamination. Contamination happens when test items, or text that closely resembles them,
 leak into the training data. When this occurs, reported scores stop measuring true
 generalisation and instead reward memorisation. \citet{deng2024benchmarkprobing} showed that
@@ -214,17 +213,16 @@ written in technical vocabulary and edited to a consistent standard. Its main li
 it provides abstracts only, without the full text of the articles. PubMed Central (PMC) Open
 Access addresses this by providing full text: about 4.5 million articles, of which roughly
 98\% are in English \citep{labrak-etal-2024-biomistral}. The collection is heterogeneous,
-mixing research articles, reviews, case reports, editorials, and clinical guidelines. A
-practical difficulty is its article-level granularity, because a single research article can
-combine clinically relevant case material with methodological sections that are of little
-clinical use.
+mixing research articles, reviews, case reports, editorials, and clinical guidelines. It is
+also hard to use at the article level, because a single research article can combine
+clinically relevant case material with methodological sections that are of little clinical use.
 
 Clinical text is harder to obtain. The main reference is MIMIC
 \citep{johnson2016mimiciii, johnson2023mimiciv}, a set of clinical notes from a single
 United States hospital, the Beth Israel Deaconess Medical Center. Access is restricted and
 requires a data use agreement and ethics training. MIMIC is treated as a gold standard for
-English clinical text, but coming from one hospital in one country limits how far models
-trained on it generalise to other settings.
+English clinical text. But it comes from one hospital in one country, which limits how far
+models trained on it generalise to other settings.
 
 \subsection{Article-Level Curation for Biomedicine}
 
@@ -251,7 +249,7 @@ articles in both technical and simplified versions \citep{grabar_clear_2018}. E3
 multilingual corpus of clinical cases, drug leaflets, and medical-thesis abstracts
 \citep{magnini_e3c_2021}. HAL, the French open repository, and its harvested version HALvest
 provide French and English scientific articles \citep{kulumba2024halvest}. Biomedical
-Wikipedia adds a free and multilingual source. Taken together these resources are useful, but
+Wikipedia adds a free and multilingual source. Together these resources are useful, but
 each is partial, and none approaches the scale of PubMed or PMC.
 
 The French biomedical models, including the ones trained from scratch and the ones obtained
@@ -264,14 +262,14 @@ leaflets and no gain on scientific titles \citep{le_clercq_de_lannoy_strategies_
 third used 21 million private hospital documents, which improved a private clinical benchmark
 but could not be shared with other researchers \citep{dura_learning_2022}.
 
-These French results are mixed, and their cause is not settled. It is not clear whether the
+These French results are mixed, and their cause is not settled. We do not know whether the
 disappointing outcomes come from the corpora, which may be too small or not well targeted, or
 from the continual-pretraining method. These difficulties sharpen the clinical scarcity
-introduced earlier. Clinical text is private and in France is governed by the data-protection
+introduced earlier. Clinical text is private, and in France it is governed by the data-protection
 rules of the CNIL. Models trained inside one hospital cannot be shared between institutions.
 And the public French sources are fragmented and small next to PubMed and PMC.
 
-Biomedical corpora help models learn the vocabulary and style of medical text, but language
+Biomedical corpora help models learn the vocabulary and style of medical text. But language
 models capture statistical patterns and not the explicit structure that tasks such as medical
 coding require, so we now turn to the medical ontologies that provide it.
 
@@ -280,29 +278,29 @@ coding require, so we now turn to the medical ontologies that provide it.
 
 \subsection{Main Medical Ontologies}
 
-An ontology is a structured vocabulary that records concepts, the names used to refer to
+An ontology is a structured vocabulary. It records concepts, the names used to refer to
 them, and the relations between them, such as hierarchy, synonymy, and association. It
-therefore encodes explicitly the knowledge that a language model would otherwise have to
-learn implicitly from running text. A diagnosis, the procedures that treat it, and the drugs
-prescribed for it are written down as concepts and links rather than left to be inferred from
+therefore writes down explicitly the knowledge that a language model would otherwise have to
+learn on its own from running text. A diagnosis, the procedures that treat it, and the drugs
+prescribed for it are recorded as concepts and links, rather than left to be inferred from
 word statistics. Several large ontologies of this kind cover the biomedical domain, and a few
 of them are central to clinical work in France.
 
 The Unified Medical Language System (UMLS) is the meta-ontology maintained by the United
-States National Library of Medicine (NLM). It integrates about 189 source vocabularies,
+States National Library of Medicine (NLM). It brings together about 189 source vocabularies,
 including SNOMED-CT, the Medical Subject Headings (MeSH), the International Classification of
 Diseases (ICD), and the Anatomical Therapeutic Chemical classification (ATC). It contains
-roughly 3.4 million concepts and about 16.7 million unique concept names, and for each concept
-it provides synonyms, hierarchical and associative relations, and definitions
+roughly 3.4 million concepts and about 16.7 million unique concept names. For each concept
+it gives synonyms, hierarchical and associative relations, and definitions
 \citep{lindberg_unified_1993}.
 
-SNOMED-CT holds about 371{,}000 clinical concepts connected by hierarchical relations, of the
-is-a kind, and by associative relations such as finding site and causative agent. It is an
-international standard for clinical information systems and covers diagnoses, procedures,
-anatomy, substances, and organisms.
+SNOMED-CT holds about 371{,}000 clinical concepts. They are connected by hierarchical
+relations, of the is-a kind, and by associative relations such as finding site and causative
+agent. It is an international standard for clinical information systems and covers diagnoses,
+procedures, anatomy, substances, and organisms.
 
 The International Classification of Diseases, tenth revision (ICD-10, in French CIM-10), is
-the World Health Organization's (WHO) disease classification, organised as a hierarchy of
+the World Health Organization's (WHO) disease classification. It is organised as a hierarchy of
 chapters, blocks, categories, and subcategories. The French version, maintained by the Agence
 Technique de l'Information sur l'Hospitalisation (ATIH), adds inclusions, exclusions, and
 notes, and contains about 19{,}000 codes. It is used for hospital coding under the French
@@ -321,7 +319,7 @@ Ontologies are published in a small set of standard formats defined by the World
 Consortium (W3C). The Resource Description Framework (RDF) stores facts as
 subject-predicate-object triples. The Web Ontology Language (OWL) adds description logic,
 which allows automatic reasoning over classes and properties. The Simple Knowledge
-Organization System (SKOS) provides a lighter vocabulary for thesauri, with prefLabel and
+Organization System (SKOS) provides a lighter vocabulary for thesauri. It uses prefLabel and
 altLabel for a concept's preferred and alternative names, and broader, narrower, and related
 links for hierarchy and association.
 
@@ -348,10 +346,10 @@ learns node representations by running random walks on a graph and feeding the r
 sequences to a skip-gram model, the same kind of model used for word embeddings
 \citep{grover2016node2vec}. RDF2Vec adapts this walk-plus-skip-gram idea to RDF graphs, and it
 became the basis for later walk-based ontology methods \citep{ristoski2016rdf2vec}. Snomed2Vec
-applies Node2Vec to SNOMED-CT and reports a large improvement on concept similarity
+applies Node2Vec to SNOMED-CT and reports a large gain on concept similarity
 \citep{agarwal2019snomed2vec}. OWL2Vec* extends the approach by running walks over OWL
 ontologies \citep{chen2021owl2vec}. These methods share one limit. The embeddings are static
-and live outside any transformer, so a concept receives a single fixed vector whatever the
+and live outside any transformer, so a concept gets a single fixed vector whatever the
 surrounding text says.
 
 \subsection{Injecting Knowledge into Transformers}
@@ -359,7 +357,7 @@ surrounding text says.
 A second family puts entities inside the model. ERNIE aligns entity embeddings with text
 representations during pretraining \citep{zhang2019ernie}. KnowBERT inserts entity linkers as
 extra attention layers within BERT \citep{peters2019knowbert}. K-BERT injects knowledge-graph
-triples into the input using soft-position information so that the added triples do not
+triples into the input using soft-position information, so that the added triples do not
 disturb the sentence order \citep{liu2020kbert}. A later generation pretrains on language and
 knowledge together. KEPLER trains masked language modeling and a knowledge-embedding objective
 at the same time on Wikidata, with one shared encoder \citep{wang2021kepler}. CoLAKE builds
@@ -383,7 +381,7 @@ the graph through pairs of terms rather than through full sentences.
 
 A recent direction turns the graph into text that a language model can read directly. The
 ``Textbooks Are All You Need'' work showed that high-quality, textbook-like synthetic data
-lets small models perform well, which suggests that the structure and quality of the data can
+lets small models perform well. This suggests that the structure and quality of the data can
 matter more than its raw volume \citep{gunasekar2023textbooks}. EntiGraph follows this line
 with an entity-centric augmentation method. It breaks a corpus into entities and generates
 text about the relations between them, turning about 1.3 million real tokens into about 600
@@ -405,27 +403,27 @@ open problems set up the limits we discuss next.
 
 This chapter examined the data behind pretrained language models. We looked at web-scale
 corpora and how they are collected, at quality filtering and curation, at biomedical and
-clinical sources, at medical ontologies, and at ways to fold structured knowledge into
-pretraining. Taken together, these threads leave several open problems for biomedical text in
+clinical sources, at medical ontologies, and at ways to add structured knowledge to
+pretraining. Together, these threads leave several open problems for biomedical text in
 a lower-resource language such as French.
 
 The first problem is scarcity outside English. PMC is about 98\% English
 \citep{labrak-etal-2024-biomistral}, and French biomedical corpora remain small and
-fragmented. The main filtering pipelines that made web-scale curation work, such as
-FineWeb-Edu and DCLM, were designed for English \citep{penedo2024fineweb, li2024datacomp}. How
+scattered. The main filtering pipelines that made web-scale curation work, such as
+FineWeb-Edu and DCLM, were built for English \citep{penedo2024fineweb, li2024datacomp}. How
 to collect and filter text for a specific domain in a language with little data is still an
 open question.
 
-The second problem is the granularity of filtering. Existing biomedical curation operates at
+The second problem is the granularity of filtering. Existing biomedical curation works at
 the document or article level, as in Meditron \citep{chen2023meditron}, which leaves the
-within-article mix of relevant and irrelevant content untouched. Finer, paragraph-level
+mix of relevant and irrelevant content within an article untouched. Finer, paragraph-level
 filtering has received little attention.
 
 The third problem is that quality criteria do not transfer across domains. The educational
 criterion used by FineWeb-Edu does not match biomedical text such as clinical cases, drug
 leaflets, and protocols. The domain biases identified by WebOrganizer
-\citep{wettig2024weborganizer} may also take a different shape in the biomedical case. What
-the right domain-specific quality criteria are for biomedical text remains open.
+\citep{wettig2024weborganizer} may also take a different shape in the biomedical case. The
+right domain-specific quality criteria for biomedical text are still unknown.
 
 Two further gaps concern knowledge. Research on medical ontologies is dominated by UMLS, but
 French hospital systems use ICD-10 as maintained by the ATIH, along with CCAM for procedures
