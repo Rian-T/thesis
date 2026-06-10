@@ -322,6 +322,28 @@ overflow, touching cells, unreadable labels, broken arrows. The summary's
 "looks-right-in-source" is not enough; Rian's corrections were all things only
 visible in the rendered figure.
 
+### Concept figures already in the thesis (reuse their code as templates)
+In `sources/related_works/language_modeling.tex` and the biomedical-text chapters:
+`fig:lm-entropy` (Shannon bars), `fig:lm-nexttoken`, `fig:lm-word2vec` (the
+king−man+woman≈queen parallelogram), `fig:lm-rnn` (unrolled RNN), `fig:lm-attention`
+(encoder/decoder mask matrices), `fig:lm-objectives` (CLM/MLM dense-vs-sparse),
+`fig:lm-fewshot` (3-panel zero/one/few-shot prompt box), `fig:lm-dapt` (DAPT/TAPT
+pipeline); plus three Python plots in `plots/related_works/` (`rnn_gradient.py` =
+analytical η^(t−k) bound, `chinchilla_scaling.py`, `llama_vs_gpt3.py`). The bilingual
+example boxes are in `clinical/scientific/web.tex` (see `working-with-rian.md` §9).
+
+### Small lessons that cost a redo this session
+- **Load the TikZ library you use.** `calc` (for `($(a)!0.5!(b)$)`, `($(a)+(..)$)`) and
+  `decorations.pathreplacing` (braces) are in `thesis.tex`'s `\usetikzlibrary{...}`; add new
+  ones there, not per-figure.
+- **Drop decorative axes** when they carry no data (they read as chartjunk and caused a label
+  to overflow onto the axis). Label points directly instead.
+- **Put a label ON its line**, not floating beside it: `\draw[...] (a)--(b) node[midway,
+  sloped, above]{label};` rather than a separate `\node` near the midpoint.
+- **Color carries meaning, text stays quiet.** Saturated colour only on the data
+  (lines/points/bars); regime/word labels in `ThesisNeutral`/`ThesisInk`, no legend box when
+  direct labels or a frameless outside legend will do.
+
 ---
 
 ## 3. Quick Reference — Do / Don't

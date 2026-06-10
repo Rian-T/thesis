@@ -133,3 +133,47 @@ don't repeat them.)
 - Add real entries to `thesis.bib`; run `make checkbib` after citing.
 - Books and workshop/French venues often won't verify → add to
   `tools/bibcheck_whitelist.txt` with a justification. Never invent DOIs/pages.
+- **Get exact bib by curl, never WebFetch.** Prefer the PUBLISHED venue over arXiv.
+  Recipe that works: Crossref by DOI (`api.crossref.org/works/<DOI>`), ACL Anthology
+  `.bib` (`aclanthology.org/<id>.bib`), DBLP bibtex (`dblp.org/rec/<key>.bib`),
+  OpenAlex for author *order* when Crossref alphabetises it. Verify the title/authors
+  resolve to the real paper. (This session caught a wrong author list in
+  `kirkpatrick2017ewc` and the BioMistral entry filed under the wrong venue.)
+- **Derived numbers are OK but must be flagged as derived, not quoted** (e.g. Chinchilla
+  "~20 tokens per parameter" and UMLS "~3 names per concept" are reader-derived ratios,
+  not sentences in the papers).
+
+## 8. Subagent writing passes (fable) — the rewrite workflow Rian likes
+
+For making prose plainer / more human, dispatch `fable`-model subagents (Agent tool,
+`model: fable`). This worked well across the whole "What is Biomedical Text?" triptych
+and LM chapter 5.1–5.7.
+
+- **Always calibrate on CamemBERT-bio.** Point each agent at
+  `publications/CamemBERT_bio___LREC_COLING_2024/camembert-bio-lrec-coling2024.tex` and make
+  it **quote two sentences from it as proof it read it**. Closely copying that voice is what
+  kills the AI-slop and the "not X but Y" seesaws.
+- **The dial, boldest → lightest:** full rewrite → clarify-and-enrich (add a clause where a
+  cited name like Foucault would otherwise feel "randomly dropped", without digressing) →
+  pure simplification (simpler words, shorter sentences, no new content) → style pass (kill
+  antithesis). State which one you want, explicitly, each time. Rian iterates several rounds.
+- **Always re-read the diff before committing.** Subagents reintroduce things you removed
+  (an unverified claim, a "not X but Y", an "itself", a dangling comparative). Catch them.
+- **Preserve, every time:** `\citep/\citet/\emph/\Cref`, verbatim quotes, all math/figures/
+  tables, `% === Pn ===` markers. Tell the agent so.
+
+### Concurrent same-file edits CORRUPT — use the /tmp-copy trick
+If several subagents must edit ONE file (e.g. `language_modeling.tex` section by section),
+do **not** let them all Edit the repo file at once. Tell each to `cp` the file to a unique
+`/tmp/lm_secNN.tex`, edit ONLY its section there, and report. Then merge in the main loop,
+section by section, by `\section{...}` markers (a small Python splice: take block
+`[start_marker, next_marker)` from each `/tmp` copy into the repo file). This is how 5.4/5.5/5.6
+were done safely in parallel.
+
+## 9. Bilingual example figures (the triptych convention)
+Each "What is Biomedical Text?" chapter opens on a side-by-side box: **French original on the
+left in `ThesisInk`, English translation on the right in muted `ThesisNeutral`**, a thin
+vertical rule between, tiny labels `FRANÇAIS` / `ENGLISH · TRANSLATION`. French is the source;
+English muted = "this is a translation". Built as a 2-column `tabular` with a `!{\vrule}`
+separator, each column a `\begin{minipage}[t]{0.40\textwidth}`. Caption is one sentence ending
+"…; French original, English translation."
