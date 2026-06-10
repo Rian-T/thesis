@@ -849,61 +849,96 @@ question that the next section takes up through the biomedical models built to a
 it.
 
 
-\section{Modeles pretrained biomed}
+\section{Biomedical Language Models}
 \label{sec:lm-biomedical}
 
-\subsection{Encoders biomed anglais}
+The previous section left an open question: does continued pretraining reliably
+specialise a model, and does the answer depend on the architecture? The biomedical
+models built over the past few years are the testbed. We look at them in three groups,
+the English encoders, the French models, and the generative decoders, and the
+from-scratch-versus-continue split runs through all three.
 
-\begin{itemize}
-  \item BioBERT (Lee et al., 2019): PubMed+PMC 18B mots, continual -> +0.62\% NER, +2.80\% RE
-  \item SciBERT (Beltagy et al., 2019): Semantic Scholar 1.14M papers, from scratch -> 42\% vocab overlap avec BERT
-  \item PubMedBERT (Gu et al., 2022): PubMed only, from scratch -> introduit BLURB benchmark
-  \item ClinicalBERT (Alsentzer et al., 2019): MIMIC-III, continual -> acces restreint
-  \item BioLinkBERT (Yasunaga et al., 2022): PubMed + citation links, from scratch -> +7\% BioASQ
-\end{itemize}
+\subsection{English Biomedical Encoders}
 
-SOTA 2025: BioClinical ModernBERT, cf section architectures modernes.
+The first biomedical encoders took the continued-pretraining route. BioBERT continued
+the pretraining of BERT on PubMed abstracts and full-text articles, and reported clear
+gains over the general model: about half a point of F1 on biomedical named-entity
+recognition, nearly three on relation extraction, and twelve points of mean reciprocal
+rank on question answering \citep{lee_biobert_2019}. The gains were real and the recipe
+was cheap, since it reused the existing weights, and this established the
+mixed-domain paradigm: start from a general model, keep training on domain text.
 
-% TODO tableau
+A second line questioned that paradigm by training from scratch, with a vocabulary
+built from domain text rather than inherited. SciBERT measured what is at stake:
+between BERT's general vocabulary and one learned from scientific text, only 42\% of
+frequent tokens overlap, so more than half of the common scientific words are split
+into pieces by a general tokenizer \citep{beltagy_scibert_2019}. Training from scratch
+on 1.14 million papers fixes this. PubMedBERT made the strongest version of the claim:
+pretraining from scratch on biomedical text, with an in-domain vocabulary, ``substantially
+outperforms continual pretraining of generic language models'', and they released the
+BLURB benchmark that became the standard yardstick for the field \citep{gu_domain-specific_2022}.
+BioLinkBERT added a twist, pretraining from scratch on PubMed with its citation links so
+that related documents are seen together, for a further gain on biomedical question
+answering \citep{yasunaga-etal-2022-linkbert}. Clinical text adds a constraint of its
+own: ClinicalBERT was trained on the notes of the MIMIC-III intensive-care database, and
+while its weights are public the underlying notes are not, sitting behind credentialed
+access \citep{alsentzer-etal-2019-publicly}. The current strongest encoder follows the
+continued route again, on a far larger and more varied corpus: BioClinical ModernBERT
+continues a modern long-context encoder on more than 53 billion tokens drawn from twenty
+datasets across institutions \citep{sounack2025bioclinicalmodernbert}, with the
+architectural changes that make it long-context deferred to \Cref{sec:lm-modern}.
 
-\subsection{Modeles francais}
+\subsection{French Language Models}
 
-General:
-\begin{itemize}
-  \item CamemBERT (Martin et al., 2020): RoBERTa sur OSCAR 138GB
-    -> resultat interessant: 4GB donne a peu pres la meme perf que 138GB
-  \item FlauBERT (Le et al., 2020)
-  \item CamemBERT 2.0 / CamemBERTa (2024): architecture DeBERTaV3, nouveau tokenizer
-\end{itemize}
+French has its own lineage. CamemBERT adapted the RoBERTa recipe to French web text and
+made a point that matters for low-resource work: about four gigabytes of text gave
+results ``as good as those obtained using larger datasets (130+GB)''
+\citep{martin-etal-2020-camembert}. FlauBERT appeared in parallel, trained on a
+heterogeneous French corpus \citep{le-etal-2020-flaubert}. Later models refreshed the
+recipe: CamemBERTa adopted the DeBERTaV3 architecture and its replaced-token-detection
+objective for better data efficiency \citep{antoun-etal-2023-camemberta}, and CamemBERT~2.0
+retrained the family on newer data to counter the drift of language over time
+\citep{antoun2024camembert2}.
 
-Biomedical francais:
-\begin{itemize}
-  \item DrBERT (Labrak et al., 2023): from scratch, public + prive
-    -> pretend que continual PT marche pas pour le francais biomed
-  \item AliBERT (Berhe et al., 2023): from scratch, Unigram regularise
-    -> pas disponible publiquement
-\end{itemize}
+The two dedicated French biomedical encoders were both trained from scratch. DrBERT
+trained a RoBERTa model on NACHOS, a corpus of French biomedical and clinical text, and
+its experiments argued for the from-scratch route: models trained from scratch gave the
+best results, and continuing the pretraining of a French general model never reached the
+top on any of their tasks \citep{labrak2023drbert}. The picture is not one-sided, though,
+even in their own results: continuing the pretraining of an \emph{English} biomedical
+model on French data did work, which they read as cross-lingual transfer. They also found
+that publicly available biomedical text could match or beat private hospital data, a
+point that bears directly on the use of public corpora for the clinic. AliBERT, the other
+French biomedical encoder, was likewise trained from scratch, with a regularised Unigram
+tokenizer built for the domain \citep{berhe:hal-03911564}. Whether continuing from a
+French general model can be made to match a from-scratch biomedical one is, on this
+evidence, still an open question.
 
--> tension: DrBERT dit from-scratch necessaire, CamemBERT-bio (cette these) montre le contraire
+\subsection{Biomedical Decoders}
 
-\subsection{Decoders biomed}
+Generative models were specialised in the same way, by continuing the pretraining of a
+general large language model on medical text, but at a much larger scale. BioMistral
+continued Mistral~7B on PubMed Central and reported that the adapted model beat the
+general instruction-tuned Mistral on eight of ten medical question-answering tasks; to
+keep the general ability that specialisation can erode, the authors also merged the
+domain and general models, combining their strengths \citep{labrak-etal-2024-biomistral}.
+Meditron continued Llama-2, at seven and seventy billion parameters, on a curated
+medical corpus of about 48 billion tokens that deliberately mixes in one percent of
+general data as replay, and its seventy-billion model outperformed GPT-3.5 and Med-PaLM
+on medical benchmarks \citep{chen2023meditron}. PMC-LLaMA continued LLaMA on biomedical
+papers and books \citep{wu2024pmcllama}.
 
-\begin{itemize}
-  \item BioMistral (Labrak et al., 2024): 3B tokens PMC, 32x A100 20h, base Mistral
-  \item Meditron (Chen et al., 2023): 46B tokens, 128x A100 332h, base Llama-2
-  \item PMC-LLaMA (Wu et al., 2024): 75B tokens, massif
-\end{itemize}
-
-Continual PT pour decoders = resultats mitiges:
-\begin{itemize}
-  \item BioMistral: $-$0.9 points, recupere seulement via model merging
-  \item Dorfner et al. (2024): ``Biomedical LLMs Seem not to be Superior to Generalist Models''
-  \item -> contraste avec les encoders, voir Ch.5
-\end{itemize}
-
-% TODO tableau
-
--> les modeles existent mais les archis ont evolue, quoi de neuf?
+Each of these reports gains on its own medical benchmarks, yet a broader picture is more
+sober. Evaluating biomedical models against the general models they were built from, on
+tasks chosen to fall outside the fine-tuning data, \citet{dorfner2024biomedical} found
+the specialised models mostly the weaker of the two, especially away from pure medical
+knowledge. The contrast with the encoders is the lesson of this section. For encoders,
+continued pretraining on domain text is close to a default win on extraction tasks; for
+large decoders, specialising on a domain is a riskier trade, where in-domain gains can
+come at the cost of general ability and do not always survive an independent test. Why
+the two architectures should behave so differently is not settled, and it is one of the
+threads this thesis follows. These models, finally, are built on architectures that have
+themselves moved on from the original Transformer, which is where we turn next.
 
 
 \section{Architectures modernes}
