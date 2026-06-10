@@ -994,7 +994,7 @@ Two encoder lines feed directly into the models used today. DeBERTa changed how 
 content and position are combined \citep{deberta}. The original Transformer adds a
 position vector to each word vector, so the two signals are mixed before attention sees
 them. DeBERTa keeps them apart, with one vector for content and one for position, and lets
-attention use the two separately, an idea its authors call disentangled attention. The
+attention use the two separately. Its authors call this disentangled attention. The
 model was the first to pass the human baseline on the SuperGLUE benchmark, and the design
 influenced later encoders, including ModernBERT and CamemBERT~2.0.
 
@@ -1017,7 +1017,7 @@ times faster in practice, and it is now a standard component. Grouped-query atte
 addresses memory at inference time by sharing key and value heads across several query
 heads, which shrinks the cache that the model must hold while generating
 \citep{ainslie-etal-2023-gqa}; it is used in models such as Llama-2 and Mistral. RMSNorm
-simplifies layer normalisation by dropping the mean-centring step, which makes it cheaper
+simplifies layer normalisation by dropping the mean-centring step. This makes it cheaper
 to compute and is now common in large models \citep{zhang2019rmsnorm}. These are
 engineering refinements, and together they are what made large-scale and long-context
 training practical.
@@ -1045,7 +1045,6 @@ current evidence, the strongest biomedical and clinical encoder
 \citep{sounack2025bioclinicalmodernbert}. It inherits the 8192-token window, which lets it
 read a full clinical note rather than a truncated fragment. These architectures still
 inherit a vocabulary and a tokenizer, which is the next lever we examine.
-
 
 \section{Tokenization}
 \label{sec:lm-tokenization}
@@ -1077,7 +1076,7 @@ beforehand, which helps for languages that do not mark word boundaries with spac
 treats the input as a raw stream of characters and learns its subword units from that
 stream. CamemBERT used SentencePiece to build its vocabulary. A related method is the
 unigram language model \citep{kudo-2018-subword}. It selects subword units with a
-probabilistic model rather than by greedy merging, and it can sample several different
+probabilistic model rather than by greedy merging. It can also sample several different
 segmentations of the same text, which is useful as a form of regularization during
 training.
 
@@ -1101,12 +1100,11 @@ Training a model from scratch lets it build a vocabulary fitted to the domain, s
 terms stay compact. This route is expensive, because it needs a large corpus and a long
 training run. Continuing the pretraining of a general model is much cheaper, but the model
 is stuck with a general-purpose tokenizer that over-splits domain terms. The vocabulary is
-fixed once the general model is built, so continual pretraining cannot repair it. This
-tension between a fitted vocabulary and a cheap training path stays open.
+fixed once the general model is built, so continual pretraining cannot repair it. The choice
+between a fitted vocabulary and a cheap training path therefore stays open.
 
 Tokenizer mismatch is one of several limits that matter for a clinical, French, and
 biomedical target, and we turn to those limits next.
-
 
 \section{Limits and Transition}
 \label{sec:lm-limitations}
@@ -1115,10 +1113,10 @@ This chapter followed language modeling from Shannon and n-grams to neural and r
 models, then to the Transformer and its two main pretraining objectives. It then covered
 scaling laws and large language models, with instruction tuning, alignment, and reasoning,
 and the use of continual pretraining to specialise a model to a domain. It closed on
-biomedical models, efficient attention, long context, and tokenization. The thread running
-through all of it is the target of this thesis: text that is at once French, biomedical,
-and clinical. Seen from that target, the methods above share a set of limits, and each of
-these limits points away from the models and toward the data they need.
+biomedical models, efficient attention, long context, and tokenization. One thread runs
+through all of it: the target of this thesis, text that is at once French, biomedical,
+and clinical. Seen from that target, the methods above share a set of limits, and each
+limit points past the models to the data they need.
 
 The first limit is data rarity. Every method here assumes a large in-domain corpus, either
 to pretrain a model from scratch or to continue training an existing one. For clinical text
@@ -1140,6 +1138,6 @@ Longformer, BigBird, and ModernBERT, raise this ceiling. Using them well on clin
 still calls for adapting them to the domain, which brings the discussion back to the
 question of in-domain data.
 
-The chapter has described the models; the following chapter turns to what they need, the
+The chapter has described the models. The next chapter turns to what they need, the
 data: the corpora and the structured knowledge used to pretrain these models, and how such
 resources are collected, filtered, and prepared.
