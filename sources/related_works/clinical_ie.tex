@@ -8,49 +8,47 @@
 \label{sec:ie-intro}
 
 The previous chapters built pretrained language models and asked what data they should learn
-from. This chapter turns to the task these models are ultimately built for. Clinical
-information extraction means turning unstructured clinical text into structured information
-that a computer can store, query, and analyse. A discharge summary, a referral letter, or a
-prescription is written for human readers, so the facts it contains are not directly
-available to software. The goal is to recover those facts, such as diagnoses, treatments, and
-their relations, and to record them in a form that supports research and care.
+from. This chapter turns to the task these models are built for. Clinical information
+extraction means turning unstructured clinical text into structured information that a computer
+can store, query, and analyse. A discharge summary, a referral letter, or a prescription is
+written for human readers, so the facts it contains are not directly available to software. The
+goal is to recover those facts, such as diagnoses, treatments, and their relations, and to
+record them in a form that supports research and care.
 
 This task matters because hospitals increasingly store their records in clinical data
 warehouses, large databases that gather electronic health records for secondary use. Most of
-the clinically useful information in these records lives in free text rather than in
-structured fields. Up to 80\% of clinical entities are absent from the structured part of the
-record, which leaves reports, letters, and prescriptions as the main source
-\citep{raghavan_how_2014}. France adds a further reason to study the problem. The PMSI, the
-national system that describes hospital activity, requires every hospital stay to be coded
-with ICD-10 diagnosis codes and CCAM procedure codes, covering about 30 million stays a year.
-This coding is still done by hand by professional coders and reported to the ATIH, the
-national agency for hospital information, which makes automation a practical and economic
-priority.
+the clinically useful information in these records lives in free text rather than in structured
+fields. Up to 80\% of clinical entities are absent from the structured part of the record,
+which leaves reports, letters, and prescriptions as the main source \citep{raghavan_how_2014}.
+France adds a further reason to study the problem. The PMSI, the national system that describes
+hospital activity, requires every hospital stay to be coded with ICD-10 diagnosis codes and
+CCAM procedure codes, covering about 30 million stays a year. This coding is still done by hand
+by professional coders and reported to the ATIH, the national agency for hospital information.
+This makes automation a practical and economic priority.
 
-Clinical information extraction covers a family of related tasks. Named
-entity recognition finds the spans of text that mention entities of interest, such as a drug
-name or a symptom. Relation extraction identifies how these entities are connected, for
-example which drug treats which condition. Medical coding assigns ontology codes to a
-document, such as ICD-10, CCAM, or ATC codes for medications. Entity linking, also called
-normalisation, maps a mention in the text to a single concept in a knowledge base such as the
-UMLS or SNOMED-CT. These tasks are often combined in a pipeline, since a coded record usually
-needs both the entities and the concepts they refer to.
+Clinical information extraction covers a family of related tasks. Named entity recognition finds
+the spans of text that mention entities of interest, such as a drug name or a symptom. Relation
+extraction identifies how these entities are connected, for example which drug treats which
+condition. Medical coding assigns ontology codes to a document, such as ICD-10, CCAM, or ATC
+codes for medications. Entity linking, also called normalisation, maps a mention in the text to
+a single concept in a knowledge base such as the UMLS or SNOMED-CT. These tasks are often
+combined in a pipeline, since a coded record usually needs both the entities and the concepts
+they refer to.
 
 These tasks are the right place to close the related work, because they are where the
 pretrained models of the earlier chapters are finally put to use and judged. Once a model has
 been built and adapted, its value shows in how well it supports named entity recognition,
-coding, and normalisation on real clinical text. The difficulties that recur across these
-tasks also frame the open problems of the field. Labelled clinical data are scarce, because
-the text is sensitive and annotation requires medical expertise. The label space can be very
-large, since coding systems contain tens of thousands of codes. Evaluation is not
-standardised, which makes results hard to compare across datasets and studies.
+coding, and normalisation on real clinical text. The difficulties that recur across these tasks
+also frame the open problems of the field. Labelled clinical data are scarce, because the text
+is sensitive and annotation requires medical expertise. The label space can be very large,
+since coding systems contain tens of thousands of codes. Evaluation is not standardised, which
+makes results hard to compare across datasets and studies.
 
 The chapter follows the structure of these tasks. It starts from the fundamentals of named
 entity recognition, then reviews biomedical and clinical benchmarks. It moves on to medical
 coding and to entity linking, before turning to zero-shot approaches and to the use of
 synthetic data. It closes with a discussion of how clinical information extraction is
 evaluated.
-
 
 \section{Named Entity Recognition}
 \label{sec:ie-ner}
@@ -75,15 +73,15 @@ Token labels are not independent, since some label sequences are not valid. An
 the two belong to different entities. Conditional random fields \citep{lafferty2001crf} model
 the dependencies between consecutive labels and assign a score to the whole sequence, which
 lets them avoid these invalid transitions. They were the standard method for NER before deep
-learning. The BiLSTM-CRF model later combined a bidirectional long short-term memory network,
-which builds a contextual representation of each token, with a CRF decoding layer on top
-\citep{lample2016ner}. It also used character-level embeddings to capture word morphology, and
-it was the state of the art before BERT.
+learning. The BiLSTM-CRF model later combined two parts: a bidirectional long short-term
+memory network, which builds a contextual representation of each token, and a CRF decoding
+layer on top \citep{lample2016ner}. It also used character-level embeddings to capture word
+morphology, and it was the state of the art before BERT.
 
 \subsection{BERT-based NER}
 
 With BERT \citep{devlin_bert_2019}, NER becomes a pretrained encoder with a linear
-classification layer placed on each token, with the whole model fine-tuned end to end. This
+classification layer on each token, and the whole model is fine-tuned end to end. This
 approach needs no handcrafted features. It often needs no CRF either, though whether a CRF
 layer still helps is debated and the reported gain is usually small. The pretrained encoder
 brings general linguistic knowledge to the task through transfer learning, so the model starts
@@ -133,13 +131,13 @@ extraction \citep{henry2020n2c2}. A few benchmarks frame biomedical extraction a
 classification rather than span labelling, such as GAD for gene-disease associations as a
 binary task \citep{bravo2015gad} and the hallmarks-of-cancer multi-label classification
 \citep{baker2016hallmarks}. To make these scattered tasks comparable, BLURB collected thirteen
-biomedical datasets into one benchmark, with PubMedBERT the first model evaluated on it
+biomedical datasets into one benchmark, and PubMedBERT was the first model evaluated on it
 \citep{gu_domain-specific_2022}.
 
 \subsection{French Benchmarks}
 
 French biomedical NER has fewer resources, but several are now standard. QUAERO is the main
-reference, with an EMEA set of drug leaflets and a MEDLINE set of scientific titles, annotated
+reference. It has an EMEA set of drug leaflets and a MEDLINE set of scientific titles, annotated
 with ten UMLS semantic groups and including nested entities \citep{neveol14quaero}. CAS
 provides clinical cases drawn from scientific articles and was used as task 3 of DEFT 2020,
 with a two-class version (CAS1) and an eight-class version (CAS2) \citep{cardon_presentation_2020}.
@@ -148,7 +146,7 @@ E3C is a multilingual corpus of clinical cases annotated with a single clinical-
 QUAERO using the BRATeval tool, and added ICD-10 coding of death certificates
 \citep{neveol_clinical_2016}.
 
-These corpora were long used in isolation, which made model comparison difficult. DrBenchmark
+These corpora were long used in isolation, which made models hard to compare. DrBenchmark
 was the first unified French biomedical benchmark, gathering twenty tasks over twelve datasets
 so that models could be compared under one protocol \citep{labrak2024drbenchmark}. Its results
 show that models pretrained on biomedical text outperform general-language models on these
@@ -162,7 +160,7 @@ of non-standard abbreviations, such as IDM for myocardial infarction and HTA for
 hypertension in French. Negation is central, since a phrase like ``no sign of pneumonia''
 mentions pneumonia while ruling it out, and the rule-based NegEx algorithm is still used as a
 baseline for detecting it \citep{chapman2001negex}. Temporality also matters, since a model
-must separate medical history, current diagnosis, and hypothesis, and expressions of
+must separate medical history, current diagnosis, and hypothesis. Expressions of
 uncertainty such as ``probable'' or ``to be ruled out'' are common. Spelling errors are
 frequent as well, because clinicians type quickly under time pressure.
 
@@ -193,18 +191,18 @@ The task is hard for several reasons. The label space is very large, with about 
 in the French version of ICD-10, about 8{,}000 CCAM codes, and about 6{,}000 ATC codes. The
 documents are long, since a discharge summary runs from 1000 to 3000 tokens, well beyond the
 512-token limit of BERT. The code distribution is very skewed, with a few codes that appear
-often and a long tail of codes that appear rarely. Finally, a single stay is multi-label, with
-one principal diagnosis and several associated diagnoses to predict at once.
+often and a long tail of codes that appear rarely. Finally, a single stay is multi-label, since
+one principal diagnosis and several associated diagnoses must be predicted at once.
 
 \subsection{Approaches}
 
 Early work treated coding as multi-label classification with attention over the document.
 \citet{mullenbach2018caml} proposed CAML, a convolutional model with one attention head per
-label, so each code attends to its own passages of text. This per-label attention also gives
-an explainable view, since it shows which words motivated each predicted code.
-\citet{cao2020hypercore} extended this idea with HyperCore, which uses the ICD hierarchy
-through hyperbolic embeddings, because hyperbolic space represents tree structures more
-naturally than Euclidean space, and which adds a graph of code co-occurrences.
+label, so each code attends to its own passages of text. This per-label attention is also
+explainable, since it shows which words motivated each predicted code.
+\citet{cao2020hypercore} extended this idea with HyperCore. It represents the ICD hierarchy
+with hyperbolic embeddings, since hyperbolic space fits tree structures better than Euclidean
+space, and it adds a graph of code co-occurrences.
 
 Pretrained language models then entered the field. \citet{huang2022plmicd} introduced PLM-ICD,
 the first model to use pretrained encoders for ICD coding, with label attention over the model
@@ -269,15 +267,15 @@ several synonyms, BioSyn aggregates scores across the synonyms of a candidate us
 objective during training. Re-ranking the retrieved candidates with the cross-encoder improves
 the final results over retrieval alone.
 
-These methods share clear limits. Most of the work is done in English and built on UMLS, which
-covers English vocabulary well but matches French clinical language poorly, with its informal
-abbreviations and local synonyms. The methods also treat each concept in isolation. They do
-not use the structure of the ontology, such as parent concepts, exclusions, and complications,
-and they ignore the RDF and SKOS relations that connect concepts, including broader, narrower,
-related, and exactMatch links.
+These methods share clear limits. Most of the work is done in English and built on UMLS. UMLS
+covers English vocabulary well, but it matches French clinical language poorly, with its
+informal abbreviations and local synonyms. The methods also treat each concept in isolation.
+They do not use the structure of the ontology, such as parent concepts, exclusions, and
+complications, and they ignore the RDF and SKOS relations that connect concepts, including
+broader, narrower, related, and exactMatch links.
 
 These methods can normalize a mention once it has been found and once its label exists in
-training, but clinical extraction needs to recognize and normalize text across thousands of
+training. But clinical extraction needs to recognize and normalize text across thousands of
 concepts never seen during training.
 
 \section{Zero-shot and Open NER}
@@ -311,9 +309,10 @@ GLiNER-BioMed \citep{zaratiana2025glinerbiomed}, fine-tunes the approach on biom
 recognition datasets and reports gains over the general GLiNER on biomedical benchmarks. This
 result shows that domain adaptation still helps even for a zero-shot model. The quality of
 such models depends heavily on their training data. UniversalNER builds its training set by
-asking ChatGPT to annotate text from the Pile, a large general corpus, which yields about
-45{,}000 instruction examples covering some 13{,}000 entity types \citep{zhou2024universalner}.
-A model tuned on this data beats ChatGPT on named entity recognition by several points.
+asking ChatGPT to annotate text from the Pile, a large general corpus
+\citep{zhou2024universalner}. This yields about 45{,}000 instruction examples covering some
+13{,}000 entity types, and a model tuned on this data beats ChatGPT on named entity
+recognition by several points.
 
 \subsection{Other Approaches}
 
@@ -338,9 +337,9 @@ biomedical models. Entity types are given as short text descriptions, which do n
 hierarchy of a medical ontology. The relations between codes, such as parent and child, mutual
 exclusion, or synonymy, are not used by the model. Performance also drops on the rare codes
 that make up the long tail of medical classifications, where examples are scarcest. Zero-shot
-named entity recognition is a promising answer to the problem of thousands of unseen labels,
-but the strongest models are trained on general web text, while clinical data are private and
-cannot be shared, which raises the question of how to train for the clinical domain without
+named entity recognition is a promising answer to the problem of thousands of unseen labels.
+But the strongest models are trained on general web text, while clinical data are private and
+cannot be shared. This raises the question of how to train for the clinical domain without
 access to real clinical data.
 
 \section{Synthetic Data for Clinical NLP}
@@ -351,9 +350,9 @@ access to real clinical data.
 Clinical text is hard to obtain because it is private. In France, the CNIL regulates the use of
 patient data, and in the United States HIPAA plays the same role. A model trained on the
 records of one hospital carries information about its patients, so it cannot be shared freely
-with another institution. This is the central obstacle for clinical information extraction: the
-data that matters most cannot leave the building where it was produced. Models and their
-training corpora are bound by the same constraints, which makes collaboration between hospitals
+with another institution. This is the central obstacle for clinical information extraction:
+the data that matters most cannot leave the hospital where it was produced. Models and their
+training corpora fall under the same rules, which makes collaboration between hospitals
 difficult.
 
 Public annotated French clinical resources exist, but they are small and not fully clinical.
@@ -377,7 +376,7 @@ model supplies labels that would otherwise require human annotators.
 For the clinical domain this pattern is attractive for a practical reason. The large model
 holds broad medical knowledge and can label text without supervision, while the small model it
 teaches is cheap to run and can be deployed inside a hospital where the data must stay. The
-expensive component does the labelling once, and the deployable component inherits much of its
+expensive model does the labelling once, and the model that is deployed inherits much of its
 behaviour. The quality of the small model then depends on how reliable the large model is as an
 annotator, which is not guaranteed for technical clinical content.
 
@@ -387,18 +386,18 @@ A second route generates clinical notes directly with language models, instead o
 existing text. \citet{ive2020synthetic} generated synthetic psychiatric records and found
 that models trained on the synthetic notes reached performance comparable to models trained on
 real notes. This was an early sign that generated text can stand in for real text in clinical
-NLP. \citet{chintagunta2021} used GPT-3 to augment medical-dialogue data, where a small set of
+NLP. \citet{chintagunta2021} used GPT-3 to augment medical-dialogue data. A small set of
 annotated examples together with generated variants matched the performance of a much larger
 annotated set, with an ensemble used to filter low-quality generations. Asclepius pushed the
-idea further by training a clinical language model entirely on synthetic notes, turning public
-case reports into realistic clinical notes with a large model and using no private clinical
+idea further by training a clinical language model entirely on synthetic notes. It turned public
+case reports into realistic clinical notes with a large model and used no private clinical
 data, and the result was competitive with models trained on real notes \citep{kweon2024asclepius}.
 
 The same work makes the limits clear. Synthetic notes often read as too clean and complete, and
 they lack the telegraphic style of real clinical writing. The generator can also produce
 stereotyped cases that under-represent rare presentations and unusual patients. When a large
 model supplies the labels rather than the text, those labels are not gold-standard expert
-annotations, and errors in them propagate to the model that learns from them. These caveats
+annotations, and errors in them pass on to the model that learns from them. These caveats
 temper the otherwise encouraging finding that generated data can replace real data.
 
 Synthetic data is one answer to the scarcity of clinical text, but it raises a further
@@ -410,8 +409,8 @@ how do we compare models that use different tokenizers on a fair footing?
 
 Before any model can be compared with another, we need to agree on how its predictions are
 scored. The way we measure performance shapes which model looks best, and the field has not
-settled on a single way to measure it. This section reviews the metrics used for clinical information
-extraction, shows how the choice of tokenizer leaks into the score, and sets out why a shared
+settled on one way to measure it. This section reviews the metrics used for clinical information
+extraction, shows how the choice of tokenizer leaks into the score, and explains why a shared
 evaluation protocol is still missing.
 
 \subsection{NER Metrics}
@@ -421,7 +420,7 @@ implemented in the seqeval tool \citep{seqeval}. Under this metric an entity cou
 only when its type and its boundaries are both exact, read off from tags in the IOB2 scheme.
 Scores can then be aggregated in two ways. The micro-average pools all entities together, so
 frequent classes carry the most weight. The macro-average computes a score per class and then
-averages those scores, so every class counts equally regardless of how often it appears. Strict
+averages those scores, so every class counts equally, however often it appears. Strict
 entity-level seqeval has become the de facto standard for named entity recognition, and most
 recent French biomedical work reports it.
 
@@ -429,13 +428,13 @@ A second tool, BRATeval, was used in the CLEF eHealth 2016 shared task
 \citep{neveol_clinical_2016}. It scores predictions against exact character offsets in the
 original text. Because it works on character positions rather than on tokens, it does not
 depend on how the text was split or otherwise preprocessed. This makes it robust to
-tokenization, although it is used far less often than seqeval and so gives fewer points of
+tokenization. It is used far less often than seqeval, so it gives fewer points of
 comparison across papers.
 
 A third approach scores each token on its own and reports a weighted F1 over all tokens. Here
-every token receives a label and is evaluated separately, rather than being grouped into
+every token receives a label and is evaluated separately, instead of being grouped into
 entities. The problem is that the ``O'' label, which marks tokens that belong to no entity, is
-by far the most frequent label and so dominates the average and inflates the reported score.
+by far the most frequent label. It therefore dominates the average and inflates the reported score.
 This token-level weighted F1 was the metric used by DrBERT \citep{labrak2023drbert}, which
 makes its numbers hard to compare with models scored under entity-level seqeval.
 
@@ -447,8 +446,8 @@ two vocabularies can diverge sharply: SciBERT found only a 42\% overlap between 
 BERT vocabulary and a vocabulary built from scientific text \citep{beltagy_scibert_2019}. A
 tokenizer that over-splits technical terms produces more tokens to predict, and therefore more
 chances to make an error. The word ``échocardiographie'' is a clear case. A general tokenizer
-breaks it into three pieces, while a specialised one breaks it into two, which changes the
-number of predictions for the same word and so changes the score. Token-level metrics are
+breaks it into three pieces, while a specialised one breaks it into two. This changes the
+number of predictions for the same word, and so changes the score. Token-level metrics are
 biased by the choice of tokenizer, and that bias is hard to separate from genuine differences
 in model quality.
 
@@ -459,7 +458,7 @@ own datasets, its own metric, its own train and test splits, and its own hyperpa
 is no standard protocol for French biomedical NLP that fixes these choices in advance. Many of
 the choices change the result on their own: a CRF layer versus a linear classification head,
 frozen versus full fine-tuning of the encoder, and micro versus macro F1 can each move the
-ranking of two models. As a consequence, comparison across published systems is difficult and
+ranking of two models. As a result, comparison across published systems is difficult and
 often unfair, since differences in the protocol are easily mistaken for differences in the
 models.
 
@@ -483,17 +482,17 @@ and together they define the questions that the rest of this thesis takes up.
 
 The first difficulty is the scarcity of clinical data. French hospital text is personal data,
 and the CNIL places strict conditions on its use. A model trained inside a hospital cannot be
-shared with other institutions, so the work done on private corpora stays local and hard to
+shared with other institutions, so work done on private corpora stays local and hard to
 reproduce. The public French resources that remain, such as QUAERO, CAS, and E3C, are small,
 and most of their content is scientific writing rather than clinical notes. This shortage of
 shareable clinical text pushes the field to look for alternatives to real hospital data.
 
 The second difficulty is the size of the label space. Clinical coding relies on systems such as
-ICD-10 and CCAM, whose tens of thousands of codes (\Cref{sec:ie-coding}) make annotating
-examples for every label infeasible. A classifier with a fixed output
-head has one slot per label and cannot handle codes it never saw in training, so the classic
-supervised recipe does not scale to this setting. The field therefore needs methods that
-generalise to labels for which no annotated example exists.
+ICD-10 and CCAM, whose tens of thousands of codes (\Cref{sec:ie-coding}) make it infeasible to
+annotate examples for every label. A classifier with a fixed output head has one slot per label.
+It cannot handle codes it never saw in training, so the classic supervised recipe does not scale
+to this setting. The field therefore needs methods that generalise to labels for which no
+annotated example exists.
 
 The third difficulty is that zero-shot extraction is not adapted to the clinic. Models such as
 GLiNER and UniversalNER recognise entities described by free-text labels, which removes the
