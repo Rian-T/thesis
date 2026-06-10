@@ -838,11 +838,15 @@ evidence above points the other way: with the right learning-rate schedule and a
 little replay, continued pretraining can match a from-scratch model at a fraction of
 the cost \citep{ibrahim2024simple}. The disagreement is not settled, and it may depend
 on the architecture. Continued pretraining has often disappointed for generative
-decoder models, where specialising on a domain can cost more in lost general ability
-than it gains, while the bidirectional, masked objective of encoders may behave
-differently. Whether continued pretraining reliably specialises a model, and how the
-answer depends on whether the model is an encoder or a decoder, is the open question
-that the next section takes up through the biomedical models built to answer it.
+decoder models: comparing biomedical large language models with their general-purpose
+counterparts, \citet{dorfner2024biomedical} found the specialised models mostly the
+weaker of the two, sometimes by a wide margin, with one eight-billion biomedical model
+scoring 30\% against 64.3\% for the general model it was built from on New England
+Journal of Medicine case challenges. The bidirectional, masked objective of encoders
+may behave differently. Whether continued pretraining reliably specialises a model,
+and how the answer depends on whether the model is an encoder or a decoder, is the open
+question that the next section takes up through the biomedical models built to answer
+it.
 
 
 \section{Modeles pretrained biomed}
