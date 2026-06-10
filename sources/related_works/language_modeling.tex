@@ -886,14 +886,13 @@ Journal of Medicine case challenges. The bidirectional, masked objective of enco
 may behave differently. The open question is whether continued pretraining reliably
 specialises a model, and how the answer depends on whether the model is an encoder or a
 decoder. The next section takes it up through the biomedical models built to answer it.
-
 \section{Biomedical Language Models}
 \label{sec:lm-biomedical}
 
 The previous section left an open question. Does continued pretraining reliably
 specialise a model, and does the answer depend on the architecture? The biomedical
-models built over the past few years are the testbed. We look at them in three groups,
-the English encoders, the French models, and the generative decoders, and the
+models built over the past few years are the testbed. We look at them in three groups:
+the English encoders, the French models, and the generative decoders. The
 from-scratch-versus-continue question runs through all three.
 
 \subsection{English Biomedical Encoders}
@@ -977,7 +976,6 @@ come at the cost of general ability and do not always survive an independent tes
 the two architectures should behave so differently is not settled, and it is one of the
 threads this thesis follows. These models, finally, are built on architectures that have
 moved on from the original Transformer, which is where we turn next.
-
 \section{Modern Architectures}
 \label{sec:lm-modern}
 
@@ -1019,7 +1017,7 @@ heads, which shrinks the cache that the model must hold while generating
 \citep{ainslie-etal-2023-gqa}; it is used in models such as Llama-2 and Mistral. RMSNorm
 simplifies layer normalisation by dropping the mean-centring step. This makes it cheaper
 to compute and is now common in large models \citep{zhang2019rmsnorm}. These are
-engineering refinements, and together they are what made large-scale and long-context
+engineering refinements, and together they made large-scale and long-context
 training practical.
 
 \subsection{Long Context}
@@ -1045,7 +1043,6 @@ current evidence, the strongest biomedical and clinical encoder
 \citep{sounack2025bioclinicalmodernbert}. It inherits the 8192-token window, which lets it
 read a full clinical note rather than a truncated fragment. These architectures still
 inherit a vocabulary and a tokenizer, which is the next lever we examine.
-
 \section{Tokenization}
 \label{sec:lm-tokenization}
 
@@ -1105,7 +1102,6 @@ between a fitted vocabulary and a cheap training path therefore stays open.
 
 Tokenizer mismatch is one of several limits that matter for a clinical, French, and
 biomedical target, and we turn to those limits next.
-
 \section{Limits and Transition}
 \label{sec:lm-limitations}
 
