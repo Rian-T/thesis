@@ -44,8 +44,6 @@ methods used to collect them, then turns to quality filtering and how it changes
 corpus contains. It then moves to biomedical and clinical sources, where this scarcity
 becomes concrete. Finally, it presents medical ontologies and discusses how such structured
 knowledge can be folded into the pretraining of language models.
-
-
 \section{Web-Scale Pretraining Corpora}
 \label{sec:corpus-web}
 
@@ -109,8 +107,6 @@ composite built for the BLOOM model \citep{laurencon2023roots}.
 These corpora give us billions to trillions of tokens of web text, but their quality varies
 enormously from one document to the next, which raises the question of how to select the
 good documents.
-
-
 \section{Data Quality and Curation}
 \label{sec:corpus-quality}
 
@@ -193,8 +189,6 @@ These methods work well for general web corpora, where text is abundant and the 
 keep the best of a large pool. The biomedical setting is different. The corpora are far
 smaller, the domain is specific, and the criteria for good text are not the same, which
 raises the prior question of what biomedical sources exist in the first place.
-
-
 \section{Biomedical and Clinical Corpora}
 \label{sec:corpus-biomed}
 
@@ -221,7 +215,7 @@ Clinical text is harder to obtain. The main reference is MIMIC
 \citep{johnson2016mimiciii, johnson2023mimiciv}, a set of clinical notes from a single
 United States hospital, the Beth Israel Deaconess Medical Center. Access is restricted and
 requires a data use agreement and ethics training. MIMIC is treated as a gold standard for
-English clinical text. But it comes from one hospital in one country, which limits how far
+English clinical text, but it comes from one hospital in one country, which limits how far
 models trained on it generalise to other settings.
 
 \subsection{Article-Level Curation for Biomedicine}
@@ -272,7 +266,6 @@ And the public French sources are fragmented and small next to PubMed and PMC.
 Biomedical corpora help models learn the vocabulary and style of medical text. But language
 models capture statistical patterns and not the explicit structure that tasks such as medical
 coding require, so we now turn to the medical ontologies that provide it.
-
 \section{Medical Ontologies and Knowledge Graphs}
 \label{sec:corpus-ontologies}
 
@@ -280,7 +273,7 @@ coding require, so we now turn to the medical ontologies that provide it.
 
 An ontology is a structured vocabulary. It records concepts, the names used to refer to
 them, and the relations between them, such as hierarchy, synonymy, and association. It
-therefore writes down explicitly the knowledge that a language model would otherwise have to
+therefore makes explicit the knowledge that a language model would otherwise have to
 learn on its own from running text. A diagnosis, the procedures that treat it, and the drugs
 prescribed for it are recorded as concepts and links, rather than left to be inferred from
 word statistics. Several large ontologies of this kind cover the biomedical domain, and a few
@@ -332,7 +325,6 @@ treatments, and links that cross from one ontology to another.
 
 This structured knowledge is rich, but it is stored as graphs rather than as the running text
 that language models expect, which raises the question of how to bring it into pretraining.
-
 \section{Knowledge-Enhanced Pretraining}
 \label{sec:corpus-knowledge}
 
@@ -397,7 +389,6 @@ generated text. National ontologies, such as the French ICD-10 maintained by the
 CCAM procedure coding, have not been used for pretraining. Contrastive methods such as SapBERT
 and CODER use UMLS through pairs of terms rather than by generating text from the graph. These
 open problems set up the limits we discuss next.
-
 \section{Limits and Transition}
 \label{sec:corpus-limitations}
 
