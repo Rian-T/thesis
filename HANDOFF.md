@@ -38,11 +38,33 @@ and `guidelines/writing-guide.md` (§7 especially), then `CLAUDE.md`.
   few-shot 3-panel prompt box, **Chinchilla scaling** plot (`plots/related_works/chinchilla_scaling.py`),
   **LLaMA-13B-vs-GPT3** bars (`plots/related_works/llama_vs_gpt3.py`), DAPT/TAPT pipeline.
 
-### TODO / NOT done
-- **5.8 Architectures modernes, 5.9 Tokenization, 5.10 Limites et transition** in
-  `language_modeling.tex` are **still telegraphic French outlines** — prosify next (same method).
-- Other RW chapters **`corpus_annotation.tex` (`chap:rw-corpus`) and `clinical_ie.tex`
-  (`chap:rw-ie`) are still telegraphic** — untouched this session.
+### Related Works — NOW FULLY PROSIFIED (all 3 chapters, drafted + reviewed)
+- `language_modeling.tex` (`chap:rw-lm`): 5.1–5.10 all prose. 5.8 Modern Architectures, 5.9
+  Tokenization, 5.10 Limits/Transition were prosified this session (DeBERTa/MosaicBERT,
+  FlashAttn/GQA/RMSNorm, Longformer/BigBird/ModernBERT; BPE/SentencePiece/Unigram + domain
+  mismatch; data-rarity/knowledge-gap/long-docs limits).
+- `corpus_annotation.tex` (`chap:rw-corpus`): 6.1–6.7 all prose (web corpora, quality/curation,
+  biomed+FR sources, ontologies, knowledge-enhanced pretraining, limits). Cross-refs
+  `sec:lm-biomedical` to avoid model redundancy.
+- `clinical_ie.tex` (`chap:rw-ie`): 7.1–7.9 all prose (NER, biomed/FR benchmarks, coding,
+  linking, zero-shot/GLiNER, synthetic data, evaluation, limits→bridge to contributions).
+- All drafted section-by-section by fable subagents (returning text, I merged), then a fable
+  REVIEW pass per chapter caught cross-section repetition + reintroduced antitheses/padding.
+  Builds clean (0 undefined). ~53 exact refs added by curl this session (5.8/5.9: flashattention,
+  mosaicbert, rmsnorm, bigbird; corpus: dodge/weber/soldaini/laurencon/rae/nemotron_cc/wettig/
+  deng/xu/liu-infinigram/johnson-mimic-iii+iv/kulumba/grover/peters-knowbert/sun-colake/yuan-coder/
+  gunasekar; clinical: lafferty/lample/li-bc5cdr/dogan/collier/pyysalo/krallinger/uzuner/henry/
+  bravo/baker/labrak-drbenchmark/chapman-negex/yang-clinicalmamba/mullenbach/cao/yuan-msmn/soroush/
+  sung/zaratiana-gliner+gliner2+glinerbiomed/zhou-universalner/sainz-gollie/bogdanov/agrawal/singhal/
+  chintagunta/ive/kweon). 2 poorly-indexed-but-real entries whitelisted (krallinger2017chemprot,
+  yang2024clinicalmamba). NOTE: zaratiana2025glinerbiomed key is mis-named — real authors are
+  Yazdani/Stepanov/Teodoro (the prose does NOT attribute it to Zaratiana; only the key is legacy).
+- Still telegraphic-free; only remaining comment is the "chapter title provisoire" note in
+  corpus_annotation.tex (a real open decision, kept).
+- UMLS count mismatch to reconcile: corpus says 3.4M concepts/16.7M names; triptych web.tex
+  (Bodenreider) says 2.5M names/900k concepts. See `research/rw_prosify_todo.md`.
+
+### TODO / NOT done (earlier items, still open)
 - **`research/clinical_verify_todo.md`**: the Harris "fewer words" claim (clinical P2) needs a
   verbatim check against Harris before submission (the vocabulary may be *different*, not smaller).
 - **Bib dedup**: GPT-3 has two entries — `gpt3` (used) and `brown2020language` (duplicate) —
