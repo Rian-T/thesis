@@ -154,12 +154,58 @@ a dead end, because its words resemble others the model has seen. This alone cut
 the perplexity of the best n-gram models by about a quarter. The embeddings turned
 out to be useful on their own. word2vec \citep{mikolov-etal-2013-linguistic} showed
 that simple arithmetic on them captures regularities of meaning. The textbook
-example is that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}.
+example is that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}
+(\Cref{fig:lm-word2vec}).
 These early vectors were still \emph{static}: one vector per word, whatever the
 sentence. ELMo \citep{peters-etal-2018-deep} made them contextual, giving a word a
 different vector in each sentence. It also showed that representations pretrained on
 plain text and then reused improve a wide range of tasks. This is an early form of
 the pretrain-then-adapt recipe the rest of this thesis depends on.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  pt/.style={circle, fill=ThesisInk, inner sep=1.6pt},
+  word/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
+    inner sep=3pt, font=\small\sffamily, text=ThesisInk},
+  target/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!30, rounded corners=2pt,
+    inner sep=3pt, font=\small\sffamily, text=ThesisInk},
+  off/.style={-{Stealth[length=2.4mm]}, ThesisInk!55, line width=0.8pt,
+    shorten >=2pt, shorten <=2pt},
+  faint/.style={-{Stealth[length=2.4mm]}, ThesisNeutral!70, dashed, line width=0.7pt,
+    shorten >=2pt, shorten <=2pt},
+]
+\coordinate (man)   at (0,0);
+\coordinate (king)  at (0.9,2.2);
+\coordinate (woman) at (3.6,0);
+\coordinate (queen) at (4.5,2.2);
+
+\draw[ThesisNeutral!35, line width=0.6pt, -{Stealth[length=2mm]}] (-0.7,-0.7) -- (5.6,-0.7);
+\draw[ThesisNeutral!35, line width=0.6pt, -{Stealth[length=2mm]}] (-0.7,-0.7) -- (-0.7,3.0);
+
+\draw[off] (man)   -- (king);
+\draw[off] (woman) -- (queen);
+\draw[faint] (man) -- (woman);
+\draw[faint] (king) -- (queen);
+
+\node[pt] at (man) {};   \node[pt] at (king) {};
+\node[pt] at (woman) {}; \node[pt] at (queen) {};
+
+\node[word, anchor=north east]   at ($(man)+(-0.05,-0.08)$)   {man};
+\node[word, anchor=south east]   at ($(king)+(-0.05,0.08)$)   {king};
+\node[word, anchor=north west]   at ($(woman)+(0.05,-0.08)$)  {woman};
+\node[target, anchor=south west]  at ($(queen)+(0.05,0.08)$)  {queen};
+
+\node[font=\scriptsize\sffamily, text=ThesisNeutral, sloped, above]
+  at ($(man)!0.5!(king)$) {royalty};
+\end{tikzpicture}
+\caption{Word embeddings place the analogy
+$\text{king}-\text{man}+\text{woman}\approx\text{queen}$ as a parallelogram, with the
+``royalty'' direction shared by both offset arrows
+\citep{mikolov-etal-2013-linguistic}.}
+\label{fig:lm-word2vec}
+\end{figure}
 
 \subsection{Recurrent networks}
 
