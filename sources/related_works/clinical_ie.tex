@@ -49,7 +49,6 @@ entity recognition, then reviews biomedical and clinical benchmarks. It moves on
 coding and to entity linking, before turning to zero-shot approaches and to the use of
 synthetic data. It closes with a discussion of how clinical information extraction is
 evaluated.
-
 \section{Named Entity Recognition}
 \label{sec:ie-ner}
 
@@ -107,7 +106,6 @@ These methods work well on general-domain text, where entities such as people, p
 organizations follow fairly regular patterns. The biomedical domain raises its own
 difficulties, including a large and technical vocabulary, frequent nested entities, negation,
 and a telegraphic clinical style, which the next section takes up.
-
 \section{Biomedical and Clinical NER}
 \label{sec:ie-biomed-ner}
 
@@ -169,12 +167,11 @@ text, which is why domain-pretrained models were developed (discussed in
 \Cref{sec:lm-biomedical}). These specialised models help, but they remain supervised, so each
 target class still needs annotated examples. One architectural alternative is ClinicalMamba,
 which adapts state-space models to clinical text with linear-time complexity in sequence
-length, which is useful for long clinical documents \citep{yang2024clinicalmamba}.
+length, useful for long clinical documents \citep{yang2024clinicalmamba}.
 
 We now have benchmarks and models for biomedical NER, but medical coding is not simply NER,
 because it assigns codes from an ontology with thousands of possible labels to a whole
 document.
-
 \section{Medical Coding}
 \label{sec:ie-coding}
 
@@ -231,7 +228,6 @@ Coding works on English benchmarks such as MIMIC, but the label space is huge, a
 examples for every one of the thousands of codes is impossible. French resources are scarcer
 still. This motivates approaches that generalise to labels never seen in training, and before
 reaching those, we first ask how to connect a mention in the text to a concept.
-
 \section{Entity Linking and Normalization}
 \label{sec:ie-linking}
 
@@ -277,7 +273,6 @@ broader, narrower, related, and exactMatch links.
 These methods can normalize a mention once it has been found and once its label exists in
 training. But clinical extraction needs to recognize and normalize text across thousands of
 concepts never seen during training.
-
 \section{Zero-shot and Open NER}
 \label{sec:ie-zeroshot}
 
@@ -341,7 +336,6 @@ named entity recognition is a promising answer to the problem of thousands of un
 But the strongest models are trained on general web text, while clinical data are private and
 cannot be shared. This raises the question of how to train for the clinical domain without
 access to real clinical data.
-
 \section{Synthetic Data for Clinical NLP}
 \label{sec:ie-synthetic}
 
@@ -389,9 +383,9 @@ real notes. This was an early sign that generated text can stand in for real tex
 NLP. \citet{chintagunta2021} used GPT-3 to augment medical-dialogue data. A small set of
 annotated examples together with generated variants matched the performance of a much larger
 annotated set, with an ensemble used to filter low-quality generations. Asclepius pushed the
-idea further by training a clinical language model entirely on synthetic notes. It turned public
-case reports into realistic clinical notes with a large model and used no private clinical
-data, and the result was competitive with models trained on real notes \citep{kweon2024asclepius}.
+idea further by training a clinical language model entirely on synthetic notes. It used a large
+model to turn public case reports into realistic clinical notes and used no private clinical
+data. The result was competitive with models trained on real notes \citep{kweon2024asclepius}.
 
 The same work makes the limits clear. Synthetic notes often read as too clean and complete, and
 they lack the telegraphic style of real clinical writing. The generator can also produce
@@ -403,7 +397,6 @@ temper the otherwise encouraging finding that generated data can replace real da
 Synthetic data is one answer to the scarcity of clinical text, but it raises a further
 question: how do we evaluate a model trained on generated data correctly, and more generally
 how do we compare models that use different tokenizers on a fair footing?
-
 \section{Evaluation}
 \label{sec:ie-evaluation}
 
@@ -469,9 +462,8 @@ tokenizers and different fine-tuning procedures, so a token-level or even an ent
 computed on one model's tokenization does not transfer cleanly to another. This points toward
 evaluation at the character level, which is independent of the tokenizer and so allows models
 of any architecture to be placed on the same scale. Such an evaluation is an open need rather
-than a solved problem, and it is this missing piece of a fair, standardised comparison that the
-closing section takes up.
-
+than a solved problem, and the closing section takes up this missing piece of a fair,
+standardised comparison.
 \section{Limits and Transition}
 \label{sec:ie-limitations}
 
