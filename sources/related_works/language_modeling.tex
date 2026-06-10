@@ -978,15 +978,14 @@ large decoders, specialising on a domain is a riskier trade, where in-domain gai
 come at the cost of general ability and do not always survive an independent test. Why
 the two architectures should behave so differently is not settled, and it is one of the
 threads this thesis follows. These models, finally, are built on architectures that have
-themselves moved on from the original Transformer, which is where we turn next.
+moved on from the original Transformer, which is where we turn next.
 
 
 \section{Modern Architectures}
 \label{sec:lm-modern}
 
-The biomedical models of the previous section are built on encoders and decoders that
-have moved well past the original Transformer. The changes are partly about quality and
-partly about cost. The same attention mechanism described in \Cref{sec:lm-transformer}
+The changes from the original Transformer are partly about quality and partly about cost.
+The same attention mechanism described in \Cref{sec:lm-transformer}
 becomes much cheaper to train and to run, and the context window grows from a few hundred
 tokens to several thousand. For clinical text the second change matters most, so this
 section ends on long documents. We first cover the encoder refinements and the attention
@@ -1042,7 +1041,7 @@ lowers the quadratic cost to something close to linear in the length. BigBird al
 window \citep{modernbert}. It combines FlashAttention, RoPE positional encoding
 (\Cref{sec:lm-transformer}), an alternation of local and global attention layers, and the
 30\% masking rate from MosaicBERT. This is the long-context recipe that
-\Cref{sec:lm-biomedical} deferred to here.
+\Cref{sec:lm-biomedical} pointed forward to.
 
 BioClinical ModernBERT carries this long-context encoder to clinical text and is, on
 current evidence, the strongest biomedical and clinical encoder
@@ -1054,8 +1053,8 @@ inherit a vocabulary and a tokenizer, which is the next lever we examine.
 \section{Tokenization}
 \label{sec:lm-tokenization}
 
-We now turn to that tokenizer. The tokenizer decides how a string of text becomes the
-discrete units a model reads. This choice shapes how well the model handles rare and
+We now turn to that tokenizer, which decides how a string of text becomes the discrete
+units a model reads. This choice shapes how well the model handles rare and
 technical words, and it carries forward into every later stage of training.
 
 \subsection{Subword Tokenization}
@@ -1144,6 +1143,6 @@ Longformer, BigBird, and ModernBERT, raise this ceiling. Using them well on clin
 still calls for adapting them to the domain, which brings the discussion back to the
 question of in-domain data.
 
-The chapter has described the models. What they need next is data. The following chapter
-turns to that side of the problem: the corpora and the structured knowledge used to
-pretrain these models, and how such resources are collected, filtered, and prepared.
+The chapter has described the models; the following chapter turns to what they need, the
+data: the corpora and the structured knowledge used to pretrain these models, and how such
+resources are collected, filtered, and prepared.

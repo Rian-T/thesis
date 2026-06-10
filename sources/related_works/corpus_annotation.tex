@@ -132,7 +132,7 @@ perplexity filtering, where a small n-gram model trained on Wikipedia scores eac
 and documents with high perplexity are treated as noise and removed. Language identification
 with fastText keeps only documents in the target language. Almost every modern pipeline
 reuses these heuristics. They remove the obvious noise, but they do not judge whether the
-content is informative, so they are necessary and not sufficient.
+content is informative.
 
 \subsection{Quality Classifiers}
 
@@ -238,7 +238,7 @@ whole articles and so still mixes relevant and non-relevant content within a sin
 A second example is the corpus used for BioClinical ModernBERT
 \citep{sounack2025bioclinicalmodernbert}, which combines PubMed, PMC, and around twenty
 clinical datasets into one large collection. Most of those clinical sources require their own
-data use agreements, so the assembled corpus cannot be considered truly public. The model
+data use agreements, so the assembled corpus is not fully public. The model
 built on it is discussed in \Cref{sec:lm-biomedical}; what matters here is that the access
 constraint sits in the clinical part of the corpus.
 
@@ -266,10 +266,10 @@ but could not be shared with other researchers \citep{dura_learning_2022}.
 
 These French results are mixed, and their cause is not settled. It is not clear whether the
 disappointing outcomes come from the corpora, which may be too small or not well targeted, or
-from the continual-pretraining method itself. The broader picture is one of scarcity on three
-fronts. Clinical text is private and in France is governed by the data-protection rules of the
-CNIL. Models trained inside one hospital cannot be shared between institutions. And the public
-French sources are fragmented and small next to PubMed and PMC.
+from the continual-pretraining method. These difficulties sharpen the clinical scarcity
+introduced earlier. Clinical text is private and in France is governed by the data-protection
+rules of the CNIL. Models trained inside one hospital cannot be shared between institutions.
+And the public French sources are fragmented and small next to PubMed and PMC.
 
 Biomedical corpora help models learn the vocabulary and style of medical text, but language
 models capture statistical patterns and not the explicit structure that tasks such as medical
@@ -338,8 +338,6 @@ that language models expect, which raises the question of how to bring it into p
 \section{Knowledge-Enhanced Pretraining}
 \label{sec:corpus-knowledge}
 
-The previous section left an open question. Ontologies hold curated knowledge, but they store
-it as graphs rather than the running text that language models read during pretraining.
 Several lines of work try to close this gap. They differ in how much of the graph they bring
 into the model and at what stage of training they do it.
 
@@ -419,10 +417,9 @@ to collect and filter text for a specific domain in a language with little data 
 open question.
 
 The second problem is the granularity of filtering. Existing biomedical curation operates at
-the level of the document or the article, as in Meditron \citep{chen2023meditron}. A single
-biomedical article can mix clinically relevant case material with sections that carry little
-clinical value, such as methods or acknowledgements. This suggests that finer, paragraph-level
-filtering is needed, yet such filtering has received little attention.
+the document or article level, as in Meditron \citep{chen2023meditron}, which leaves the
+within-article mix of relevant and irrelevant content untouched. Finer, paragraph-level
+filtering has received little attention.
 
 The third problem is that quality criteria do not transfer across domains. The educational
 criterion used by FineWeb-Edu does not match biomedical text such as clinical cases, drug

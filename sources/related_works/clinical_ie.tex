@@ -27,7 +27,7 @@ This coding is still done by hand by professional coders and reported to the ATI
 national agency for hospital information, which makes automation a practical and economic
 priority.
 
-Clinical information extraction is not a single problem but a family of related tasks. Named
+Clinical information extraction covers a family of related tasks. Named
 entity recognition finds the spans of text that mention entities of interest, such as a drug
 name or a symptom. Relation extraction identifies how these entities are connected, for
 example which drug treats which condition. Medical coding assigns ontology codes to a
@@ -212,7 +212,7 @@ representations and segment pooling to handle long documents. Its main finding i
 pretrained encoder leads to better coding, so pretraining quality matters directly for this
 task. \citet{yuan2022msmn} took a different route with MSMN, a multiple-synonym matching
 network that uses UMLS synonyms for each code. This helps because clinical text uses varied
-expressions for one concept, and myocardial infarction, MI, and heart attack all map to the
+expressions for one concept, and a synonym table lets the model match these variants to the
 same code.
 
 Large language models do poorly on coding. \citet{soroush2024gpt4coding} benchmarked GPT-4 for
@@ -328,8 +328,7 @@ matter more than any other choice. Large language models have also been applied 
 clinical named entity recognition. Early work was encouraging \citep{agrawal_large_2022,
 singhal_large_2022}, but \citet{lehman_we_2023} argued that BERT-style models remain
 competitive on extractive clinical tasks, that large models are hard to run inside a hospital,
-and that sending clinical text to a proprietary API raises confidentiality problems. Encoders
-therefore remain relevant for clinical extraction.
+and that sending clinical text to a proprietary API raises confidentiality problems.
 
 \subsection{Limits of Current Zero-shot}
 
@@ -384,8 +383,8 @@ annotator, which is not guaranteed for technical clinical content.
 
 \subsection{Generating Synthetic Clinical Notes}
 
-A second route does not annotate existing text but generates clinical notes directly with
-language models. \citet{ive2020synthetic} generated synthetic psychiatric records and found
+A second route generates clinical notes directly with language models, instead of annotating
+existing text. \citet{ive2020synthetic} generated synthetic psychiatric records and found
 that models trained on the synthetic notes reached performance comparable to models trained on
 real notes. This was an early sign that generated text can stand in for real text in clinical
 NLP. \citet{chintagunta2021} used GPT-3 to augment medical-dialogue data, where a small set of
@@ -410,10 +409,8 @@ how do we compare models that use different tokenizers on a fair footing?
 \label{sec:ie-evaluation}
 
 Before any model can be compared with another, we need to agree on how its predictions are
-scored. The previous section asked how to evaluate models trained on generated data, and how to
-compare models that do not share a tokenizer. Both questions reduce to a more basic one. The
-way we measure performance shapes which model looks best, and the field has not settled on a
-single way to measure it. This section reviews the metrics used for clinical information
+scored. The way we measure performance shapes which model looks best, and the field has not
+settled on a single way to measure it. This section reviews the metrics used for clinical information
 extraction, shows how the choice of tokenizer leaks into the score, and sets out why a shared
 evaluation protocol is still missing.
 
@@ -492,8 +489,8 @@ and most of their content is scientific writing rather than clinical notes. This
 shareable clinical text pushes the field to look for alternatives to real hospital data.
 
 The second difficulty is the size of the label space. Clinical coding relies on systems such as
-ICD-10, with about 17{,}000 codes, and CCAM, with about 8{,}000 codes. Annotating enough
-examples for every label in these systems is not feasible. A classifier with a fixed output
+ICD-10 and CCAM, whose tens of thousands of codes (\Cref{sec:ie-coding}) make annotating
+examples for every label infeasible. A classifier with a fixed output
 head has one slot per label and cannot handle codes it never saw in training, so the classic
 supervised recipe does not scale to this setting. The field therefore needs methods that
 generalise to labels for which no annotated example exists.
@@ -518,7 +515,7 @@ next. Fair comparison calls for an evaluation that does not depend on the tokeni
 A final point runs underneath all of these. Much recent attention has gone to large decoder
 models, yet for extractive clinical tasks encoder models remain competitive. They are also
 small enough to run on the hardware available inside a hospital, which matters when the data
-cannot leave the building. This keeps encoders at the centre of the work that follows.
+cannot be moved off-site. This keeps encoders at the centre of the work that follows.
 
 These three survey chapters covered the language models used in biomedical natural language
 processing, the data used to pretrain them, and the clinical tasks they are built for. The gaps
