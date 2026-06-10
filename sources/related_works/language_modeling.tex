@@ -6,22 +6,21 @@
 \section{Introduction}
 \label{sec:lm-intro}
 
-Long before there were computers, there was the idea that the next symbol in a
-text can be guessed from the ones before it. In 1913 the mathematician Andrei
-Markov tested it by hand. He took twenty thousand letters from Pushkin's
-\emph{Eugene Onegin}, reduced each to a vowel or a consonant, and counted: a vowel
-followed another vowel only 13\% of the time, but followed a consonant 66\% of the
-time \citep{markov_onegin_1913}. Letters are not independent. What comes before
-shapes what comes next, and that can be measured.
+Long before computers, people already had the idea that you can guess the next
+symbol in a text from the ones that came before. In 1913 the mathematician Andrei
+Markov tried it out by hand. He took twenty thousand letters from Pushkin's
+\emph{Eugene Onegin}, marked each one as a vowel or a consonant, and counted: a vowel
+was followed by another vowel only 13\% of the time, but by a consonant 66\% of the
+time \citep{markov_onegin_1913}. Letters do not stand alone. What comes before shapes
+what comes next, and you can measure it.
 
-Claude Shannon turned this counting into a theory. He modelled a text as a random
-source and defined its \emph{entropy}, the average information carried by each
-symbol, as
+Claude Shannon turned this counting into a theory. He treated a text as a random
+source and defined its \emph{entropy}, the average information each symbol carries, as
 \[
   H = -\sum_i p_i \log_2 p_i,
 \]
-measured in bits \citep{shannon_mi}. The quantity is largest when every symbol is
-equally likely and shrinks as some symbols become predictable.
+measured in bits \citep{shannon_mi}. This number is at its highest when every symbol
+is equally likely, and it gets smaller as some symbols become easier to guess.
 
 Shannon showed this with a simple demonstration. Generate letters independently and
 the result is noise, \emph{xfoml rxkhrjffjuj zlpwcfwkcyj}. Keep three-letter
