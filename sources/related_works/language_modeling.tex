@@ -167,38 +167,31 @@ the pretrain-then-adapt recipe the rest of this thesis depends on.
 \begin{tikzpicture}[
   font=\small\sffamily,
   pt/.style={circle, fill=ThesisInk, inner sep=1.6pt},
-  word/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
-    inner sep=3pt, font=\small\sffamily, text=ThesisInk},
-  target/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!30, rounded corners=2pt,
-    inner sep=3pt, font=\small\sffamily, text=ThesisInk},
-  off/.style={-{Stealth[length=2.4mm]}, ThesisInk!55, line width=0.8pt,
-    shorten >=2pt, shorten <=2pt},
-  faint/.style={-{Stealth[length=2.4mm]}, ThesisNeutral!70, dashed, line width=0.7pt,
-    shorten >=2pt, shorten <=2pt},
+  qpt/.style={circle, fill=ThesisSecondaryDark, inner sep=1.8pt},
+  word/.style={font=\small\sffamily, text=ThesisInk},
+  target/.style={font=\small\sffamily\bfseries, text=ThesisSecondaryDark},
+  off/.style={-{Stealth[length=2.4mm]}, ThesisPrimaryDark, line width=1pt,
+    shorten >=2.5pt, shorten <=2.5pt},
+  faint/.style={ThesisNeutral!55, dashed, line width=0.7pt},
 ]
 \coordinate (man)   at (0,0);
-\coordinate (king)  at (0.9,2.2);
-\coordinate (woman) at (3.6,0);
-\coordinate (queen) at (4.5,2.2);
+\coordinate (king)  at (1.2,2.3);
+\coordinate (woman) at (4.4,0);
+\coordinate (queen) at (5.6,2.3);
 
-\draw[ThesisNeutral!35, line width=0.6pt, -{Stealth[length=2mm]}] (-0.7,-0.7) -- (5.6,-0.7);
-\draw[ThesisNeutral!35, line width=0.6pt, -{Stealth[length=2mm]}] (-0.7,-0.7) -- (-0.7,3.0);
-
-\draw[off] (man)   -- (king);
-\draw[off] (woman) -- (queen);
+% the parallelogram sides (faint), then the two shared offsets (bold)
 \draw[faint] (man) -- (woman);
 \draw[faint] (king) -- (queen);
+\draw[off] (man)   -- (king)  node[midway, sloped, above=1pt, font=\scriptsize, text=ThesisNeutral] {royalty};
+\draw[off] (woman) -- (queen) node[midway, sloped, above=1pt, font=\scriptsize, text=ThesisNeutral] {royalty};
 
 \node[pt] at (man) {};   \node[pt] at (king) {};
-\node[pt] at (woman) {}; \node[pt] at (queen) {};
+\node[pt] at (woman) {}; \node[qpt] at (queen) {};
 
-\node[word, anchor=north east]   at ($(man)+(-0.05,-0.08)$)   {man};
-\node[word, anchor=south east]   at ($(king)+(-0.05,0.08)$)   {king};
-\node[word, anchor=north west]   at ($(woman)+(0.05,-0.08)$)  {woman};
-\node[target, anchor=south west]  at ($(queen)+(0.05,0.08)$)  {queen};
-
-\node[font=\scriptsize\sffamily, text=ThesisNeutral, sloped, above]
-  at ($(man)!0.5!(king)$) {royalty};
+\node[word,   below=2pt]       at (man)   {man};
+\node[word,   left=2pt]        at (king)  {king};
+\node[word,   below=2pt]       at (woman) {woman};
+\node[target, right=2pt]       at (queen) {queen};
 \end{tikzpicture}
 \caption{Word embeddings place the analogy
 $\text{king}-\text{man}+\text{woman}\approx\text{queen}$ as a parallelogram, with the
