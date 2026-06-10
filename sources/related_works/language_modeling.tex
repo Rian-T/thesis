@@ -804,11 +804,11 @@ in-domain corpus, then task-adaptive pretraining on the task's own unlabelled te
 \medskip
 
 This second phase is one case of a broader topic. A recent survey divides continual
-learning for language models into continued pretraining, continual instruction
-tuning, and continual alignment, and sorts the methods that protect earlier knowledge
-into replay, regularisation, and architecture-based families \citep{shi2025continual}.
-The rest of this section keeps to the first case, continued pretraining, since it is
-the one this thesis uses.
+learning for language models into three settings: continued pretraining, continual
+instruction tuning, and continual alignment. It sorts the methods that protect earlier
+knowledge into replay, regularisation, and architecture-based families
+\citep{shi2025continual}. The rest of this section keeps to the first setting,
+continued pretraining, since it is the one this thesis uses.
 
 \subsection{Catastrophic Forgetting}
 
@@ -824,7 +824,7 @@ it began with. The danger is uneven. \citet{yildiz2024continual} report that sma
 models are the most sensitive, showing the highest rates of both learning and
 forgetting, so a small domain encoder is more exposed than a large one.
 
-Not every drop in a benchmark score is true forgetting. \citet{zheng2025spurious}
+A drop in a benchmark score is not always true forgetting. \citet{zheng2025spurious}
 argue that the early steps of a new training phase often disturb a model's
 \emph{alignment}, its learned way of exposing what it knows, more than its knowledge.
 In their words, ``performance drops often reflect a decline in task alignment rather
@@ -834,8 +834,8 @@ that it does not disturb more than it must.
 
 \subsection{Making Continual Pretraining Work}
 
-Recent work shows that, done carefully, continued pretraining need not forget and need
-not cost much. \citet{ibrahim2024simple} reduce the recipe to three ingredients. The
+Recent work shows that, done carefully, continued pretraining can avoid forgetting and
+stay cheap. \citet{ibrahim2024simple} reduce the recipe to three ingredients. The
 learning rate has decayed to almost nothing by the end of pretraining, so they re-warm
 it, then re-decay it, and they replay a small fraction of the original data alongside
 the new domain. This combination, they report, is ``sufficient to match the
@@ -844,7 +844,7 @@ only a fraction of the compute'', and they verify it at both the 405-million and
 10-billion parameter scales. So continued pretraining can reach the same place as
 starting over, far more cheaply.
 
-Two refinements sharpen this. First, less data can be better than more. Choosing a
+Two refinements sharpen this. First, less data can work better than more. Choosing a
 small, relevant slice of the domain corpus rather than all of it can match or beat
 training on the whole. \citet{xie2024efficientcpt} report data-selection strategies
 that ``outperform vanilla continual pre-training's performance with just 10\% of
@@ -860,7 +860,7 @@ schedule, the amount of replay, and the choice of data.
 \subsection{From Scratch or Continue?}
 
 The alternative to continuing is to pretrain a specialised model from scratch on
-in-domain text. The two poles have canonical biomedical examples. BioBERT continued
+in-domain text. Each pole has a canonical biomedical example. BioBERT continued
 the pretraining of BERT on PubMed abstracts and full-text articles
 \citep{lee_biobert_2019}, the continued-pretraining route. PubMedBERT was instead
 pretrained from scratch on biomedical text, with a vocabulary built from that text
@@ -878,25 +878,23 @@ evidence above points the other way. With the right learning-rate schedule and a
 little replay, continued pretraining can match a from-scratch model at a fraction of
 the cost \citep{ibrahim2024simple}. The disagreement is not settled, and it may depend
 on the architecture. Continued pretraining has often disappointed for generative
-decoder models. Comparing biomedical large language models with their general-purpose
-counterparts, \citet{dorfner2024biomedical} found the specialised models mostly the
+decoder models. \citet{dorfner2024biomedical} compared biomedical large language models
+with their general-purpose counterparts and found the specialised models mostly the
 weaker of the two, sometimes by a wide margin. One eight-billion biomedical model
 scored 30\% against 64.3\% for the general model it was built from on New England
 Journal of Medicine case challenges. The bidirectional, masked objective of encoders
-may behave differently. Whether continued pretraining reliably specialises a model,
-and how the answer depends on whether the model is an encoder or a decoder, is the open
-question that the next section takes up through the biomedical models built to answer
-it.
-
+may behave differently. The open question is whether continued pretraining reliably
+specialises a model, and how the answer depends on whether the model is an encoder or a
+decoder. The next section takes it up through the biomedical models built to answer it.
 
 \section{Biomedical Language Models}
 \label{sec:lm-biomedical}
 
-The previous section left an open question: does continued pretraining reliably
+The previous section left an open question. Does continued pretraining reliably
 specialise a model, and does the answer depend on the architecture? The biomedical
 models built over the past few years are the testbed. We look at them in three groups,
 the English encoders, the French models, and the generative decoders, and the
-from-scratch-versus-continue split runs through all three.
+from-scratch-versus-continue question runs through all three.
 
 \subsection{English Biomedical Encoders}
 
@@ -905,25 +903,25 @@ the pretraining of BERT on PubMed abstracts and full-text articles, and reported
 gains over the general model: about half a point of F1 on biomedical named-entity
 recognition, nearly three on relation extraction, and twelve points of mean reciprocal
 rank on question answering \citep{lee_biobert_2019}. The gains were real and the recipe
-was cheap, since it reused the existing weights, and this established the
-mixed-domain paradigm: start from a general model, keep training on domain text.
+was cheap, since it reused the existing weights. This established the
+mixed-domain paradigm: start from a general model, then keep training on domain text.
 
 A second line questioned that paradigm by training from scratch, with a vocabulary
-built from domain text rather than inherited. SciBERT measured what is at stake:
-between BERT's general vocabulary and one learned from scientific text, only 42\% of
-frequent tokens overlap, so more than half of the common scientific words are split
-into pieces by a general tokenizer \citep{beltagy_scibert_2019}. Training from scratch
+built from domain text rather than inherited. SciBERT measured what is at stake.
+Between BERT's general vocabulary and one learned from scientific text, only 42\% of
+frequent tokens overlap, so a general tokenizer splits more than half of the common
+scientific words into pieces \citep{beltagy_scibert_2019}. Training from scratch
 on 1.14 million papers fixes this. PubMedBERT made the strongest version of the claim:
 pretraining from scratch on biomedical text, with an in-domain vocabulary, ``substantially
 outperforms continual pretraining of generic language models'', and they released the
 BLURB benchmark that became the standard yardstick for the field \citep{gu_domain-specific_2022}.
-BioLinkBERT added a twist, pretraining from scratch on PubMed with its citation links so
+BioLinkBERT added a twist. It pretrained from scratch on PubMed with its citation links so
 that related documents are seen together, for a further gain on biomedical question
 answering \citep{yasunaga-etal-2022-linkbert}. Clinical text adds a constraint of its
-own: ClinicalBERT was trained on the notes of the MIMIC-III intensive-care database, and
-while its weights are public the underlying notes are not, sitting behind credentialed
+own. ClinicalBERT was trained on the notes of the MIMIC-III intensive-care database, and
+while its weights are public the underlying notes are not, since they sit behind credentialed
 access \citep{alsentzer-etal-2019-publicly}. The current strongest encoder follows the
-continued route again, on a far larger and more varied corpus: BioClinical ModernBERT
+continued route again, on a far larger and more varied corpus. BioClinical ModernBERT
 continues a modern long-context encoder on more than 53 billion tokens drawn from twenty
 datasets across institutions \citep{sounack2025bioclinicalmodernbert}, with the
 architectural changes that make it long-context deferred to \Cref{sec:lm-modern}.
@@ -935,7 +933,7 @@ made a point that matters for low-resource work: about four gigabytes of text ga
 results ``as good as those obtained using larger datasets (130+GB)''
 \citep{martin-etal-2020-camembert}. FlauBERT appeared in parallel, trained on a
 heterogeneous French corpus \citep{le-etal-2020-flaubert}. Later models refreshed the
-recipe: CamemBERTa adopted the DeBERTaV3 architecture and its replaced-token-detection
+recipe. CamemBERTa adopted the DeBERTaV3 architecture and its replaced-token-detection
 objective for better data efficiency \citep{antoun-etal-2023-camemberta}, and CamemBERT~2.0
 retrained the family on newer data to counter the drift of language over time
 \citep{antoun2024camembert2}.
@@ -944,22 +942,22 @@ The two dedicated French biomedical encoders were both trained from scratch. DrB
 trained a RoBERTa model on NACHOS, a corpus of French biomedical and clinical text, and
 its experiments argued for the from-scratch route: models trained from scratch gave the
 best results, and continuing the pretraining of a French general model never reached the
-top on any of their tasks \citep{labrak2023drbert}. The picture is not one-sided, though,
-even in their own results: continuing the pretraining of an \emph{English} biomedical
+top on any of their tasks \citep{labrak2023drbert}. The picture is not one-sided, even
+in their own results. Continuing the pretraining of an \emph{English} biomedical
 model on French data did work, which they read as cross-lingual transfer. They also found
 that publicly available biomedical text could match or beat private hospital data, a
 point that bears directly on the use of public corpora for the clinic. AliBERT, the other
-French biomedical encoder, was likewise trained from scratch, with a regularised Unigram
-tokenizer built for the domain \citep{berhe:hal-03911564}. Whether continuing from a
-French general model can be made to match a from-scratch biomedical one is, on this
-evidence, still an open question.
+French biomedical encoder, was also trained from scratch, with a regularised Unigram
+tokenizer built for the domain \citep{berhe:hal-03911564}. On this evidence, whether
+continuing from a French general model can be made to match a from-scratch biomedical one
+is still an open question.
 
 \subsection{Biomedical Decoders}
 
 Generative models were specialised in the same way, by continuing the pretraining of a
 general large language model on medical text, but at a much larger scale. BioMistral
 continued Mistral~7B on PubMed Central and reported that the adapted model beat the
-general instruction-tuned Mistral on eight of ten medical question-answering tasks; to
+general instruction-tuned Mistral on eight of ten medical question-answering tasks. To
 keep the general ability that specialisation can erode, the authors also merged the
 domain and general models, combining their strengths \citep{labrak-etal-2024-biomistral}.
 Meditron continued Llama-2, at seven and seventy billion parameters, on a curated
@@ -969,17 +967,16 @@ on medical benchmarks \citep{chen2023meditron}. PMC-LLaMA continued LLaMA on bio
 papers and books \citep{wu2024pmcllama}.
 
 Each of these reports gains on its own medical benchmarks, yet a broader picture is more
-sober. Evaluating biomedical models against the general models they were built from, on
-tasks chosen to fall outside the fine-tuning data, \citet{dorfner2024biomedical} found
-the specialised models mostly the weaker of the two, especially away from pure medical
+sober. \citet{dorfner2024biomedical} evaluated biomedical models against the general
+models they were built from, on tasks chosen to fall outside the fine-tuning data, and
+found the specialised models mostly the weaker of the two, especially away from pure medical
 knowledge. The contrast with the encoders is the lesson of this section. For encoders,
-continued pretraining on domain text is close to a default win on extraction tasks; for
+continued pretraining on domain text is close to a default win on extraction tasks. For
 large decoders, specialising on a domain is a riskier trade, where in-domain gains can
 come at the cost of general ability and do not always survive an independent test. Why
 the two architectures should behave so differently is not settled, and it is one of the
 threads this thesis follows. These models, finally, are built on architectures that have
 moved on from the original Transformer, which is where we turn next.
-
 
 \section{Modern Architectures}
 \label{sec:lm-modern}
