@@ -981,107 +981,169 @@ threads this thesis follows. These models, finally, are built on architectures t
 themselves moved on from the original Transformer, which is where we turn next.
 
 
-\section{Architectures modernes}
+\section{Modern Architectures}
 \label{sec:lm-modern}
 
-\subsection{Modernisation des encoders}
+The biomedical models of the previous section are built on encoders and decoders that
+have moved well past the original Transformer. The changes are partly about quality and
+partly about cost. The same attention mechanism described in \Cref{sec:lm-transformer}
+becomes much cheaper to train and to run, and the context window grows from a few hundred
+tokens to several thousand. For clinical text the second change matters most, so this
+section ends on long documents. We first cover the encoder refinements and the attention
+engineering that made them possible.
 
-DeBERTa (He et al., ICLR 2021):
-\begin{itemize}
-  \item Disentangled attention: separe contenu et position
-  \item Premier a battre l'humain sur SuperGLUE
-  \item -> influence sur ModernBERT, CamemBERT 2.0
-\end{itemize}
+\subsection{Modernising the Encoder}
 
-MosaicBERT (Portes et al., NeurIPS 2023):
-\begin{itemize}
-  \item 30\% masking au lieu de 15\% BERT
-  \item FlashAttention + ALiBi + GLU + unpadding
-  \item BERT-base en 1.13h sur 8x A100 (\~{}\$20)
-  \item -> fondation directe de ModernBERT
-\end{itemize}
+Two encoder lines feed directly into the models used today. DeBERTa changed how a token's
+content and position are combined \citep{deberta}. The original Transformer adds a
+position vector to each word vector, so the two signals are mixed before attention sees
+them. DeBERTa keeps them apart, with one vector for content and one for position, and lets
+attention use the two separately, an idea its authors call disentangled attention. The
+model was the first to pass the human baseline on the SuperGLUE benchmark, and the design
+influenced later encoders, including ModernBERT and CamemBERT~2.0.
+
+A second line attacked the cost of pretraining. MosaicBERT is a recipe for training a
+BERT-style encoder cheaply \citep{portes2023mosaicbert}. It raises the masking rate to
+30\%, against BERT's 15\%, so each example teaches the model more, and it stacks several
+engineering changes: FlashAttention, ALiBi position information, gated linear units, and
+the removal of padding tokens from the computation. Together these let the authors train a
+BERT-base model in about 1.13 hours on eight A100 GPUs, for roughly twenty dollars. This
+recipe is the direct foundation of ModernBERT.
 
 \subsection{Efficient Attention}
 
-FlashAttention (Dao et al., 2022):
-\begin{itemize}
-  \item Reorganise le calcul pour la hierarchie memoire GPU (tiling, kernel fusion)
-  \item Meme $O(L^2)$ mais 2-4x plus rapide en pratique
-  \item Standard maintenant
-\end{itemize}
+The encoder gains above rest on a handful of changes to attention and normalisation.
+FlashAttention reorganises the attention computation to fit the memory hierarchy of the
+GPU, using tiling and kernel fusion so that intermediate results stay in fast memory
+\citep{dao2022flashattention}. The arithmetic cost is still the $O(L^2)$ of
+\Cref{sec:lm-transformer}, but avoiding slow memory reads and writes makes it two to four
+times faster in practice, and it is now a standard component. Grouped-query attention
+addresses memory at inference time by sharing key and value heads across several query
+heads, which shrinks the cache that the model must hold while generating
+\citep{ainslie-etal-2023-gqa}; it is used in models such as Llama-2 and Mistral. RMSNorm
+simplifies layer normalisation by dropping the mean-centring step, which makes it cheaper
+to compute and is now common in large models \citep{zhang2019rmsnorm}. These are
+engineering refinements, and together they are what made large-scale and long-context
+training practical.
 
-Autres:
-\begin{itemize}
-  \item GQA (Ainslie et al., 2023): partage de KV-heads -> Llama-2, Mistral
-  \item RMSNorm (Zhang \& Sennrich, 2019): LayerNorm simplifie
-\end{itemize}
+\subsection{Long Context}
 
-\subsection{Long context}
+Context length is a concrete limit for clinical work. BERT accepts at most 512 tokens,
+while a hospital discharge summary often runs past 2000 tokens. Feeding such a document to
+BERT means cutting it short, and the part that is dropped may carry the diagnosis, the
+treatment, or the outcome. The model then never sees information that the task depends on.
 
-Le probleme: BERT = 512 tokens, comptes-rendus cliniques = souvent 2000+. Tronquer = perdre de l'info diagnostique.
+Several architectures push the limit up. Longformer reaches 4096 tokens by replacing full
+attention with a sliding window, where each token attends to its neighbours, plus a small
+number of global tokens that attend to everything \citep{beltagy2020longformer}. This
+lowers the quadratic cost to something close to linear in the length. BigBird also reaches
+4096 tokens, with a sparse pattern that combines local, global, and random connections
+\citep{zaheer2020bigbird}. ModernBERT goes further, to 8192 tokens, sixteen times BERT's
+window \citep{modernbert}. It combines FlashAttention, RoPE positional encoding
+(\Cref{sec:lm-transformer}), an alternation of local and global attention layers, and the
+30\% masking rate from MosaicBERT. This is the long-context recipe that
+\Cref{sec:lm-biomedical} deferred to here.
 
-\begin{itemize}
-  \item Longformer (Beltagy et al., 2020): 4096 tokens, sliding window + global attention
-  \item BigBird (Zaheer et al., 2020): 4096, sparse attention
-  \item Clinical Longformer (Li et al., 2022): 4096, Longformer continue pretrained sur MIMIC-III
-  \item ModernBERT (Warner et al., 2024): 8192 tokens
-    \begin{itemize}
-      \item FlashAttention v2/v3
-      \item RoPE
-      \item Alternance local/global attention
-      \item 30\% masking (de MosaicBERT)
-      \item -> 16x le contexte de BERT
-    \end{itemize}
-\end{itemize}
-
-Adaptations cliniques 2025:
-\begin{itemize}
-  \item Clinical ModernBERT (Lee et al., 2025): PubMed + MIMIC-IV + ontologies
-  \item BioClinical ModernBERT (2025): 53.5B tokens, 20 datasets cliniques -> SOTA actuel
-\end{itemize}
-
-% TODO tableau
+BioClinical ModernBERT carries this long-context encoder to clinical text and is, on
+current evidence, the strongest biomedical and clinical encoder
+\citep{sounack2025bioclinicalmodernbert}. It inherits the 8192-token window, which lets it
+read a full clinical note rather than a truncated fragment. These architectures still
+inherit a vocabulary and a tokenizer, which is the next lever we examine.
 
 
 \section{Tokenization}
 \label{sec:lm-tokenization}
 
-\subsection{Methodes subword}
+We now turn to that tokenizer. The tokenizer decides how a string of text becomes the
+discrete units a model reads. This choice shapes how well the model handles rare and
+technical words, and it carries forward into every later stage of training.
 
-\begin{itemize}
-  \item BPE (Sennrich et al., 2016): merge les paires les plus frequentes
-  \item SentencePiece (Kudo \& Richardson, 2018): language-independent
-  \item Unigram (Kudo, 2018): selection probabiliste
-\end{itemize}
+\subsection{Subword Tokenization}
 
-\subsection{Domain mismatch}
+A tokenizer first has to solve a coverage problem. A model with a fixed vocabulary of
+whole words can only represent the words it has seen, and any rare or unseen word becomes
+an out-of-vocabulary token that the model cannot read. Subword tokenization avoids this by
+splitting rare words into smaller pieces that are already in the vocabulary. A common word
+stays as one unit, while a rare word is broken into several known parts. Any word can then
+be represented as a sequence of subword units, so the out-of-vocabulary problem
+disappears.
 
-SciBERT: vocab general vs scientifique = 42\% intersection seulement.
+The most widely used method is byte-pair encoding, often called BPE
+\citep{sennrich-etal-2016-neural}. It starts from individual characters and repeatedly
+merges the most frequent adjacent pair of units. Each merge adds a new, slightly longer
+piece to the vocabulary, so frequent sequences become single units while rare sequences
+stay split. After a fixed number of merges, the result is a vocabulary of common subword
+pieces that balances short frequent words against longer rare ones.
 
-Exemple biomed francais:
-\begin{itemize}
-  \item Tokenizer general: ``echocardiographie'' -> [``echo'', ``\#\#cardi'', ``\#\#ographie'']
-  \item Tokenizer domaine: ``echocardiographie'' -> [``echocardiographi'', ``e'']
-\end{itemize}
+SentencePiece is a language-independent tokenizer that works directly on raw text
+\citep{kudo_sentencepiece_2018}. It does not need the text to be split into words
+beforehand, which helps for languages that do not mark word boundaries with spaces. It
+treats the input as a raw stream of characters and learns its subword units from that
+stream. CamemBERT used SentencePiece to build its vocabulary. A related method is the
+unigram language model \citep{kudo-2018-subword}. It selects subword units with a
+probabilistic model rather than by greedy merging, and it can sample several different
+segmentations of the same text, which is useful as a form of regularization during
+training.
 
-Tradeoff:
-\begin{itemize}
-  \item From-scratch = vocab custom mais cher
-  \item Continual PT = tokenizer sous-optimal mais efficient
-\end{itemize}
+\subsection{Domain Mismatch}
+
+A tokenizer trained on general text is a poor fit for a technical domain. SciBERT measured
+this gap directly \citep{beltagy_scibert_2019}. Between the general vocabulary of BERT and
+a vocabulary learned from scientific text, only 42\% of the frequent tokens overlap. More
+than half of the common scientific words are therefore split into pieces by the general
+tokenizer. The model has to reassemble each technical term from generic fragments, which
+makes those terms harder to learn and to represent.
+
+The same mismatch appears in French biomedical text. A general French tokenizer splits a
+technical term such as ``échocardiographie'' into several generic pieces, for example
+``écho'', ``cardi'', and ``ographie''. A tokenizer trained on biomedical text keeps the
+same term nearly whole, as one or two units. Over-splitting makes technical terms longer
+in tokens and harder for the model to handle, and biomedical text is full of such terms.
+
+This connects back to the from-scratch-versus-continue question of \Cref{sec:lm-continual}.
+Training a model from scratch lets it build a vocabulary fitted to the domain, so technical
+terms stay compact. This route is expensive, because it needs a large corpus and a long
+training run. Continuing the pretraining of a general model is much cheaper, but the model
+is stuck with a general-purpose tokenizer that over-splits domain terms. The vocabulary is
+fixed once the general model is built, so continual pretraining cannot repair it. This
+tension between a fitted vocabulary and a cheap training path stays open.
+
+Tokenizer mismatch is one of several limits that matter for a clinical, French, and
+biomedical target, and we turn to those limits next.
 
 
-\section{Limites et transition}
+\section{Limits and Transition}
 \label{sec:lm-limitations}
 
-\begin{itemize}
-  \item Rarete des donnees: texte clinique prive (CNIL), modeles hospitaliers pas partageables
-    -> besoin d'alternatives publiques -> Ch.3 Corpus Annotation
-  \item Knowledge gap: LMs captent des patterns, pas la structure des ontologies. Codage medical = connaissances hierarchiques
-    -> approches knowledge-enhanced -> Ch.4 Clinical IE
-  \item Documents longs: comptes-rendus hospitaliers depassent les limites de BERT. Longformer et ModernBERT aident mais faut adapter au domaine
-\end{itemize}
+This chapter followed language modeling from Shannon and n-grams to neural and recurrent
+models, then to the Transformer and its two main pretraining objectives. It then covered
+scaling laws and large language models, with instruction tuning, alignment, and reasoning,
+and the use of continual pretraining to specialise a model to a domain. It closed on
+biomedical models, efficient attention, long context, and tokenization. The thread running
+through all of it is the target of this thesis: text that is at once French, biomedical,
+and clinical. Seen from that target, the methods above share a set of limits, and each of
+these limits points away from the models and toward the data they need.
 
--> ce chapitre a couvert les fondations techniques du language modeling. Le chapitre suivant traite de comment construire et annoter des corpus pour entrainer ces modeles.
+The first limit is data rarity. Every method here assumes a large in-domain corpus, either
+to pretrain a model from scratch or to continue training an existing one. For clinical text
+that assumption does not hold. Clinical notes are private and regulated, in France under
+the CNIL, and a model trained inside one hospital cannot be shared with another
+institution. This is why public sources of biomedical text become attractive, and it
+raises a practical question that the models alone do not answer: how to build a corpus that
+is usable and shareable.
 
-% TODO rediger la transition proprement
+The second limit is a knowledge gap. Language models learn the statistical patterns of
+text, and they pick up many facts along the way. They do not absorb the explicit structure
+of medical ontologies, the hierarchies and relations that medical coding schemes such as
+ICD-10 depend on. That structured knowledge is needed for clinical tasks, and capturing it
+is a different problem from modeling running text.
+
+The third limit is document length. Hospital reports are often long and exceed the input
+size of standard encoders. The long-context architectures of \Cref{sec:lm-modern}, such as
+Longformer, BigBird, and ModernBERT, raise this ceiling. Using them well on clinical text
+still calls for adapting them to the domain, which brings the discussion back to the
+question of in-domain data.
+
+The chapter has described the models. What they need next is data. The following chapter
+turns to that side of the problem: the corpora and the structured knowledge used to
+pretrain these models, and how such resources are collected, filtered, and prepared.
