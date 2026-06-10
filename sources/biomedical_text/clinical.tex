@@ -114,53 +114,52 @@ sets the transfer in motion. The note is a document with real authority, signed 
 legally binding.
 
 % === P8 ===
-The layout of the note also has roots. Each finding is tied to a place in the body,
-so the patient appears as a list of lesions. This way of looking at the body grew out
-of the clinical gaze that took shape in the modern hospital \citep{foucault_clinique_1963}.
+The shape of the note also has roots. Each finding is tied to a place in the body, so
+the patient comes across as a list of lesions. This way of seeing the body grew out of
+the clinical gaze that formed in the modern hospital \citep{foucault_clinique_1963}.
 
 % === P9 ===
-The note stays inside the hospital for a plainer reason: it is full of personal data.
-One report can hold the patient's name, age, and dates, a home address, a family
-situation, and a diagnosis rare enough to point to one person. Stripping out the
-obvious identifiers does not solve this. A pseudonymised note is still not anonymous,
-and a model trained on such text can memorise what it read and later give it back
-\citep{tannier_parhaf_2026}. Confidentiality is not a rule laid on top of the text. It
-is part of what the text is.
+The note stays inside the hospital for a simpler reason. It is full of personal data.
+A single report can hold the patient's name, age, and dates, a home address, a family
+situation, and a diagnosis rare enough to point to one person. Removing the obvious
+identifiers does not fix this. A pseudonymised note is still not anonymous, and a
+model trained on such text can memorise what it read and later repeat it
+\citep{tannier_parhaf_2026}. Confidentiality is not a rule added on top of the text.
+It is part of what the text is.
 
 % === P10 ===
-For French the problem is sharper. There is no shareable corpus of real French
-hospital records to set beside the large English ones, and there has been none for a
-decade \citep{neveol_clinical_2018}. Public text takes its place: published case
-reports, drug leaflets, article abstracts. But a case report is written to teach. It
-reads like a short story, in full sentences and the past tense, as in this opening
-from a French case corpus: \emph{``B.A., âgé de 36 ans, sans antécédents notables, a
-été admis en février 1994 pour des douleurs lombaires droites''} \citep{grabar_cas_2020}.
-Set against the clipped lines of the note in \Cref{fig:bt-clinical-note}, the gap is
-easy to see.
+For French the problem is worse. There is no shareable corpus of real French hospital
+records to place beside the large English ones, and there has been none for a decade
+\citep{neveol_clinical_2018}. Public text takes its place: published case reports,
+drug leaflets, article abstracts. But a case report is written to teach. It reads like
+a short story, in full sentences and the past tense, as in this opening from a French
+case corpus: \emph{``B.A., âgé de 36 ans, sans antécédents notables, a été admis en
+février 1994 pour des douleurs lombaires droites''} \citep{grabar_cas_2020}. Next to
+the clipped lines of the note in \Cref{fig:bt-clinical-note}, the gap is easy to see.
 
-Whether these substitutes really match hospital notes is an open argument. The team
-behind the case-report corpus is hopeful: the clinical part of a published case, they
+Whether these stand-ins really match hospital notes is still being argued. The team
+behind the case-report corpus is hopeful. The clinical part of a published case, they
 say, can be close enough to a real note that tools built on it still work on hospital
 text \citep{grabar_cas_2020}. They also name the limits. Real notes are full of
-misspellings, carry administrative boilerplate, and present examinations and lab
+misspellings, carry administrative boilerplate, and lay out examinations and lab
 values in tables, while a published case rewrites all of this as clean sentences. A
 more recent project sees it differently. In building PARHAF, a corpus of 7{,}394
-fictitious reports hand-written by 104 medical residents, its authors say flatly that
-``the style of case reports [\ldots] is quite different from that of electronic health
-records'' \citep{tannier_parhaf_2026}. They wrote fake reports from scratch because
-the real ones, even pseudonymised, cannot be shared. The field still cannot agree on
-whether the text it may share even resembles the text it cannot, and the text we most
-want to model remains the text we can least obtain.
+fictitious reports written by hand by 104 medical residents, its authors say plainly
+that ``the style of case reports [\ldots] is quite different from that of electronic
+health records'' \citep{tannier_parhaf_2026}. They wrote fake reports from scratch
+because the real ones, even pseudonymised, cannot be shared. The field still cannot
+agree on whether the text it may share even looks like the text it cannot, and the
+text we most want to model stays the text we can least obtain.
 
 % === P11 ===
-Put together, these traits explain why the clinical note is so hard to get. It is rare
-because it is private, and private because of what it is: a closed sublanguage,
-written in compressed form for an expert in-group, packed with personal data, and
+Taken together, these traits explain why the clinical note is so hard to get. It is
+rare because it is private, and private because of what it is: a closed sublanguage,
+written in compressed form for an expert group, packed with personal data, and
 carrying out acts with legal weight. The note is not scarce by accident. It is scarce
 because of what it is.
 
 % === P12 ===
 Yet medicine produces text in huge amounts. Most of it is not the clinical note at
-all, but the published literature, which is plentiful and free to read. That sets up
+all, but the published literature, which is plentiful and free to read. This sets up
 the question for the next chapter: can this abundance stand in for the language of the
 clinic?
