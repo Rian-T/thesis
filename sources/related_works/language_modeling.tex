@@ -354,10 +354,10 @@ objective, the subject of the next section.
 \section{Pretraining Objectives}
 \label{sec:lm-objectives}
 
-The architecture fixes how a model reads its context; the pretraining objective
-fixes what it is asked to predict, and that choice shapes the representations it
-learns. Two objectives dominate, and they differ in a way that matters for the rest
-of this thesis (\Cref{fig:lm-objectives}).
+The architecture sets how a model reads its context. The pretraining objective
+sets what it must predict. That choice shapes the representations it learns. Two
+objectives dominate, and they differ in a way that matters for the rest of this
+thesis (\Cref{fig:lm-objectives}).
 
 \begin{figure}[t]
 \centering
@@ -414,52 +414,52 @@ token carries is what the encoder pretraining of \Cref{chap:objectives} exploits
 \subsection{Causal language modeling}
 
 The most direct objective follows the chain rule: predict the next token. The model
-reads the sequence once and, at each position $t$, produces a probability
-distribution over the vocabulary for the token that should come next. Training
-lowers the negative log-probability it assigns to the token that actually follows,
-summed over the whole sequence,
+reads the sequence once. At each position $t$, it gives a probability distribution
+over the vocabulary for the token that should come next. Training lowers the
+negative log-probability it assigns to the token that actually follows, summed over
+the whole sequence,
 \[
   \mathcal{L}_{\text{CLM}} = -\sum_{t=1}^{L} \log P(w_t \mid w_{<t}),
 \]
-where $w_{<t}$ is the tokens before position $t$. A causal mask is what lets this
-happen in a single pass: each position may look only to its left, so the model can
-be scored at every position at once without seeing the very token it must predict.
-Every position therefore yields a prediction and a gradient, so the supervision is
-dense. This is the objective behind GPT \citep{Radford2018ImprovingLU} and the
-modern decoder models, and it fits generation naturally: at inference the model does
-exactly what it was trained to do, continue the text.
+where $w_{<t}$ is the tokens before position $t$. A causal mask lets this happen in
+a single pass. Each position may look only to its left, so the model can be scored
+at every position at once without seeing the token it must predict. Every position
+therefore gives a prediction and a gradient, so the supervision is dense. This is
+the objective behind GPT \citep{Radford2018ImprovingLU} and the modern decoder
+models. It also fits generation well: at inference the model does exactly what it
+was trained to do, continue the text.
 
 \subsection{Masked language modeling}
 
 Understanding a text, rather than continuing it, calls for a different objective.
 BERT \citep{devlin_bert_2019} corrupts the input by replacing some tokens with a
-special \texttt{[MASK]} symbol, then trains the model to put the originals back. At
-each masked position the model predicts the missing token from the context on both
-sides, and the loss counts only those positions,
+special \texttt{[MASK]} symbol. It then trains the model to put the originals back.
+At each masked position the model predicts the missing token from the context on
+both sides, and the loss counts only those positions,
 \[
   \mathcal{L}_{\text{MLM}} = -\sum_{t \in \mathcal{M}} \log P(w_t \mid \mathbf{w}_{\setminus t}),
 \]
 where $\mathcal{M}$ is the set of masked positions and $\mathbf{w}_{\setminus t}$ is
-the rest of the (corrupted) sequence. About 15\% of the tokens are chosen; of those,
+the rest of the (corrupted) sequence. About 15\% of the tokens are chosen. Of those,
 80\% become \texttt{[MASK]}, 10\% are swapped for a random word, and 10\% are left
-as they are, a mix that stops the model from only ever reacting to the
-\texttt{[MASK]} symbol. Seeing the whole sequence at once makes the representations
-bidirectional, which is what makes encoders strong at classification and entity
-recognition. The price is that only the masked positions produce a gradient, about
-one token in seven, against every token under the causal objective.
+as they are. This mix stops the model from only ever reacting to the \texttt{[MASK]}
+symbol. Seeing the whole sequence at once makes the representations bidirectional,
+which is what makes encoders strong at classification and entity recognition. The
+price is that only the masked positions produce a gradient, about one token in
+seven, while the causal objective uses every token.
 
 \subsection{Mixing the two}
 
-The two objectives trade the same quantity against itself: causal training gives a
-signal at every token but only looks left, while masked training looks both ways but
-learns from few tokens. Recent work tries to get both at once. Some encoders are
-pretrained with a causal phase followed by a short masked phase, which beats masked
-pretraining alone \citep{gisserot2025clm}; others alternate the two objectives during
-training \citep{antlm2024}. This line is central to the thesis: \Cref{chap:objectives}
-shows that a temporary detour through causal pretraining leaves a lasting and useful
-mark on an encoder. An earlier idea, ELECTRA's replaced-token detection
-\citep{electra}, also sought a denser signal, by training the model to spot tokens a
-small generator had swapped in, though recent encoders such as ModernBERT
+Each objective has a strength and a cost. Causal training gives a signal at every
+token but only looks left. Masked training looks both ways but learns from few
+tokens. Recent work tries to get both at once. Some encoders are pretrained with a
+causal phase followed by a short masked phase, which beats masked pretraining alone
+\citep{gisserot2025clm}. Others alternate the two objectives during training
+\citep{antlm2024}. This line is central to the thesis. \Cref{chap:objectives} shows
+that a temporary detour through causal pretraining leaves a lasting and useful mark
+on an encoder. An earlier idea, ELECTRA's replaced-token detection \citep{electra},
+also sought a denser signal. It trained the model to spot tokens that a small
+generator had swapped in. Still, recent encoders such as ModernBERT
 \citep{modernbert} show that a good architecture with plain masking is already
 enough.
 
@@ -473,28 +473,29 @@ this recipe scales.
 \subsection{Scaling}
 
 The Transformer settled how a model reads its context, and the pretraining objective
-settled what it learns from raw text. The remaining lever is size. The natural
-question is how far performance keeps improving as we add parameters and data, and
-whether anything new appears along the way. The answer, found around 2020, changed
-both how the field builds models and how it uses them.
+settled what it learns from raw text. The last lever is size. We can ask how far
+performance keeps improving as we add parameters and data, and whether anything new
+appears along the way. The answer, found around 2020, changed how the field builds
+models and how it uses them.
 
 Until then, a pretrained model was put to work by \emph{fine-tuning}. After
 pretraining, each new task needed a further round of supervised training on labelled
-examples, producing a separate specialised copy of the model. \citet{gpt3} showed a
-different route. Their model, GPT-3, a decoder with 175 billion parameters, can carry
-out a task from nothing more than a description and a few examples written into its
-input, with no change to its weights. They call this \emph{in-context learning}, and
-the abstract states the mechanism plainly: the model is ``applied without any
-gradient updates or fine-tuning, with tasks and few-shot demonstrations specified
-purely via text'' \citep{gpt3}. The practical shift is large. Instead of collecting
-labelled data and training a classifier for every task, one writes a prompt.
+examples. This produced a separate specialised copy of the model for each task.
+\citet{gpt3} showed another route. Their model, GPT-3, a decoder with 175 billion
+parameters, can carry out a task from nothing more than a description and a few
+examples written into its input, with no change to its weights. They call this
+\emph{in-context learning}, and the abstract states the mechanism plainly: the model
+is ``applied without any gradient updates or fine-tuning, with tasks and few-shot
+demonstrations specified purely via text'' \citep{gpt3}. The practical change is large.
+Instead of collecting labelled data and training a classifier for every task, one
+writes a prompt.
 
 How much help the prompt carries defines three settings. In the \emph{zero-shot}
-setting the model is given only the task, at most a short instruction; in
-\emph{one-shot} it also sees one worked example; in \emph{few-shot} it sees several,
-typically ten to a hundred, as many as fit in the 2048-token context window (the most
+setting the model is given only the task, at most a short instruction. In
+\emph{one-shot} it also sees one worked example. In \emph{few-shot} it sees several,
+usually ten to a hundred, as many as fit in the 2048-token context window (the most
 text the model can read at once). \Cref{fig:lm-fewshot} places the three side by side
-on a simple arithmetic task. The examples are not training data, they are text the
+on a simple arithmetic task. The examples are not training data. They are text the
 model reads before answering, and the same idea works across very different tasks:
 unscrambling letters (\texttt{skicts} $\to$ \texttt{sticks}), word analogies
 (\emph{lull is to trust as cajole is to compliance}), or translating a sentence into
@@ -528,12 +529,13 @@ from \citet{gpt3}.}
 
 The striking part is that more demonstrations help, and they help more as the model
 grows. On two-digit addition GPT-3 goes from 76.9\% with no example to 99.6\% with
-one and 100\% with a few; on the TriviaQA question-answering benchmark it goes from
+one and 100\% with a few. On the TriviaQA question-answering benchmark it goes from
 64.3\% to 68.0\% to 71.2\% (\Cref{tab:lm-fewshot}). The same trend holds across many
 tasks, and \citet{gpt3} note that ``the gap between zero-, one-, and few-shot
-performance often grows with model capacity'', which they read as a sign that larger
+performance often grows with model capacity''. They read this as a sign that larger
 models are better at learning from their context. A capability that is weak or absent
-in small models and strengthens with scale is what later work called \emph{emergent}.
+in small models and grows stronger with scale is what later work called
+\emph{emergent}.
 
 \begin{table}[t]
 \centering
@@ -552,34 +554,34 @@ weight updates. Numbers are verbatim from \citet{gpt3}.}
 \label{tab:lm-fewshot}
 \end{table}
 
-These gains are not a fluke, and they rest on something the model is trained to do
+These gains are not a fluke. They rest on something the model is trained to do
 directly. Below the downstream abilities sits the loss, the model's average surprise
-on held-out text, and the loss falls with scale in a strikingly regular way.
+on held-out text, and the loss falls with scale in a very regular way.
 \citet{kaplan_scaling} showed that it follows a smooth \emph{power law} in two
-quantities, the number of parameters $N$ and the number of training tokens $D$, which
-is a straight line when plotted on logarithmic axes. The loss drops predictably as
-either grows, so model design becomes a forecast: pick a budget of computation and
-read off the loss to expect. Their estimate, though, placed the optimum at large
-models trained on relatively little data.
+quantities, the number of parameters $N$ and the number of training tokens $D$. On
+logarithmic axes this is a straight line. The loss drops predictably as either grows,
+so model design becomes a forecast: pick a budget of computation and read off the loss
+to expect. Their estimate placed the optimum at large models trained on relatively
+little data.
 
-\citet{chinchilla_scaling} revisited this and found the trade-off was wrong. Fitting,
-on over 400 trained models, a loss law of the form
+\citet{chinchilla_scaling} revisited this and found the trade-off was wrong. They
+fitted, on over 400 trained models, a loss law of the form
 \[
   L(N, D) = E + \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}},
 \]
-they estimated $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$ and
+and estimated $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$ and
 $\beta = 0.28$. Here $E$ is the loss that would remain with unlimited data and
-parameters, a floor set by the language itself, while the two fractions measure how
-far a finite model and a finite dataset still sit above it. The cost of training,
-counted in arithmetic operations (FLOPs), grows with both, roughly as $6ND$, so for a
-fixed budget the law gives the best split between model size and data, the
-\emph{compute-optimal} point. The answer is that the two should grow together: each
-time the model doubles, the data should double with it (\Cref{fig:lm-chinchilla}). By
-the authors' own projection this means about twenty training tokens per parameter,
-far more data than earlier models had used.
+parameters, a floor set by the language itself. The two fractions measure how far a
+finite model and a finite dataset still sit above it. The cost of training, counted in
+arithmetic operations (FLOPs), grows with both, roughly as $6ND$. So for a fixed budget
+the law gives the best split between model size and data, the \emph{compute-optimal}
+point. The answer is that the two should grow together: each time the model doubles,
+the data should double with it (\Cref{fig:lm-chinchilla}). By the authors' own
+projection this means about twenty training tokens per parameter, far more data than
+earlier models had used.
 
 To prove the point they trained Chinchilla, a 70-billion-parameter model, on 1.4
-trillion tokens, and it beat Gopher, a 280-billion model trained on the same compute,
+trillion tokens. It beat Gopher, a 280-billion model trained on the same compute,
 scoring 67.6\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven
 subjects. Most large models before it had simply been undertrained: built large, then
 fed too little data to fill them.
@@ -595,16 +597,16 @@ reproduced here.}
 \end{figure}
 
 Chinchilla optimises the cost of \emph{training} a model once. \citet{touvron2023llama}
-pointed out that this ignores the cost of \emph{using} it afterwards: a model served
-to many users is run countless times, and each run costs computation too, its
+pointed out that this ignores the cost of \emph{using} it afterwards. A model served to
+many users is run countless times, and each run costs computation too, its
 \emph{inference} cost. As they put it, ``a smaller one trained longer will ultimately
-be cheaper at inference''. They pushed small models well past the compute-optimal point,
-finding that a 7-billion model keeps improving even after a trillion tokens. The
+be cheaper at inference''. They pushed small models well past the compute-optimal point
+and found that a 7-billion model keeps improving even after a trillion tokens. The
 resulting LLaMA models, trained only on publicly available data, make the case
 plainly: the 13-billion model outperforms GPT-3 (175B) on most benchmarks ``despite
 being 10$\times$ smaller'' (\Cref{fig:lm-llama}), and the 65-billion model is
-competitive with Chinchilla and the 540-billion PaLM. Because their weights were
-released, they also brought capable models within reach of ordinary research budgets.
+competitive with Chinchilla and the 540-billion PaLM. Their weights were released, so
+they also brought capable models within reach of ordinary research budgets.
 
 \begin{figure}[t]
 \centering
@@ -621,40 +623,40 @@ The previous section showed that a large base model can already perform a task f
 few examples placed in its prompt. That ability is fragile. It leans on well-chosen
 demonstrations and on phrasing the task as a text to be continued, and it is weakest
 in the zero-shot case, with no examples at all. A base model is trained only to
-predict the next token, so asked a plain question it may answer, but it may equally
+predict the next token. So asked a plain question it may answer, or it may simply
 continue with another question. \emph{Instruction tuning} closes this gap. The model
 is fine-tuned on many existing datasets, each rewritten as a natural-language
-instruction paired with its answer, after which it follows instructions phrased in the
-same way, including instructions for tasks it never saw during tuning.
+instruction paired with its answer. After this it follows instructions phrased the same
+way, including instructions for tasks it never saw during tuning.
 
-\citet{wei2022flan} introduced the idea and the name. Taking a 137-billion-parameter
-model and tuning it on more than sixty datasets phrased as instructions, they found
-that its zero-shot accuracy rose above that of the much larger GPT-3 on twenty of the
-twenty-five evaluation datasets they tried. The gain came not from more scale but from
-teaching the model to read instructions. \citet{sanh2022t0} made the same case at a
-smaller size: an eleven-billion model tuned on a wide range of prompted tasks matched
-or beat GPT-3, about sixteen times larger, on nine of eleven held-out tasks. What
-matters most is the breadth of the tuning mixture. Increasing the number of distinct
-tasks improves generalisation to unseen ones, with most of the benefit reached after
-a few hundred tasks \citep{flan_t5}, and collections such as Super-NaturalInstructions
-were built to supply that breadth, gathering more than 1{,}600 tasks
-\citep{wang2022supernatural}. Such instruction datasets are costly to assemble by
-hand, which opened a second route: \citet{wang2023selfinstruct} showed that a model
-can bootstrap its own instruction data, generating new instructions and answers from a
-small seed set and tuning on the filtered result, an approach that seeded much of the
-open instruction-tuning that followed.
+\citet{wei2022flan} introduced the idea and the name. They took a 137-billion-parameter
+model and tuned it on more than sixty datasets phrased as instructions. Its zero-shot
+accuracy then rose above that of the much larger GPT-3 on twenty of the twenty-five
+evaluation datasets they tried. The gain came from teaching the model to read
+instructions, not from more scale. \citet{sanh2022t0} made the same case at a smaller
+size: an eleven-billion model tuned on a wide range of prompted tasks matched or beat
+GPT-3, about sixteen times larger, on nine of eleven held-out tasks. What matters most
+is the breadth of the tuning mixture. Adding more distinct tasks improves
+generalisation to unseen ones, with most of the benefit reached after a few hundred
+tasks \citep{flan_t5}. Collections such as Super-NaturalInstructions were built to
+supply that breadth, gathering more than 1{,}600 tasks \citep{wang2022supernatural}.
+Such instruction datasets are costly to assemble by hand, which opened a second route.
+\citet{wang2023selfinstruct} showed that a model can build its own instruction data,
+generating new instructions and answers from a small seed set and tuning on the
+filtered result. This approach seeded much of the open instruction-tuning that
+followed.
 
 \subsection{Aligning Assistants with Human Feedback}
 
-Instruction tuning teaches a model to attempt the task, but it does not by itself make
-its answers the ones a person would prefer. A useful assistant should be, in an early
+Instruction tuning teaches a model to attempt the task. It does not by itself make its
+answers the ones a person would prefer. A useful assistant should be, in an early
 statement of the goal, helpful, honest, and harmless \citep{askell2021hhh}. Reaching
 that goal from supervised data alone is hard: for an open-ended question there is no
 single correct target to imitate, only answers that are better or worse than others.
-The way around this is to learn from comparisons. \citet{christiano2017preferences}
-had shown, for control problems, that an agent can be trained from human judgments of
-which of two behaviours is better, with no hand-written reward, by fitting a
-\emph{reward model} to those judgments and then optimising against it.
+The way around this is to learn from comparisons. \citet{christiano2017preferences} had
+shown, for control problems, that an agent can be trained from human judgments of which
+of two behaviours is better, with no hand-written reward. They fit a \emph{reward
+model} to those judgments and then optimise against it.
 
 \citet{ouyang2022instructgpt} brought this recipe to language in three steps:
 fine-tune the model on human-written demonstrations, collect human rankings of model
@@ -662,14 +664,14 @@ outputs and fit a reward model to them, then optimise the model against that rew
 with reinforcement learning. The result, \emph{reinforcement learning from human
 feedback} (RLHF), was striking: human raters preferred the answers of a
 1.3-billion-parameter aligned model over those of the hundred-times-larger 175-billion
-GPT-3. This is the recipe behind ChatGPT and the assistants that followed it, and it
-is what let a non-expert state a request in plain language and get a useful answer.
+GPT-3. This is the recipe behind ChatGPT and the assistants that followed it. It is what
+let a non-expert state a request in plain language and get a useful answer.
 \citet{bai2022hh} built a helpful and harmless assistant the same way and reported that
 alignment training improved performance across most benchmarks while remaining
-compatible with specialised skills such as coding. Because the expensive part is the
-human labelling, later work sought to reduce it: Constitutional AI replaces human
-judgments of harmful content with judgments the model itself makes against a short
-written list of principles, training from AI feedback rather than human feedback
+compatible with specialised skills such as coding. The expensive part is the human
+labelling, so later work sought to reduce it. Constitutional AI replaces human judgments
+of harmful content with judgments the model itself makes against a short written list of
+principles, training from AI feedback instead of human feedback
 \citep{bai2022constitutional}.
 
 \subsection{Reasoning and Verifiable Rewards}
@@ -677,30 +679,30 @@ written list of principles, training from AI feedback rather than human feedback
 The most recent shift concerns problems that have a checkable answer.
 \citet{wei2022chain} observed that prompting a model to produce a \emph{chain of
 thought}, a series of intermediate steps before its final answer, sharply improves its
-accuracy on multi-step problems, with no change to its weights, and sampling several
-such chains and taking the majority answer improves it further
-\citep{wang2023selfconsistency}. This made reasoning something one could first elicit
+accuracy on multi-step problems, with no change to its weights. Sampling several such
+chains and taking the majority answer improves it further
+\citep{wang2023selfconsistency}. This made reasoning something one could first draw out
 and then train for. On tasks such as mathematics or programming the answer can be
-checked automatically, by matching the solution or running the code, which yields a
+checked automatically, by matching the solution or running the code. This yields a
 reward computed by a rule rather than predicted by a learned model. Training against
 such a signal has been named \emph{reinforcement learning with verifiable rewards}
-\citep{lambert2024tulu3}; because the reward is a correctness check, it cannot be gamed
-the way a learned reward model can.
+\citep{lambert2024tulu3}. The reward is a correctness check, so it cannot be gamed the
+way a learned reward model can.
 
 The DeepSeekMath work introduced an efficient optimiser for this setting, Group
-Relative Policy Optimization, which drops the separate value network of standard
-policy optimisation and instead judges an answer against a group of sampled answers to
-the same question \citep{shao2024deepseekmath}. DeepSeek-R1 then pushed the idea to its
-limit: a model trained by reinforcement learning alone, with no supervised fine-tuning
+Relative Policy Optimization. It drops the separate value network of standard policy
+optimisation and instead judges an answer against a group of sampled answers to the
+same question \citep{shao2024deepseekmath}. DeepSeek-R1 then pushed the idea to its
+limit. A model trained by reinforcement learning alone, with no supervised fine-tuning
 first, developed reasoning behaviours such as self-checking and changing strategy from
 the reward signal, and this reasoning could afterwards be distilled into smaller
 models \citep{deepseek_r1_2025}. The strength of the approach is also its boundary.
 Verifiable rewards exist for mathematics and code, where correctness is a computable
-rule, but not for open-ended writing, where there is no automatic check.
+rule. They do not exist for open-ended writing, where there is no automatic check.
 
-Two cautions close this picture. As models are tuned to follow instructions and
-increasingly trained on data shaped or generated by other models, the line between
-training and evaluation blurs, which raises the problem of \emph{benchmark
+Two cautions close this picture. Models are tuned to follow instructions and
+increasingly trained on data shaped or generated by other models, so the line between
+training and evaluation blurs. This raises the problem of \emph{benchmark
 contamination}: when test items, or text closely resembling them, leak into the
 training data, reported scores stop measuring genuine generalisation. And all of these
 advances, from instruction tuning to verifiable-reward reasoning, concern
@@ -712,23 +714,23 @@ lever for it is to keep pretraining on text from that domain.
 \section{Continual Pretraining}
 \label{sec:lm-continual}
 
-The pivot just reached, specialising a model to a domain by continuing its
-pretraining on in-domain text, is the mechanism this thesis turns on, so we look at
-it closely. This section asks three questions in turn: what continued pretraining is,
-why it is delicate, and how recent work makes it reliable. The biomedical models that
-put it into practice come in the next section.
+We just reached the idea of specialising a model to a domain by continuing its
+pretraining on in-domain text. This thesis relies on that idea, so we look at it
+closely. The section asks three questions: what continued pretraining is, why it is
+hard, and how recent work makes it reliable. The biomedical models that use it come
+in the next section.
 
 \subsection{A Second Phase of Pretraining}
 
 The idea is simple. Between the generic pretraining of \Cref{sec:lm-objectives} and
-fine-tuning on a labelled task, one inserts a further phase of self-supervised
-training on text closer to the target. \citet{gururangan2020dapt} studied this across
-four domains, including biomedicine, and eight classification tasks, and named two
+fine-tuning on a labelled task, we add another phase of self-supervised training on
+text closer to the target. \citet{gururangan2020dapt} studied this across four
+domains, including biomedicine, and eight classification tasks, and named two
 variants. \emph{Domain-adaptive pretraining} continues training on a large in-domain
-corpus; \emph{task-adaptive pretraining} continues it on the unlabelled text of the
-task itself. They found that the two help in both high- and low-resource settings,
-that task-adaptive pretraining helps even after the domain phase, and that it pays off
-even when the task corpus is small (\Cref{fig:lm-dapt}).
+corpus. \emph{Task-adaptive pretraining} continues it on the unlabelled text of the
+task itself. They found that both help in high- and low-resource settings, that
+task-adaptive pretraining helps even after the domain phase, and that it pays off even
+when the task corpus is small (\Cref{fig:lm-dapt}).
 
 \medskip
 \begin{center}
@@ -762,85 +764,85 @@ in-domain corpus, then task-adaptive pretraining on the task's own unlabelled te
 \end{center}
 \medskip
 
-This second phase is one case of a broader topic. A recent survey organises continual
+This second phase is one case of a broader topic. A recent survey divides continual
 learning for language models into continued pretraining, continual instruction
-tuning, and continual alignment, and groups the methods that protect earlier
-knowledge into replay, regularisation, and architecture-based families
-\citep{shi2025continual}. The rest of this section keeps to the first case, continued
-pretraining, since it is the one this thesis uses.
+tuning, and continual alignment, and sorts the methods that protect earlier knowledge
+into replay, regularisation, and architecture-based families \citep{shi2025continual}.
+The rest of this section keeps to the first case, continued pretraining, since it is
+the one this thesis uses.
 
 \subsection{Catastrophic Forgetting}
 
 Continuing to train a network has a cost. When a connectionist model is trained on new
-material, the weights that encoded the old material are overwritten, a failure named
-\emph{catastrophic interference} when it was first described \citep{mccloskey1989catastrophic}.
-The standard remedy keeps the new training from straying too far: elastic weight
-consolidation adds a penalty that, in the authors' words, works by ``selectively
-slowing down learning on the weights important for'' the earlier tasks
-\citep{kirkpatrick2017ewc}. For a model adapted to a domain the same risk applies in
-reverse: pushing it toward biomedical text can erode the general competence it began
-with. The danger is uneven. \citet{yildiz2024continual} report that smaller models are
-the most sensitive, showing the highest rates of both learning and forgetting, so a
-small domain encoder is more exposed than a large one.
+material, the weights that encoded the old material are overwritten. This failure was
+named \emph{catastrophic interference} when it was first described
+\citep{mccloskey1989catastrophic}. The standard remedy keeps the new training from
+straying too far. Elastic weight consolidation adds a penalty that, in the authors'
+words, works by ``selectively slowing down learning on the weights important for'' the
+earlier tasks \citep{kirkpatrick2017ewc}. For a model adapted to a domain the same risk
+applies in reverse: pushing it toward biomedical text can erode the general competence
+it began with. The danger is uneven. \citet{yildiz2024continual} report that smaller
+models are the most sensitive, showing the highest rates of both learning and
+forgetting, so a small domain encoder is more exposed than a large one.
 
-Not every drop in a benchmark score is true forgetting, however. \citet{zheng2025spurious}
+Not every drop in a benchmark score is true forgetting. \citet{zheng2025spurious}
 argue that the early steps of a new training phase often disturb a model's
-\emph{alignment}, its learned way of exposing what it knows, more than its knowledge,
-so that ``performance drops often reflect a decline in task alignment rather than true
-knowledge loss'' and much of the loss can be recovered. The lesson for what follows is
-to read a post-adaptation drop with care, and to design the adaptation so that it does
-not disturb more than it must.
+\emph{alignment}, its learned way of exposing what it knows, more than its knowledge.
+In their words, ``performance drops often reflect a decline in task alignment rather
+than true knowledge loss'', and much of the loss can be recovered. The lesson for what
+follows is to read a post-adaptation drop with care, and to design the adaptation so
+that it does not disturb more than it must.
 
 \subsection{Making Continual Pretraining Work}
 
 Recent work shows that, done carefully, continued pretraining need not forget and need
-not cost much. \citet{ibrahim2024simple} reduce the recipe to three ingredients:
-re-warming the learning rate, which has decayed to almost nothing by the end of
-pretraining, then re-decaying it, and replaying a small fraction of the original data
-alongside the new domain. This combination, they report, is ``sufficient to match the
+not cost much. \citet{ibrahim2024simple} reduce the recipe to three ingredients. The
+learning rate has decayed to almost nothing by the end of pretraining, so they re-warm
+it, then re-decay it, and they replay a small fraction of the original data alongside
+the new domain. This combination, they report, is ``sufficient to match the
 performance of fully re-training from scratch on all available data'' while ``using
 only a fraction of the compute'', and they verify it at both the 405-million and
-10-billion parameter scales. Continued pretraining, in other words, can reach the same
-place as starting over, far more cheaply.
+10-billion parameter scales. So continued pretraining can reach the same place as
+starting over, far more cheaply.
 
-Two refinements sharpen this. First, less data can be better than more: choosing a
+Two refinements sharpen this. First, less data can be better than more. Choosing a
 small, relevant slice of the domain corpus rather than all of it can match or beat
 training on the whole. \citet{xie2024efficientcpt} report data-selection strategies
 that ``outperform vanilla continual pre-training's performance with just 10\% of
 corpus size and cost'', with no loss on general tasks. Second, the adaptation does not
-improve smoothly. \citet{guo2024efficient} document a \emph{stability gap}, a
-temporary fall in in-domain performance at the start of continued pretraining followed
-by a recovery, and show that training for several passes over a high-quality subset
-and mixing in pretraining-like data smooths it out, raising the average medical-task
-accuracy of a three-billion model from 36.2\% to 40.7\% while using only 40\% of the
-training budget. The common thread is that continued pretraining rewards care in the
-learning-rate schedule, the amount of replay, and the choice of data.
+improve smoothly. \citet{guo2024efficient} document a \emph{stability gap}: in-domain
+performance falls for a time at the start of continued pretraining, then recovers. They
+show that training for several passes over a high-quality subset and mixing in
+pretraining-like data smooths it out, raising the average medical-task accuracy of a
+three-billion model from 36.2\% to 40.7\% while using only 40\% of the training budget.
+The common thread is that continued pretraining rewards care in the learning-rate
+schedule, the amount of replay, and the choice of data.
 
 \subsection{From Scratch or Continue?}
 
 The alternative to continuing is to pretrain a specialised model from scratch on
 in-domain text. The two poles have canonical biomedical examples. BioBERT continued
 the pretraining of BERT on PubMed abstracts and full-text articles
-\citep{lee_biobert_2019}, the continued-pretraining route; PubMedBERT was instead
+\citep{lee_biobert_2019}, the continued-pretraining route. PubMedBERT was instead
 pretrained from scratch on biomedical text, with a vocabulary built from that text
 rather than inherited \citep{gu_domain-specific_2022}. The trade-off is clear in
 principle. Training from scratch can fit a vocabulary to the domain and cannot forget
 what it never learned, but it is expensive and throws away the general competence of
-an existing model; continuing is cheap and keeps that competence, but inherits a
+an existing model. Continuing is cheap and keeps that competence, but inherits a
 tokenizer and an initialisation built for general text.
 
 Which wins is contested. \citet{gu_domain-specific_2022} found that pretraining from
-scratch on in-domain text, with an in-domain vocabulary, outperformed continued
+scratch on in-domain text, with an in-domain vocabulary, did better than continued
 pretraining from a general model across a suite of biomedical tasks, and argued that
 the general-text vocabulary of a continued model holds it back. The general-purpose
-evidence above points the other way: with the right learning-rate schedule and a
+evidence above points the other way. With the right learning-rate schedule and a
 little replay, continued pretraining can match a from-scratch model at a fraction of
 the cost \citep{ibrahim2024simple}. The disagreement is not settled, and it may depend
 on the architecture. Continued pretraining has often disappointed for generative
-decoder models: comparing biomedical large language models with their general-purpose
+decoder models. Comparing biomedical large language models with their general-purpose
 counterparts, \citet{dorfner2024biomedical} found the specialised models mostly the
-weaker of the two, sometimes by a wide margin, with one eight-billion biomedical model
-scoring 30\% against 64.3\% for the general model it was built from on New England
+weaker of the two, sometimes by a wide margin. One eight-billion biomedical model
+scored 30\% against 64.3\% for the general model it was built from on New England
 Journal of Medicine case challenges. The bidirectional, masked objective of encoders
 may behave differently. Whether continued pretraining reliably specialises a model,
 and how the answer depends on whether the model is an encoder or a decoder, is the open
