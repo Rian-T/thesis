@@ -502,6 +502,8 @@ your draft and match its plainness.
 - **Fancy words where a plain one exists.** Real fixes made here: "tidy" → "better-written"; "this scarcity is sharper still" → "the shortage is worse"; "stance-laden" → "personal"; "the far informational end of the range" → "about as far from everyday conversation as written English gets"; "built around prototypes" → "cluster around typical cases"; "reads as a small narrative" → "reads like a short story".
 - **Over-built closers.** BAD: "Its scarcity is not an accident of collection that more effort would remove; it follows from the nature of the text itself." → GOOD: "The note is not scarce by accident. It is scarce because of what it is."
 - **"not only … but …"** to pile up contrasts. Break into separate short sentences.
+- **Reflexive "itself"/"the text itself"/"the thing itself" as emphasis padding.** A recurring tic: "built into the text itself", "the concept itself", "the language itself". Usually the bare noun is plainer. BAD: "Confidentiality is built into the text itself." → GOOD: "Confidentiality is inherent to this document type." Drop "itself" unless it carries a real contrast.
+- **Dangling comparatives.** "for a simpler reason", "the harder problem", "a deeper issue" need a stated thing to compare to. If the first term was never set up, the reader stumbles. BAD (no earlier reason given): "The note stays inside the hospital for a simpler reason." → GOOD: "The note also stays inside the hospital because it is full of personal data."
 
 ### The test
 Read the sentence aloud. If it sounds like it is performing, or a plain reader

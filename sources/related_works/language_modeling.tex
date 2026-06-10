@@ -6,11 +6,11 @@
 \section{Introduction}
 \label{sec:lm-intro}
 
-Long before computers, people already had the idea that you can guess the next
-symbol in a text from the ones that came before. In 1913 the mathematician Andrei
-Markov tried it out by hand. He took twenty thousand letters from Pushkin's
-\emph{Eugene Onegin}, marked each one as a vowel or a consonant, and counted: a vowel
-was followed by another vowel only 13\% of the time, but by a consonant 66\% of the
+Long before computers, people knew you could guess the next
+symbol in a text from the ones before it. In 1913 the mathematician Andrei
+Markov tested this by hand. He took twenty thousand letters from Pushkin's
+\emph{Eugene Onegin} and marked each one as a vowel or a consonant. Then he counted.
+A vowel was followed by another vowel 13\% of the time and by a consonant 66\% of the
 time \citep{markov_onegin_1913}. Letters do not stand alone. What comes before shapes
 what comes next, and you can measure it.
 
@@ -19,28 +19,28 @@ source and defined its \emph{entropy}, the average information each symbol carri
 \[
   H = -\sum_i p_i \log_2 p_i,
 \]
-measured in bits \citep{shannon_mi}. This number is at its highest when every symbol
-is equally likely, and it gets smaller as some symbols become easier to guess.
+measured in bits \citep{shannon_mi}. This number is highest when every symbol
+is equally likely. It gets smaller as some symbols become easier to guess.
 
 Shannon showed this with a simple demonstration. Generate letters independently and
 the result is noise, \emph{xfoml rxkhrjffjuj zlpwcfwkcyj}. Keep three-letter
 statistics and the output is already pronounceable and nearly English, \emph{in no
-ist lat whey cratict froure birs}. Stitch whole words together by pairs and the
-fragments start to read like real sentences, \emph{the head and in frontal attack
+ist lat whey cratict froure birs}. Join whole words in pairs and the
+fragments begin to read like real sentences, \emph{the head and in frontal attack
 on an english writer that the character of this point}. Each step uses a little
 more context, and each step looks more like the language.
 
-How predictable is English, then? Shannon answered with an experiment in which a
+How predictable is English, then? Shannon answered with an experiment. A
 person guessed the next letter of a text one symbol at a time
-\citep{shannon_prediction_1951}. Shown the preceding text, his reader guessed
-correctly about two times in three, usually on the first try; from how the guesses
-fell, Shannon derived bounds on the entropy. An alphabet of 27
+\citep{shannon_prediction_1951}. Shown the text so far, the reader guessed
+correctly about two times in three, usually on the first try. From how the guesses
+fell, Shannon worked out bounds on the entropy. An alphabet of 27
 symbols, the 26 letters and a space, could in principle carry $\log_2 27 \approx
-4.76$ bits per character. Yet
+4.76$ bits per character. But
 given enough preceding text, Shannon estimated the true entropy of English at
 about one bit per character, somewhere between roughly 0.6 and 1.3
 (\Cref{fig:lm-entropy}). Nearly four of every five possible bits are redundant,
-already fixed by what came before. That redundancy is the whole opportunity: a
+already fixed by what came before. This redundancy is the whole opportunity. A
 model that predicts the next symbol well has learned how the language works.
 
 \begin{figure}[t]
@@ -73,13 +73,13 @@ from $\log_2 27 \approx 4.76$ bits per character with no context to about one bi
 \end{figure}
 
 This is what a language model is. By the chain rule, the probability of a whole
-text factorises exactly into a product of next-symbol predictions,
+text breaks down exactly into a product of next-symbol predictions,
 \[
   P(w_1,\dots,w_T) = \prod_{t=1}^{T} P(w_t \mid w_{<t}),
 \]
-so modeling language reduces to estimating a single conditional distribution: the
+so modeling language comes down to estimating a single conditional distribution: the
 probability of the next token given those before it (\Cref{fig:lm-nexttoken}).
-Every model in this chapter is an estimator of that one quantity, and the history
+Every model in this chapter estimates that one quantity, and the history
 of the field is the history of estimating it better.
 
 \begin{figure}[t]
@@ -103,24 +103,24 @@ probability of a whole text is the product of these next-token predictions.}
 \label{fig:lm-nexttoken}
 \end{figure}
 
-Estimating that conditional is harder than it sounds. The simplest idea, the one
-Markov and the early n-gram models used, is to count: see how often each short
+Estimating that conditional is harder than it sounds. The simplest idea is the one
+Markov and the early n-gram models used: count how often each short
 sequence is followed by each next word. But counting runs out almost at once. Most
 word sequences never appear twice, even in a large corpus, so the counts are zero
 exactly where we need them. Much of the history of language modeling is the search
-for estimators that get around this problem, and the rest of this chapter follows
+for estimators that get around this problem. The rest of this chapter follows
 that search, from n-gram counts to neural networks to the Transformer.
 
 For this thesis the point is practical. Clinical information extraction rests
-entirely on these models: they are pretrained on large corpora and then adapted to
+entirely on these models. They are pretrained on large corpora and then adapted to
 a task. Adaptation is the hard part, because the target combines three scarcities
-at once, French, biomedical, and clinical, and, as the previous part showed, the
+at once, French, biomedical, and clinical. As the previous part showed, the
 text we can gather most easily is the least like the text we need. This chapter
 reviews the methods that make this adaptation possible: the architectures and
 pretraining objectives, how they scale, how they are specialised to a domain
 through continual pretraining, and the tokenization and long-context choices that
 matter for clinical documents. Continual pretraining, the mechanism at the heart of
-this thesis, is treated last and in the most detail.
+this thesis, comes last and in the most detail.
 
 
 \section{From Statistical to Neural Language Models}
@@ -128,17 +128,17 @@ this thesis, is treated last and in the most detail.
 
 \subsection{N-gram models}
 
-The first estimators keep only a short history. Markov's assumption is that the next
-token depends only on the last few, so the full conditional $P(w_t \mid w_{<t})$ is
-approximated by $P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$, the probability of a token
-given the $n-1$ before it. These probabilities are read straight from counts in a
-training corpus. The trouble is the one raised above, only sharper: the number of
+The first estimators keep only a short history. Markov assumed that the next
+token depends only on the last few. The full conditional $P(w_t \mid w_{<t})$ is
+then approximated by $P(w_t \mid w_{t-n+1}, \ldots, w_{t-1})$, the probability of a token
+given the $n-1$ before it. These probabilities come straight from counts in a
+training corpus. The problem is the same as before, only sharper. The number of
 possible $n$-grams grows as $|\mathcal{V}|^{n}$, so for any real vocabulary most
-$n$-grams are never seen and their counts are zero. Smoothing methods, of which
-Kneser-Ney smoothing \citep{kneser_ney} is the best known, move some probability
-onto unseen sequences and fall back to shorter contexts when a longer one is
-missing. They made n-gram models good enough to be the state of the art for years.
-But they cannot share what they learn between similar words: \emph{heart attack}
+$n$-grams are never seen and their counts are zero. Smoothing methods help here.
+The best known is Kneser-Ney smoothing \citep{kneser_ney}. It moves some probability
+onto unseen sequences and falls back to shorter contexts when a longer one is
+missing. Smoothing made n-gram models good enough to be the state of the art for years.
+But these models cannot share what they learn between similar words. \emph{Heart attack}
 and \emph{cardiac arrest} are two separate entries in the table, with nothing in
 common.
 
@@ -146,25 +146,25 @@ common.
 
 The neural language model fixes exactly that. \citet{bengio2003neural} replace the
 count table with a small neural network. Each word is first mapped to a vector, its
-\emph{embedding}; the network reads the embeddings of the context and predicts the
-next word with a softmax over the vocabulary. Because it learns the embeddings at
-the same time as the prediction, words used in similar ways end up with similar
+\emph{embedding}. The network reads the embeddings of the context and predicts the
+next word with a softmax over the vocabulary. It learns the embeddings at
+the same time as the prediction, so words used in similar ways end up with similar
 vectors and can pool their evidence. A sequence never seen in training is no longer
 a dead end, because its words resemble others the model has seen. This alone cut
 the perplexity of the best n-gram models by about a quarter. The embeddings turned
-out to be useful on their own: word2vec \citep{mikolov-etal-2013-linguistic} showed
-that simple arithmetic on them captures regularities of meaning; the textbook
+out to be useful on their own. word2vec \citep{mikolov-etal-2013-linguistic} showed
+that simple arithmetic on them captures regularities of meaning. The textbook
 example is that \emph{king} $-$ \emph{man} $+$ \emph{woman} lands near \emph{queen}.
 These early vectors were still \emph{static}: one vector per word, whatever the
 sentence. ELMo \citep{peters-etal-2018-deep} made them contextual, giving a word a
-different vector in each sentence, and showed that representations pretrained on
+different vector in each sentence. It also showed that representations pretrained on
 plain text and then reused improve a wide range of tasks. This is an early form of
 the pretrain-then-adapt recipe the rest of this thesis depends on.
 
 \subsection{Recurrent networks}
 
 All of the models so far read a fixed window of context. A \emph{recurrent neural
-network} removes that limit by reading the sequence one token at a time and carrying
+network} removes that limit. It reads the sequence one token at a time and carries
 a running summary forward. The idea goes back to \citet{rnn_origins} and was first
 made to work as a language model by \citet{mikolov10_interspeech}. At each step $t$
 the network takes the current token $x_t$ and the previous hidden state $h_{t-1}$,
@@ -174,8 +174,8 @@ and combines them into a new hidden state,
 \]
 where $f$ is a small learned function and $h_t$ is a fixed-size vector that
 summarises everything read up to position $t$. The next token is predicted from
-$h_t$ with a softmax over the vocabulary, just as in the neural model above. Because
-the hidden state is passed from one step to the next (\Cref{fig:lm-rnn}), a
+$h_t$ with a softmax over the vocabulary, just as in the neural model above. The
+hidden state is passed from one step to the next (\Cref{fig:lm-rnn}), so a
 prediction can in principle depend on the whole history rather than the last $n-1$
 tokens.
 
@@ -215,11 +215,11 @@ running state lets a prediction depend on the whole past rather than a fixed win
 \medskip
 
 In practice this memory is short. The network is trained by propagating the error
-back through every step, and \citet{pascanu_difficulty_2013} showed that this
+back through every step. \citet{pascanu_difficulty_2013} showed that this
 backward signal is scaled by a similar factor at each step, so it shrinks or grows
 geometrically as it travels into the past (\Cref{fig:lm-gradient}). When the factor
 is below one the gradient vanishes and the model cannot learn links between distant
-tokens; when it is above one the gradient explodes and training becomes unstable.
+tokens. When it is above one the gradient explodes and training becomes unstable.
 \citet{bengio_longterm_1994} had already identified this \emph{vanishing} and
 \emph{exploding gradient} problem as inherent to plain recurrence.
 
@@ -236,16 +236,16 @@ measured gradients.}
 
 The \emph{long short-term memory} network, or LSTM, was built to ease it
 \citep{hochreiter1997long}. Alongside the hidden state it keeps a separate memory
-cell that runs along the sequence, controlled by a set of \emph{gates} that decide
+cell that runs along the sequence. A set of \emph{gates} controls it, deciding
 at each step what to erase from the cell, what to write into it, and what to read
-out. Because information can travel along the cell almost unchanged, useful facts
+out. Information can travel along the cell almost unchanged, so useful facts
 survive over longer spans, and so does the gradient that carries them. A lighter
 variant, the gated recurrent unit, drops one of the gates and performs comparably
 \citep{rnn_eval}. LSTMs became the standard language model of the early 2010s.
 
-Two limits remained. Even with gates, very long dependencies are hard to capture,
-and the step-by-step processing cannot be parallelised, which makes training on
-large corpora slow. A related weakness showed up in translation, where an encoder
+Two limits remained. Even with gates, very long dependencies are hard to capture.
+And the step-by-step processing cannot be parallelised, which makes training on
+large corpora slow. A related weakness showed up in translation. There an encoder
 had to compress a whole input sentence into its final hidden state before a decoder
 could read it. \citet{bahdanau_nmt} relieved this bottleneck by letting the decoder
 look back at all of the encoder's states through an early form of attention.
@@ -258,46 +258,46 @@ positions are what the next architecture was built around.
 
 \subsection{Self-attention}
 
-The Transformer \citep{vaswani2017attention} keeps the goal, predicting the next
-token, and changes how context is read. Its core operation is \emph{self-attention},
-which lets every token look directly at every other. From the input representations
+The Transformer \citep{vaswani2017attention} keeps the same goal, predicting the next
+token. It changes how the model reads its context. Its core operation is \emph{self-attention}.
+It lets every token look directly at every other token. From the input representations
 $X$, the model computes three projections, a set of queries, keys, and values:
 \[
   Q = XW_Q, \quad K = XW_K, \quad V = XW_V.
 \]
-Each token's query is compared with every key through a dot product, which measures
-how relevant the other tokens are to it. These scores are turned into weights with a
-softmax, and the token's new representation is the weighted average of the values:
+Each token's query is compared with every key through a dot product. This measures
+how relevant the other tokens are to it. A softmax turns these scores into weights.
+The token's new representation is then the weighted average of the values:
 \[
   \mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V.
 \]
 The division by $\sqrt{d_k}$, the size of the key vectors, keeps the dot products
-from growing too large, which would push the softmax to put almost all the weight on
-a single token.
+from growing too large. Large dot products would push the softmax to put almost all
+the weight on a single token.
 
-Two things follow. Any two tokens now interact in a single step, however far apart
-they are, whereas a recurrent network had to pass information through every position
-in between. And since the scores for all positions are computed together as matrix
-products, the whole sequence is processed at once, which is what made training on
-very large corpora practical. The price is cost: every token is compared with every
-other, so time and memory grow with the square of the sequence length, $O(L^2)$. In
-practice the operation runs in several \emph{heads} side by side, each with its own
-projections, so that different heads can follow different things, such as syntax,
-meaning, or position.
+This design has two effects. First, any two tokens now interact in a single step,
+however far apart they are. A recurrent network instead had to pass information through
+every position in between. Second, the scores for all positions are computed together
+as matrix products, so the whole sequence is processed at once. This is what made
+training on very large corpora practical. The cost is that every token is compared
+with every other one, so time and memory grow with the square of the sequence length,
+$O(L^2)$. In practice the operation runs in several \emph{heads} side by side. Each
+head has its own projections, so different heads can follow different things, such as
+syntax, meaning, or position.
 
 \subsection{Positional encodings}
 
-Self-attention has one blind spot: it treats its input as a set, with no sense of
+Self-attention has one blind spot. It treats its input as a set, with no sense of
 order. \emph{The cat sat} and \emph{sat the cat} look the same to it, so position
 has to be supplied separately. The original Transformer added fixed sinusoidal
-signals to the embeddings \citep{vaswani2017attention}, and BERT instead learned a
-vector for each position \citep{devlin_bert_2019}; both encode an \emph{absolute}
-position and cope badly with sequences longer than those seen in training. Later
+signals to the embeddings \citep{vaswani2017attention}. BERT instead learned a
+vector for each position \citep{devlin_bert_2019}. Both encode an \emph{absolute}
+position, and both cope badly with sequences longer than those seen in training. Later
 methods encode \emph{relative} position. ALiBi adds a small penalty that grows with
-the distance between two tokens \citep{alibi}, and RoPE rotates the queries and keys
+the distance between two tokens \citep{alibi}. RoPE rotates the queries and keys
 by an angle that depends on their position, so that their dot product ends up
 depending only on how far apart they are \citep{rope}. RoPE handles long and
-variable lengths well and is now the default in recent models such as LLaMA,
+variable lengths well, and it is now the default in recent models such as LLaMA,
 Mistral, and ModernBERT.
 
 \subsection{Encoders and decoders}
@@ -337,16 +337,16 @@ follow.}
 \label{fig:lm-attention}
 \end{figure}
 
-The same Transformer block can be wired in two ways, and the only difference is
+The same Transformer block can be wired in two ways. The only difference is
 which tokens each one is allowed to see (\Cref{fig:lm-attention}). In an \emph{encoder}, every token attends
 to the whole sequence, left and right. This two-sided view suits tasks that read a
-text and label it, such as classification or entity recognition, and it underlies
+text and label it, such as classification or entity recognition. It underlies
 BERT \citep{devlin_bert_2019} and RoBERTa \citep{roberta}. In a \emph{decoder}, a
-token may attend only to the tokens before it, a restriction imposed by a causal
-mask. This is what makes generation possible, one token at a time, as in GPT
+token may attend only to the tokens before it. A causal mask imposes this
+restriction. It is what makes generation possible, one token at a time, as in GPT
 \citep{Radford2018ImprovingLU} and LLaMA. A third design keeps both: an encoder to
-read an input and a decoder to write an output, as in T5 \citep{raffel2020t5},
-which is natural for translation and other input-to-output tasks but less common
+read an input and a decoder to write an output, as in T5 \citep{raffel2020t5}. This
+design is natural for translation and other input-to-output tasks, but it is less common
 today. The two are built the same way. What really separates them is the training
 objective, the subject of the next section.
 
