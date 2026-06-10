@@ -3,7 +3,6 @@
 \label{chap:rw-corpus}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO rediger proprement
 % TODO: le titre du chapitre est provisoire, a discuter
 
 
@@ -195,10 +194,6 @@ These methods work well for general web corpora, where text is abundant and the 
 keep the best of a large pool. The biomedical setting is different. The corpora are far
 smaller, the domain is specific, and the criteria for good text are not the same, which
 raises the prior question of what biomedical sources exist in the first place.
-
-% TODO: mentionner les approches de decontamination?
-
--> ok le filtrage marche pour les corpus web generalistes, mais en biomedical c'est different: les corpus sont plus petits, le domaine est tres specifique, les criteres de qualite ne sont pas les memes -> quelles sources biomed existent?
 
 
 \section{Biomedical and Clinical Corpora}
@@ -407,22 +402,44 @@ CCAM procedure coding, have not been used for pretraining. Contrastive methods s
 and CODER use UMLS through pairs of terms rather than by generating text from the graph. These
 open problems set up the limits we discuss next.
 
-\section{Limites et transition}
+\section{Limits and Transition}
 \label{sec:corpus-limitations}
 
-\begin{itemize}
-  \item Rarete biomed non-anglais: PMC = 98\% anglais, les corpus francais biomed sont petits et fragmentes. Les pipelines de filtrage (FineWeb-Edu, DCLM) sont concus pour l'anglais
-    -> besoin de strategies de collection et de filtrage adaptees au domaine et a la langue
-  \item Granularite de filtrage: les approches existantes (Meditron, FineWeb-Edu) filtrent au niveau document ou article. Mais un article biomed peut contenir a la fois des cas cliniques pertinents et des sections non pertinentes
-    -> besoin de filtrage a granularite plus fine (paragraphe)
-  \item Criteres de qualite non adaptes: les criteres "educatifs" de FineWeb-Edu ne correspondent pas au texte biomedical (cas cliniques, notices medicamenteuses, protocoles). Les biais vers Science \& Technology identifies par WebOrganizer peuvent etre differents en biomed
-    -> besoin de criteres domaine-specifiques
-  \item Ontologies nationales sous-exploitees: UMLS domine la recherche, mais les systemes hospitaliers francais utilisent CIM-10/ATIH, CCAM, ATC. Aucun travail n'a integre ces ontologies dans le pretraining
-    -> gap pour le codage medical en francais
-  \item Graph-to-text naissant: AntGLM-Med et EntiGraph montrent la voie mais sont limites aux decoders en anglais. Pas encore explore pour les encoders bidirectionnels ni pour les ontologies non-anglophones
-    -> possibilite de generer du texte "textbook" a partir des ontologies ATIH
-\end{itemize}
+This chapter examined the data behind pretrained language models. We looked at web-scale
+corpora and how they are collected, at quality filtering and curation, at biomedical and
+clinical sources, at medical ontologies, and at ways to fold structured knowledge into
+pretraining. Taken together, these threads leave several open problems for biomedical text in
+a lower-resource language such as French.
 
--> ce chapitre a couvert les donnees de pretraining: sources textuelles web et biomed, methodes de curation et filtrage, ontologies medicales et leurs integrations dans le pretraining. Le chapitre suivant traite de la tache finale: l'extraction d'information clinique, et de comment les modeles pretrained sont utilises pour cette tache.
+The first problem is scarcity outside English. PMC is about 98\% English
+\citep{labrak-etal-2024-biomistral}, and French biomedical corpora remain small and
+fragmented. The main filtering pipelines that made web-scale curation work, such as
+FineWeb-Edu and DCLM, were designed for English \citep{penedo2024fineweb, li2024datacomp}. How
+to collect and filter text for a specific domain in a language with little data is still an
+open question.
 
-% TODO rediger la transition proprement
+The second problem is the granularity of filtering. Existing biomedical curation operates at
+the level of the document or the article, as in Meditron \citep{chen2023meditron}. A single
+biomedical article can mix clinically relevant case material with sections that carry little
+clinical value, such as methods or acknowledgements. This suggests that finer, paragraph-level
+filtering is needed, yet such filtering has received little attention.
+
+The third problem is that quality criteria do not transfer across domains. The educational
+criterion used by FineWeb-Edu does not match biomedical text such as clinical cases, drug
+leaflets, and protocols. The domain biases identified by WebOrganizer
+\citep{wettig2024weborganizer} may also take a different shape in the biomedical case. What
+the right domain-specific quality criteria are for biomedical text remains open.
+
+Two further gaps concern knowledge. Research on medical ontologies is dominated by UMLS, but
+French hospital systems use ICD-10 as maintained by the ATIH, along with CCAM for procedures
+and ATC for drugs. No pretraining work has used these national ontologies, which is a clear
+gap for medical coding in French. At the same time, turning ontology graphs into text for
+pretraining is recent, and the existing work targets decoder models in English, as in
+EntiGraph \citep{yang2025entigraph}. Whether textbook-like text generated from a national
+ontology could help has not been tested for bidirectional encoders or for non-English
+ontologies.
+
+This chapter covered the data used to pretrain and adapt language models. The next chapter
+turns to the task these models are ultimately built for, clinical information extraction, and
+to how pretrained models are put to work on named entity recognition, medical coding, and
+normalization.
