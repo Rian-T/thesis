@@ -5,23 +5,43 @@
 \begin{center}
 \begin{tikzpicture}
 \node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
-      text width=0.84\textwidth, inner sep=11pt, align=left,
-      font=\footnotesize, text=ThesisInk] {
-{\bfseries CENTRE HOSPITALIER DE SAINT-AUBIN}\hfill Dossier n\textsuperscript{o} 4471902\\[1pt]
-Service de Cardiologie --- Unité de Soins Intensifs\hfill Séjour : 03/11--08/11/2024\\[5pt]
-{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[5pt]
-\textbf{Patient :} CARON Julien, né le 14/03/1962 (62 ans).\quad\textbf{Destinataire :} D\textsuperscript{r} S.~Lemaire.\\[6pt]
+      inner sep=10pt] {%
+\begin{tabular}{@{}l !{\hspace{6pt}\textcolor{ThesisNeutral}{\vrule width 0.3pt}\hspace{6pt}} l@{}}
+\begin{minipage}[t]{0.40\textwidth}
+\scriptsize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} FRANÇAIS · ORIGINAL}\\[4pt]
+{\bfseries CENTRE HOSPITALIER DE SAINT-AUBIN}\\ Dossier n\textsuperscript{o} 4471902\\[1pt]
+Cardiologie, Soins Intensifs\\ Séjour : 03/11--08/11/2024\\[4pt]
+{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[4pt]
+\textbf{Patient :} CARON Julien, né le 14/03/1962 (62 ans). \textbf{Dest. :} D\textsuperscript{r} S.~Lemaire.\\[5pt]
 \textbf{Motif.} Douleur thoracique constrictive rétrosternale, irradiation bras G, depuis 2h.\\[5pt]
 \textbf{Antécédents.} HTA. DT2 sous metformine. Tabac 30 PA. Dyslipidémie.\\[5pt]
 \textbf{Examen.} TA 148/92, FC 98, SpO\textsubscript{2} 96\% AA, EVA 7/10. Pas de signe d'IVG.\\[5pt]
-\textbf{Paraclinique.} ECG : sus-décalage ST V1--V4. Tropo T 4520 ng/L (N $<$14).
-Coro : occlusion IVA proximale, angioplastie + stent actif, TIMI 3. ETT : FEVG 40\%.\\[5pt]
+\textbf{Paraclinique.} ECG : sus-décalage ST V1--V4. Tropo T 4520 ng/L (N $<$14). Coro : occlusion IVA proximale, angioplastie + stent actif, TIMI 3. ETT : FEVG 40\%.\\[5pt]
 \textbf{Au total.} SCA ST+ antérieur (I21.0).\\[5pt]
 \textbf{Ttt sortie.} Kardégic 75, ticagrélor 90x2, atorvastatine 80, bisoprolol 2,5, ramipril 5.\\[5pt]
 \textbf{CAT.} Réadaptation cardiaque. Consultation cardio à 1 mois.\hfill D\textsuperscript{r} C.~Després
+\end{minipage}
+&
+\begin{minipage}[t]{0.40\textwidth}
+\scriptsize\color{ThesisNeutral}
+{\tiny\sffamily\color{ThesisNeutral} ENGLISH · TRANSLATION}\\[4pt]
+{\bfseries SAINT-AUBIN HOSPITAL}\\ Record no. 4471902\\[1pt]
+Cardiology, Intensive Care\\ Stay: 03/11--08/11/2024\\[4pt]
+{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[4pt]
+\textbf{Patient:} CARON Julien, b.\ 14/03/1962 (62 y). \textbf{To:} Dr S.~Lemaire.\\[5pt]
+\textbf{Reason.} Constrictive retrosternal chest pain, radiating to L arm, for 2h.\\[5pt]
+\textbf{History.} HTN. T2DM on metformin. Smoking 30 PY. Dyslipidaemia.\\[5pt]
+\textbf{Exam.} BP 148/92, HR 98, SpO\textsubscript{2} 96\% RA, pain 7/10. No sign of LVF.\\[5pt]
+\textbf{Workup.} ECG: ST elevation V1--V4. Trop T 4520 ng/L (N $<$14). Angiography: proximal LAD occlusion, angioplasty + drug-eluting stent, TIMI 3. Echo: LVEF 40\%.\\[5pt]
+\textbf{Summary.} Anterior STEMI (I21.0).\\[5pt]
+\textbf{Discharge tx.} Aspirin 75, ticagrelor 90x2, atorvastatin 80, bisoprolol 2.5, ramipril 5.\\[5pt]
+\textbf{Plan.} Cardiac rehabilitation. Cardiology review at 1 month.\hfill Dr C.~Després
+\end{minipage}
+\end{tabular}%
 };
 \end{tikzpicture}
-\captionof{figure}{A discharge summary for an acute myocardial infarction.}
+\captionof{figure}{A discharge summary for an acute myocardial infarction; French original, English translation.}
 \label{fig:bt-clinical-note}
 \end{center}
 \medskip

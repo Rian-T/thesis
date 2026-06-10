@@ -3,18 +3,32 @@
 
 \noindent
 \begin{center}
-\begin{tikzpicture}
 % Representative (fictional, de-identified) patient-forum message; lay/involved register.
+\begin{tikzpicture}
 \node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
-      text width=0.84\textwidth, inner sep=12pt, align=justify,
-      font=\footnotesize, text=ThesisInk] {
+      inner sep=10pt] {%
+\begin{tabular}{@{}l !{\hspace{6pt}\textcolor{ThesisNeutral}{\vrule width 0.3pt}\hspace{6pt}} l@{}}
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} FRANÇAIS · ORIGINAL}\\[5pt]
 \textit{Bonjour, mon père a fait une crise cardiaque la semaine dernière. Il a eu
 une grosse douleur dans la poitrine qui descendait dans le bras gauche, il était
 tout pâle et en sueur, on a appelé le 15 tout de suite. Est-ce que quelqu'un sait
 combien de temps dure la convalescence après un infarctus ? Merci d'avance.}
+\end{minipage}
+&
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisNeutral}
+{\tiny\sffamily\color{ThesisNeutral} ENGLISH · TRANSLATION}\\[5pt]
+\textit{Hello, my father had a heart attack last week. He had a strong pain in the
+chest that went down into the left arm, he was all pale and sweating, we called
+emergency services right away. Does anyone know how long recovery takes after a
+heart attack? Thanks in advance.}
+\end{minipage}
+\end{tabular}%
 };
 \end{tikzpicture}
-\captionof{figure}{A patient forum about myocardial infarction.}
+\captionof{figure}{A patient forum about myocardial infarction; French original, English translation.}
 \label{fig:bt-web}
 \end{center}
 \medskip

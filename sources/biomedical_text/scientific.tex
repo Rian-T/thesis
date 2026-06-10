@@ -5,8 +5,11 @@
 \begin{center}
 \begin{tikzpicture}
 \node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
-      text width=0.84\textwidth, inner sep=12pt, align=justify,
-      font=\footnotesize, text=ThesisInk] {
+      inner sep=10pt] {%
+\begin{tabular}{@{}l !{\hspace{6pt}\textcolor{ThesisNeutral}{\vrule width 0.3pt}\hspace{6pt}} l@{}}
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} FRANÇAIS · ORIGINAL}\\[5pt]
 \textit{L'insuffisance mitrale (IM) ischémique est une valvulopathie fonctionnelle,
 restrictive, liée au remodelage ventriculaire gauche post-infarctus et qui
 complique environ 20\% des cardiopathies ischémiques. Sa présence grève lourdement
@@ -14,9 +17,23 @@ le pronostic de la maladie coronarienne, tant en termes de morbidité que de
 mortalité. Encore mal connue, elle suscite depuis quelques années de nombreux
 travaux visant à préciser ses mécanismes physiopathologiques, ses facteurs
 pronostiques et sa prise en charge thérapeutique.}
+\end{minipage}
+&
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisNeutral}
+{\tiny\sffamily\color{ThesisNeutral} ENGLISH · TRANSLATION}\\[5pt]
+\textit{Ischaemic mitral regurgitation is a functional, restrictive valve disease,
+linked to post-infarction left-ventricular remodelling, which complicates about
+20\% of ischaemic heart diseases. Its presence weighs heavily on the prognosis of
+coronary disease, in terms of both morbidity and mortality. Still poorly understood,
+it has prompted in recent years a large body of work seeking to clarify its
+pathophysiological mechanisms, its prognostic factors and its therapeutic
+management.}
+\end{minipage}
+\end{tabular}%
 };
 \end{tikzpicture}
-\captionof{figure}{A research article about myocardial infarction.}
+\captionof{figure}{A research article about myocardial infarction; French original, English translation.}
 \label{fig:bt-scientific}
 \end{center}
 \medskip
