@@ -828,7 +828,7 @@ A drop in a benchmark score is not always true forgetting. \citet{zheng2025spuri
 argue that the early steps of a new training phase often disturb a model's
 \emph{alignment}, its learned way of exposing what it knows, more than its knowledge.
 In their words, ``performance drops often reflect a decline in task alignment rather
-than true knowledge loss'', and much of the loss can be recovered. The lesson for what
+than knowledge loss'', and much of the loss can be recovered. The lesson for what
 follows is to read a post-adaptation drop with care, and to design the adaptation so
 that it does not disturb more than it must.
 
@@ -1010,7 +1010,7 @@ The encoder gains above rest on a handful of changes to attention and normalisat
 FlashAttention reorganises the attention computation to fit the memory hierarchy of the
 GPU, using tiling and kernel fusion so that intermediate results stay in fast memory
 \citep{dao2022flashattention}. The arithmetic cost is still the $O(L^2)$ of
-\Cref{sec:lm-transformer}, but avoiding slow memory reads and writes makes it two to four
+\Cref{sec:lm-transformer}, but avoiding slow memory reads and writes makes it up to roughly three
 times faster in practice, and it is now a standard component. Grouped-query attention
 addresses memory at inference time by sharing key and value heads across several query
 heads, which shrinks the cache that the model must hold while generating

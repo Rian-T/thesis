@@ -147,8 +147,8 @@ QUAERO using the BRATeval tool, and added ICD-10 coding of death certificates
 These corpora were long used in isolation, which made models hard to compare. DrBenchmark
 was the first unified French biomedical benchmark, gathering twenty tasks over twelve datasets
 so that models could be compared under one protocol \citep{labrak2024drbenchmark}. Its results
-show that models pretrained on biomedical text outperform general-language models on these
-tasks.
+show that biomedical pretraining helps on most of these tasks, though no single model is best
+on all of them.
 
 \subsection{Specifics of Clinical Text}
 
@@ -202,7 +202,7 @@ with hyperbolic embeddings, since hyperbolic space fits tree structures better t
 space, and it adds a graph of code co-occurrences.
 
 Pretrained language models then entered the field. \citet{huang2022plmicd} introduced PLM-ICD,
-the first model to use pretrained encoders for ICD coding, with label attention over the model
+the first to make pretrained encoders work competitively for ICD coding, with label attention over the model
 representations and segment pooling to handle long documents. Its main finding is that a better
 pretrained encoder leads to better coding, so pretraining quality matters directly for this
 task. \citet{yuan2022msmn} took a different route with MSMN, a multiple-synonym matching
@@ -218,7 +218,7 @@ models.
 \subsection{Coding in French}
 
 French resources for coding are scarce. \citet{pignat2024fracco} released FRACCO, a French
-oncology corpus of 1301 clinical cases annotated with ICD-O codes. \citet{zaghir2023frasimed}
+oncology corpus of 1301 synthetic clinical cases annotated with ICD-O codes. \citet{zaghir2023frasimed}
 released FRASIMED, a French adaptation of Spanish coding corpora with about 2000 clinical
 documents. The CLEF eHealth 2016 shared task also provided ICD-10 coding of French death
 certificates. These corpora are small and cover narrow domains, so they support evaluation
@@ -256,12 +256,12 @@ adds relation information to improve term normalization \citep{yuan2022coder}. W
 both models are pretrained in \Cref{sec:corpus-knowledge}, so here we note only their role as
 ready encoders for matching mentions to concepts.
 
-BioSyn takes a more structured view of normalization \citep{sung2020biosyn}. It combines a
-bi-encoder, which retrieves a set of candidate concepts quickly, with a cross-encoder, which
-compares a mention against each candidate more carefully. Because one concept often has
-several synonyms, BioSyn aggregates scores across the synonyms of a candidate using a marginal
-objective during training. Re-ranking the retrieved candidates with the cross-encoder improves
-the final results over retrieval alone.
+BioSyn takes a more structured view of normalization \citep{sung2020biosyn}. It represents a
+mention with both a sparse and a dense encoder and adds their scores to retrieve candidate
+concepts. Because one concept often has several synonyms, BioSyn aggregates scores across the
+synonyms of a candidate using a marginal objective during training, and it refreshes the hard
+candidates as training proceeds. This synonym marginalization is what improves the final
+results.
 
 These methods share clear limits. Most of the work is done in English and built on UMLS. UMLS
 covers English vocabulary well, but it matches French clinical language poorly, with its
@@ -296,7 +296,7 @@ bidirectional transformer encodes the input text and the candidate entity types 
 types are written as natural language, such as ``disease'' or ``drug name'', rather than as
 fixed numeric labels, so a user can ask for any type at inference time. The model places span
 representations and type representations in a shared space and matches them by similarity.
-GLiNER reaches higher zero-shot scores than ChatGPT while using about 200 million parameters,
+GLiNER reaches higher zero-shot scores than ChatGPT while using up to 300 million parameters,
 which is far smaller than a large language model. GLiNER2 extends this design into a single
 framework that covers named entity recognition, relation extraction, classification, and
 structured extraction in one model \citep{zaratiana2025gliner2}. A biomedical version,
