@@ -19,3 +19,11 @@ ec_directive_2001_83             # EU legal act (EUR-Lex CELEX 32001L0083), no D
 ema_qrd_template                 # EMA web resource (QRD template), no DOI
 krallinger2017chemprot
 yang2024clinicalmamba
+
+# Real but poorly indexed (title-only fuzzy match misfires); verified real by hand:
+fox_health_online_2013          # Pew Research, Health Online 2013 (report, no DOI)
+kittredge_sublanguages_1982     # Kittredge & Lehrberger (eds.), de Gruyter book chapter
+sager_mlp_1987                  # Sager et al., Medical Language Processing, Addison-Wesley (sim 100)
+grice_logic_1975                # Grice, Logic and Conversation (sim 100; 1975 vs reprint year)
+wuster_einfuhrung_1979          # Wüster, allgemeine Terminologielehre (German classic, no DOI)
+tang2024txt360                  # TxT360 LLM pretraining dataset (HuggingFace, no DOI)
