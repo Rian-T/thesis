@@ -196,6 +196,21 @@
 }
 
 %% ============================================================
+%% PART-OPENING EPIGRAPH (Tufte-style, flush right)
+%% ============================================================
+%% \partepigraph{quote text}{attribution}
+\newcommand{\partepigraph}[2]{%
+  \par\null\vskip1ex
+  \hfill\begin{minipage}{0.6\textwidth}%
+    \raggedleft\itshape\small\color{ThesisInk!85}%
+    #1\par
+    \vskip0.8ex
+    \upshape\footnotesize\color{ThesisNeutral}#2%
+  \end{minipage}\par
+  \vskip3ex
+}
+
+%% ============================================================
 %% ERROR BAR STYLE
 %% ============================================================
 
