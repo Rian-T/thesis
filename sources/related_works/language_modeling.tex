@@ -10,7 +10,7 @@ Long before computers, people knew you could guess the next
 symbol in a text from the ones before it. In 1913 the mathematician Andrei
 Markov tested this by hand. He took twenty thousand letters from Pushkin's
 \emph{Eugene Onegin} and marked each one as a vowel or a consonant. Then he counted.
-A vowel was followed by another vowel 13\% of the time and by a consonant 66\% of the
+A vowel was followed by another vowel 13\% of the time and by a consonant 87\% of the
 time \citep{markov_onegin_1913}. Letters do not stand alone. What comes before shapes
 what comes next, and you can measure it.
 
@@ -135,7 +135,7 @@ given the $n-1$ before it. These probabilities come straight from counts in a
 training corpus. The problem is the same as before, only sharper. The number of
 possible $n$-grams grows as $|\mathcal{V}|^{n}$, so for any real vocabulary most
 $n$-grams are never seen and their counts are zero. Smoothing methods help here.
-The best known is Kneser-Ney smoothing \citep{kneser_ney}. It moves some probability
+The best known is Kneser-Ney smoothing \citep{kneserney1995}. It moves some probability
 onto unseen sequences and falls back to shorter contexts when a longer one is
 missing. Smoothing made n-gram models good enough to be the state of the art for years.
 But these models cannot share what they learn between similar words. \emph{Heart attack}
@@ -276,7 +276,7 @@ measured gradients.}
 The \emph{long short-term memory} network, or LSTM, was built to ease it
 \citep{hochreiter1997long}. Alongside the hidden state it keeps a separate memory
 cell that runs along the sequence. A set of \emph{gates} controls it, deciding
-at each step what to erase from the cell, what to write into it, and what to read
+at each step what to write into the cell and what to read
 out. Information can travel along the cell almost unchanged, so useful facts
 survive over longer spans, and so does the gradient that carries them. A lighter
 variant, the gated recurrent unit, drops one of the gates and performs comparably
@@ -589,7 +589,7 @@ TriviaQA (open QA)     & 64.3 & 68.0 & 71.2 \\
 \bottomrule
 \end{tabular}
 \caption{GPT-3 (175B) accuracy as the number of in-context examples grows, with no
-weight updates. Numbers are verbatim from \citet{gpt3}.}
+weight updates. Numbers are from \citet{gpt3}.}
 \label{tab:lm-fewshot}
 \end{table}
 
@@ -630,8 +630,7 @@ fed too little data to fill them.
 \includegraphics[width=0.78\textwidth]{plots/related_works/chinchilla_scaling.pdf}
 \caption{The compute-optimal model size and the compute-optimal number of training
 tokens rise together with the training budget, as the parallel lines show. Points are
-verbatim from Table 3 of \citet{chinchilla_scaling}; the paper's loss curves are not
-reproduced here.}
+from Table 3 of \citet{chinchilla_scaling}.}
 \label{fig:lm-chinchilla}
 \end{figure}
 
@@ -652,7 +651,7 @@ they also brought capable models within reach of ordinary research budgets.
 \includegraphics[width=0.86\textwidth]{plots/related_works/llama_vs_gpt3.pdf}
 \caption{A 13-billion-parameter model trained on more tokens matches or beats GPT-3,
 which is more than ten times larger, on most of these zero-shot reasoning tasks.
-Numbers are verbatim from Table 4 of \citet{touvron2023llama}.}
+Numbers are from Table 3 of \citet{touvron2023llama}.}
 \label{fig:lm-llama}
 \end{figure}
 
@@ -804,10 +803,10 @@ in-domain corpus, then task-adaptive pretraining on the task's own unlabelled te
 \medskip
 
 This second phase is one case of a broader topic. A recent survey divides continual
-learning for language models into three settings: continued pretraining, continual
-instruction tuning, and continual alignment. It sorts the methods that protect earlier
+learning for language models into three stages: continued pretraining, domain-adaptive
+pretraining, and continual fine-tuning. It sorts the methods that protect earlier
 knowledge into replay, regularisation, and architecture-based families
-\citep{shi2025continual}. The rest of this section keeps to the first setting,
+\citep{shi2025continual}. The rest of this section keeps to the first stage,
 continued pretraining, since it is the one this thesis uses.
 
 \subsection{Catastrophic Forgetting}
@@ -934,8 +933,9 @@ results ``as good as those obtained using larger datasets (130+GB)''
 heterogeneous French corpus \citep{le-etal-2020-flaubert}. Later models refreshed the
 recipe. CamemBERTa adopted the DeBERTaV3 architecture and its replaced-token-detection
 objective for better data efficiency \citep{antoun-etal-2023-camemberta}, and CamemBERT~2.0
-retrained the family on newer data to counter the drift of language over time
-\citep{antoun2024camembert2}.
+retrained the family on more recent data, with a longer context, an updated tokenizer,
+and new architectures, to counter the temporal concept drift caused by outdated training
+data \citep{antoun2024camembert2}.
 
 The two dedicated French biomedical encoders were both trained from scratch. DrBERT
 trained a RoBERTa model on NACHOS, a corpus of French biomedical and clinical text, and

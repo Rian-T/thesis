@@ -3,6 +3,37 @@
 Last updated end of a long writing session. Read this, then `guidelines/working-with-rian.md`
 and `guidelines/writing-guide.md` (§7 especially), then `CLAUDE.md`.
 
+## ADDENDUM — session 2026-06-11 (claim-level fact-check, triptych + whole RW, fixes applied)
+- **Second, independent, BLIND fact-check** of every `\cite` in the triptych AND all three RW
+  chapters — checks *what the source actually says*, not just that the bib entry is real.
+  Method: staged Opus workflow, **one subagent per citation**, **curl/Bash only (no WebFetch,
+  no memory)**, 1 round on all + 2 more rounds on anything not VERIFIED + adjudication on
+  disagreement; agents blind to the earlier `research/factcheck/`. Scripts + reports in
+  `research/factcheck2/` (triptych, 37 cites) and `research/factcheck_rw/` (RW, 156 cites).
+- **Triptych (37): 27 verified, 8 partial, 2 cant-verify.** Fixes applied & committed:
+  grabar "B.A." case quote is NOT in the CAS paper → now an illustrative example (cite dropped);
+  biber "speech verbs"→"private verbs"; biber_finegan "personal language"→"hedging"; bodenreider
+  drop homonymy half; kittredge soften; luzón → her real frameworks; friedman (commented) reworded.
+- **RW (156): 143 verified, 10 partial, 3 mismatch, 0 cant-verify.** Fixes applied this session:
+  raghavan drop nonexistent "80%"; magnini E3C "medical-thesis"→"PubMed clinical-case" abstracts;
+  touvron "one to two"→"one to 1.4" trillion + fig caption Table 4→Table 3; shi survey taxonomy
+  corrected; gliner2 drop "relation extraction"; **kneser-ney → added verified Kneser&Ney 1995
+  entry (`kneserney1995`)**; markov 66%→87%; hochreiter drop "erase"/forget-gate; singhal removed
+  from clinical-NER cite (Med-PaLM=QA); kweon limitation de-attributed; lindberg cite moved to the
+  foundational claim; soroush softened to "medical coding … error-prone".
+- **CamemBERT 2.0 (`antoun2024camembert2`)**: prose said "drift of language over time" — wrong;
+  paper says **temporal concept drift** (stale *data*). Reworded to "more recent data, longer
+  context, updated tokenizer, new architectures, to counter temporal concept drift".
+- **web.tex P1**: dropped the unsupported superlative "most common medical writing of all"; now
+  backed by **Pew *Health Online 2013*** (added `fox_health_online_2013`, curl-verified: 72% of
+  US internet users looked online for health info). Rian then refined the wording himself.
+- **3 "verbatim from Table X" figure captions** (GPT-3/Chinchilla/LLaMA) → plain "from …".
+- **Two lessons:** (1) the mechanical claim-extraction window can truncate a leading digit
+  ("15 trillion"→"5 trillion" false MISMATCH on `penedo2024fineweb`) — ALWAYS read the real line
+  before editing. (2) an agent can mis-flag a bib title by comparing to the arXiv vs published
+  version (`zaratiana2025gliner2` title was already correct vs Crossref/ACL). Verify before changing.
+- Build clean (`latexmk`, 0 undefined). All of the above committed.
+
 ## ADDENDUM — session 2026-06-10/11 (Related Works finished + verified)
 - **All 3 RW chapters now full prose** (LM 5.8–5.10 + corpus_annotation 6.1–6.7 + clinical_ie
   7.1–7.9 prosified this session via fable subagents, then 1 review pass + **3 simplification

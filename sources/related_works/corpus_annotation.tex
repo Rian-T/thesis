@@ -11,7 +11,7 @@
 
 The previous chapter ended on a simple point: language models are only as good as the data
 they are trained on. The scale of that data is now very large. GPT-3 was trained on about
-300 billion tokens \citep{gpt3}, and the LLaMA models on one to two trillion tokens
+300 billion tokens \citep{gpt3}, and the LLaMA models on one to 1.4 trillion tokens
 \citep{touvron2023llama}. These numbers are not arbitrary. The Chinchilla scaling result
 showed that, for a fixed compute budget, the strongest models use far more data than
 earlier practice assumed, and that data and model size should grow together
@@ -240,7 +240,7 @@ Public French biomedical resources exist, but they are scattered across several 
 ISTEX is a base of about 27 million scientific references from which French biomedical
 documents can be extracted. CLEAR provides French drug leaflets and medical encyclopaedia
 articles in both technical and simplified versions \citep{grabar_clear_2018}. E3C is a
-multilingual corpus of clinical cases, drug leaflets, and medical-thesis abstracts
+multilingual corpus of clinical cases, drug leaflets, and PubMed clinical-case abstracts
 \citep{magnini_e3c_2021}. HAL, the French open repository, and its harvested version HALvest
 provide French and English scientific articles \citep{kulumba2024halvest}. Biomedical
 Wikipedia adds a free and multilingual source. Together these resources are useful, but
@@ -280,12 +280,11 @@ word statistics. Several large ontologies of this kind cover the biomedical doma
 of them are central to clinical work in France.
 
 The Unified Medical Language System (UMLS) is the meta-ontology maintained by the United
-States National Library of Medicine (NLM). It brings together about 189 source vocabularies,
+States National Library of Medicine (NLM) \citep{lindberg_unified_1993}. It brings together about 189 source vocabularies,
 including SNOMED-CT, the Medical Subject Headings (MeSH), the International Classification of
 Diseases (ICD), and the Anatomical Therapeutic Chemical classification (ATC). In its current releases it contains
 roughly 3.4 million concepts and about 16.7 million unique concept names. For each concept
-it gives synonyms, hierarchical and associative relations, and definitions
-\citep{lindberg_unified_1993}.
+it gives synonyms, hierarchical and associative relations, and definitions.
 
 SNOMED-CT holds about 371{,}000 clinical concepts. They are connected by hierarchical
 relations, of the is-a kind, and by associative relations such as finding site and causative

@@ -46,6 +46,12 @@ make checkbib-strict   # exit 1 if any MISMATCH/NOT_FOUND (pre-submission gate)
 - Results are cached in `tools/.bibcheck_cache.json`, so re-runs are fast/offline.
 - Run `make checkbib` after adding or editing any `\cite`d reference, and
   `make checkbib-strict` before any submission.
+- `checkbib` only proves a reference is *real*; it does NOT check that the source actually
+  says what the prose claims. A separate **claim-level** fact-check (one Opus subagent per
+  `\cite`, curl-only, blind, side-by-side with the original PDF) covered the triptych and all
+  3 RW chapters — method + verdicts in `research/factcheck2/` and `research/factcheck_rw/`
+  (gitignored). Reuse that pattern for new chapters; always read the real `.tex` line before
+  applying a fix (the extraction window can truncate a leading digit).
 
 ## Git Commit Conventions
 

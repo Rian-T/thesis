@@ -18,8 +18,8 @@ record them in a form that supports research and care.
 This task matters because hospitals increasingly store their records in clinical data
 warehouses, large databases that gather electronic health records for secondary use. Most of
 the clinically useful information in these records lives in free text rather than in structured
-fields. Up to 80\% of clinical entities are absent from the structured part of the record,
-which leaves reports, letters, and prescriptions as the main source \citep{raghavan_how_2014}.
+fields. Most medical concepts appear only in the free text, which leaves reports, letters, and
+prescriptions as the main source \citep{raghavan_how_2014}.
 France adds a further reason to study the problem. The PMSI, the national system that describes
 hospital activity, requires every hospital stay to be coded with ICD-10 diagnosis codes and
 CCAM procedure codes, covering about 30 million stays a year. This coding is still done by hand
@@ -210,8 +210,8 @@ network that uses UMLS synonyms for each code. This helps because clinical text 
 expressions for one concept, and a synonym table lets the model match these variants to the
 same code.
 
-Large language models do poorly on coding. \citet{soroush2024gpt4coding} benchmarked GPT-4 for
-ICD-10 coding and found low exact-match accuracy. Specialised approaches such as PLM-ICD and
+Large language models do poorly on coding. \citet{soroush2024gpt4coding} benchmarked large
+language models for medical coding and found them highly error-prone. Specialised approaches such as PLM-ICD and
 MSMN remain stronger, which reinforces the case for specialised encoders over generic large
 models.
 
@@ -298,7 +298,7 @@ fixed numeric labels, so a user can ask for any type at inference time. The mode
 representations and type representations in a shared space and matches them by similarity.
 GLiNER reaches higher zero-shot scores than ChatGPT while using up to 300 million parameters,
 which is far smaller than a large language model. GLiNER2 extends this design into a single
-framework that covers named entity recognition, relation extraction, classification, and
+framework that covers named entity recognition, classification, and
 structured extraction in one model \citep{zaratiana2025gliner2}. A biomedical version,
 GLiNER-BioMed \citep{zaratiana2025glinerbiomed}, fine-tunes the approach on biomedical entity
 recognition datasets and reports gains over the general GLiNER on biomedical benchmarks. This
@@ -319,8 +319,8 @@ a compact named entity recognition foundation model built on a RoBERTa-base enco
 \citep{bogdanov2024nuner}. It is pretrained with contrastive learning on GPT-3.5 annotations of
 the C4 web corpus, and its authors find that the size and diversity of this training data
 matter more than any other choice. Large language models have also been applied directly to
-clinical named entity recognition. Early work was encouraging \citep{agrawal_large_2022,
-singhal_large_2022}, but \citet{lehman_we_2023} argued that BERT-style models remain
+clinical named entity recognition. Early work was encouraging \citep{agrawal_large_2022},
+but \citet{lehman_we_2023} argued that BERT-style models remain
 competitive on extractive clinical tasks, that large models are hard to run inside a hospital,
 and that sending clinical text to a proprietary API raises confidentiality problems.
 
@@ -387,8 +387,8 @@ idea further by training a clinical language model entirely on synthetic notes. 
 model to turn public case reports into realistic clinical notes and used no private clinical
 data. The result was competitive with models trained on real notes \citep{kweon2024asclepius}.
 
-The same work makes the limits clear. Synthetic notes often read as too clean and complete, and
-they lack the telegraphic style of real clinical writing. The generator can also produce
+Synthetic notes built this way still tend to read as too clean and complete, and
+they lack the terse, telegraphic style of real clinical writing. The generator can also produce
 stereotyped cases that under-represent rare presentations and unusual patients. When a large
 model supplies the labels rather than the text, those labels are not gold-standard expert
 annotations, and errors in them pass on to the model that learns from them. These caveats
