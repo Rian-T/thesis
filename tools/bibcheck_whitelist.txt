@@ -18,7 +18,6 @@ lindberg_unified_1993           # UMLS, Lindberg et al., Methods Inf Med 1993
 ec_directive_2001_83             # EU legal act (EUR-Lex CELEX 32001L0083), no DOI
 ema_qrd_template                 # EMA web resource (QRD template), no DOI
 krallinger2017chemprot
-yang2024clinicalmamba
 
 # Real but poorly indexed (title-only fuzzy match misfires); verified real by hand:
 fox_health_online_2013          # Pew Research, Health Online 2013 (report, no DOI)

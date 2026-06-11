@@ -294,6 +294,7 @@ thesis.pdf
 # Publications (separate repos)
 publications/
 tools/.bibcheck_cache.json
+tools/.arxivcheck_cache.json
 tools/bibcheck_report.json
 build/
 logs/

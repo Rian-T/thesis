@@ -3287,14 +3287,12 @@ url={https://openreview.net/forum?id=jznbgiynus}
   year={2022}
 }
 
-@misc{penedo2024finewebdatasetsdecantingweb,
-      title={The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale}, 
-      author={Guilherme Penedo and Hynek Kydlíček and Loubna Ben allal and Anton Lozhkov and Margaret Mitchell and Colin Raffel and Leandro Von Werra and Thomas Wolf},
-      year={2024},
-      eprint={2406.17557},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2406.17557}
+@inproceedings{penedo2024finewebdatasetsdecantingweb,
+  title = {The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale},
+  author = {Penedo, Guilherme and Kydlíček, Hynek and Ben Allal, Loubna and Lozhkov, Anton and Mitchell, Margaret and Raffel, Colin and Von Werra, Leandro and Wolf, Thomas},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024) Datasets and Benchmarks Track},
+  year = {2024},
+  doi = {10.52202/079017-0970},
 }
 
 @inproceedings{
@@ -4108,11 +4106,15 @@ url={https://openreview.net/forum?id=rkE3y85ee}
   year = {2025},
 }
 
-@article{modernbert,
+@inproceedings{modernbert,
   title = {Smarter, Better, Faster, Longer: A Modern Bidirectional Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference},
-  author = {Warner, Benjamin and Clavié, Benjamin and others},
-  journal = {arXiv preprint arXiv:2412.13663},
-  year = {2024},
+  author = {Warner, Benjamin and Chaffin, Antoine and Clavié, Benjamin and Weller, Orion and Hallström, Oskar and Taghadouini, Said and Gallagher, Alexis and Biswas, Raja and Ladhak, Faisal and Aarsen, Tom and Adams, Griffin Thomas and Howard, Jeremy and Poli, Iacopo},
+  booktitle = {Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  year = {2025},
+  address = {Vienna, Austria},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.acl-long.127},
+  pages = {2526--2547},
 }
 
 @inproceedings{jin2021medqa,
@@ -4129,11 +4131,15 @@ url={https://openreview.net/forum?id=rkE3y85ee}
   year = {2022},
 }
 
-@article{jin2019pubmedqa,
+@inproceedings{jin2019pubmedqa,
   title = {{PubMedQA}: A Dataset for Biomedical Research Question Answering},
   author = {Jin, Qiao and Dhingra, Bhuwan and Liu, Zhengping and Cohen, William and Lu, Xinghua},
-  journal = {arXiv preprint arXiv:1909.06146},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
   year = {2019},
+  address = {Hong Kong, China},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/D19-1259},
+  pages = {2567--2577},
 }
 
 @inproceedings{labrak-etal-2022,
@@ -4457,13 +4463,6 @@ url={https://openreview.net/forum?id=rkE3y85ee}
 @comment{Synthetic Data and LLM-Generated Training Data}
 @comment{============================================================}
 
-@article{gunasekar2023phi,
-  title={Textbooks Are All You Need},
-  author={Gunasekar, Suriya and Zhang, Yi and Anber, Jyoti and Bubeck, S{\'e}bastien and Eldan, Ronen and Ganapathy, Neel and Lee, Yin Tat and Li, Yuanzhi and others},
-  journal={arXiv preprint arXiv:2306.11644},
-  year={2023}
-}
-
 
 @inproceedings{yang2025entigraph,
   title={Synthetic Continued Pretraining},
@@ -4478,14 +4477,6 @@ url={https://openreview.net/forum?id=rkE3y85ee}
 @comment{Medical Coding}
 @comment{============================================================}
 
-@inproceedings{mullenbach2018explainable,
-  title={Explainable Prediction of Medical Codes from Clinical Text},
-  author={Mullenbach, James and Wiegreffe, Sarah and Duke, Jon and Sun, Jimeng and Eisenstein, Jacob},
-  booktitle={Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies},
-  pages={1101--1111},
-  year={2018},
-  publisher={ACL}
-}
 
 @inproceedings{huang2022plmicd,
   title={{PLM-ICD}: Automatic {ICD} Coding with Pretrained Language Models},
@@ -5091,13 +5082,15 @@ url={https://openreview.net/forum?id=rkE3y85ee}
   note      = {arXiv:2403.08763}
 }
 
-@misc{guo2024efficient,
-  title         = {Efficient Continual Pre-training by Mitigating the Stability Gap},
-  author        = {Guo, Yiduo and Fu, Jie and Zhang, Huishuai and Zhao, Dongyan and Shen, Yikang},
-  year          = {2024},
-  eprint        = {2406.14833},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CL}
+@inproceedings{guo2024efficient,
+  title         = {Efficient Domain Continual Pretraining by Mitigating the Stability Gap},
+  author        = {Guo, Yiduo and Fu, Jie and Zhang, Huishuai and Zhao, Dongyan},
+  booktitle     = {Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  year          = {2025},
+  address       = {Vienna, Austria},
+  publisher     = {Association for Computational Linguistics},
+  doi           = {10.18653/v1/2025.acl-long.1578},
+  pages         = {32850--32870},
 }
 
 @inproceedings{xie2024efficientcpt,
@@ -5548,10 +5541,15 @@ url={https://openreview.net/forum?id=rkE3y85ee}
   publisher = {Elsevier}, doi = {10.1006/jbin.2001.1029}
 }
 
-@article{yang2024clinicalmamba,
+@inproceedings{yang2024clinicalmamba,
   title = {{ClinicalMamba}: A Generative Clinical Language Model on Longitudinal Clinical Notes},
-  author = {Yang, Zhichao and Mitra, Avijit and Hu, Weisong and Yu, Hong},
-  journal = {arXiv preprint arXiv:2403.05795}, year = {2024}, note = {Clinical NLP workshop}
+  author = {Yang, Zhichao and Mitra, Avijit and Kwon, Sunjae and Yu, Hong},
+  booktitle = {Proceedings of the 6th Clinical Natural Language Processing Workshop},
+  year = {2024},
+  address = {Mexico City, Mexico},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2024.clinicalnlp-1.5},
+  pages = {54--63},
 }
 
 @inproceedings{mullenbach2018caml,
@@ -5609,11 +5607,12 @@ url={https://openreview.net/forum?id=rkE3y85ee}
   doi = {10.18653/v1/2025.emnlp-demos.10}
 }
 
-@misc{zaratiana2025glinerbiomed,
-  title = {{GLiNER-biomed}: A Suite of Efficient Models for Open Biomedical Named Entity Recognition},
+@article{zaratiana2025glinerbiomed,
+  title = {{GLiNER-BioMed}: A Suite of Efficient Models for Open Biomedical Named Entity Recognition},
   author = {Yazdani, Anthony and Stepanov, Ihor and Teodoro, Douglas},
-  year = {2025}, eprint = {2504.00676}, archivePrefix = {arXiv}, primaryClass = {cs.CL},
-  note = {arXiv:2504.00676}
+  journal = {Bioinformatics},
+  year = {2026},
+  doi = {10.1093/bioinformatics/btag322},
 }
 
 @inproceedings{zhou2024universalner,
