@@ -36,23 +36,24 @@ heart attack? Thanks in advance.}
 % === P1 — HOOK ===
 \Cref{fig:bt-web} shows the same heart attack one more time. This time it is in the
 words of the people who live through it. There is no technical vocabulary here. A
-worried relative writes \emph{crise cardiaque} rather than \emph{infarctus du
-myocarde}. The symptoms are described in plain, everyday words. This kind of text is
-the most common medical writing of all. Far more health information is written for
-patients than there are journal articles. There is more again than there are clinical
-notes. It is clearly not a clinical record. Still, it is worth a close look. It shows
-what happens to medical language when it reaches the public, and above all what
-happens to the names of things.
+worried relative writes \emph{crise cardiaque} (\emph{heart attack}) rather than
+\emph{infarctus du myocarde} (\emph{myocardial infarction}). The symptoms are
+described in plain, everyday words. This kind of text is
+the most common medical writing of all. A large amount of health information is
+written for patients, much of it freely available. This text is far from the
+language of the clinic, but it offers something research articles do not: an
+abundant and more varied representation of medical knowledge. It is therefore worth
+examining how medical language, and especially medical terms, change when they reach
+the public.
 
 % === P2 — Fleck ===
 The idea that a fact changes as it travels is an old one. In 1935 the physician
 Ludwik Fleck argued that knowledge is first made inside a small circle of
 specialists. It is then changed as it moves out to a wider audience
-\citep{fleck_genesis_1979}. On the way out it is made simpler and more vivid. The
-cautious \emph{it appears that} of the laboratory becomes the public's
-\emph{doctors have shown}, and the careful technical term gives way to an everyday
-word. On this view, writing for patients is another layer of the same knowledge,
-cut to a different shape for a different reader.
+\citep{fleck_genesis_1979}. As knowledge reaches the public, cautious claims become
+more direct and technical terms are replaced by everyday words. Writing for patients
+therefore presents the same knowledge in a different form, adapted to a different
+audience.
 
 % === P2b — the drug leaflet: official, mandated vulgarisation ===
 Not all of this lay writing is unofficial. The most systematic patient-facing text
@@ -63,11 +64,29 @@ understandable terms for the users'' \citep{ec_directive_2001_83}. A shared
 template fixes the same six headings everywhere, from \emph{what the medicine is
 and what it is used for} to \emph{possible side effects}. A draft must also be
 tested on real patients for readability before it can be approved
-\citep{ema_qrd_template}. Here the move from specialist to public that Fleck
-described is spelled out and checked. The leaflet also
-puts the variation in names on display. The rules require the brand name to
+\citep{ema_qrd_template}. This makes the move from specialist to public explicit.
+The leaflet also shows how names vary. The rules require the brand name to
 sit beside the common one, \emph{Doliprane} next to \emph{paracétamol}. So a
 single substance carries several of its names side by side on one page.
+
+\begin{center}
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      inner sep=10pt] {%
+\begin{minipage}{0.84\textwidth}
+\footnotesize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} EMEA · PATIENT-FACING MEDICINE SUMMARY}\\[5pt]
+\textit{Ultratard est une insuline de substitution identique à l'insuline fabriquée
+par le pancréas. Le principe actif d'Ultratard, l'insuline humaine (ADNr), est
+produit grâce à une méthode dite de ``technologie recombinante''.}
+\end{minipage}
+};
+\end{tikzpicture}
+\captionof{figure}{One medicine named as a brand, a treatment, and an active substance
+in the EMEA split of the MC-Bio corpus.}
+\label{fig:bt-emea-names}
+\end{center}
+\medskip
 
 % === P3 — naming varies (Wüster foil, Cabré, Gaudin) ===
 What changes most, for our purpose, is the naming. When terminology was founded as
@@ -98,8 +117,8 @@ blurred at the boundary.
 Medicine has not solved this. It has only catalogued it. The Unified Medical
 Language System, described by Olivier Bodenreider, gathers more than sixty
 vocabularies into a single map that links names to concepts
-\citep{bodenreider_unified_2004}. The map is many-to-many on purpose. One concept
-can carry many names, and one name can point to more than one concept. In its 2004
+\citep{bodenreider_unified_2004}. It clusters the synonyms of one idea under a single
+concept, so one concept can carry many names. In its 2004
 release it held about 2.5 million names for some 900{,}000 concepts. That is about three
 names for every concept on average. It keeps them all. Wüster's dream of one concept
 and one term never came true, and the field's main tool simply stores every name

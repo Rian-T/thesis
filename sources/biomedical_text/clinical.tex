@@ -50,23 +50,23 @@ Cardiology, Intensive Care\\ Stay: 03/11--08/11/2024\\[4pt]
 \Cref{fig:bt-clinical-note} is a letter from one cardiologist to a colleague. For an
 ordinary French reader, it is a text that is very hard to read and to understand. It
 has very few verbs, few adverbs, and sometimes neither. The sentences are telegraphic,
-the information very dense and simply separated by commas, like a table. One might think this is just carelessness, that
+the information very dense and simply separated by commas like a table. One might think this is just carelessness, that
 doctors have very little time and rush their letters without paying them much
-attention. There is some truth to that. In reality, though, it is a style of
-communication tuned for the community it is written for. The writer and the reader
+attention. There is some truth to that, but in reality, it is a style of
+communication specially tuned for the community it is written for. The writer and the reader
 share enough knowledge that the writer can give just the precise information he knows
 the other needs and go straight to what matters clinically.
 
 % === P2 ===
 This phenomenon has a precise name. Studying how specialised communities write,
 the linguist Zellig Harris observed in the 1960s that a technical field has a
-language of its own, with its own grammar, and not just everyday language with fewer
+language of its own, with its own grammar, and it is not just everyday language with fewer
 words \citep{harris_mathematical_1968}. He called it a \emph{sublanguage}: the
 text a community produces about a specialised domain, following its own rules for how
-words combine. Some of these rules are stricter than those of everyday language, and some ignore
-everyday rules entirely. Harris and his colleagues later made this concrete,
-reconstructing the grammar of a small immunology literature from its articles alone,
-and showing that the sublanguage itself held the field's knowledge
+words combine. Some of these rules are stricter than usual, and some ignore the usual rules entirely. Harris and his colleagues later made this concrete by
+reconstructing the grammar of a small body of immunology articles. They showed
+that its recurring sentence structures encoded the domain's entities and the
+relations between them, revealing how its knowledge developed over time
 \citep{harris_immunology_1989}.
 
 % === P3 ===
@@ -79,44 +79,44 @@ them, the program needed rules for the short, verbless phrases that notes use bu
 everyday language does not, together with categories taken from medicine itself,
 such as patient, finding, and treatment, all visible in \Cref{fig:bt-clinical-note}.
 A line like \emph{afebrile, chest clear} is not broken language; it is written this
-way for a reason. The style emerged in the community of clinicians, for efficiency,
-and newcomers learn to write the same way \citep{kittredge_sublanguages_1982}. A grammar like this can live inside a
+way for a reason. The style takes hold within a community that shares the same specialised
+knowledge and keeps up its patterns of usage \citep{kittredge_sublanguages_1982}. A grammar like this can live inside a
 hospital, kept up and extended by the people who use it.
 
 % === P4 ===
-Let us come back to the idea of carelessness. If the note were merely careless, its
+But let us come back to the idea of \emph{carelessness}. If this style was the result of a lack of care, its
 missing words would be scattered at random through the document, with no logic behind
-them. Instead, the omissions follow a pattern. Sager and colleagues showed that
-clinical shorthand obeys a small set of deletion rules: the writer drops a subject
-here, a verb there, a tense elsewhere, but only when the reader can put it back
-\citep{anderson_compression_1975}. \emph{Chest films normal} stands for \emph{the
+them. Instead, the omissions follow a pattern. \citet{anderson_compression_1975}
+showed that clinical shorthand obeys a small set of deletion rules: the writer drops
+a subject here, a verb there, a tense elsewhere, but only when the reader can put it
+back. \emph{Chest films normal} stands for \emph{the
 chest films were normal}; \emph{no bone pain} stands for \emph{the patient has no
-bone pain}. What disappears is the part the reader already knows. The note is a form
-of compression: it leaves out the information the writer is sure the reader already
-has.
+bone pain}. What disappears is the part the reader already knows. A note is a form
+of \emph{compression}.
 
 % === P5 ===
-This works because the reader is an expert. Writing for a colleague who shares the
+This works because the reader is an expert of the same domain. Writing for a colleague who went through the
 same training, the clinician can leave out whatever the other already knows, and say
-only what is needed \citep{grice_logic_1975, sperber_relevance_1995}. The same words
+only what is needed \citep{grice_logic_1975, sperber_relevance_1995}. This means that same words can
 behave differently depending on who reads them. \emph{Afebrile, vitals stable,
 continue antibiotics} is complete for a physician and almost empty for anyone else.
 
 % === P6 (common ground + performativity, merged) ===
 That shared background is what linguists call \emph{common ground}. The note records
-only the update to a large body of assumptions the writer and reader already hold,
-their medical training, the patient's history, the routines of the ward
-\citep{stalnaker_common_2002}. A clinical note is also performative. Written by a
+only what is new, leaving out what the writer and reader already know: medicine, the
+patient's history, and how the hospital works \citep{stalnaker_common_2002}. A
+clinical note is also performative. Written by a
 doctor, it can also declare or set off an action \citep{austin_words_1962,
 searle_speech_1969}. A prescription lets the patient obtain the medication, and an
 order to transfer a patient sets the transfer in motion. The note is a document with
 real authority, signed and legally binding.
 
 % === P8 ===
-The shape of the note also has roots. Read it again and one habit stands out: almost
-every finding is tied to a place in the body. In \Cref{fig:bt-clinical-note}, the
-changes show up in the anterior ECG leads, the blockage sits in the LAD (IVA) artery,
-and the damage is read off the left ventricle. The patient comes across as a list of
+The text describes the illness by moving through the parts of the heart it affects.
+In \Cref{fig:bt-clinical-note}, the ECG first locates the problem in the anterior
+wall, the angiogram then finds a blockage in the LAD (IVA) artery, and the ultrasound
+shows damage to the left ventricle. Each test adds another location to the same
+picture of the disease. The patient comes across as a list of
 lesions, each at its site. This way of seeing has a history. When the modern hospital
 took shape, doctors learned to see illness as something placed in a specific tissue
 or organ, and to read the body as a map of local damage. Foucault called this trained
@@ -130,21 +130,20 @@ note rarely leaves the hospital that produced it, because it is full of personal
 data. A single report can hold the patient's name, age, and dates, a home address, a
 family situation, and a diagnosis rare enough to point to one person. Removing the obvious
 identifiers does not fix this. A pseudonymised note is still not anonymous. A
-model trained on such text can memorise what it read and later repeat it
-\citep{tannier_parhaf_2026}. Confidentiality is inherent to this document type.
+malicious actor may combine the details it contains with other information to
+identify the patient. Confidentiality is inherent to this document type.
 
 % === P10 ===
 For French the problem is worse. There is no shareable corpus of real French hospital
 records, nothing like what exists for English \citep{neveol_clinical_2018}. Public
-text takes its place: published case reports, drug leaflets, article abstracts. But a
-case report is written to teach. It reads like a short story, in full sentences and
-the past tense, as in this opening from a French case corpus: \emph{``B.A., âgé de 36
+data is an alternative: published case reports, drug leaflets, article abstracts. But a case report is written to teach. It reads like a short story, in full sentences and
+the past tense, as in this typical opening of a published case: \emph{``B.A., âgé de 36
 ans, sans antécédents notables, a été admis en février 1994 pour des douleurs
-lombaires droites''} \citep{grabar_cas_2020}. The patient is introduced, the admission
-is told, the story moves in order. Next to the clipped lines of the note in
-\Cref{fig:bt-clinical-note}, the gap is easy to see.
+lombaires droites''}. The patient is introduced, the admission
+is told, the story moves in order. The gap is easy to see when compared with the
+clipped lines in \Cref{fig:bt-clinical-note}.
 
-Whether these stand-ins really match hospital notes is still being argued. The team
+Whether these stand-ins really match sufficiently hospital notes is still being argued. The team
 behind the case-report corpus is hopeful. They say the clinical part of a published
 case can be close enough to a real note that tools built on it still work on hospital
 text \citep{grabar_cas_2020}. They also name the limits. Real notes are full of
@@ -153,18 +152,16 @@ values in tables, while a published case rewrites all of this as clean sentences
 more recent project sees it differently. In building PARHAF, a corpus of 7{,}394
 fictitious reports written by hand by 104 medical residents, its authors say plainly
 that ``the style of case reports [\ldots] is quite different from that of electronic
-health records'' \citep{tannier_parhaf_2026}. They wrote fake reports from scratch
-because the real ones, even pseudonymised, cannot be shared. The field still cannot
-agree on whether the text it may share even looks like the text it cannot. The
-text we most want to model stays the text we can least obtain.
+health records'' \citep{tannier_parhaf_2026}. They wrote the reports from scratch so
+that they could be shared safely.
 
 % === P11 ===
-Taken together, these traits explain why the clinical note is so hard to get. It is
-rare because it is private, and private because of what it is: a closed sublanguage,
-written in compressed form for an expert group, packed with personal data, and
-carrying out acts with legal weight. It is scarce because of what it is.
+Taken together, these alternatives and the traits described above explain why our
+target text is so hard to obtain. Clinical notes are private by nature: they are
+written for a closed group of experts, contain personal data, and carry legal weight.
 
 % === P12 ===
-Yet medicine produces text in huge amounts. Most of it is the published literature,
-which is plentiful and free to read. This sets up the question for the next chapter:
-can this abundance stand in for the language of the clinic?
+However, if we are willing to step slightly beyond the clinical domain, we find that
+medicine actually produces an enormous amount of text. This vast, freely available
+literature documents the state of medical knowledge. But how far is its language from
+the clinical text we ultimately want to model?
