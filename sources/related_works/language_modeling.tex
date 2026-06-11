@@ -699,7 +699,7 @@ model} to those judgments and then optimise against it.
 \citet{ouyang2022instructgpt} brought this recipe to language in three steps:
 fine-tune the model on human-written demonstrations, collect human rankings of model
 outputs and fit a reward model to them, then optimise the model against that reward
-with reinforcement learning. The result, \emph{reinforcement learning from human
+with reinforcement learning (\Cref{fig:lm-rlhf}). The result, \emph{reinforcement learning from human
 feedback} (RLHF), was striking: human raters preferred the answers of a
 1.3-billion-parameter aligned model over those of the hundred-times-larger 175-billion
 GPT-3. This is the recipe behind ChatGPT and the assistants that followed it. It is what
@@ -711,6 +711,43 @@ labelling, so later work sought to reduce it. Constitutional AI replaces human j
 of harmful content with judgments the model itself makes against a short written list of
 principles, training from AI feedback instead of human feedback
 \citep{bai2022constitutional}.
+
+\medskip
+\begin{center}
+\resizebox{0.7\textwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize\sffamily,
+  data/.style={rounded corners=3pt, minimum width=2.0cm, minimum height=1.0cm,
+    align=center, text=ThesisInk, draw=ThesisNeutral!45, fill=ThesisPaper, inner sep=4pt},
+  reward/.style={rounded corners=3pt, minimum width=3.0cm, minimum height=1.1cm,
+    align=center, text=ThesisInk, draw=ThesisTertiary!80, fill=ThesisTertiary!18, inner sep=5pt},
+  policy/.style={rounded corners=11pt, minimum width=2.3cm, minimum height=1.3cm,
+    align=center, text=ThesisInk, draw=ThesisNeutral!60, fill=ThesisNeutral!22, inner sep=4pt},
+  lab/.style={font=\scriptsize, text=ThesisSecondaryDark, align=center},
+  fl/.style={->, ThesisInk!70, very thick, shorten >=2pt, shorten <=2pt},
+  node distance=1.7cm and 2.6cm]
+\node[data]   (tr)                       {\textbf{training}\\\textbf{data}};
+\node[policy] (pol)  [right=of tr]       {\textbf{policy}\\[2pt]$\pi_\theta(\cdot)$};
+\node[reward] (rm)   [above=of pol]      {\textbf{reward model}\\[2pt]$r=\mathrm{RM}_\theta(x,y)$};
+\node[data]   (pref) [left=of rm]        {\textbf{preference}\\\textbf{data}};
+\draw[fl] (pref) -- (rm) node[lab,midway,above] {RM training} node[lab,midway,below] {(offline)};
+\draw[fl] (tr) -- (pol) node[lab,midway,above] {$s_i$} node[lab,midway,below] {prompts};
+\draw[fl] (rm) -- (pol) node[lab,midway,right] {$r_i$ scalar\\reward};
+\draw[fl] (pol.east) -- ++(1.5,0) coordinate (loopR) |- (rm.east) node[lab,pos=0.22,right] (cmp) {$a_i$\\completions};
+\node[lab,text=ThesisNeutral,below=10pt of pol] (upd) {$\theta_{t+1}=\theta_t+\alpha\nabla_\theta J(\pi_\theta)$\\policy update};
+\begin{scope}[on background layer]
+\node[draw=ThesisPrimaryDark, dashed, thick, rounded corners=6pt,
+  fit=(pref)(rm)(tr)(pol)(upd)(loopR)(cmp), inner sep=14pt] (box) {};
+\end{scope}
+\node[font=\sffamily\bfseries, text=ThesisPrimaryDark, above=1pt of box.north]
+  {Reinforcement Learning from Human Feedback (RLHF)};
+\end{tikzpicture}}
+\vspace{6pt}
+\captionof{figure}{In reinforcement learning from human feedback the policy generates
+completions, a reward model learned offline from human preference data scores them, and
+the scalar reward updates the policy \citep{ouyang2022instructgpt}.}
+\label{fig:lm-rlhf}
+\end{center}
+\medskip
 
 \subsection{Reasoning and Verifiable Rewards}
 
@@ -725,7 +762,43 @@ checked automatically, by matching the solution or running the code. This yields
 reward computed by a rule rather than predicted by a learned model. Training against
 such a signal has been named \emph{reinforcement learning with verifiable rewards}
 \citep{lambert2024tulu3}. The reward is a correctness check, so it cannot be gamed the
-way a learned reward model can.
+way a learned reward model can (\Cref{fig:lm-rlvr}).
+
+\medskip
+\begin{center}
+\resizebox{0.7\textwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize\sffamily,
+  data/.style={rounded corners=3pt, minimum width=2.0cm, minimum height=1.0cm,
+    align=center, text=ThesisInk, draw=ThesisNeutral!45, fill=ThesisPaper, inner sep=4pt},
+  reward/.style={rounded corners=3pt, minimum width=3.2cm, minimum height=1.1cm,
+    align=center, text=ThesisInk, draw=ThesisTertiary!80, fill=ThesisTertiary!18, inner sep=5pt},
+  policy/.style={rounded corners=11pt, minimum width=2.3cm, minimum height=1.3cm,
+    align=center, text=ThesisInk, draw=ThesisNeutral!60, fill=ThesisNeutral!22, inner sep=4pt},
+  lab/.style={font=\scriptsize, text=ThesisSecondaryDark, align=center},
+  fl/.style={->, ThesisInk!70, very thick, shorten >=2pt, shorten <=2pt},
+  node distance=1.7cm and 2.6cm]
+\node[data]   (tr)                  {\textbf{training}\\\textbf{data}};
+\node[policy] (pol)  [right=of tr]  {\textbf{policy}\\[2pt]$\pi_\theta(\cdot)$};
+\node[reward] (vr)   [above=of pol] {\textbf{verifiable reward}\\[2pt]$r=\begin{cases}1 & \text{if correct}\\ 0 & \text{otherwise}\end{cases}$};
+\draw[fl] (tr) -- (pol) node[lab,midway,above] {$s_i$} node[lab,midway,below] {prompts};
+\draw[fl] (vr) -- (pol) node[lab,midway,right] {$r_i$ scalar\\reward};
+\draw[fl] (pol.east) -- ++(1.5,0) coordinate (loopR) |- (vr.east) node[lab,pos=0.22,right] (cmp) {$a_i$\\completions};
+\node[lab,text=ThesisNeutral,below=10pt of pol] (upd) {$\theta_{t+1}=\theta_t+\alpha\nabla_\theta J(\pi_\theta)$\\policy update};
+\begin{scope}[on background layer]
+\node[draw=ThesisSecondaryDark, dashed, thick, rounded corners=6pt,
+  fit=(vr)(tr)(pol)(upd)(loopR)(cmp), inner sep=14pt] (box) {};
+\end{scope}
+\node[font=\sffamily\bfseries, text=ThesisSecondaryDark, above=1pt of box.north]
+  {Reinforcement Learning with Verifiable Rewards (RLVR)};
+\end{tikzpicture}}
+\vspace{6pt}
+\captionof{figure}{Reinforcement learning with verifiable rewards keeps the same loop
+as \Cref{fig:lm-rlhf} but replaces the learned reward model with a rule that checks the
+answer or runs the code, so the reward needs no human labelling
+\citep{shao2024deepseekmath}.}
+\label{fig:lm-rlvr}
+\end{center}
+\medskip
 
 The DeepSeekMath work introduced an efficient optimiser for this setting, Group
 Relative Policy Optimization. It drops the separate value network of standard policy
@@ -821,7 +894,20 @@ earlier tasks \citep{kirkpatrick2017ewc}. For a model adapted to a domain the sa
 applies in reverse: pushing it toward biomedical text can erode the general competence
 it began with. The danger is uneven. \citet{yildiz2024continual} report that smaller
 models are the most sensitive, showing the highest rates of both learning and
-forgetting, so a small domain encoder is more exposed than a large one.
+forgetting, so a small domain encoder is more exposed than a large one. The effect
+shows up directly as a rise in the model's loss on its original domain, sharp when the
+new data is distant from the old (\Cref{fig:lm-forgetting}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.74\textwidth]{plots/related_works/forgetting.pdf}
+\caption{Catastrophic forgetting and its remedy: continuing to train a 405-million
+parameter model on new data raises its loss on the original domain, slightly when the
+shift is small (English to English) and sharply when it is large (English to German),
+and replaying a small fraction of the original data brings that loss back toward the
+source-only baseline \citep{ibrahim2024simple}.}
+\label{fig:lm-forgetting}
+\end{figure}
 
 A drop in a benchmark score is not always true forgetting. \citet{zheng2025spurious}
 argue that the early steps of a new training phase often disturb a model's
@@ -867,7 +953,54 @@ rather than inherited \citep{gu_domain-specific_2022}. The trade-off is clear in
 principle. Training from scratch can fit a vocabulary to the domain and cannot forget
 what it never learned, but it is expensive and throws away the general competence of
 an existing model. Continuing is cheap and keeps that competence, but inherits a
-tokenizer and an initialisation built for general text.
+tokenizer and an initialisation built for general text (\Cref{fig:lm-scratch-continue}).
+
+\medskip
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize\sffamily,
+  stage/.style={rounded corners=3pt, minimum width=3.1cm, minimum height=1.1cm,
+    align=center, text=ThesisInk, draw=ThesisPrimaryDark!70, fill=ThesisPrimary!18, inner sep=4pt},
+  scratch/.style={rounded corners=3pt, minimum width=3.1cm, minimum height=1.1cm,
+    align=center, text=ThesisInk, draw=ThesisTertiary!80, fill=ThesisTertiary!18, inner sep=4pt},
+  last/.style={rounded corners=3pt, minimum width=2.4cm, minimum height=1.1cm,
+    align=center, text=ThesisInk, draw=ThesisSecondaryDark, fill=ThesisSecondary!28, inner sep=4pt},
+  dat/.style={font=\scriptsize, text=ThesisNeutral, align=center, text width=3.5cm},
+  trk/.style={font=\footnotesize\sffamily\bfseries, text=ThesisInk, align=right},
+  fl/.style={->, ThesisInk!60, thick, shorten >=2pt, shorten <=2pt},
+  node distance=1.9cm and 2.0cm]
+% top track: continue
+\node[stage] (gen)                    {general\\pretrained model};
+\node[stage] (cont) [right=of gen]    {continue pretraining\\on biomedical text};
+\node[last]  (domT) [right=of cont]   {domain\\model};
+% bottom track: from scratch
+\node[scratch] (rand) [below=of gen]  {random\\initialisation};
+\node[scratch] (sc)   [right=of rand] {pretrain from scratch\\on biomedical text};
+\node[last]    (domB) [right=of sc]   {domain\\model};
+% track labels
+\node[trk] [left=0.5cm of gen]  {continue};
+\node[trk] [left=0.5cm of rand] {from\\scratch};
+% annotations
+\node[dat, below=3pt of gen]  {general text, inherited vocabulary};
+\node[dat, below=3pt of cont] {cheap, keeps general competence};
+\node[dat, below=3pt of domT] {inherits a general tokenizer, can forget};
+\node[dat, below=3pt of rand] {in-domain vocabulary built from the corpus};
+\node[dat, below=3pt of sc]   {expensive, no general competence};
+\node[dat, below=3pt of domB] {domain-fit tokenizer, cannot forget};
+% arrows
+\draw[fl] (gen)  -- (cont);
+\draw[fl] (cont) -- (domT);
+\draw[fl] (rand) -- (sc);
+\draw[fl] (sc)   -- (domB);
+\end{tikzpicture}}
+\vspace{6pt}
+\captionof{figure}{Two routes to a domain model: continuing from a general pretrained
+model is cheap and keeps general competence but inherits a general tokenizer and may
+forget, while pretraining from scratch fits the vocabulary to the domain and cannot
+forget but is expensive and starts with no general competence.}
+\label{fig:lm-scratch-continue}
+\end{center}
+\medskip
 
 Which wins is contested. \citet{gu_domain-specific_2022} found that pretraining from
 scratch on in-domain text, with an in-domain vocabulary, did better than continued
