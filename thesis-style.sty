@@ -211,6 +211,46 @@
 }
 
 %% ============================================================
+%% ILLUSTRATED PART OPENING (Tufte-style plate page)
+%% ============================================================
+%% \illustratedpart[short title]{title}{image path}{image credit}
+\newcommand{\partplatecaption}[2]{%
+  \emph{#1}\enspace #2%
+}
+
+\newcommand{\illustratedpart}[4][]{%
+  \cleardoublepage
+  \refstepcounter{part}%
+  \def\@currentlabelname{#2}%
+  \ifstrempty{#1}{%
+    \def\illustratedpartshorttitle{#2}%
+  }{%
+    \def\illustratedpartshorttitle{#1}%
+  }%
+  \addcontentsline{toc}{part}{%
+    \protect\numberline{\thepart}\illustratedpartshorttitle
+  }%
+  \partmark{\illustratedpartshorttitle}%
+  \thispagestyle{plain}%
+  \begingroup
+    \setlength{\parindent}{0pt}%
+    \vspace*{0.04\textheight}%
+    \begin{minipage}[b][0.56\textheight][b]{\textwidth}%
+      \centering
+      \includegraphics[width=\textwidth]{#3}%
+    \end{minipage}\par
+    \vspace{1.2ex}%
+    {\raggedright\fontsize{7.5}{9.5}\selectfont\color{ThesisNeutral}#4\par}%
+    \vfill
+    {\raggedright\normalfont\color{ThesisInk}%
+      {\large\scshape\partname~\thepart\par}%
+      \vspace{0.8ex}%
+      {\huge\scshape #2\par}%
+    }%
+  \endgroup
+}
+
+%% ============================================================
 %% ERROR BAR STYLE
 %% ============================================================
 

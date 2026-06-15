@@ -300,6 +300,7 @@ build/
 logs/
 research/
 sources/drafts/
+guidelines/avoid-ai-slop.md
 
 # Python bytecode
 __pycache__/

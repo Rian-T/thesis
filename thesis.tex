@@ -150,40 +150,73 @@
 \mainmatter
 
 
-\part[Introduction]{%
-  Introduction
-}
+\illustratedpart[Introduction]{Introduction}%
+  {static/part-openers/the-doctors-dream.jpg}%
+  {\partplatecaption
+    {Doctor Syntax asleep in a library.}
+    {Thomas Rowlandson, \emph{The Doctor's Dream}, 1813.
+     Hand-coloured etching and aquatint. Public domain.}}
 \label{part:intro}
 \include{sources/introduction}
 \include{sources/contemporary_ai}
+\include{sources/contributions}
+
+\illustratedpart[What Is Biomedical Text?]{What Is Biomedical Text?}%
+  {static/part-openers/a-physician-writing-a-prescription.jpg}%
+  {\partplatecaption
+    {A physician writes a prescription for a sick young woman.}
+    {After Jan Steen. Wellcome Collection. Public domain.}}
+\label{part:biomedtext}
 \include{sources/biomedical_text/biomedical_text}
 
-\part[Related Works]{%
-  Related Works
-}
+\illustratedpart[Related Works]{Related Works}%
+  {static/part-openers/leibniz-i-ching-hexagrams.jpg}%
+  {\partplatecaption
+    {Each \emph{I Ching} hexagram combines six broken or unbroken lines.
+     Leibniz compared their arrangement with binary notation.}
+    {Diagram of the 64 hexagrams, sent to Leibniz by Joachim Bouvet, 1701.
+     Unknown maker; Leibniz added the Arabic numerals. Public domain.}}
 \include{sources/related_works}
 
 
-\part[Building a Biomedical Corpus]{%
-  Building a Biomedical Corpus
-}
+\illustratedpart[Building a Biomedical Corpus]{Building a Biomedical Corpus}%
+  {static/part-openers/vesalius-fabrica.jpg}%
+  {\partplatecaption
+    {An anatomical figure appears beside its written description.}
+    {Andreas Vesalius and John of Calcar,
+     \emph{De humani corporis fabrica}, 1555.
+     The Metropolitan Museum of Art. Public domain.}}
 \label{part:corpus}
 \include{sources/part_1/analysis_lm}
 
 
-\part[Pretraining Language Models]{%
-  Pretraining Language Models
-}
+\illustratedpart[Pretraining Language Models]{Pretraining Language Models}%
+  {static/part-openers/ramelli-bookwheel.jpg}%
+  {\partplatecaption
+    {A rotating bookcase allows one person to read multiple books with ease.}
+    {Agostino Ramelli, bookwheel from
+     \emph{Le diverse et artificiose machine}, 1588. Public domain.}}
 \label{part:pretraining}
 \include{sources/part_2/extensions_lm}
 
 
-\part[Adapting to Clinical Tasks]{%
-  Adapting to Clinical Tasks
-}
+\illustratedpart[Adapting to Clinical Tasks]{Adapting to Clinical Tasks}%
+  {static/part-openers/diagnosis-by-radio.jpg}%
+  {\partplatecaption
+    {The doctor of the future feels a distant patient's arm through controls
+     duplicated by radio.}
+    {\emph{Diagnosis by Radio}, cover of \emph{Science and Invention},
+     February 1925. Public domain.}}
 \label{part:adaptation}
 \include{sources/part_3/clinical_tasks}
 
+\illustratedpart[Conclusion]{Conclusion}%
+  {static/part-openers/durer-melencolia.jpg}%
+  {\partplatecaption
+    {A winged figure sits among geometrical instruments and tools.}
+    {Albrecht Dürer, \emph{Melencolia I}, 1514.
+     Copper engraving. Public domain.}}
+\label{part:conclusion}
 \include{sources/conclusion}
 
 
@@ -212,4 +245,3 @@
 
 
 \end{document}
-
