@@ -169,9 +169,8 @@ target class still needs annotated examples. One architectural alternative is Cl
 which adapts state-space models to clinical text with linear-time complexity in sequence
 length, useful for long clinical documents \citep{yang2024clinicalmamba}.
 
-We now have benchmarks and models for biomedical NER, but medical coding is not simply NER,
-because it assigns codes from an ontology with thousands of possible labels to a whole
-document.
+We now have benchmarks and models for biomedical NER. Medical coding is a different task: it
+assigns codes from an ontology with thousands of possible labels to a whole document.
 \section{Medical Coding}
 \label{sec:ie-coding}
 
@@ -212,8 +211,8 @@ same code.
 
 Large language models do poorly on coding. \citet{soroush2024gpt4coding} benchmarked large
 language models for medical coding and found them highly error-prone. Specialised approaches such as PLM-ICD and
-MSMN remain stronger, which reinforces the case for specialised encoders over generic large
-models.
+MSMN remain stronger, so for coding a specialised encoder still outperforms a generic large
+model.
 
 \subsection{Coding in French}
 
@@ -240,9 +239,9 @@ one canonical entry. The phrases ``myocardial infarction'', ``MI'', and ``heart 
 describe the same condition, and normalization sends them to a single ICD-10 concept. Both
 tasks deal with the gap between how clinicians write and how knowledge bases store information.
 
-Entity linking differs from medical coding in scope. Linking works at the level of a single
-mention, where each mention receives one concept. Coding works at the level of a whole
-document, where a report receives a set of codes that summarize the encounter. The two tasks
+Entity linking differs from medical coding in scope. Linking operates on a single mention and
+assigns it one concept, whereas coding operates on a whole document and assigns a set of codes
+that summarize the encounter. The two tasks
 are connected, and linking can be seen as a building block of coding. A typical pipeline first
 recognizes entities with named entity recognition, then links each mention to a concept, and
 finally aggregates these concepts into document-level codes. Strong linking is therefore
@@ -469,41 +468,42 @@ standardised comparison.
 
 This chapter reviewed how clinical information extraction is done in French, from the tasks and
 corpora to the models that perform them. Across these topics, the same difficulties came back.
-They are not isolated problems with one method. They are structural features of the setting,
-and together they define the questions that the rest of this thesis takes up.
+These are structural features of the setting, and together they define the questions the rest
+of this thesis takes up.
 
-The first difficulty is the scarcity of clinical data. French hospital text is personal data,
+The most immediate difficulty is the scarcity of clinical data. French hospital text is personal data,
 and the CNIL places strict conditions on its use. A model trained inside a hospital cannot be
 shared with other institutions, so work done on private corpora stays local and hard to
 reproduce. The public French resources that remain, such as QUAERO, CAS, and E3C, are small,
 and most of their content is scientific writing rather than clinical notes. This shortage of
 shareable clinical text pushes the field to look for alternatives to real hospital data.
 
-The second difficulty is the size of the label space. Clinical coding relies on systems such as
+A second comes from the size of the label space. Clinical coding relies on systems such as
 ICD-10 and CCAM, whose tens of thousands of codes (\Cref{sec:ie-coding}) make it infeasible to
 annotate examples for every label. A classifier with a fixed output head has one slot per label.
 It cannot handle codes it never saw in training, so the classic supervised recipe does not scale
 to this setting. The field therefore needs methods that generalise to labels for which no
 annotated example exists.
 
-The third difficulty is that zero-shot extraction is not adapted to the clinic. Models such as
+Zero-shot extraction, the apparent way around the label space, is itself not adapted to the
+clinic. Models such as
 GLiNER and UniversalNER recognise entities described by free-text labels, which removes the
 fixed head, but they are trained on general web text. On clinical writing, and especially on
 rare codes, their accuracy drops. Closing this gap requires adapting these models to the
 biomedical domain.
 
-The fourth difficulty is that ontologies are underused. Coding systems are published as
+Ontologies are also underused. Coding systems are published as
 structured resources in formats such as RDF and SKOS, with a hierarchy of concepts, exclusion
 rules, and lists of synonyms. Zero-shot models reduce each label to a short description and
 ignore this structure. The field needs ways to bring ontological knowledge into the
 representation of labels.
 
-The fifth difficulty is that evaluation is not standardised. There is no shared benchmark for
+Finally, evaluation is not standardised. There is no shared benchmark for
 French biomedical natural language processing. Token-level scores depend on how each model
 splits text, so the tokenizer biases the comparison, and protocols differ from one paper to the
 next. Fair comparison calls for an evaluation that does not depend on the tokenizer.
 
-A final point runs underneath all of these. Much recent attention has gone to large decoder
+One point cuts across all of these. Much recent attention has gone to large decoder
 models, yet for extractive clinical tasks encoder models remain competitive. They are also
 small enough to run on the hardware available inside a hospital, which matters when the data
 cannot be moved off-site. This keeps encoders at the centre of the work that follows.

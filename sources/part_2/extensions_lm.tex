@@ -1,8 +1,16 @@
-\chapter{Encoder Models for French Biomedicine}
-\label{chap:encoders}
 \partepigraph{``I'd taught him new words that he'd held there in his mind like
 jewels, and repeated over and over until he knew them better than I did.''}{%
 Jeff VanderMeer, \textit{Borne}}
+
+A corpus is only useful once a model has learned from it. This part puts the
+biomedical corpus to work and asks what makes pretraining on it effective. We first
+try the naive approach: continuing the pretraining of an existing French encoder on
+biomedical text. We then look past masked language modeling to the training
+objective itself, and finally bring structured medical knowledge into what the
+model reads.
+
+\chapter{Encoder Models for French Biomedicine}
+\label{chap:encoders}
 \input{sources/part_2/chapter4/article}
 
 \chapter{Beyond Masked Language Modeling}
