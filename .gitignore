@@ -305,3 +305,6 @@ guidelines/avoid-ai-slop.md
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Local OncoLab context (confidential reports, contract, PII) — never commit
+context_oncolab/

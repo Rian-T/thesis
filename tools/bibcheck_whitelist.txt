@@ -24,5 +24,6 @@ fox_health_online_2013          # Pew Research, Health Online 2013 (report, no D
 kittredge_sublanguages_1982     # Kittredge & Lehrberger (eds.), de Gruyter book chapter
 sager_mlp_1987                  # Sager et al., Medical Language Processing, Addison-Wesley (sim 100)
 grice_logic_1975                # Grice, Logic and Conversation (sim 100; 1975 vs reprint year)
+austin_words_1962               # Austin, How to Do Things with Words, OUP 1962 (sim 100; 1962 vs 2009 reprint)
 wuster_einfuhrung_1979          # Wüster, allgemeine Terminologielehre (German classic, no DOI)
 tang2024txt360                  # TxT360 LLM pretraining dataset (HuggingFace, no DOI)

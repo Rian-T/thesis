@@ -4,12 +4,12 @@ that general methods that leverage computation are ultimately the most effective
 by a large margin. [\ldots] We should build in only the meta-methods that can find and
 capture this arbitrary complexity. [\ldots]''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 
-This thesis is about teaching artificial intelligence to read clinical text, when
-there is almost no clinical text to teach it with. This opening part sets up the
-problem. A first chapter traces how
-healthcare AI came to rely on learning from large public collections of text, and
-why the clinical setting resists it. The next looks at what today's systems make
-newly possible, and the shortage of data they run into. A short final chapter states the
+This thesis asks how to train language models for clinical text when direct
+clinical data is scarce. The opening part sets up that problem. The first
+chapter traces how healthcare AI moved from hand-built medical knowledge to
+learning from large collections of text, and why the clinical setting resists
+that shift. The next chapter looks at what current systems make possible and
+at the data shortage they run into. A short final chapter states the
 contributions of the thesis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,16 +17,35 @@ contributions of the thesis.
 \label{chap:ai-health}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Healthcare has been one of the earliest and most prominent application domains for artificial intelligence. Use cases range from diagnostic support to medical record management, cohort selection, report generation, and clinical information extraction.
+\noindent
+\begin{center}
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+      line width=0.5pt, inner sep=12pt]{%
+\begin{minipage}{0.82\textwidth}
+\footnotesize\color{ThesisInk}
+If a physician is asked, ``How do you make a medical diagnosis?'' his explanation
+of the process might be as follows. ``First, I obtain the case facts from the
+patient's history, physical examination, and laboratory tests. Second, I evaluate
+the relative importance of the different signs and symptoms. [\ldots] Third, to
+make a differential diagnosis I list all the diseases which the specific case can
+reasonably resemble. Then I exclude one disease after another from the list until
+it becomes apparent that the case can be fitted into a definite disease category
+[\ldots]''
+\end{minipage}%
+};
+\end{tikzpicture}
+\captionof{figure}{A physician's own account of how a diagnosis is made~\citep{ledley_lusted_1959}.}
+\label{fig:ledley-lusted}
+\end{center}
+\medskip
 
-As early as the 1970s, MYCIN, the iconic expert system developed at Stanford, diagnosed bacterial infections and recommended antibiotics. It already achieved performance comparable to human specialists in its narrow domain. INTERNIST-1, later known as CADUCEUS, tackled internal medicine diagnosis across hundreds of diseases. However, these systems relied on explicit rules and static knowledge bases, which limited their ability to handle the complexity and variability of real-world medical data. They were rigid and required constant maintenance to keep up with medical advances. Building such systems demanded expensive medical experts to annotate clinical data and write rules by hand.
+The quotation comes from Robert Ledley and Lee Lusted, writing in 1959. In \emph{Science}, they argued that diagnosis could be made explicit enough to be written down and, in principle, carried out by a machine~\citep{ledley_lusted_1959}. The 1956 Dartmouth workshop had named ``artificial intelligence'' only three years before, with broad goals such as language and learning; medicine sat outside that initial agenda. Ledley and Lusted framed diagnosis as a medical version of the same problem: a form of reasoning that could be specified and run by a machine. A few years later, programs began to implement this idea.
 
-With the rise of machine learning in the 1990s and 2000s, data-driven approaches began to dominate healthcare AI. Supervised and unsupervised learning algorithms trained models directly from data. The interpretability of rule-based systems was traded for the performance of deep neural networks capable of capturing complex patterns. R2 ImageChecker (1998) became the first FDA-approved computer-aided detection system for mammography, using neural networks to spot suspicious microcalcifications. PAPNET applied neural networks to cytological screening for cervical cancer.
+In 1961, Homer Warner and his colleagues built a system that used a patient's signs to estimate the probability of congenital heart disease, one of the first working versions of the new approach~\citep{warner_1961}. A decade later, F.~T. de Dombal's group in Leeds tested a program on the acute abdomen, the urgent problem of distinguishing appendicitis from other causes of abdominal pain. They reported that it matched the attending clinicians and, in their trial, slightly exceeded them~\citep{dedombal_1972}. The performance depended on the data the program had seen: the probabilities were only as good as the cases used to estimate them.
 
-Then came the scaling era. The recipe became simple: pretrain a language model on billions of words of raw text, then fine-tune on the target task. This approach routinely outperformed systems built with years of domain expertise. The need for expensive annotation, hand-crafted rules, and curated knowledge bases faded, beaten by data and compute.
+At Stanford in the 1970s, MYCIN advised on antibiotics for blood infections from a set of hand-written rules. In a blinded evaluation, experts rated its recommendations acceptable in 65\% of cases, against 42.5 to 62.5\% for the human prescribers~\citep{mycin_1975, mycin_eval_1979}. INTERNIST-1, built at Pittsburgh, aimed at the whole of internal medicine and encoded hundreds of diseases. Yet its own authors, testing it on real cases, judged it ``not sufficiently reliable for clinical applications''~\citep{internist1_1982}.
 
-Despite healthcare offering many structured and curated knowledge bases such as UMLS, SNOMED-CT, and RxNorm, experience has shown that general-purpose language models pretrained on massive unstructured data outperform approaches based on domain-specific rules and knowledge bases. It seems our models cannot effectively integrate these structured resources, or perhaps these knowledge bases do not cover the full complexity and variability of medical knowledge as it is used in practice.
+These systems had two main limits. Their knowledge was written by hand: every rule had to be drawn from experts and kept up to date as medicine changed. This made the programs expensive to build and brittle outside the narrow cases they were designed for. They also remained hard to use in the clinic. Physicians wanted reasoning they could check; opaque verdicts from an oracle were a poor fit~\citep{teach_shortliffe_1981}. There was as yet no electronic medical record for such a program to draw on. Public funding for artificial intelligence collapsed twice in these decades, and medical expert systems left routine care largely untouched.
 
-However, healthcare faces a limitation that other domains do not: the confidentiality and scarcity of annotated clinical data. Medical data is sensitive and difficult to obtain in large quantities for model training. Works adapting language models to the medical domain often rely on public data such as PubMed or patient forums, but these do not always reflect the real clinical language used in electronic health records. The clinical domain has unique jargon, abbreviations, and writing styles that differ from general medical texts. Moreover, while MIMIC exists in the United States, public clinical datasets remain scarce in other countries such as France.
-
-This leads to a fundamental problem: the paradigm that has won is pretraining at scale, but in healthcare we lack massive public clinical data to pretrain language models. Can we find new ways to exploit public data for pretraining language models adapted to the clinical domain, without using sensitive clinical data?
+Machine learning changed the source of knowledge. Systems began to learn directly from data instead of encoding what experts knew, and the gains were large. By 2016, a neural network read retinal photographs for diabetic retinopathy about as accurately as ophthalmologists~\citep{gulshan_2016}, and a related approach matched dermatologists at spotting skin cancer from images~\citep{esteva_2017}. The same shift reached language, where systems trained on large amounts of text became the best way to process it. Medicine had found that the strongest approach set aside much of the hand-built knowledge the field had spent decades assembling.
