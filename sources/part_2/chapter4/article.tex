@@ -10,7 +10,7 @@
 
 In \Cref{chap:collecting}, we found that 55\% of biomedical subwords are absent from CamemBERT's vocabulary. PubMedBERT~\citep{gu_domain-specific_2022} turned this kind of observation into a principle: for domains with enough unlabeled text, training a language model from scratch with a specialized vocabulary outperforms continual pretraining. The gain over BioBERT~\citep{lee_biobert_2019} was modest, but the conclusion was adopted widely.
 
-For French, \citet{labrak2023drbert} went further. They reported that continual pretraining from CamemBERT led to $F_1$ losses of up to 20 points, and released DrBERT, trained from scratch on 128 V100 GPUs for 20 hours. The claim was strong, the compute was expensive, and the implication was clear: continual pretraining does not work for French biomedical models. Yet the size of the reported loss is difficult to reconcile with what we know about continual pretraining. A model that has already seen 138\,GB of French text should not lose 20 points from seeing additional biomedical text. Something in the evaluation deserves closer examination.
+For French, \citet{labrak2023drbert} went further. They reported that continual pretraining from CamemBERT led to $F_1$ losses of up to 20 points, and released DrBERT, trained from scratch on 128 V100 GPUs for 20 hours. Their conclusion was clear: continual pretraining does not work for French biomedical models. Yet the size of the reported loss is difficult to reconcile with what we know about continual pretraining. A model that has already seen 138\,GB of French text should not lose 20 points from seeing additional biomedical text. The most likely explanation lies in the evaluation protocol.
 
 In this chapter, we show that continual pretraining on \textit{biomed-fr} (\Cref{chap:collecting}) yields an average improvement of +2.54 $F_1$ across five biomedical NER benchmarks, using 2 V100 GPUs for 39 hours. We also identify the methodological differences that led to the contradictory conclusion.
 
@@ -199,4 +199,4 @@ The vocabulary mismatch identified in \Cref{chap:collecting} is real, but it doe
 
 \vspace{2em}
 
-Continual pretraining works for encoders. The bidirectional nature of MLM may make these models particularly robust to domain shifts. But the field has moved toward autoregressive decoders, where the dynamics of continual pretraining are different, and the results, as the next chapter discusses, are less encouraging.
+Continual pretraining works for encoders, and the bidirectional nature of MLM may make these models particularly robust to domain shifts. But the field has moved toward autoregressive decoders, where the dynamics of continual pretraining are different, and the results, as the next chapter discusses, are less encouraging.
