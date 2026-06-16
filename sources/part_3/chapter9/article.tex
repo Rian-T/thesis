@@ -140,24 +140,24 @@ The generation then splits into four stages and respects time, as \Cref{fig:doss
 \begin{tikzpicture}[
   font=\footnotesize\sffamily,
   stage/.style={draw, rounded corners=3pt, line width=0.7pt, inner sep=8pt,
-                align=left, text width=2.8cm, minimum height=3.6cm, anchor=north},
+                align=left, text width=2.85cm, minimum height=4.3cm, anchor=north},
   arr/.style={-{Latex[length=2.4mm]}, line width=1pt, ThesisInk!45},
 ]
 \node[stage, draw=ThesisNeutral, fill=ThesisPaper] (seed) at (0,0)
-  {\stitle{Seed case}\par\vspace{4pt}
+  {\stitle{Seed case}\par\vspace{5pt}
    {\itshape Public English case: 64 y, lymphoma, R-CHOP, relapse at 22 months, salvage R-DHAP, death.}};
 
-\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.2,0)
-  {\stitle{Timeline}\par\vspace{4pt}
-   {2019-03 diagnosis\par 2019-04 R-CHOP\par 2019-10 complete resp.\par 2021-01 relapse\par 2021-02 R-DHAP\par 2021-08 death}};
+\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.05,0)
+  {\stitle{Timeline}\par\vspace{5pt}
+   {2019-03 diagnosis\par 2019-04 R-CHOP\par 2019-10 response\par 2021-01 relapse\par 2021-02 R-DHAP\par 2021-08 death}};
 
-\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (6.4,0)
-  {\stitle{Documents}\par\vspace{4pt}
+\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (6.1,0)
+  {\stitle{Documents}\par\vspace{5pt}
    {anapath 2019-03\par RCP 2019-03\par PET-CT 2019-10\par relapse RCP 2021-01\par discharge 2021-08}};
 
-\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (9.6,0)
-  {\stitle{Fields (traced)}\par\vspace{4pt}
-   {first line: R-CHOP\par \textit{from RCP 2019-03}\par relapse: 2021-01\par \textit{from RCP 2021-01}\par second line: R-DHAP\par \textit{from discharge}}};
+\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (9.15,0)
+  {\stitle{Fields (traced)}\par\vspace{5pt}
+   {1st line: R-CHOP\par \textit{(RCP 2019-03)}\par relapse: 2021-01\par \textit{(RCP 2021-01)}\par 2nd line: R-DHAP\par \textit{(discharge)}}};
 
 \draw[arr] (seed.east) -- (tl.west);
 \draw[arr] (tl.east) -- (doc.west);
