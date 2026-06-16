@@ -19,6 +19,47 @@
 \RequirePackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
+\RequirePackage{listings}
+
+%% ============================================================
+%% CODE / PROMPT LISTINGS — Tufte-clean (thin left rule, no box,
+%% subtle thesis-palette syntax colours). thesiscode = Python;
+%% thesisprompt = plain prompt text.
+%% ============================================================
+\lstdefinestyle{thesiscode}{%
+  basicstyle=\ttfamily\footnotesize\color{ThesisInk},
+  keywordstyle=\color{ThesisPrimaryDark}\bfseries,
+  commentstyle=\color{ThesisNeutral}\itshape,
+  stringstyle=\color{ThesisSecondaryDark},
+  emphstyle=\color{ThesisTertiaryDark},
+  showstringspaces=false,
+  breaklines=true,
+  breakindent=2em,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=2,
+  frame=leftline,
+  framerule=1pt,
+  rulecolor=\color{ThesisTableSep},
+  framesep=8pt,
+  xleftmargin=10pt,
+  aboveskip=1.1em, belowskip=1.1em,
+  extendedchars=true,
+  literate=%
+    {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
+    {à}{{\`a}}1 {â}{{\^a}}1 {ä}{{\"a}}1
+    {î}{{\^i}}1 {ï}{{\"i}}1
+    {ô}{{\^o}}1 {ö}{{\"o}}1
+    {ù}{{\`u}}1 {û}{{\^u}}1 {ü}{{\"u}}1
+    {ç}{{\c c}}1 {œ}{{\oe}}1 {Œ}{{\OE}}1
+    {É}{{\'E}}1 {È}{{\`E}}1 {Ê}{{\^E}}1 {À}{{\`A}}1 {Ç}{{\c C}}1
+    {«}{{\guillemotleft{}}}1 {»}{{\guillemotright{}}}1
+    {’}{{'}}1 {–}{{--}}1 {…}{{\ldots}}1,
+}
+\lstdefinestyle{thesisprompt}{%
+  style=thesiscode,
+  keywordstyle=\color{ThesisInk},
+}
 
 %% ============================================================
 %% COLOR PALETTE — Change these to restyle the entire thesis

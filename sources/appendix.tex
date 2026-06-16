@@ -8,19 +8,40 @@ from the French original used on the corpus.
 
 \section{Multi-task annotation schema}
 
-\begin{verbatim}
-CandidateSpan: text
-Entity:        type_name, level (1-4), type_description, mentions []
-Classification: task_name, labels [], true_labels [], multi_label
-Structure:     schema_name, fields [{name, dtype, description, value}]
-Relation:      relation_name, head, tail
-Annotation:    candidate_spans [], entities [], classifications [],
-               structures [], relations [], absent_plausible_types []
-\end{verbatim}
+\begin{lstlisting}[style=thesiscode, language=Python]
+class Entity(BaseModel):
+    type_name: str          # generic French lemma: Disease, Drug, Symptom, ...
+    level: int              # granularity, 1 (abstract) to 4 (compositional)
+    type_description: str   # 10-25 words: what the type covers and excludes
+    mentions: list[str]     # exact substrings of the text; may overlap
+
+class Classification(BaseModel):
+    task_name: str
+    labels: list[str]
+    true_labels: list[str]  # subset of labels that apply
+    multi_label: bool
+
+class Structure(BaseModel):
+    schema_name: str
+    fields: list[Field]     # each: {name, dtype, description, value}
+
+class Relation(BaseModel):
+    relation_name: str      # treats, causes, located_in, dosage_of, ...
+    head: str               # exact substring of the text
+    tail: str               # exact substring of the text
+
+class Annotation(BaseModel):
+    candidate_spans: list[str]            # every noun phrase, exhaustive
+    entities: list[Entity]
+    classifications: list[Classification]
+    structures: list[Structure]
+    relations: list[Relation]
+    absent_plausible_types: list[str]     # 3-5 hard negatives
+\end{lstlisting}
 
 \section{System prompt}
 
-\begin{verbatim}
+\begin{lstlisting}[style=thesisprompt]
 You are an expert annotator in French biomedical NLP. You produce an exhaustive
 multi-task annotation to train a general extractor (four tasks: entities,
 classifications, structures, relations).
@@ -62,7 +83,7 @@ STEP 6 - HARD NEGATIVES
 Three to five types that are plausible in the domain but absent from the text.
 
 Reply with valid JSON following the schema.
-\end{verbatim}
+\end{lstlisting}
 
 The clinical variant adds a register note stating that the document is a terse
 hospital note (abbreviations, missing accents, dictation typos) whose entities

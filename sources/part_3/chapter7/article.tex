@@ -4,19 +4,120 @@ The extractor of the previous chapter can be asked for a type it never saw. That
 
 \section{A Reference-Free Evaluation with a Language-Model Judge}
 
-We evaluate without a gold standard. We take 400 clinical case documents the models were never trained on, and a bank of twenty types: ten common clinical types, such as disease, drug, and symptom, and ten novel types that no benchmark uses, built to be compositional or cross-domain, such as an adverse effect, an implantable device, or an environmental risk factor. Each model runs twice, once for the common types and once for the novel ones, so the two can be measured apart. We pool the spans every model proposes, add candidates of the judge's own, remove duplicates, and hide which system produced which span. A large language model then judges each span against its type description and labels it correct, wrong type, wrong boundary, or not an entity. We score with mean average precision, which does not depend on a decision threshold, and we summarise generalisation by the gap between a model's score on common types and its score on novel ones.
+We evaluate without a gold standard. We take 400 clinical case documents the models were never trained on, and a bank of twenty types: ten common clinical types, such as disease, drug, and symptom, and ten novel types that no benchmark uses, built to be compositional or cross-domain, such as an adverse effect, an implantable device, or an environmental risk factor. Each model runs twice, once for the common types and once for the novel ones, so the two can be measured apart. We pool the spans every model proposes, add candidates of the judge's own, remove duplicates, and hide which system produced which span. A large language model then judges each span against its type description and labels it correct, wrong type, wrong boundary, or not an entity. We score with mean average precision, which does not depend on a decision threshold, and we summarise generalisation by the gap between a model's score on common types and its score on novel ones. \Cref{fig:judge-schema} sets out the whole procedure.
 
 To keep the judge honest we seed the pool with controls: real clinical entities that should be accepted, and function words mislabelled as diseases that should be rejected. We keep only the runs where the judge handles these correctly.
 
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    font=\small\sffamily,
+    box/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!12, rounded corners=2pt,
+                line width=0.7pt, align=center, inner sep=6pt, minimum width=2.7cm},
+    proc/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
+                 line width=0.7pt, align=center, inner sep=6pt, minimum width=2.4cm},
+    judge/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18, rounded corners=2pt,
+                  line width=0.9pt, align=center, inner sep=7pt, minimum width=2.4cm},
+    res/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
+                line width=0.7pt, align=center, inner sep=5pt, minimum width=3.0cm},
+    flow/.style={-{Stealth[length=2.4mm]}, ThesisInk, line width=0.8pt}]
+
+  \node[box] (preds) at (0,1.4) {predicted span};
+  \node[box] (type)  at (0,0.0) {type description};
+
+  \node[proc] (pool) at (4.2,0.7) {pooled,\\blind};
+  \node[judge] (judge) at (8.4,0.7) {language-model\\judge};
+
+  \node[res] (v1) at (12.8, 2.3) {correct};
+  \node[res] (v2) at (12.8, 1.1) {wrong type};
+  \node[res] (v3) at (12.8,-0.1) {wrong boundary};
+  \node[res] (v4) at (12.8,-1.3) {not an entity};
+
+  \draw[flow] (preds.east) -- (pool.west |- preds.east) -- ([yshift=2pt]pool.north);
+  \draw[flow] (type.east)  -- (pool.west |- type.east)  -- ([yshift=-2pt]pool.south);
+  \draw[flow] (pool.east) -- (judge.west);
+  \draw[flow] (judge.east) -- (v1.west);
+  \draw[flow] (judge.east) -- (v2.west);
+  \draw[flow] (judge.east) -- (v3.west);
+  \draw[flow] (judge.east) -- (v4.west);
+\end{tikzpicture}
+\caption{The reference-free judge. Each predicted span is paired with its type description; the spans from all systems are pooled, de-duplicated, and stripped of their provenance, then a blind language-model judge labels each one correct, wrong type, wrong boundary, or not an entity. Common and novel types are judged in separate runs and summarised by mean average precision and the common-minus-novel overfit gap.}
+\label{fig:judge-schema}
+\end{figure}
+
 \section{Benchmark Winners Do Not Generalise}
 
-On the common types the models are close. The novel types separate them. Our entity-tuned configuration reaches a mean average precision of $0.476$ on novel types, the best of any model we test. The baselines collapse: a strong single-encoder model tuned to a standard benchmark scores well on common types but never makes a confident prediction on a novel one, and a published biomedical extractor falls to $0.121$ on novel types. The gap between common and novel performance, which measures how far a model has overfit to familiar types, is small for our models and large for the baselines.
+On the common types the models are close. The novel types separate them, as \Cref{tab:judge-map} shows. Our entity-tuned configuration reaches a mean average precision of $0.476$ on novel types, the best of any model we test. The baselines collapse: a strong single-encoder model tuned to a standard benchmark scores well on common types but never makes a confident prediction on a novel one, and a published biomedical extractor falls to $0.121$ on novel types. The gap between common and novel performance, which measures how far a model has overfit to familiar types, is small for our models and large for the baselines. The entity-tuned model beats the convention-tuned baseline on novel types by $+0.095$ in mean average precision, with a $95\%$ bootstrap confidence interval of $[+0.063, +0.131]$.
 
-Ranked on a standard benchmark, the same models come out in almost the opposite order: the convention-tuned baseline first, our multi-task configuration last. A model can top the benchmark and still be the weakest at finding new types, because the benchmark measures agreement with one annotation convention rather than the ability to generalise. This is the central result of the part. A lower benchmark score is what we should expect from a model that has not overfit to a single convention, and it is the entity-tuned configuration, weaker on the benchmark, that generalises best.
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{10pt}
+\sisetup{detect-weight=true, table-format=1.3}
+\begin{tabular}{l S S S[table-format=+1.3]}
+\toprule
+\textbf{Model} & {\textbf{MAP common}} & {\textbf{MAP novel}} & {$\boldsymbol{\Delta}$\textbf{overfit}} \\
+\midrule
+\tablegroup{4}{Our models}
+Entity-tuned & 0.583 & \bfseries 0.476 & +0.107 \\
+Multi-task & 0.534 & 0.302 & +0.232 \\
+\midrule
+\tablegroup{4}{Baselines}
+Convention-tuned baseline & 0.569 & 0.381 & +0.188 \\
+GLiNER2-large             & 0.496 & 0.285 & +0.211 \\
+GLiNER-biomed             & 0.390 & 0.121 & +0.269 \\
+\bottomrule
+\end{tabular}
+\caption{Reference-free judge scores on common and novel types: the entity-tuned model has the best novel-type mean average precision and the smallest common-to-novel gap, while the baselines drop sharply on novel types.}
+\label{tab:judge-map}
+\end{table}
+
+Ranked on a standard benchmark, the same models come out in almost the opposite order (\Cref{tab:benchmark-macro}): the convention-tuned baseline first, our multi-task configuration last. A model can top the benchmark and still be the weakest at finding new types, because the benchmark measures agreement with one annotation convention rather than the ability to generalise. This is the central result of the part. A lower benchmark score is what we should expect from a model that has not overfit to a single convention, and it is the entity-tuned configuration, weaker on the benchmark, that generalises best.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{10pt}
+\sisetup{detect-weight=true, table-format=1.3}
+\begin{tabular}{l S}
+\toprule
+\textbf{Model} & {\textbf{Strict macro-F1}} \\
+\midrule
+Convention-tuned baseline        & \bfseries 0.389 \\
+GLiNER2-large                    & 0.346 \\
+Entity-tuned & 0.331 \\
+Multi-task & 0.266 \\
+\bottomrule
+\end{tabular}
+\caption{Strict macro-F1 on the standard annotated benchmark: the order is close to the inverse of \Cref{tab:judge-map}, so the benchmark winner is the weakest generaliser to novel types.}
+\label{tab:benchmark-macro}
+\end{table}
 
 \section{Is the Judge Trustworthy?}
 
-Using a language model to grade extractions invites two worries: that the judge is unreliable, and that it favours models like itself. We check both. Against human annotations on clinical types where the gold is unambiguous, the judge agrees at a Cohen's kappa of $0.532$, rising to $0.797$ on the cleanest set. Two judges from different model families agree with each other at $0.728$, so the result does not rest on a single judge. Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. And where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
+Using a language model to grade extractions invites two worries: that the judge is unreliable, and that it favours models like itself. We check both. Against human annotations on clinical types where the gold is unambiguous, the judge agrees at a Cohen's kappa of $0.532$, rising to $0.797$ on the cleanest set (\Cref{tab:judge-validity}). Two judges from different model families agree with each other at $0.728$, so the result does not rest on a single judge.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{l S[table-format=1.3]}
+\toprule
+\textbf{Annotated set} & {\textbf{Cohen's }$\boldsymbol{\kappa}$} \\
+\midrule
+CAS1    & 0.257 \\
+CAS2    & 0.544 \\
+E3C     & 0.797 \\
+EMEA    & 0.560 \\
+MEDLINE & 0.502 \\
+\midrule
+Global (judge vs human gold) & 0.532 \\
+Inter-judge (Qwen vs MedGemma) & 0.728 \\
+\bottomrule
+\end{tabular}
+\caption{The judge agrees with human gold at a Cohen's kappa of $0.532$ overall and $0.797$ on the cleanest set, and the two judges agree with each other at $0.728$.}
+\label{tab:judge-validity}
+\end{table} Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. And where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
 
 The judge is conservative: it under-credits correct spans, so the absolute scores understate real performance while the rankings between models stay stable. One limit remains. The human check covers only the common types, so the headline claim about novel types has no direct human anchor yet, and a small human study of novel-type judgements is the most useful next step.
 
@@ -26,7 +127,26 @@ The last test is the one that matters most, because it puts the whole thesis to 
 
 Off the shelf, no model does well. The best zero-shot result is a micro-averaged F-score of $0.174$, and most models sit between $0.10$ and $0.15$. The convention-tuned baseline is precise but barely fires, finding only a small fraction of the fields. This is a hard, long, multi-document task, and reading it cold is beyond every model we try.
 
-After fine-tuning on the synthetic dossiers, the picture changes. Every model rises to about $0.31$ to $0.33$, and the differences between them nearly vanish. The synthetic data closes most of the distance, and it closes it for all of them: the benchmark champion and the generalist extractor reach the same ceiling. The scores are still low in absolute terms, which measures how hard the task is rather than showing it solved. But the shape of the result is the payoff of this work. Built only from public and synthetic data, a small open model reaches the same level on a real oncology task as a model tuned on a standard benchmark, without ever seeing a real clinical note.
+After fine-tuning on the synthetic dossiers, the picture changes (\Cref{tab:lymphoma-capstone}). Every model rises to about $0.31$ to $0.33$, and the differences between them nearly vanish. The synthetic data closes most of the distance, and it closes it for all of them: the benchmark champion and the generalist extractor reach the same ceiling. The scores are still low in absolute terms, which measures how hard the task is rather than showing it solved. But the shape of the result is the payoff of this work. Built only from public and synthetic data, a small open model reaches the same level on a real oncology task as a model tuned on a standard benchmark, without ever seeing a real clinical note.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{12pt}
+\sisetup{detect-weight=true, table-format=1.3}
+\begin{tabular}{l S S}
+\toprule
+\textbf{Model} & {\textbf{Zero-shot}} & {\textbf{After fine-tuning}} \\
+\midrule
+GLiNER-biomed             & \bfseries 0.174 & \bfseries 0.329 \\
+Entity-tuned              & 0.150 & 0.318 \\
+Convention-tuned baseline & 0.138 & 0.324 \\
+Multi-task                & 0.106 & 0.319 \\
+\bottomrule
+\end{tabular}
+\caption{Micro-F1 on the OncoLab lymphoma cohort: zero-shot the models are low and spread out, but after fine-tuning on the synthetic dossiers they all converge to about $0.32$.}
+\label{tab:lymphoma-capstone}
+\end{table}
 
 \section*{Conclusion}
 

@@ -10,15 +10,171 @@ Our extractor, \emph{ModernCamemBERT-bio-gliner-base}, follows the GLiNER2 desig
 
 We release the model in two configurations that differ only in their training-data mix. The first is tuned for entity extraction and is the stronger general extractor: it finds types it was never trained on more accurately than any baseline we compare against in \Cref{chap:evaluation}. The second is multi-task: alongside entities it classifies the document, fills structures, and extracts relations, and it does these better than the first, at some cost to entity extraction. The trade-off between the two is itself one of the findings of this part, and we return to it in \Cref{chap:evaluation}.
 
-\section{The MedEmbed Backbone}
+\section{Recognition as Similarity Matching}
 
-The matching is only as good as the encoder that places type descriptions and spans in a shared space. We train our own, \emph{MedEmbed}, a French biomedical sentence encoder. It starts from ModernCamemBERT-bio, the modern French biomedical encoder developed in \Cref{chap:objectives,chap:ontobook}, and is trained with a contrastive objective: a type description and a matching span are pulled together, and mismatched pairs are pushed apart. The model has 149 million parameters and reads up to 8192 tokens, so a long description and a long passage fit in one pass.
+The matching is only as good as the encoder that places type descriptions and spans in a shared space. GLiNER turns recognition into a comparison: a label encoder reads a type description and produces a vector, a document encoder reads a candidate span and produces a vector, and a cosine similarity decides whether the two refer to the same thing. \Cref{fig:medembed-schema} shows the two paths. Because the type is supplied as text, a description the model never saw in training still produces a vector, and the same span can be tested against any number of types at once. The whole system rests on one question: are the two vectors close when the type matches the span, and far when it does not. The embedding space is the bottleneck, so we build an encoder for it.
 
-The training pairs that matter most come from medical terminologies. The CIM-10, CCAM, and ATC nomenclatures are turned into description-span pairs by the ontology work of \Cref{chap:ontobook}, which we do not repeat here.
+\begin{center}
+\begin{tikzpicture}[
+    font=\small\color{ThesisInk},
+    box/.style={draw=ThesisNeutral, rounded corners=3pt, line width=0.6pt,
+                inner sep=7pt, align=center, minimum height=11mm},
+    enc/.style={box, fill=ThesisPrimary!18, draw=ThesisPrimaryDark, minimum width=26mm},
+    txt/.style={box, fill=ThesisPaper, minimum width=34mm},
+    vec/.style={box, fill=ThesisSecondary!18, draw=ThesisSecondaryDark, minimum width=20mm},
+    flow/.style={->, line width=1pt, ThesisInk!45, >=stealth, shorten >=2pt, shorten <=2pt}
+]
+% top path: label
+\node[txt] (lab) at (0,1.7) {\textit{Disease: a pathological}\\\textit{condition affecting an organ}};
+\node[enc] (le) at (4.6,1.7) {Label encoder};
+\node[vec] (lv) at (8.2,1.7) {vector};
+% bottom path: span
+\node[txt] (sp) at (0,-1.7) {\textit{infarctus du myocarde}\\(span in the document)};
+\node[enc] (de) at (4.6,-1.7) {Document encoder};
+\node[vec] (sv) at (8.2,-1.7) {vector};
+% arrows
+\draw[flow] (lab) -- (le);
+\draw[flow] (le) -- (lv);
+\draw[flow] (sp) -- (de);
+\draw[flow] (de) -- (sv);
+% match
+\node[box, fill=ThesisTertiary!22, draw=ThesisTertiaryDark, minimum width=24mm] (cos) at (11.4,0) {cosine\\similarity};
+\draw[flow] (lv) -- (cos);
+\draw[flow] (sv) -- (cos);
+\node[align=center, ThesisNeutral, font=\footnotesize] at (11.4,-1.7) {high if the type\\matches the span};
+\end{tikzpicture}
+\captionof{figure}{Recognition as similarity matching: a type description and a text span are each mapped to a vector, and their cosine similarity decides the match.}
+\label{fig:medembed-schema}
+\end{center}
 
-On OntoBench-FR, a retrieval benchmark built from the French terminologies and from real clinical cases, MedEmbed reaches 58.1\% average accuracy and beats encoders several times its size: 48.9\% for mE5-large-instruct, 47.2\% for BGE-M3, and 44.9\% for Solon.\footnote{This is the average weighted by the number of test items per benchmark; an unweighted average gives a slightly higher figure on a different scale, and the two should not be compared directly.} An ablation confirms where the strength comes from: the terminology pairs are the one source that matters, and training on them alone is enough to match the full mixture, while removing them costs more than ten points. The starting encoder matters too: ModernCamemBERT-bio gives a clear gain over a plainly pretrained encoder on the novel types that generalisation depends on.
+\section{What a Good Label Encoder Must Do}
 
-\section{Training}
+The label encoder carries most of the burden. It has to read a medical type description and place it near the spans that belong to that type, even for types it never saw in training, and it has to do this in French, where biomedical text is scarce. The encoder must understand what a medical term means rather than match surface words, so that a code, its label, and a clinical synonym land in the same region. It must also keep close terms apart when they are clinically distinct, because much of medicine is fine distinctions between neighbours. It must do this in French biomedical language specifically.
+
+A plainly pretrained French encoder fails this test. On the terminology-coding tasks we describe below, a general ModernCamemBERT scores barely above chance: it knows French, but it has not learned which terms denote the same medical concept and which only look alike. The gap MedEmbed targets is this grounding of French biomedical terminology, which neither a general French encoder nor a strong multilingual one covers well.
+
+\section{Training Data}
+
+MedEmbed is trained on description-span pairs assembled from four families, summarised in \Cref{tab:medembed-data}. The first family, terminology pairs, is built from the French nomenclatures CIM-10, CCAM, and ATC by the ontology extraction of \Cref{chap:ontobook}; we describe the kinds of pairs here but do not repeat the extraction. From the structured graph of each terminology we read out, for every code, its official label, its synonyms, its parent and child codes, and the codes it is explicitly distinguished from. A code paired with its label or a synonym teaches the encoder that they denote the same concept. A child paired with its parent teaches the hierarchy. An exclusion link, where the terminology states that one code must not be confused with a named other, gives a hard negative: a positive and a deliberately close wrong answer for the same anchor.
+
+The other three families come from \Cref{chap:synthetic}. Synthetic passages are short question-and-answer pairs generated from French biomedical articles, where the question is the anchor and a relevant passage is the positive. Long documents are the same idea at full length, with the positive being a whole document, which exercises the 8192-token context. Persona queries take one source document and ask about it from several points of view, so that a clinician's technical question and a patient's plain question both map to the same passage. \Cref{fig:medembed-examples} shows real pairs from each family.
+
+\begin{table}[t]
+\centering
+\caption{The four families of training pairs and their sizes.}
+\label{tab:medembed-data}
+\sisetup{group-separator={,}, group-minimum-digits=4}
+\begin{tabular}{l S[table-format=6.0]}
+\toprule
+Source & {Pairs} \\
+\midrule
+Terminology pairs (CIM-10, CCAM, ATC) & 258521 \\
+Synthetic passages & 489680 \\
+Persona queries & 187310 \\
+Long documents & 25638 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{center}
+\usetikzlibrary{matrix}
+% Each example pair gets its own panel: grey sffamily tag, then the
+% anchor/positive(/negative) lines, with whitespace between panels.
+\newcommand{\extag}[1]{{\scriptsize\sffamily\color{ThesisNeutral} #1}\\[3pt]}
+\newcommand{\exrole}[1]{{\scriptsize\sffamily\color{ThesisNeutral} #1}}
+\newcommand{\expanel}[2]{%
+  \begin{minipage}{\dimexpr\textwidth-22pt\relax}
+  \footnotesize\color{ThesisInk}
+  \extag{#1}#2
+  \end{minipage}}
+\begin{tikzpicture}[
+    panel/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=2.5pt,
+                  line width=0.5pt, inner sep=8pt}]
+\matrix[matrix of nodes, nodes={anchor=west}, row sep=5pt, column sep=0pt,
+        every node/.style={panel}] {
+  \expanel{CODE $\rightarrow$ LABEL \textnormal{(CIM-10)}}{%
+    \exrole{anchor} \textit{B08.5}\\[1pt]
+    \exrole{positive} \textit{Pharyngite vésiculaire due à un entérovirus}} \\
+  \expanel{SYNONYM \textnormal{(CIM-10)}}{%
+    \exrole{anchor} \textit{B08.5 Pharyngite vésiculaire due à un entérovirus}\\[1pt]
+    \exrole{positive} \textit{Herpangine}} \\
+  \expanel{HIERARCHY \textnormal{(child $\rightarrow$ parent, CIM-10)}}{%
+    \exrole{child} \textit{F02.00 Démence de la maladie de Pick, sans symptôme supplémentaire}\\[1pt]
+    \exrole{parent} \textit{F02.0 Démence de la maladie de Pick}} \\
+  \expanel{EXCLUSION \textnormal{(hard negative: anchor / positive / negative, CIM-10)}}{%
+    \exrole{anchor\hphantom{x}} \textit{D37.7 Tumeur à évolution imprévisible ou inconnue d'autres organes digestifs}\\[1pt]
+    \exrole{positive} \textit{Tumeur à évolution imprévisible ou inconnue d'autres organes digestifs}\\[1pt]
+    \exrole{negative} \textit{D48.5 Tumeur à évolution imprévisible et inconnue de la peau}} \\
+  \expanel{PERSONA \textnormal{(clinician vs patient, same source document)}}{%
+    \exrole{clinician} \textit{Quelle est la corrélation entre le taux des IgE sériques totales et la gravité de la dermatite atopique ?}\\[1pt]
+    \exrole{patient\hphantom{xx}} \textit{Est-ce que l'érythème noueux est grave docteur ?}} \\
+};
+\end{tikzpicture}
+\captionof{figure}{Real training pairs: a code and its label, a synonym, a child-to-parent hierarchy link, an exclusion triplet with a deliberately close wrong answer, and the same source document queried by a clinician and by a patient.}
+\label{fig:medembed-examples}
+\end{center}
+
+\section{Contrastive Training}
+
+The encoder is trained to pull a matching pair together and push the rest apart. Most of the data is simple pairs with no curated negative, and for these we use a multiple-negatives ranking loss. For each anchor in a batch, its own positive is the right answer and every other positive in the same batch is treated as a wrong answer, so a large batch supplies many negatives for free and the contrastive signal grows with batch size. This suits terminology, where most pairs are a positive match and the hard cases are rare.
+
+The rare cases are handled by a triplet loss on the curated hard negatives: the exclusion links from the terminologies, sibling reformulations under the same parent, and negatives mined by searching for the most similar wrong passage. The random in-batch negatives of the first loss are usually easy, because two terminology entries picked at random are rarely confusable. The triplet loss supplies the difficulty the data was built to teach, forcing a gap between a positive and a known-wrong-but-similar negative, with a cosine distance that matches the cosine used at inference.
+
+The released model is trained in two stages, terminology pairs first. Adding the passages and documents in a second stage does not improve terminology coding and slightly hurts it, so the second stage is dropped and the terminology-only model is released. That outcome is itself evidence that the terminology pairs carry the signal that matters. The backbone is ModernCamemBERT-bio from \Cref{chap:objectives,chap:ontobook}, with mean pooling over tokens followed by L2 normalisation, 149 million parameters, and an 8192-token context.
+
+\section{Results}
+
+\Cref{tab:medembed-results} compares MedEmbed against three strong baselines on OntoBench-FR, a retrieval benchmark built from the French terminologies and from real clinical cases. MedEmbed reaches the highest weighted average and beats encoders several times its size, including the multilingual mE5-large-instruct and BGE-M3 and the strongest general French encoder, Solon. Two findings stand out. Contrastive training matters more than size: a 149-million-parameter encoder trained this way beats a raw billion-parameter model that was never trained to compare, so the way the space is shaped counts for more than the number of parameters. And the starting encoder matters, since ModernCamemBERT-bio gives a clear gain over a plainly pretrained encoder on exactly the novel types that generalisation depends on.
+
+\begin{table}[t]
+\centering
+\caption{OntoBench-FR accuracy, weighted average over benchmarks.}
+\label{tab:medembed-results}
+\sisetup{detect-weight=true, mode=text}
+\begin{tabular}{l S[table-format=2.1]}
+\toprule
+Model & {Avg.} \\
+\midrule
+\tablegroup{2}{Our model}
+MedEmbed (149M) & \bfseries 58.1 \\
+\tablegroup{2}{Baselines}
+mE5-large-instruct & 48.9 \\
+BGE-M3 & 47.2 \\
+Solon & 44.9 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize\color{ThesisNeutral} Average accuracy over the four benchmarks, weighted by benchmark size.}
+\end{table}
+
+\Cref{tab:medembed-ablation} isolates each data family by training on it alone or removing it. The numbers here are an unweighted grand average over the four benchmarks, on a different scale from \Cref{tab:medembed-results}, so the two tables must not be compared directly. Terminology pairs are the one source that matters. Training on them alone gives the best score of the whole study, above the full mixture, while removing them costs about fifteen points and collapses the CCAM and CIM-10 coding tasks in particular. Personas, passages, and documents on their own are the weakest mixes. This is why the released model is the terminology-only one: the richer data does not help, and the structured terminology pairs carry the discriminative signal a label encoder needs.
+
+\begin{table}[t]
+\centering
+\caption{Data-source ablation: grand average over the four benchmarks.}
+\label{tab:medembed-ablation}
+\sisetup{detect-weight=true, mode=text}
+\begin{tabular}{l S[table-format=2.2]}
+\toprule
+Training data & {Grand avg.} \\
+\midrule
+Terminology pairs only & \bfseries 60.31 \\
+Full mixture & 58.06 \\
+No personas & 56.90 \\
+Personas only & 49.01 \\
+\textit{Solon (baseline)} & \textit{47.89} \\
+No terminology pairs & 45.60 \\
+Long documents only & 45.27 \\
+Synthetic passages only & 44.18 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize\color{ThesisNeutral} Unweighted average over the four benchmarks.}
+\end{table}
+
+\section{Training the Extractor}
 
 We train the extractor on the synthetic annotations of \Cref{chap:synthetic}, with no real clinical labels at any point. Both configurations use the same recipe and run in a few hours on a single GPU. The result is a small open model that extracts types defined at inference time, trained entirely on public and synthetic data.
 

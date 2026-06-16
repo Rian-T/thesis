@@ -10,54 +10,52 @@ We already saw one form of generated data in \Cref{chap:ontobook}, where medical
 
 \begin{figure}[t]
 \centering
-\providecommand{\ftitle}[1]{{\normalsize\bfseries\sffamily\color{ThesisInk}#1}}
+\providecommand{\ftitle}[1]{{\footnotesize\bfseries\sffamily\color{ThesisInk}#1}}
 \providecommand{\etype}[1]{{\color{ThesisPrimaryDark}#1}}
-\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  font=\small\sffamily,
-  outbox/.style={draw, rounded corners=4pt, line width=0.8pt,
-                 text width=7.4cm, inner sep=12pt, align=left, font=\small},
+  font=\footnotesize\sffamily,
+  outbox/.style={draw, rounded corners=4pt, line width=0.7pt,
+                 text width=6.9cm, inner sep=7pt, align=left, anchor=west},
+  fan/.style={-{Latex[length=2.2mm]}, line width=0.9pt, ThesisInk!50},
 ]
-% Input text block (left)
-\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=4pt, line width=0.8pt,
-      text width=3.7cm, inner sep=11pt, align=justify, font=\small,
-      text=ThesisInk] (input) at (0,0)
-  {\itshape Mrs Diallo, 64, diffuse large B-cell lymphoma diagnosed 12/03/2019.
+% Input text block (left), vertically centred against the output stack
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=4pt, line width=0.7pt,
+      text width=2.7cm, inner sep=7pt, align=justify, text=ThesisInk,
+      font=\footnotesize\itshape] (input) at (0,0)
+  {Mrs Diallo, 64, diffuse large B-cell lymphoma diagnosed 12/03/2019.
    R-CHOP started 02/04/2019, 6 cycles. Relapse 15/01/2021. Death 03/02/2021.
    LDH 480 IU/L at diagnosis.};
 
-% Three output blocks (right), stacked with generous spacing
-\node[outbox, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
-      anchor=west] (ent) at (5.6,4.2)
-  {\ftitle{Entities}\par\vspace{5pt}
-   {\ttfamily\etype{Disease}\,$\rightarrow$\,diffuse large B-cell lymphoma\par
-    \etype{Drug}\,$\rightarrow$\,R-CHOP\quad
+% LLM step
+\node[draw=ThesisInk!55, fill=ThesisInk!6, rounded corners=3pt, line width=0.7pt,
+      minimum width=1.0cm, minimum height=0.8cm, text=ThesisInk,
+      font=\footnotesize\bfseries\sffamily] (llm) at (3.2,0) {LLM};
+
+% Three output blocks (right), equal width, evenly stacked
+\node[outbox, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ent) at (4.3,2.7)
+  {\ftitle{Entities}\par\vspace{3pt}
+   {\footnotesize\ttfamily\etype{Disease}\,$\rightarrow$\,diffuse large B-cell lymphoma\par
+    \etype{Drug}\,$\rightarrow$\,R-CHOP\qquad
     \etype{Examination}\,$\rightarrow$\,LDH\par
-    \etype{date}\,$\rightarrow$\,03/02/2021\quad
+    \etype{date}\,$\rightarrow$\,03/02/2021\qquad
     \etype{measure}\,$\rightarrow$\,480 IU/L}};
 
-\node[outbox, draw=ThesisSecondaryDark, fill=ThesisSecondary!12,
-      anchor=west] (rel) at (5.6,0)
-  {\ftitle{Relations}\par\vspace{5pt}
-   {\ttfamily treats:\, R-CHOP\,$\rightarrow$\,lymphoma}};
+\node[outbox, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (rel) at (4.3,0)
+  {\ftitle{Relations}\par\vspace{3pt}
+   {\footnotesize\ttfamily treats:\, R-CHOP\,$\rightarrow$\,lymphoma}};
 
-\node[outbox, draw=ThesisTertiaryDark, fill=ThesisTertiary!14,
-      anchor=west] (str) at (5.6,-4)
-  {\ftitle{Structure \& classification}\par\vspace{5pt}
-   {\ttfamily timeline \{diagnosis date, treatment start,\par
-    \hphantom{timeline \{}relapse, death\}\par
+\node[outbox, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (str) at (4.3,-2.7)
+  {\ftitle{Structure and classification}\par\vspace{3pt}
+   {\footnotesize\ttfamily timeline \{diagnosis date, treatment start, relapse, death\}\par
     ICD-10 chapter: tumours\par
     document type: follow-up note}};
 
-% Fan-out arrows through an LLM label
-\coordinate (hub) at (4.2,0);
-\draw[-{Latex[length=2.6mm]}, line width=1.1pt, ThesisInk!55]
-   (input.east) -- node[above, font=\small\bfseries, color=ThesisInk]{LLM} (hub);
-\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) to[out=55,in=180] (ent.west);
-\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) -- (rel.west);
-\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) to[out=-55,in=180] (str.west);
-\end{tikzpicture}%
-}
+% Input -> LLM -> fan-out to the three blocks
+\draw[fan, line width=1pt] (input.east) -- (llm.west);
+\draw[fan] (llm.east) to[out=40,in=180]  (ent.west);
+\draw[fan] (llm.east) --                  (rel.west);
+\draw[fan] (llm.east) to[out=-40,in=180] (str.west);
+\end{tikzpicture}
 \caption{A large language model turns one passage into typed entities, relations
 between them, and a document structure with its classifications. The full
 annotation prompts are given in \Cref{app:gliner-prompts}.}
@@ -82,25 +80,31 @@ The text we annotate is drawn from three kinds of public source, listed in \Cref
   filtering.}
   \label{tab:gliner-sources}
   \small
-  \setlength{\tabcolsep}{12pt}
-  \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{@{}ll S[table-format=6.0, group-separator={,}, group-minimum-digits=4]@{}}
+  \setlength{\tabcolsep}{6pt}
+  \renewcommand{\arraystretch}{1.2}
+  % Left-aligned group band (the global \tablegroup centres; here the data rows
+  % are left-aligned, so a centred band reads as zigzag).
+  \newcommand{\tablegroupl}[1]{%
+    \rowcolor{ThesisTableSep}%
+    \multicolumn{3}{@{}l@{}}{\rule{0pt}{9pt}\textbf{#1}} \\[1pt]%
+  }%
+  \begin{tabular}{@{}l l S[table-format=6.0, group-separator={,}, group-minimum-digits=4]@{}}
     \toprule
     Source & What it provides & {Sampled} \\
     \midrule
-    \tablegroup{3}{Biomedical literature (\Cref{chap:mcbio})}
-    HAL                 & French biomedical articles             & 26000 \\
-    ISTEX               & French biomedical articles             & 26000 \\
-    \tablegroup{3}{Patient cases}
-    Articles with cases & passages describing real patient cases  & 18000 \\
-    PMC-Patients-FR     & translated PubMed Central case reports  & 14000 \\
-    \tablegroup{3}{Ontology terminology}
-    CIM-10 / CCAM / ATC & passages from the coding nomenclatures  & 9000 \\
-    \tablegroup{3}{Negatives}
-    Non-medical / low quality & documents with no entity to find  & 25000 \\
+    \tablegroupl{Biomedical literature (\Cref{chap:mcbio})}
+    HAL                       & French biomedical articles              & 26000 \\
+    ISTEX                     & French biomedical articles              & 26000 \\
+    \tablegroupl{Patient cases}
+    Articles with cases       & passages describing real patient cases  & 18000 \\
+    PMC-Patients-FR           & translated PubMed Central case reports   & 14000 \\
+    \tablegroupl{Ontology terminology}
+    CIM-10 / CCAM / ATC       & passages from the coding nomenclatures   & 9000 \\
+    \tablegroupl{Negatives}
+    Non-medical / low quality & documents with no entity to find         & 25000 \\
     \midrule
-    Documents sampled    &                                        & 118000 \\
-    Valid annotations    & after grounding and filtering          & 94000 \\
+    Documents sampled         &                                          & 118000 \\
+    Valid annotations         & after grounding and filtering            & 94000 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -118,13 +122,55 @@ Public case descriptions still read like published cases, not like the terse not
 
 A single note captures one moment. A patient's record is a story that unfolds over years and across many documents, and the clinical questions we care about live in that story rather than in any one note. This thesis is part of OncoLab, a project that annotates the dossiers of lymphoma patients, all of them relapsed, against a form of about a hundred variables covering demographics, disease history, treatment lines, imaging, and outcome. Real dossiers cannot be used to develop and test that annotation, for the privacy reasons that run through this thesis, so the project needs a synthetic but realistic set of French dossiers to build the form and train automatic extraction before any real record is touched.
 
-A first attempt seeded each synthetic dossier from a single short case description, and it did not work. The reason is worth stating, because it shaped everything that followed. The seed text was about a thousand characters and described one moment, while a dossier spans years and a dozen documents. Asked to bridge that distance, the model had to invent almost everything, and it did so by imitation, producing dossiers that looked plausible but did not hold together. Clinicians who reviewed the output found the revealing gaps: there were almost no follow-up reports and almost no relapse consultations, although every patient in the target cohort has relapsed; cases with both a first and a second treatment line were missing, so adverse events beyond the first cycle could not be annotated; and the multidisciplinary-meeting reports had the wrong shape.
+A first attempt seeded each synthetic dossier from a single short case description, and it did not work. The reason is worth stating, because it shaped everything that followed. The seed text was about a thousand characters and described one moment, while a dossier spans years and about a dozen documents. Asked to bridge that distance, the model had to invent almost everything, and it did so by imitation, producing dossiers that looked plausible but did not hold together. Clinicians who reviewed the output found the revealing gaps: there were almost no follow-up reports and almost no relapse consultations, although every patient in the target cohort has relapsed; cases with both a first and a second treatment line were missing, so adverse events beyond the first cycle could not be annotated; and the multidisciplinary-meeting reports had the wrong shape.
 
-The fix was not to add a rule for each defect. Patching the prompt with one constraint per problem makes the model produce clone-like patients and loses the variety that made it useful. The better question is what lets the model do well on its own, and the answer was a better source and a decomposed task. We seed instead from real longitudinal case reports, translated into French, in which relapse, second-line treatment, adverse events, and death are already present in the text. From the $167{,}034$ public cases we keep the richest, giving more weight to those that mention a relapse and a second treatment line, down to about $2{,}800$ adult cases.
+The fix was not to add a rule for each defect. Patching the prompt with one constraint per problem makes the model produce clone-like patients and loses the variety that made it useful. The better question is what lets the model do well on its own, and the answer was a better source and a decomposed task.
 
-The generation then splits into stages and respects time. The model first writes a coherent patient timeline as structured data, and a short reflexive pass repairs any inconsistency in that timeline rather than rejecting it. Only then does it write the documents, one at a time and in chronological order: each document is generated seeing the earlier ones but never the later ones, so the dossier accumulates the way a real record does and no document can quote a result from its own future. A final pass extracts the structured fields. Because a field such as a treatment date takes several values over a dossier, each field is stored as a list of values, each tied to the document it came from, which keeps the longitudinal structure and lets every value be traced back to its source.
+\subsection*{A richer source}
 
-The redesign produced about three thousand synthetic dossiers, around eight documents each, with a valid timeline and a complete annotation in almost every case. Second-line treatment now appears in about a third of the dossiers, against roughly a fifth before, which is the gap the clinicians had flagged. The work is still in progress: the most recent run covers $2{,}050$ of its $2{,}774$ planned cases, and the automatic quality check measures format coherence rather than clinical accuracy, so it should not be read as a correctness score. A held-out part of this set becomes the hardest evaluation in the thesis, the one we use in \Cref{chap:evaluation}.
+We seed instead from PMC-Patients, a public set of $167{,}034$ patient case narratives extracted from PubMed Central, where each case follows one patient across diagnosis, treatment, response, and sometimes relapse and death. These narratives average about $3{,}000$ characters, roughly three times the short snippets the first attempt used, and they carry structured age and gender fields that let us keep adults only. A set of regular expressions tags each case by lymphoma subtype and scores it for longitudinal richness. The richness score is weighted to favour exactly what the clinicians found missing: a mention of relapse adds $2.0$ and a mention of second-line therapy adds $2.5$, the two highest weights, ahead of a chemotherapy regimen ($1.0$), a response assessment ($1.0$), and death ($1.0$). Keeping any lymphoma subtype, with age at least $18$, source length at least $1{,}500$ characters, and a richness score of at least $2.0$, and sorting by richness so the longest trajectories are used first, leaves $2{,}774$ adult cases. Each case is paired with a synthetic French identity drawn reproducibly from its index: a first and last name, a sex consistent with the source, a university hospital or cancer centre, an anchor year between $2015$ and $2024$, and a target document count between five and ten. The identity supplies the French institutional context the English case lacks; no real patient detail is added.
+
+\subsection*{A decomposed task}
+
+The generation then splits into four stages and respects time, as \Cref{fig:dossier-pipeline} shows on a short example. The model first writes a coherent patient timeline as structured data, with dated events and a plan of the documents to produce. A short reflexive pass then audits that timeline for inconsistencies, such as an age that does not match the diagnosis date, a relapse before any response, or a death date earlier than the last event, and repairs them rather than rejecting the case. Only then does the model write the documents, one at a time and in chronological order. Each document sees the earlier ones and the events dated up to its own date, but never anything later, so the dossier accumulates the way a real record does and no document can quote a result from its own future. A document also sees only the event categories that belong to it, so an imaging report cannot read off the histology panel. A final stage reads the assembled dossier back and extracts the structured fields. Because a field such as a response assessment takes several values over a dossier, each field is stored as a list of entries, and each entry records the value, the verbatim span it came from, and the heading of the source document. Only the two fields that cannot change, date of birth and sex, stay single-valued. This keeps the longitudinal structure and lets every value be traced back to the document that stated it.
+
+\begin{figure}[t]
+\centering
+\providecommand{\stitle}[1]{{\footnotesize\bfseries\sffamily\color{ThesisInk}#1}}
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  stage/.style={draw, rounded corners=3pt, line width=0.7pt, inner sep=8pt,
+                align=left, text width=2.8cm, minimum height=3.6cm, anchor=north},
+  arr/.style={-{Latex[length=2.4mm]}, line width=1pt, ThesisInk!45},
+]
+\node[stage, draw=ThesisNeutral, fill=ThesisPaper] (seed) at (0,0)
+  {\stitle{Seed case}\par\vspace{4pt}
+   {\itshape Public English case: 64 y, lymphoma, R-CHOP, relapse at 22 months, salvage R-DHAP, death.}};
+
+\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.2,0)
+  {\stitle{Timeline}\par\vspace{4pt}
+   {2019-03 diagnosis\par 2019-04 R-CHOP\par 2019-10 complete resp.\par 2021-01 relapse\par 2021-02 R-DHAP\par 2021-08 death}};
+
+\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (6.4,0)
+  {\stitle{Documents}\par\vspace{4pt}
+   {anapath 2019-03\par RCP 2019-03\par PET-CT 2019-10\par relapse RCP 2021-01\par discharge 2021-08}};
+
+\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (9.6,0)
+  {\stitle{Fields (traced)}\par\vspace{4pt}
+   {first line: R-CHOP\par \textit{from RCP 2019-03}\par relapse: 2021-01\par \textit{from RCP 2021-01}\par second line: R-DHAP\par \textit{from discharge}}};
+
+\draw[arr] (seed.east) -- (tl.west);
+\draw[arr] (tl.east) -- (doc.west);
+\draw[arr] (doc.east) -- (ann.west);
+\end{tikzpicture}
+\caption{The four stages on a short example. A public case becomes a dated
+timeline, the timeline is written out as documents in chronological order so
+that each document sees only the past, and the structured fields are then
+extracted back, each value tied to the document it came from.}
+\label{fig:dossier-pipeline}
+\end{figure}
+
+The production run for the broadened cohort generated $2{,}050$ of its $2{,}774$ planned cases before reaching its compute time limit, each with about eight documents and around nineteen timeline events. A timeline was valid in every case, and the structured extraction succeeded for $99.8\%$ of them. Second-line treatment now appears in $31\%$ of the dossiers, against the $20\%$ the clinicians had flagged as too low, and a relapse or progression document is present in $36\%$. The extraction records $1.21$ values per filled field on average, and $13\%$ of filled fields hold more than one value, so the longitudinal dimension is captured rather than collapsed. The automatic quality check that accompanies each dossier compares re-extracted values against the timeline and reports a low match rate near $0.29$; this number reflects format differences, such as \texttt{M} against \textit{homme}, far more than clinical error, so it should not be read as a correctness score. The work is still in progress, both in completing the remaining cases and in clinical review of the output. A held-out part of this set becomes the hardest evaluation in the thesis, the one we use in \Cref{chap:evaluation}.
 
 
 \section*{Conclusion}
