@@ -89,3 +89,66 @@ The clinical variant adds a register note stating that the document is a terse
 hospital note (abbreviations, missing accents, dictation typos) whose entities
 remain exact substrings, and the draft variant degrades the input with the same
 surface noise so the model learns to annotate it.
+
+
+\chapter{A Synthetic Lymphoma Dossier}
+\label{app:lymphoma-dossier}
+
+This appendix shows one synthetic dossier from \Cref{sec:lymphoma-dossiers} in
+full, as a longer version of the short example in \Cref{fig:dossier-pipeline}. It
+comes in three parts: the structured patient timeline, one of the generated
+French documents, and the structured fields extracted back, each value tied to
+the document it came from. The case is fictional.
+
+\section{Patient timeline}
+
+\begin{lstlisting}[style=thesisprompt]
+2019-03-12  diagnosis : diffuse large B-cell lymphoma, stage IV, IPI 3
+2019-04-02  first line : R-CHOP, 6 cycles planned
+2019-10-05  interim PET-CT : complete metabolic response (Deauville 2)
+2021-01-15  relapse : nodal, biopsy-confirmed
+2021-02-03  second line : R-DHAP, 3 cycles
+2021-05     autologous stem-cell transplant
+2021-08-03  death : disease progression
+\end{lstlisting}
+
+\section{One generated document (discharge summary)}
+
+\begin{lstlisting}[style=thesisprompt]
+COMPTE RENDU D'HOSPITALISATION - Hematologie
+
+Mme Diallo, nee le 14/06/1956, hospitalisee du 28/07/2021 au 03/08/2021.
+
+Antecedents : lymphome B diffus a grandes cellules diagnostique en mars 2019,
+stade IV, traite par R-CHOP (6 cures) avec reponse complete en octobre 2019.
+Rechute ganglionnaire en janvier 2021, traitee par R-DHAP puis autogreffe de
+cellules souches en mai 2021.
+
+Motif : alteration de l'etat general, syndrome tumoral progressif.
+
+Evolution : progression de la maladie sous surveillance, sans option
+therapeutique curative. Mise en place de soins de confort. Deces le 03/08/2021.
+\end{lstlisting}
+
+\section{Extracted fields (multi-valued, traced)}
+
+Each field is a list of entries; every entry keeps the value, the verbatim span,
+and the source document. Only the stable fields (date of birth, sex) are single.
+
+\begin{lstlisting}[style=thesiscode, language=Python]
+diagnosis        = [{"value": "lymphome B diffus a grandes cellules",
+                     "span": "lymphome B diffus a grandes cellules",
+                     "source_document": "anapath 2019-03"}]
+first_line       = [{"value": "R-CHOP", "span": "R-CHOP",
+                     "source_document": "RCP 2019-03"}]
+response         = [{"value": "reponse complete", "span": "reponse complete",
+                     "source_document": "PET-CT 2019-10"}]
+relapse_date     = [{"value": "2021-01", "span": "janvier 2021",
+                     "source_document": "RCP 2021-01"}]
+second_line      = [{"value": "R-DHAP", "span": "R-DHAP",
+                     "source_document": "discharge 2021-08"}]
+vital_status     = [{"value": "deceased", "span": "Deces",
+                     "source_document": "discharge 2021-08"}]
+date_of_birth    = "1956-06-14"   # stable, single-valued
+sex              = "F"            # stable, single-valued
+\end{lstlisting}
