@@ -1,128 +1,135 @@
-% This chapter covers two synthetic-data approaches for clinical task adaptation:
-%
-% (1) OntoBook: synthetic textbooks generated from medical ontologies (LREC 2026).
-%     Method and results are presented in detail in \Cref{chap:ontobook}.
-%     This chapter focuses on the data details (walk types, generation pipeline).
-%
-% (2) Synthetic clinical reports: reformulation of clinical case paragraphs from
-%     Biomed-Enriched (\Cref{chap:quality}) into structured clinical reports.
-%     The project exists but the paper is in progress — this section is a
-%     placeholder TODO.
-
-% Local macro for OntoBook (matches publications/OntoBook/main.tex)
-\providecommand{\method}{OntoBook\xspace}
-
 \section{Introduction}
-
-% TODO: refine hook to tie back to clinical adaptation challenges raised in Ch 7-8.
 
 Clinical text is scarce, but structured medical knowledge is not. France maintains medical ontologies that span tens of thousands of codes (CIM-10 for diagnoses, CCAM for procedures, ATC for medications), and PubMed Central contains millions of clinical case descriptions embedded in scientific articles. Both are publicly available, both are richly structured, and neither can be used directly to train a language model. The question is whether we can convert them into synthetic training data that is closer to what clinical applications actually need.
 
-This chapter presents two instances of this idea. The first, \method, generates synthetic medical textbooks from ontology graphs by reformulating random walks with a large language model. The second, currently in progress, reformulates the clinical case paragraphs extracted in \Cref{chap:quality} into synthetic clinical reports. Both share the same recipe: take a structured source, hand it to an LLM with a tight prompt, and get back fluent medical text that preserves the structure. They differ in input (graph vs.\ paragraph) and target (encoder pretraining vs.\ task adaptation). The full method and downstream results for \method are presented in \Cref{chap:ontobook}; here we focus on the data artifacts themselves.
+We already saw one form of generated data in \Cref{chap:ontobook}, where medical ontologies became synthetic textbooks for pretraining. This chapter generates data for the extraction task itself, in two ways, and neither touches a real patient record. The first annotates public biomedical text with a large language model, producing the labelled examples that train the extraction model of \Cref{chap:architectures}. The second rewrites public case descriptions into the style of hospital notes, to approximate a register that no public corpus offers. Both take a public source, hand it to a language model under a strict prompt, and get back training material that real clinical data could not supply.
 
 
-\section{Synthetic Textbooks from Medical Ontologies}
-\label{sec:ontobook-data}
+\section{Annotating Biomedical Text for Extraction}
+\label{sec:gliner-data}
 
-\subsection{Walk Generation}
+\begin{figure}[t]
+\centering
+\providecommand{\ftitle}[1]{{\normalsize\bfseries\sffamily\color{ThesisInk}#1}}
+\providecommand{\etype}[1]{{\color{ThesisPrimaryDark}#1}}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  outbox/.style={draw, rounded corners=4pt, line width=0.8pt,
+                 text width=7.4cm, inner sep=12pt, align=left, font=\small},
+]
+% Input text block (left)
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=4pt, line width=0.8pt,
+      text width=3.7cm, inner sep=11pt, align=justify, font=\small,
+      text=ThesisInk] (input) at (0,0)
+  {\itshape Mrs Diallo, 64, diffuse large B-cell lymphoma diagnosed 12/03/2019.
+   R-CHOP started 02/04/2019, 6 cycles. Relapse 15/01/2021. Death 03/02/2021.
+   LDH 480 IU/L at diagnosis.};
 
-We generate random walks through ontology graphs to capture relational structure in a sequential format suitable for language model pretraining. We sample walks starting from each code in the ontology. At each step, the next node is selected via weighted sampling where edge type weights depend on the walk type. This biased sampling is necessary because semantic edges are rare (\Cref{tab:ontology_stats} in \Cref{chap:ontobook}), and a uniform walk would rarely traverse them. Each walk records the traversed codes along with their labels and the relation types connecting them. Walk length is sampled uniformly between 8 and 20 steps. We track visited nodes to avoid cycles, with a fallback that allows revisiting nodes when all neighbors have been explored.
+% Three output blocks (right), stacked with generous spacing
+\node[outbox, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
+      anchor=west] (ent) at (5.6,4.2)
+  {\ftitle{Entities}\par\vspace{5pt}
+   {\ttfamily\etype{Disease}\,$\rightarrow$\,diffuse large B-cell lymphoma\par
+    \etype{Drug}\,$\rightarrow$\,R-CHOP\quad
+    \etype{Examination}\,$\rightarrow$\,LDH\par
+    \etype{date}\,$\rightarrow$\,03/02/2021\quad
+    \etype{measure}\,$\rightarrow$\,480 IU/L}};
 
-For CIM-10, we define five walk types, each emphasizing different aspects of medical knowledge:
+\node[outbox, draw=ThesisSecondaryDark, fill=ThesisSecondary!12,
+      anchor=west] (rel) at (5.6,0)
+  {\ftitle{Relations}\par\vspace{5pt}
+   {\ttfamily treats:\, R-CHOP\,$\rightarrow$\,lymphoma}};
 
-\begin{itemize}
-\item \textbf{\'Etiologie} (causal chains): traverses \textsc{causes} and \textsc{caused\_by} edges to follow disease etiology.
-\item \textbf{Diagnostic Diff\'erentiel}: traverses \textsc{exclusion} edges to enumerate codes to distinguish clinically.
-\item \textbf{Codage Double}: follows mandatory code pairs linking etiology to manifestation, encoding the dual-coding rules of CIM-10.
-\item \textbf{Syndrome}: traverses \textsc{manifestation} edges to follow multi-system manifestations of a single underlying condition.
-\item \textbf{Cross-Chapter}: connects different ICD chapters, e.g., a metabolic diagnosis (E11, type~2 diabetes) and its renal complication (N08.3, diabetic glomerulopathy).
-\end{itemize}
+\node[outbox, draw=ThesisTertiaryDark, fill=ThesisTertiary!14,
+      anchor=west] (str) at (5.6,-4)
+  {\ftitle{Structure \& classification}\par\vspace{5pt}
+   {\ttfamily timeline \{diagnosis date, treatment start,\par
+    \hphantom{timeline \{}relapse, death\}\par
+    ICD-10 chapter: tumours\par
+    document type: follow-up note}};
 
-We generate 402{,}328 walks for CIM-10 (average 4{,}830 characters), 762{,}958 for CCAM, and 138{,}980 for ATC, totaling 1{,}304{,}266 walks across all three ontologies.
+% Fan-out arrows through an LLM label
+\coordinate (hub) at (4.2,0);
+\draw[-{Latex[length=2.6mm]}, line width=1.1pt, ThesisInk!55]
+   (input.east) -- node[above, font=\small\bfseries, color=ThesisInk]{LLM} (hub);
+\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) to[out=55,in=180] (ent.west);
+\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) -- (rel.west);
+\draw[-{Latex[length=2.6mm]}, line width=1pt, ThesisInk!45] (hub) to[out=-55,in=180] (str.west);
+\end{tikzpicture}%
+}
+\caption{A large language model turns one passage into typed entities, relations
+between them, and a document structure with its classifications. The full
+annotation prompts are given in \Cref{app:gliner-prompts}.}
+\label{fig:annotation-example}
+\end{figure}
 
-\subsection{Walk-to-Textbook Reformulation}
+Training an extractor by fine-tuning needs labelled examples, and as this part's introduction noted, those are out of reach for French clinical text. We take a different route. Instead of paying clinicians to annotate real notes, we annotate public biomedical text automatically with a large language model, and use the result to train a smaller extraction model. This is a form of distillation: a large general model that is too heavy to run at scale produces the labels, and a small model learns to reproduce them. Everything we annotate is public text, so none of the resulting data carries the restrictions of a patient record.
 
-Raw walks contain structured markers (e.g., \texttt{>> \`A distinguer de:}) that are useful for parsing but not natural for language model pretraining. We use a large language model to reformulate walks into fluent medical prose resembling textbook paragraphs.
+The annotator is \texttt{Qwen3-235B-A22B-Instruct}, a 235-billion-parameter instruction-tuned model~\citep{yang2025qwen3}, run with FP8 quantisation on four NVIDIA H100 GPUs through vLLM~\citep{kwon2023vllm}. For each document, the model returns a single JSON object whose fields are fixed in advance by a schema, so every annotation has the same shape and parses without error. We turn off the model's step-by-step reasoning mode and sample at a low temperature of $0.6$, which keeps the output close to the schema. The same model later serves as the judge that scores our extractors (\Cref{chap:evaluation}), so we check there that it does not simply favour its own annotations.
 
-We prompt Qwen3-235B-A22B-Instruct~\citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. This ensures the textbook content remains grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4~NVIDIA~H100 GPUs using vLLM~\citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies.
+The schema asks for more than a list of entities. For each document the model first lists candidate spans, meaning every noun phrase that could be a medical entity, and then builds four kinds of annotation on top of them. It marks \emph{entities} with open-vocabulary types at four levels of granularity, from a single reusable word such as \textit{Maladie} (disease) up to a full compositional phrase, and the same span may be typed at several levels at once. It assigns two or three \emph{classifications} to the document, such as its specialty or its document type. It fills zero to two \emph{structures}, small field-value schemas such as a dosage or a patient profile. And it records \emph{relations} between entities, such as a drug that treats a disease. The model also returns a short list of \emph{hard negatives}: plausible types that are absent from the text, which teach the extractor what not to find. \Cref{fig:annotation-example} shows one annotated example.
 
-\Cref{chap:ontobook} shows one walk-to-textbook transformation in detail (\Cref{fig:textbook_example}). The same LLM prompt structure is used for CCAM and ATC, with ontology-specific terminology substituted for medical-coding domain terms.
+We then ground every annotation against the source text. A mention is kept only when it is an exact substring of the document, which removes spans the model paraphrased or invented. We also drop a type when it is merely a lexical variant of its own mention, measured by edit distance, so the model cannot take the shortcut of repeating a word as its own type. The head and tail of every relation must likewise be exact substrings. Documents where no annotation survives are not discarded: a document with text but no entity is kept as a negative example, which is what teaches the extractor to stay silent on non-medical text.
 
-% TODO: add a few more walk-to-textbook examples, one per walk type for CIM-10,
-% and one for CCAM and one for ATC. The Ch 6 example only covers Cross-Chapter
-% on CIM-10 (F02.0 → G31.0 → F02.02).
+The text we annotate is drawn from three kinds of public source, listed in \Cref{tab:gliner-sources}. Most of it is French biomedical literature from the corpus of \Cref{chap:mcbio}, kept above a quality threshold. A large share is case-centred: articles that contain patient cases, and French translations of PubMed Central case reports. A smaller part comes from passages generated from the CIM-10, CCAM, and ATC nomenclatures, which bring in coding terminology. Finally, non-medical and low-quality documents are added on purpose as negatives. The final dataset holds about $94{,}000$ annotated documents, with $662{,}000$ entities, $1.98$~million mentions, and $592{,}000$ relations; roughly a quarter of the documents are negatives.
 
-\subsection{The Role of Alignment}
+\begin{table}[t]
+  \centering
+  \caption{Public sources sampled for annotation by the language model to train
+  the extraction model of \Cref{chap:architectures}. Of the $118{,}000$ sampled
+  documents, about $94{,}000$ yield a valid annotation after grounding and
+  filtering.}
+  \label{tab:gliner-sources}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabular}{@{}ll S[table-format=6.0, group-separator={,}, group-minimum-digits=4]@{}}
+    \toprule
+    Source & What it provides & {Sampled} \\
+    \midrule
+    \tablegroup{3}{Biomedical literature (\Cref{chap:mcbio})}
+    HAL                 & French biomedical articles             & 26000 \\
+    ISTEX               & French biomedical articles             & 26000 \\
+    \tablegroup{3}{Patient cases}
+    Articles with cases & passages describing real patient cases  & 18000 \\
+    PMC-Patients-FR     & translated PubMed Central case reports  & 14000 \\
+    \tablegroup{3}{Ontology terminology}
+    CIM-10 / CCAM / ATC & passages from the coding nomenclatures  & 9000 \\
+    \tablegroup{3}{Negatives}
+    Non-medical / low quality & documents with no entity to find  & 25000 \\
+    \midrule
+    Documents sampled    &                                        & 118000 \\
+    Valid annotations    & after grounding and filtering          & 94000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
-The key result of \method, presented in \Cref{chap:ontobook}, is that aligned multi-task training (MLM and relation prediction on the same textbook data) produces a $+3.86$ $F_1$ improvement on French medical coding, while misaligned training (different data per task) causes a $-30.50$ point degradation. The synthetic textbooks themselves are necessary but not sufficient: training MLM on raw structured walks (without LLM reformulation) yields nearly the same downstream performance as training on the reformulated textbooks ($+0.59$ $F_1$). The reformulation matters specifically for the relation prediction objective, where structural markers in raw walks would let the classifier exploit formatting shortcuts rather than medical semantics.
 
 
-\section{Synthetic Clinical Reports from Case Paragraphs}
+\section{Synthetic Clinical Reports}
 \label{sec:synthetic-reports}
 
-% TODO: This section is a placeholder. The project exists but the paper is in
-% progress. Outline of what will go here:
-%
-% Motivation: Biomed-Enriched (\Cref{chap:quality}) extracted 2 million clinical
-% case paragraphs from PubMed Central. These are short, scattered across
-% scientific articles, and lack the structure of real hospital reports
-% (admission, history, examination, diagnosis, treatment plan, discharge
-% summary). Real hospital reports are private and cannot be shared. The
-% question is whether we can reformulate the public case paragraphs into
-% structured synthetic reports that approximate the style and structure of
-% real clinical documents.
-%
-% Method (TODO):
-%   - Input: Biomed-Enriched clinical case paragraphs (2M total)
-%   - LLM reformulation prompt that asks for structured report sections
-%     (admission summary, history of present illness, examination, etc.)
-%   - Quality control: schema validation, completeness checks
-%   - Synthetic report dataset for downstream task adaptation
-%
-% Comparison with OntoBook:
-%   - Input: text paragraph (vs.\ ontology graph)
-%   - Target: clinical report style (vs.\ educational textbook style)
-%   - Use case: task adaptation / fine-tuning data (vs.\ encoder pretraining)
-%   - Same paradigm: structured source → LLM reformulation → synthetic training data
-%
-% Evaluation (TODO):
-%   - Downstream tasks where real clinical reports would help: ICD coding on
-%     hospital reports, NER on discharge summaries, etc.
-%   - Compare against direct fine-tuning on Biomed-Enriched cases
-%   - Measure how close the synthetic reports get to closing the gap with
-%     models trained on private hospital data (e.g., BioClinical-ModernBERT)
-
-This section is a placeholder. The project that motivates it exists, but the paper is still in progress.
+Public case descriptions still read like published cases, not like the terse notes a hospital produces. The second use of generation closes part of that gap. We rewrite a public case into the register of a hospital note, and a deterministic degradation step adds the abbreviations, missing accents, and dictation slips that make real notes hard to read, so the extractor meets that register during training as well as on real notes.
 
 
-\section{Two Instances, One Pattern}
-\label{sec:synthetic-pattern}
+\section{Synthesizing Longitudinal Patient Dossiers}
+\label{sec:lymphoma-dossiers}
 
-% TODO: Discussion section comparing the two approaches once the synthetic
-% clinical reports section is filled in.
-%
-% Common pattern:
-%   1. Identify a structured public source (ontology / clinical case paragraph)
-%   2. Define a target text format (educational textbook / clinical report)
-%   3. Use an LLM with a strict prompt to map source → target
-%   4. Apply quality filters (length, structural completeness, code preservation)
-%   5. Train downstream models on the resulting synthetic corpus
-%
-% Differences:
-%   - Input modality: graph vs.\ free text
-%   - Output style: educational vs.\ clinical
-%   - Training role: pretraining objective vs.\ adaptation data
-%
-% Key lesson from OntoBook (alignment) likely applies to clinical reports too:
-% if the synthetic reports are used jointly with another objective (e.g.,
-% structured prediction of report fields), the two objectives should share
-% the same data.
+A single note captures one moment. A patient's record is a story that unfolds over years and across many documents, and the clinical questions we care about live in that story rather than in any one note. This thesis is part of OncoLab, a project that annotates the dossiers of lymphoma patients, all of them relapsed, against a form of about a hundred variables covering demographics, disease history, treatment lines, imaging, and outcome. Real dossiers cannot be used to develop and test that annotation, for the privacy reasons that run through this thesis, so the project needs a synthetic but realistic set of French dossiers to build the form and train automatic extraction before any real record is touched.
+
+A first attempt seeded each synthetic dossier from a single short case description, and it did not work. The reason is worth stating, because it shaped everything that followed. The seed text was about a thousand characters and described one moment, while a dossier spans years and a dozen documents. Asked to bridge that distance, the model had to invent almost everything, and it did so by imitation, producing dossiers that looked plausible but did not hold together. Clinicians who reviewed the output found the revealing gaps: there were almost no follow-up reports and almost no relapse consultations, although every patient in the target cohort has relapsed; cases with both a first and a second treatment line were missing, so adverse events beyond the first cycle could not be annotated; and the multidisciplinary-meeting reports had the wrong shape.
+
+The fix was not to add a rule for each defect. Patching the prompt with one constraint per problem makes the model produce clone-like patients and loses the variety that made it useful. The better question is what lets the model do well on its own, and the answer was a better source and a decomposed task. We seed instead from real longitudinal case reports, translated into French, in which relapse, second-line treatment, adverse events, and death are already present in the text. From the $167{,}034$ public cases we keep the richest, giving more weight to those that mention a relapse and a second treatment line, down to about $2{,}800$ adult cases.
+
+The generation then splits into stages and respects time. The model first writes a coherent patient timeline as structured data, and a short reflexive pass repairs any inconsistency in that timeline rather than rejecting it. Only then does it write the documents, one at a time and in chronological order: each document is generated seeing the earlier ones but never the later ones, so the dossier accumulates the way a real record does and no document can quote a result from its own future. A final pass extracts the structured fields. Because a field such as a treatment date takes several values over a dossier, each field is stored as a list of values, each tied to the document it came from, which keeps the longitudinal structure and lets every value be traced back to its source.
+
+The redesign produced about three thousand synthetic dossiers, around eight documents each, with a valid timeline and a complete annotation in almost every case. Second-line treatment now appears in about a third of the dossiers, against roughly a fifth before, which is the gap the clinicians had flagged. The work is still in progress: the most recent run covers $2{,}050$ of its $2{,}774$ planned cases, and the automatic quality check measures format coherence rather than clinical accuracy, so it should not be read as a correctness score. A held-out part of this set becomes the hardest evaluation in the thesis, the one we use in \Cref{chap:evaluation}.
 
 
 \section*{Conclusion}
 
-% TODO: write conclusion once §Synthetic Clinical Reports section is filled in.
-% Should pose: when is synthetic data useful? what does it not solve?
-% Transition to thesis conclusion (this is the last research chapter).
+Across these uses the recipe is the same: take a public source, constrain a language model with a strict prompt, and keep only what holds together. The data this produces is real and large, but it settles nothing on its own. It only matters if a model can turn it into clinical extraction under a label set that is open and keeps changing, the setting that defeats a fixed classifier.
 
-This is the last chapter of Part~3. The thesis conclusion revisits the research questions raised in the introduction and discusses what remains open.
+\vspace{2em}
+The data now exists. Whether a model can use it well is the question of the next chapter, \Cref{chap:architectures}, which builds the extractor trained on the material generated here.

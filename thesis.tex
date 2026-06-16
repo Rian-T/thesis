@@ -172,10 +172,8 @@
 \illustratedpart[Related Works]{Related Works}%
   {static/part-openers/leibniz-i-ching-hexagrams.jpg}%
   {\partplatecaption
-    {Each \emph{I Ching} hexagram is six lines, broken or solid, for 64 in all.
-     In 1701 the Jesuit Joachim Bouvet sent Leibniz this diagram from China, and
-     Leibniz read the lines as 0s and 1s, turning the hexagrams into the numbers
-     0 to 63 in binary. Meaning written as strings of two symbols.}
+    {Each \emph{I Ching} hexagram has six broken or unbroken lines. Leibniz
+     read the diagram as a binary sequence, numbered from 0 to 63.}
     {Diagram of the 64 hexagrams, sent to Leibniz by Joachim Bouvet, 1701.
      Unknown maker; Leibniz added the Arabic numerals.}}
 \include{sources/related_works}
@@ -205,8 +203,8 @@
 \illustratedpart[Adapting to Clinical Tasks]{Adapting to Clinical Tasks}%
   {static/part-openers/diagnosis-by-radio.jpg}%
   {\partplatecaption
-    {The doctor of the future feels a distant patient's arm through controls
-     duplicated by radio.}
+    {A proposed telemedicine device lets a doctor examine a patient at a
+     distance by radio-linked controls.}
     {\emph{Diagnosis by Radio}, cover of \emph{Science and Invention},
      February 1925.}}
 \label{part:adaptation}
@@ -220,6 +218,10 @@
      Copper engraving.}}
 \label{part:conclusion}
 \include{sources/conclusion}
+
+\appendix
+\crefalias{chapter}{appendix}
+\input{sources/appendix}
 
 
 % This ensures that the subsequent sections are being included as root
@@ -240,9 +242,6 @@
 
 \bibliographystyle{acl_natbib}
 \bibliography{thesis}
-
-\part*{Appendix}
-\input{sources/appendix}
 
 
 

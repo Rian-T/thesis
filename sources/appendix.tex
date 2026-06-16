@@ -1,1 +1,70 @@
-% TODO: Appendices if needed
+\chapter{Annotation Prompts}
+\label{app:gliner-prompts}
+
+This appendix gives the annotation prompt used to build the extraction training
+data of \Cref{sec:gliner-data}. The language model returns one JSON object per
+document, with its fields fixed by the schema below. The prompt is translated
+from the French original used on the corpus.
+
+\section{Multi-task annotation schema}
+
+\begin{verbatim}
+CandidateSpan: text
+Entity:        type_name, level (1-4), type_description, mentions []
+Classification: task_name, labels [], true_labels [], multi_label
+Structure:     schema_name, fields [{name, dtype, description, value}]
+Relation:      relation_name, head, tail
+Annotation:    candidate_spans [], entities [], classifications [],
+               structures [], relations [], absent_plausible_types []
+\end{verbatim}
+
+\section{System prompt}
+
+\begin{verbatim}
+You are an expert annotator in French biomedical NLP. You produce an exhaustive
+multi-task annotation to train a general extractor (four tasks: entities,
+classifications, structures, relations).
+
+STEP 1 - CANDIDATE SPANS (exhaustive, do this first)
+List every noun phrase in the text that could be a medical or clinical entity.
+No limit on the number. Exact substrings. Include nested forms: the core
+("diabetes") and the extended span ("uncontrolled type 2 diabetes"). Include
+modifiers (values, severity, temporality).
+
+STEP 2 - ENTITIES (exhaustive and nested, from the candidate spans)
+Annotate only biomedical or clinical entities (diseases, symptoms, drugs,
+anatomy, examinations, procedures, micro-organisms, devices, measurements,
+populations). Ignore non-medical content. If the text is not biomedical, return
+an empty entity list (a useful negative).
+Granularity L1-L4 (diversity, no quota):
+  L1 = one reusable abstract word (Disease, Symptom, Drug, Examination)
+  L2 = two or three words (subcategory)
+  L3 = specific, with a modifier
+  L4 = compositional
+Open L1 vocabulary, close to UMLS. Forbidden: a type that is only a lexical
+variant of its mention. Every mention must appear in the candidate spans.
+
+STEP 3 - CLASSIFICATIONS (two or three generic tasks)
+Inferable dimensions: document type, specialty, severity, certainty, register,
+temporality, urgency (none if not applicable).
+
+STEP 4 - STRUCTURES (zero to two, if extractable)
+If the text has structurable fields (patient profile, dosage, examination
+result): one or two schemas, three to six fields (name, dtype, description,
+value).
+
+STEP 5 - RELATIONS (head to tail, between entities)
+Head and tail must be exact substrings present in the candidate spans. Open
+vocabulary names: treats, causes, located_in, dosage_of, contraindicated_with,
+history_of, complication_of, examines, diagnoses.
+
+STEP 6 - HARD NEGATIVES
+Three to five types that are plausible in the domain but absent from the text.
+
+Reply with valid JSON following the schema.
+\end{verbatim}
+
+The clinical variant adds a register note stating that the document is a terse
+hospital note (abbreviations, missing accents, dictation typos) whose entities
+remain exact substrings, and the draft variant degrades the input with the same
+surface noise so the model learns to annotate it.

@@ -3,13 +3,26 @@
 \label{chap:contributions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-TODO
+Most modern natural language processing starts by pretraining a language model on large collections of raw text, before adapting it to a task. In the clinical setting this path is hard to follow. Real clinical notes are personal data and cannot be shared, so France has no public corpus of them to pretrain on. A model trained inside one hospital on its own records carries the same constraint and cannot be released to others. A shareable clinical model has to be built from public text.
 
-% =====================================================================
-% MIGRATED RAW MATERIAL (from the old ch.1 intro) — the thesis problem statement
-% and research question, to fold into ch.3 (problématique + contributions).
-% =====================================================================
-% This leads to a fundamental problem: the paradigm that has won is pretraining at
-% scale, but in healthcare we lack massive public clinical data to pretrain language
-% models. Can we find new ways to exploit public data for pretraining language
-% models adapted to the clinical domain, without using sensitive clinical data?
+This thesis asks one question: can public data support language models for French clinical information extraction, without training on sensitive clinical records? The manuscript answers it through three questions.
+
+\begin{itemize}
+  \item Can we assemble a useful public French biomedical corpus, and does its content and quality change what the model learns?
+  \item Given such a corpus, how should we pretrain a language model on it: by adapting an existing model, choosing the training objective, or adding knowledge from outside the text?
+  \item How can we adapt these models to clinical extraction tasks when labelled clinical data is scarce, through model architecture and synthetic data?
+\end{itemize}
+
+This thesis makes seven contributions.
+
+\begin{itemize}
+  \item \emph{biomed-fr}, a public French biomedical corpus of 413 million words, used to train CamemBERT-bio. The adapted model finds biomedical terms in French text, such as drugs and diseases, more accurately than the general model it started from, with a 2.54-point average gain and at a fraction of the cost of training from scratch~\citep{touchent2023camembertbio}.
+  \item \emph{Biomed-Enriched}, a labelling of the open biomedical literature (PubMed Central) by content type and quality. It identifies about two million paragraphs of clinical cases and improves a model trained further on them.
+  \item \emph{MC-Bio}, a ten-billion-token French biomedical corpus, and a study of which content types and quality signals help. The experiments show that some common filters degrade performance.
+  \item A pretraining method that trains the model on a different task for a while and then switches back to the main objective, improving the model at no extra cost.
+  \item \emph{OntoBook}, a way to add structured medical knowledge to pretraining by turning a medical knowledge base into training text.
+  \item Model designs, frenchmed-gliner and MedEmbed, that find clinical terms from only a handful of labelled examples.
+  \item A method for generating synthetic clinical reports by rewriting public biomedical text into hospital style, so that extractors can be trained without access to real hospital data.
+\end{itemize}
+
+The parts follow these questions. After this introduction, the first part asks what biomedical text is and how far its public forms are from the clinical notes we care about. The second part builds and studies a public French biomedical corpus. The third part pretrains language models on it, through model adaptation, training objectives, and knowledge enrichment. The final part adapts these models to clinical extraction tasks under scarce labelled data, through model architecture and synthetic data, before the conclusion.

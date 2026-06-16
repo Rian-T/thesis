@@ -1,1 +1,33 @@
-% TODO: Write chapter content
+\section{Introduction}
+
+The extractor of the previous chapter can be asked for a type it never saw. That is the point of it, and it is also what makes it hard to score. The usual way to measure extraction compares a model's output against a fixed set of human annotations. But those annotations cover only the types the annotators were told to mark, under one set of conventions about where a span begins and ends and what counts as an entity. A model rewarded for matching those conventions is not necessarily better at finding what a new study cares about; it may have learned the house style of one annotation effort. To see whether our model generalises, we need an evaluation that does not assume a fixed answer key.
+
+\section{A Reference-Free Evaluation with a Language-Model Judge}
+
+We evaluate without a gold standard. We take 400 clinical case documents the models were never trained on, and a bank of twenty types: ten common clinical types, such as disease, drug, and symptom, and ten novel types that no benchmark uses, built to be compositional or cross-domain, such as an adverse effect, an implantable device, or an environmental risk factor. Each model runs twice, once for the common types and once for the novel ones, so the two can be measured apart. We pool the spans every model proposes, add candidates of the judge's own, remove duplicates, and hide which system produced which span. A large language model then judges each span against its type description and labels it correct, wrong type, wrong boundary, or not an entity. We score with mean average precision, which does not depend on a decision threshold, and we summarise generalisation by the gap between a model's score on common types and its score on novel ones.
+
+To keep the judge honest we seed the pool with controls: real clinical entities that should be accepted, and function words mislabelled as diseases that should be rejected. We keep only the runs where the judge handles these correctly.
+
+\section{Benchmark Winners Do Not Generalise}
+
+On the common types the models are close. The novel types separate them. Our entity-tuned configuration reaches a mean average precision of $0.476$ on novel types, the best of any model we test. The baselines collapse: a strong single-encoder model tuned to a standard benchmark scores well on common types but never makes a confident prediction on a novel one, and a published biomedical extractor falls to $0.121$ on novel types. The gap between common and novel performance, which measures how far a model has overfit to familiar types, is small for our models and large for the baselines.
+
+Ranked on a standard benchmark, the same models come out in almost the opposite order: the convention-tuned baseline first, our multi-task configuration last. A model can top the benchmark and still be the weakest at finding new types, because the benchmark measures agreement with one annotation convention rather than the ability to generalise. This is the central result of the part. A lower benchmark score is what we should expect from a model that has not overfit to a single convention, and it is the entity-tuned configuration, weaker on the benchmark, that generalises best.
+
+\section{Is the Judge Trustworthy?}
+
+Using a language model to grade extractions invites two worries: that the judge is unreliable, and that it favours models like itself. We check both. Against human annotations on clinical types where the gold is unambiguous, the judge agrees at a Cohen's kappa of $0.532$, rising to $0.797$ on the cleanest set. Two judges from different model families agree with each other at $0.728$, so the result does not rest on a single judge. Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. And where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
+
+The judge is conservative: it under-credits correct spans, so the absolute scores understate real performance while the rankings between models stay stable. One limit remains. The human check covers only the common types, so the headline claim about novel types has no direct human anchor yet, and a small human study of novel-type judgements is the most useful next step.
+
+\section{The OncoLab Lymphoma Cohort}
+
+The last test is the one that matters most, because it puts the whole thesis to work on a real clinical problem. The OncoLab cohort asks for $89$ fields of a lymphoma annotation form, and we evaluate on the held-out synthetic dossiers built in \Cref{chap:synthetic}, scoring each field by how well the model locates its value in the text. Every earlier part of the thesis meets here: the public corpora that supplied the seeds (\Cref{chap:collecting,chap:quality,chap:mcbio}), the modern French biomedical encoder (\Cref{chap:objectives,chap:ontobook}), the open-vocabulary architecture (\Cref{chap:architectures}), and the synthetic dossiers themselves (\Cref{chap:synthetic}).
+
+Off the shelf, no model does well. The best zero-shot result is a micro-averaged F-score of $0.174$, and most models sit between $0.10$ and $0.15$. The convention-tuned baseline is precise but barely fires, finding only a small fraction of the fields. This is a hard, long, multi-document task, and reading it cold is beyond every model we try.
+
+After fine-tuning on the synthetic dossiers, the picture changes. Every model rises to about $0.31$ to $0.33$, and the differences between them nearly vanish. The synthetic data closes most of the distance, and it closes it for all of them: the benchmark champion and the generalist extractor reach the same ceiling. The scores are still low in absolute terms, which measures how hard the task is rather than showing it solved. But the shape of the result is the payoff of this work. Built only from public and synthetic data, a small open model reaches the same level on a real oncology task as a model tuned on a standard benchmark, without ever seeing a real clinical note.
+
+\section*{Conclusion}
+
+This is where the parts of the thesis come together. A public biomedical corpus, an encoder trained on it, a training objective with a dose of structured knowledge, an open-vocabulary architecture, and data that is generated rather than collected, all converge on one relapsed-lymphoma cohort and let a model that never saw a real clinical note reach a usable level of extraction. The conclusion of the thesis steps back from these numbers to ask what they say about building clinical models from public data, and where the approach still falls short.

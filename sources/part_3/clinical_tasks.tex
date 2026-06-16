@@ -1,11 +1,13 @@
-\chapter{Limits of Direct Fine-Tuning}
-\label{chap:limits}
-\input{sources/part_3/chapter7/article}
+A pretrained model still has to be taught a task, and the usual way is to fine-tune it on labelled examples. For clinical information extraction in French, that direct route does not work well. There are almost no labelled clinical examples to learn from, because real notes are private and cannot be shared. There are also too many possible labels for a fixed output layer, and the labels change from one study to the next. Public training text creates another gap because it does not read like a hospital note. This part takes two routes around these limits. We generate training data from public sources instead of collecting it from the clinic, and we build a model that matches text against a description of the wanted type rather than against a fixed list of labels. We then test the whole approach on a real oncology cohort, the case at the centre of the OncoLab project, where the earlier parts of this thesis are brought to bear at once.
+
+\chapter{Synthetic Data for Task Adaptation}
+\label{chap:synthetic}
+\input{sources/part_3/chapter9/article}
 
 \chapter{Architectures for Low-Resource Extraction}
 \label{chap:architectures}
 \input{sources/part_3/chapter8/article}
 
-\chapter{Synthetic Data for Task Adaptation}
-\label{chap:synthetic}
-\input{sources/part_3/chapter9/article}
+\chapter{Evaluating Open-Vocabulary Extraction}
+\label{chap:evaluation}
+\input{sources/part_3/chapter7/article}
