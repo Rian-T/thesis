@@ -152,3 +152,65 @@ vital_status     = [{"value": "deceased", "span": "Deces",
 date_of_birth    = "1956-06-14"   # stable, single-valued
 sex              = "F"            # stable, single-valued
 \end{lstlisting}
+
+
+\chapter{Evaluation Type Bank and Hyperparameters}
+\label{app:eval-details}
+
+\section{Type bank}
+
+The reference-free evaluation of \Cref{chap:evaluation} scores each model on two
+sets of ten types: ten common clinical types that any annotation effort would
+include, and ten novel types built to be compositional or cross-domain, which no
+benchmark uses. \Cref{tab:type-bank} lists them.
+
+\begin{table}[t]
+  \centering
+  \caption{The twenty evaluation types: ten common, ten novel.}
+  \label{tab:type-bank}
+  \small
+  \setlength{\tabcolsep}{14pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Common types & Novel types \\
+    \midrule
+    disease            & adverse effect \\
+    drug               & implantable device \\
+    symptom            & environmental risk factor \\
+    anatomy            & postoperative complication \\
+    examination        & contraindication \\
+    procedure          & prognostic marker \\
+    micro-organism     & route of administration \\
+    device             & family history \\
+    biological sign    & diagnostic criterion \\
+    treatment          & immunocompromised status \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Hyperparameters}
+
+\Cref{tab:hparams} gives the training settings for the MedEmbed encoder and for
+the extractor.
+
+\begin{table}[t]
+  \centering
+  \caption{Training settings for MedEmbed and the extractor.}
+  \label{tab:hparams}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Setting & MedEmbed & Extractor \\
+    \midrule
+    backbone            & ModernCamemBERT-bio & MedEmbed \\
+    parameters          & 149M                & 149M \\
+    context length      & 8192                & 8192 \\
+    objective           & contrastive (ranking + triplet) & span matching \\
+    learning rate       & 2e\text{-}5 then 1e\text{-}5 & 1e\text{-}5 (enc.) / 5e\text{-}4 (head) \\
+    effective batch     & 128                 & 16 \\
+    steps / epochs      & 20k steps per stage & 2 epochs \\
+    precision           & fp16                & fp16 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
