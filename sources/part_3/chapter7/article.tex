@@ -10,44 +10,47 @@ To keep the judge honest we seed the pool with controls: real clinical entities 
 
 \begin{figure}[t]
 \centering
-\providecommand{\jcand}[2]{{\ttfamily\small #1}\;\raisebox{0.2ex}{\scriptsize\textsc{\color{ThesisNeutral}#2}}}
+% displaCy-style: candidate span highlighted in its sentence + its candidate type
+\providecommand{\sptag}[2]{\tikz[baseline=(x.base)]{\node[fill=ThesisPrimary!20,
+  draw=ThesisPrimaryDark!55, rounded corners=2pt, inner xsep=3pt, inner ysep=1.5pt,
+  text=ThesisInk] (x) {{\ttfamily\small #1}\,\raisebox{0.15ex}{\scriptsize\textsc{\textcolor{ThesisPrimaryDark}{#2}}}};}}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\sffamily, text=ThesisInk, >={Stealth[length=2mm]},
-  cbox/.style={draw=none, fill=none, inner sep=4pt, anchor=west},
+  ctx/.style={draw=none, fill=none, inner sep=3pt, anchor=west, text=ThesisNeutral, font=\small},
   vbox/.style={draw=none, fill=none, inner sep=4pt, font=\small, anchor=west, text=ThesisInk},
   judge/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!28, rounded corners=4pt,
                 line width=1.3pt, align=center, font=\sffamily\bfseries},
   thru/.style={->, ThesisNeutral!75, line width=0.7pt, shorten >=1.5pt, shorten <=1.5pt},
   tiny/.style={font=\sffamily\scriptsize\itshape, text=ThesisNeutral},
 ]
-  \def\ya{2.55} \def\yb{1.55} \def\yc{0.55} \def\yd{-0.45}
-  \coordinate (mid) at (0,1.05);
-  % pooled, de-identified candidates (a span with a candidate type); gray = context
-  \node[cbox] (c1) at (0,\ya) {\jcand{R-CHOP}{drug}};
-  \node[cbox] (c2) at (0,\yb) {\jcand{B-cell}{disease}};
-  \node[cbox] (c3) at (0,\yc) {\jcand{hépatique}{anatomy}};
-  \node[cbox] (c4) at (0,\yd) {\jcand{sans particularité}{value}};
-  % the single accent: the judge, placed 0.9cm right of the widest candidate
-  \node[judge, anchor=west, minimum width=2.2cm, minimum height=4.2cm]
-     (J) at ([xshift=0.9cm]c4.east |- mid) {language-model\\[1pt]judge};
+  \def\ya{2.7} \def\yb{1.5} \def\yc{0.3} \def\yd{-0.9}
+  \coordinate (mid) at (0,0.9);
+  % each candidate is a span shown in its sentence (gray), so the verdict is legible
+  \node[ctx] (c1) at (0,\ya) {started \sptag{R-CHOP}{drug}, six cycles};
+  \node[ctx] (c2) at (0,\yb) {diffuse large \sptag{B-cell}{disease} lymphoma};
+  \node[ctx] (c3) at (0,\yc) {the \sptag{hépatique}{anatomy} function};
+  \node[ctx] (c4) at (0,\yd) {examination \sptag{sans particularité}{value}};
+  % the single accent: the judge, placed 0.9cm right of the widest candidate (c2)
+  \node[judge, anchor=west, minimum width=2.2cm, minimum height=4.6cm]
+     (J) at ([xshift=0.9cm]c2.east |- mid) {language-model\\[1pt]judge};
   % the four possible verdicts, one per lane (left edges aligned on v1)
   \node[vbox] (v1) at ([xshift=0.9cm]J.east |- c1) {correct};
   \node[vbox] (v2) at (v1.west |- c2) {wrong boundary};
   \node[vbox] (v3) at (v1.west |- c3) {wrong type};
   \node[vbox] (v4) at (v1.west |- c4) {not an entity};
-  \node[tiny, anchor=west] at (c1.north west |- 0,3.45) {pooled $\cdot$ blind candidates};
+  \node[tiny, anchor=west] at (c1.north west |- 0,3.6) {pooled $\cdot$ blind candidates};
   \node[tiny] at ([yshift=6pt]J.north) {one verdict each};
   \foreach \c/\v in {c1/v1, c2/v2, c3/v3, c4/v4}{
     \draw[thru] (\c.east) -- (J.west |- \c.east);
     \draw[thru] (J.east |- \v.west) -- (\v.west);
   }
 \end{tikzpicture}}
-\caption{The reference-free judge. Each pooled, de-identified candidate, a span with a
-candidate type, is labelled by a blind language-model judge as one of correct, wrong type,
-wrong boundary, or not an entity, without a gold standard. These verdicts are then
-aggregated into a mean average precision, and the gap between the common and novel types
-(\Cref{tab:judge-map}) measures overfitting.}
+\caption{The reference-free judge. Each pooled, de-identified candidate, a span shown here
+in its sentence with a candidate type, is labelled by a blind language-model judge as one of
+correct, wrong type, wrong boundary, or not an entity, without a gold standard. These
+verdicts are then aggregated into a mean average precision, and the gap between the common
+and novel types (\Cref{tab:judge-map}) measures overfitting.}
 \label{fig:judge-schema}
 \end{figure}
 
