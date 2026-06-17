@@ -137,32 +137,34 @@ The generation then splits into four stages and respects time, as \Cref{fig:doss
 \begin{figure}[t]
 \centering
 \providecommand{\stitle}[1]{{\footnotesize\bfseries\sffamily\color{ThesisInk}#1}}
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\footnotesize\sffamily,
-  stage/.style={draw, rounded corners=3pt, line width=0.7pt, inner sep=8pt,
-                align=left, text width=2.85cm, minimum height=4.3cm, anchor=north},
+  stage/.style={draw, rounded corners=3pt, line width=0.7pt, inner sep=6pt,
+                align=left, text width=2.7cm, minimum height=4.3cm, anchor=north},
   arr/.style={-{Latex[length=2.4mm]}, line width=1pt, ThesisInk!45},
 ]
 \node[stage, draw=ThesisNeutral, fill=ThesisPaper] (seed) at (0,0)
   {\stitle{Seed case}\par\vspace{5pt}
-   {\itshape Public English case: 64 y, lymphoma, R-CHOP, relapse at 22 months, salvage R-DHAP, death.}};
+   {\itshape Public case: 64 y, lymphoma, R-CHOP, relapse at 22 months, salvage R-DHAP, death.}};
 
-\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.05,0)
+\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.55,0)
   {\stitle{Timeline}\par\vspace{5pt}
    {2019-03 diagnosis\par 2019-04 R-CHOP\par 2019-10 response\par 2021-01 relapse\par 2021-02 R-DHAP\par 2021-08 death}};
 
-\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (6.1,0)
+\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (7.1,0)
   {\stitle{Documents}\par\vspace{5pt}
    {anapath 2019-03\par RCP 2019-03\par PET-CT 2019-10\par relapse RCP 2021-01\par discharge 2021-08}};
 
-\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (9.15,0)
+\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (10.65,0)
   {\stitle{Fields (traced)}\par\vspace{5pt}
    {1st line: R-CHOP\par \textit{(RCP 2019-03)}\par relapse: 2021-01\par \textit{(RCP 2021-01)}\par 2nd line: R-DHAP\par \textit{(discharge)}}};
 
 \draw[arr] (seed.east) -- (tl.west);
 \draw[arr] (tl.east) -- (doc.west);
 \draw[arr] (doc.east) -- (ann.west);
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{The four stages on a short example. A public case becomes a dated
 timeline, the timeline is written out as documents in chronological order so
 that each document sees only the past, and the structured fields are then
