@@ -136,36 +136,67 @@ The generation then splits into four stages and respects time, as \Cref{fig:doss
 
 \begin{figure}[t]
 \centering
-\providecommand{\stitle}[1]{{\footnotesize\bfseries\sffamily\color{ThesisInk}#1}}
+% ---- a single document = page icon with a folded top-right corner ----
+\newcommand{\docnode}[3]{% #1 name  #2 x  #3 label
+  \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!22, line width=0.6pt,
+        minimum width=0.52cm, minimum height=0.64cm, inner sep=0pt] (#1) at (#2,-1.35) {};
+  \fill[ThesisTertiaryDark!38] ($(#1.north east)+(-0.16,0)$) -- (#1.north east)
+        -- ($(#1.north east)+(0,-0.16)$) -- cycle;
+  \draw[ThesisTertiaryDark, line width=0.4pt] ($(#1.north east)+(-0.16,0)$)
+        -- ($(#1.north east)+(0,-0.16)$);
+  \node[font=\scriptsize, color=ThesisInk, anchor=north] at (#2,-1.78) {#3};
+  \draw[ThesisNeutral!50, line width=0.5pt, dotted] (#2,-0.10) -- (#2,-1.01);
+}
 \resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-  font=\footnotesize\sffamily,
-  stage/.style={draw, rounded corners=3pt, line width=0.7pt, inner sep=6pt,
-                align=left, text width=2.7cm, minimum height=4.3cm, anchor=north},
-  arr/.style={-{Latex[length=2.4mm]}, line width=1pt, ThesisInk!45},
-]
-\node[stage, draw=ThesisNeutral, fill=ThesisPaper] (seed) at (0,0)
-  {\stitle{Seed case}\par\vspace{5pt}
-   {\itshape Public case: 64 y, lymphoma, R-CHOP, relapse at 22 months, salvage R-DHAP, death.}};
+\begin{tikzpicture}[font=\footnotesize\sffamily,
+    >={Latex[length=2.2mm]},
+    evdot/.style={fill=ThesisSecondaryDark, draw=ThesisSecondaryDark},
+    field/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!12, rounded corners=2pt,
+                  line width=0.6pt, font=\scriptsize, text=ThesisInk, inner sep=3pt}]
 
-\node[stage, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (tl) at (3.55,0)
-  {\stitle{Timeline}\par\vspace{5pt}
-   {2019-03 diagnosis\par 2019-04 R-CHOP\par 2019-10 response\par 2021-01 relapse\par 2021-02 R-DHAP\par 2021-08 death}};
+% --- public-case seed feeding the timeline ---
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=2pt, line width=0.7pt,
+      minimum width=0.52cm, minimum height=0.66cm, inner sep=0pt] (seed) at (-1.8,0) {};
+\node[font=\scriptsize, color=ThesisNeutral, anchor=north] at (-1.8,-0.40) {public case};
+\draw[-{Latex[length=2.2mm]}, ThesisNeutral, line width=0.9pt]
+      (seed.east) -- ++(0.85,0);
 
-\node[stage, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (doc) at (7.1,0)
-  {\stitle{Documents}\par\vspace{5pt}
-   {anapath 2019-03\par RCP 2019-03\par PET-CT 2019-10\par relapse RCP 2021-01\par discharge 2021-08}};
+% --- time axis ---
+\draw[-{Latex[length=2.6mm]}, ThesisInk, line width=1.1pt] (-0.55,0) -- (10.7,0);
+\node[font=\scriptsize\itshape, color=ThesisNeutral, anchor=south west] at (10.25,0.07) {time};
 
-\node[stage, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ann) at (10.65,0)
-  {\stitle{Fields (traced)}\par\vspace{5pt}
-   {1st line: R-CHOP\par \textit{(RCP 2019-03)}\par relapse: 2021-01\par \textit{(RCP 2021-01)}\par 2nd line: R-DHAP\par \textit{(discharge)}}};
+% year ticks under the axis (label nudged off the document connector line)
+\foreach \x/\yr in {0/2019, 6.4/2021}{
+  \draw[ThesisInk, line width=0.9pt] (\x,0.10) -- (\x,-0.10);
+  \node[font=\scriptsize, color=ThesisNeutral, anchor=north east] at (\x-0.1,-0.14) {\yr};
+}
 
-\draw[arr] (seed.east) -- (tl.west);
-\draw[arr] (tl.east) -- (doc.west);
-\draw[arr] (doc.east) -- (ann.west);
+% --- event dots + staggered labels (two heights, no overlap) ---
+\foreach \x/\y/\lab in {0/1.18/diagnosis, 1.5/0.62/R-CHOP, 3.2/1.18/response,
+                        6.4/0.62/relapse, 7.9/1.18/R-DHAP, 9.7/0.62/death}{
+  \draw[ThesisNeutral!55, line width=0.5pt] (\x,0.09) -- (\x,\y-0.06);
+  \node[evdot] at (\x,0) [circle, inner sep=0pt, minimum size=4.4pt] {};
+  \node[font=\scriptsize, color=ThesisInk, anchor=south] at (\x,\y) {\lab};
+}
+
+% --- documents (page icons below the axis, dropped from their date) ---
+\docnode{danap}{0}{anapath}
+\docnode{dpet}{3.2}{PET-CT}
+\docnode{drcp}{6.4}{relapse RCP}
+\docnode{ddis}{9.7}{discharge}
+
+% --- extracted fields, aligned under their source document for straight arrows ---
+\node[field] (f1) at (0,-3.05)   {1st line: R-CHOP};
+\node[field] (f2) at (6.4,-3.05) {relapse: 2021-01};
+\node[field] (f3) at (9.7,-3.05) {2nd line: R-DHAP};
+
+\foreach \f/\d in {f1/danap, f2/drcp, f3/ddis}{
+  \draw[-{Latex[length=1.8mm]}, dashed, dash pattern=on 2pt off 1.6pt,
+        ThesisPrimaryDark!75, line width=0.6pt] (\f.north) -- (\d.south);
+}
 \end{tikzpicture}%
 }
-\caption{The four stages on a short example. A public case becomes a dated
+\caption{The four stages on a short example: a public case becomes a dated
 timeline, the timeline is written out as documents in chronological order so
 that each document sees only the past, and the structured fields are then
 extracted back, each value tied to the document it came from.}
