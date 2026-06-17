@@ -39,3 +39,16 @@ cnil_mr004                      # CNIL MR-004 délibération 2018-155 (legal)
 hdh_loi                         # LOI 2019-774 art. 41, Health Data Hub (legal)
 ce_hdh                          # Conseil d'État ord. 444937 (legal)
 pubmed_eutils                   # PubMed/PMC counts via NCBI E-utilities (live stat, access-dated)
+goodfellow_deep_2016            # textbook (Deep Learning, MIT Press) — no DOI
+russell_aima_2020               # textbook (AIMA, Pearson) — no DOI
+manning_ir_2008                 # textbook (Introduction to IR, CUP) — no DOI
+snomed_ct                       # SNOMED International terminology page (org source)
+who_icd10                       # WHO ICD-10 classification page (org source)
+whocc_atc                       # WHO-CC ATC structure/principles page (org source)
+nlm_mesh                        # NLM MeSH home (org source)
+atih_pmsi                       # ATIH PMSI page (org source, FR)
+atih_cim10                      # ATIH CIM-10 FR page (org source, FR)
+atih_ccam                       # ATIH CCAM page (org source, FR)
+inca_rcp                        # INCa RCP référentiel (org source, FR)
+gdpr_art4                       # GDPR Art. 4(5) pseudonymisation (legal, like gdpr_art9)
+finkel_nested_2009              # real ACL EMNLP 2009 (D09-1015, curl-verified); checkbib title-matches a different 2025 survey

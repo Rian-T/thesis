@@ -1,0 +1,152 @@
+% =====================================================================
+% Acronyms and glossary.
+% \input before \makeglossaries in thesis.tex.
+% Acronyms = factual expansions of abbreviations (no sourced definition).
+% Glossary entries = concepts with a definition taken from a recognized,
+% cited authoritative reference (never invented). See sources/ research notes.
+% Model names (CamemBERT, BERT, GPT, ...) are proper nouns introduced and
+% cited in the text, so they are deliberately NOT listed as acronyms.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+% Acronyms
+% ---------------------------------------------------------------------
+
+% General machine learning / NLP
+\newacronym{AI}{AI}{artificial intelligence}
+\newacronym{NLP}{NLP}{natural language processing}
+\newacronym{LLM}{LLM}{large language model}
+\newacronym{MLM}{MLM}{masked language modeling}
+\newacronym{CLM}{CLM}{causal language modeling}
+\newacronym{NER}{NER}{named entity recognition}
+\newacronym{IE}{IE}{information extraction}
+\newacronym{QA}{QA}{question answering}
+\newacronym{CPT}{CPT}{continued pretraining}
+\newacronym{DAPT}{DAPT}{domain-adaptive pretraining}
+\newacronym{TAPT}{TAPT}{task-adaptive pretraining}
+\newacronym{RoPE}{RoPE}{rotary position embedding}
+\newacronym{BPE}{BPE}{byte-pair encoding}
+\newacronym{CKA}{CKA}{centered kernel alignment}
+\newacronym{MAP}{MAP}{mean average precision}
+\newacronym{MMLU}{MMLU}{Massive Multitask Language Understanding}
+\newacronym{GPU}{GPU}{graphics processing unit}
+\newacronym{RDF}{RDF}{Resource Description Framework}
+\newacronym{JSON}{JSON}{JavaScript Object Notation}
+
+% Biomedical / clinical
+\newacronym{PMC}{PMC}{PubMed Central}
+\newacronym{UMLS}{UMLS}{Unified Medical Language System}
+\newacronym{MeSH}{MeSH}{Medical Subject Headings}
+\newacronym{SNOMEDCT}{SNOMED CT}{Systematized Nomenclature of Medicine Clinical Terms}
+\newacronym{ICD}{ICD}{International Classification of Diseases}
+\newacronym{CIM}{CIM-10}{Classification internationale des maladies, 10\textsuperscript{e} révision}
+\newacronym{CCAM}{CCAM}{Classification commune des actes médicaux}
+\newacronym{ATC}{ATC}{Anatomical Therapeutic Chemical classification}
+\newacronym{PMSI}{PMSI}{Programme de médicalisation des systèmes d'information}
+\newacronym{EHR}{EHR}{electronic health record}
+\newacronym{CDW}{CDW}{clinical data warehouse}
+\newacronym{RCP}{RCP}{réunion de concertation pluridisciplinaire}
+
+% Neural architectures and training (added from completeness sweep)
+\newacronym{RNN}{RNN}{recurrent neural network}
+\newacronym{LSTM}{LSTM}{long short-term memory}
+\newacronym{BiLSTM}{BiLSTM}{bidirectional long short-term memory}
+\newacronym{GRU}{GRU}{gated recurrent unit}
+\newacronym{CRF}{CRF}{conditional random field}
+\newacronym{GLU}{GLU}{gated linear unit}
+\newacronym{RMSNorm}{RMSNorm}{root mean square normalization}
+\newacronym{ALiBi}{ALiBi}{attention with linear biases}
+\newacronym{GQA}{GQA}{grouped-query attention}
+\newacronym{RLHF}{RLHF}{reinforcement learning from human feedback}
+\newacronym{RLVR}{RLVR}{reinforcement learning with verifiable rewards}
+\newacronym{GRPO}{GRPO}{group relative policy optimization}
+\newacronym{FP8}{FP8}{8-bit floating point}
+\newacronym{MSE}{MSE}{mean squared error}
+\newacronym{MAE}{MAE}{mean absolute error}
+\newacronym{IOB2}{IOB2}{inside--outside--beginning tagging scheme}
+
+% Formats, standards, semantic web
+\newacronym{XML}{XML}{Extensible Markup Language}
+\newacronym{OCR}{OCR}{optical character recognition}
+\newacronym{OWL}{OWL}{Web Ontology Language}
+\newacronym{SKOS}{SKOS}{Simple Knowledge Organization System}
+\newacronym{W3C}{W3C}{World Wide Web Consortium}
+
+% Document structures
+\newacronym{IMRAD}{IMRAD}{introduction, methods, results, and discussion}
+\newacronym{SOAP}{SOAP}{subjective, objective, assessment, plan}
+
+% Organisations and regulations
+\newacronym{WHO}{WHO}{World Health Organization}
+\newacronym{NCBI}{NCBI}{National Center for Biotechnology Information}
+\newacronym{EMA}{EMEA}{European Medicines Agency}
+\newacronym{ATIH}{ATIH}{Agence technique de l'information sur l'hospitalisation}
+\newacronym{SMT}{SMT}{serveur multi-terminologies}
+\newacronym{CNIL}{CNIL}{Commission nationale de l'informatique et des libertés}
+\newacronym{HIPAA}{HIPAA}{Health Insurance Portability and Accountability Act}
+
+% ---------------------------------------------------------------------
+% Glossary entries (definitions sourced from cited authoritative references)
+% Kept only terms present in the body (grep-verified); definitions never
+% invented. See research/glossary_mlnlp.md and research/glossary_clinical.md.
+% ---------------------------------------------------------------------
+
+% --- Machine learning / NLP concepts ---
+\newglossaryentry{language-model}{name={language model}, description={A model that predicts upcoming words, assigning a probability to each possible next word and thereby to an entire word sequence~\citep{jurafsky_course}.}, sort={language model}}
+\newglossaryentry{n-gram-language-model}{name={n-gram language model}, description={A language model that approximates the probability of a word given its full history by conditioning only on the previous $n-1$ words, following the Markov assumption that the recent context suffices~\citep{jurafsky_course}.}, sort={n-gram language model}}
+\newglossaryentry{masked-language-modeling}{name={masked language modeling}, description={A pretraining objective in which a random subset of input tokens is replaced by a mask symbol and the model is trained to recover the original tokens from their bidirectional context~\citep{devlin-etal-2019-bert}.}, sort={masked language modeling}}
+\newglossaryentry{causal-language-modeling}{name={causal (autoregressive) language modeling}, description={A training objective in which the model predicts each token conditioned only on the preceding tokens, factorising the sequence probability left to right via the chain rule of probability~\citep{jurafsky_course}.}, sort={causal language modeling}}
+\newglossaryentry{pretraining}{name={pretraining}, description={Training a model on one task or dataset so that its learned representations can initialise and improve learning on a different, typically downstream, task~\citep{goodfellow_deep_2016}.}, sort={pretraining}}
+\newglossaryentry{fine-tuning}{name={fine-tuning}, description={Adapting a pretrained model to a target task by continuing training, usually with supervised data, so that its general representations are specialised to that task~\citep{devlin-etal-2019-bert}.}, sort={fine-tuning}}
+\newglossaryentry{continual-pretraining}{name={continued pretraining (domain-adaptive pretraining)}, description={A second phase of self-supervised pretraining of an already pretrained language model on unlabelled in-domain text, which improves downstream performance within that domain~\citep{gururangan_dont_2020}.}, sort={continued pretraining}}
+\newglossaryentry{transformer}{name={transformer}, description={A sequence-transduction architecture that replaces recurrence and convolution entirely with stacked self-attention and position-wise feed-forward layers~\citep{vaswani2017attention}.}, sort={transformer}}
+\newglossaryentry{attention}{name={attention}, description={A mechanism that computes an output as a weighted sum of value vectors, where each weight is given by a compatibility function between a query and the corresponding key~\citep{vaswani2017attention}.}, sort={attention}}
+\newglossaryentry{self-attention}{name={self-attention}, description={An attention mechanism in which the queries, keys, and values are all derived from the same sequence, relating different positions of that sequence to compute its representation~\citep{vaswani2017attention}.}, sort={self-attention}}
+\newglossaryentry{encoder-decoder}{name={encoder and decoder architecture}, description={A model design in which an encoder maps an input sequence to a sequence of continuous representations and a decoder then generates the output sequence one element at a time from those representations~\citep{vaswani2017attention}.}, sort={encoder and decoder architecture}}
+\newglossaryentry{tokenization}{name={tokenization}, description={The process of segmenting a running text into the discrete tokens that serve as the model's atomic input units~\citep{jurafsky_course}.}, sort={tokenization}}
+\newglossaryentry{subword-tokenization}{name={subword tokenization}, description={A tokenization strategy that represents words as sequences of frequent subword units, learned for example by iteratively merging the most frequent adjacent symbol pairs as in byte-pair encoding~\citep{sennrich-etal-2016-neural}.}, sort={subword tokenization}}
+\newglossaryentry{perplexity}{name={perplexity}, description={An intrinsic evaluation measure for language models equal to the inverse probability of a test set normalised by the number of words, so that a lower value indicates a better model~\citep{jurafsky_course}.}, sort={perplexity}}
+\newglossaryentry{named-entity-recognition}{name={named entity recognition}, description={The task of finding spans of text that constitute proper names and classifying each into a predefined entity type such as person, location, or organisation~\citep{jurafsky_course}.}, sort={named entity recognition}}
+\newglossaryentry{information-extraction}{name={information extraction}, description={The process of turning unstructured text into structured data, for example by recognising entities and the relations that hold among them~\citep{jurafsky_course}.}, sort={information extraction}}
+\newglossaryentry{knowledge-distillation}{name={knowledge distillation}, description={A model-compression technique in which a small student model is trained to reproduce the output distribution of a larger teacher model, transferring its knowledge into a more compact form~\citep{sanh2019distilbert}.}, sort={knowledge distillation}}
+\newglossaryentry{contrastive-learning}{name={contrastive learning}, description={A representation-learning approach that pulls representations of matched (positive) pairs together while pushing apart those of unmatched (negative) pairs~\citep{gao-etal-2021-simcse}.}, sort={contrastive learning}}
+\newglossaryentry{in-context-learning}{name={zero-shot, few-shot, and in-context learning}, description={The ability of a large language model to perform a new task at inference time from a natural-language description alone (zero-shot) or from a few demonstrations placed in its prompt (few-shot), without any gradient updates~\citep{gpt3}.}, sort={zero-shot, few-shot, and in-context learning}}
+\newglossaryentry{rope}{name={rotary position embedding (RoPE)}, description={A position-encoding scheme that injects positional information by rotating the query and key vectors by an angle proportional to their absolute position, so that their dot product depends only on the relative distance between tokens~\citep{rope}.}, sort={rotary position embedding}}
+\newglossaryentry{cross-entropy-loss}{name={cross-entropy loss}, description={A training objective equal to the negative log-likelihood of the data under the model, measuring the dissimilarity between the model's predicted distribution and the empirical target distribution~\citep{goodfellow_deep_2016}.}, sort={cross-entropy loss}}
+\newglossaryentry{mean-average-precision}{name={mean average precision}, description={The mean over a set of queries of the average precision, where average precision is the mean of the precision values computed at each rank position at which a relevant item is retrieved~\citep{manning_ir_2008}.}, sort={mean average precision}}
+\newglossaryentry{f1-score}{name={F1 score}, description={The harmonic mean of precision and recall, summarising both in a single value that gives equal weight to the two~\citep{jurafsky_course}.}, sort={F1 score}}
+
+% --- Clinical / biomedical concepts ---
+\newglossaryentry{clinical-case-report}{name={clinical case report}, description={A detailed narrative describing the diagnosis, treatment and follow-up of an individual patient, used in French clinical NLP as a publicly shareable proxy for hospital notes~\citep{grouin_clinical_2019}.}, sort={clinical case report}}
+\newglossaryentry{ehr}{name={electronic health record (EHR)}, description={A digital, longitudinal collection of a patient's health information recorded during care, comprising structured data and free-text clinical notes~\citep{aphp_cdw}.}, sort={electronic health record}}
+\newglossaryentry{cdw}{name={clinical data warehouse (CDW)}, description={A hospital database that aggregates and integrates clinical data from operational care systems for secondary use such as research and decision support~\citep{aphp_cdw}.}, sort={clinical data warehouse}}
+\newglossaryentry{de-identification}{name={de-identification}, description={The task of detecting and removing or replacing protected health information, such as names, dates and locations, from clinical text so that patients cannot be identified~\citep{stubbs_deid_2015}.}, sort={de-identification}}
+\newglossaryentry{pseudonymisation}{name={pseudonymisation}, description={Under the GDPR, the processing of personal data so that it can no longer be attributed to a specific data subject without separately kept additional information, meaning the data remains personal data~\citep{gdpr_art4}.}, sort={pseudonymisation}}
+\newglossaryentry{clinical-information-extraction}{name={clinical information extraction}, description={The natural language processing task of automatically extracting structured information, such as medical concepts, assertions and relations, from free-text clinical narratives~\citep{neveol_clinical_2016}.}, sort={clinical information extraction}}
+\newglossaryentry{medical-coding}{name={medical coding}, description={The assignment of standardised codes from a controlled classification, such as ICD or CCAM, to the diagnoses and procedures recorded in a patient's clinical documentation~\citep{atih_pmsi}.}, sort={medical coding}}
+\newglossaryentry{umls}{name={Unified Medical Language System (UMLS)}, description={A set of files and software produced by the U.S. National Library of Medicine that brings together many health and biomedical vocabularies to enable interoperability between computer systems~\citep{bodenreider_unified_2004}.}, sort={Unified Medical Language System}}
+\newglossaryentry{snomed-ct}{name={SNOMED CT}, description={The comprehensive, multilingual clinical healthcare terminology maintained by SNOMED International, designed for the consistent representation of clinical content in electronic health records~\citep{snomed_ct}.}, sort={SNOMED CT}}
+\newglossaryentry{icd-10}{name={ICD-10}, description={The tenth revision of the World Health Organization's International Statistical Classification of Diseases and Related Health Problems, the global standard for recording and comparing diagnoses~\citep{who_icd10}.}, sort={ICD-10}}
+\newglossaryentry{cim-10-pmsi}{name={CIM-10 (PMSI)}, description={The French-language version of the WHO International Classification of Diseases (tenth revision), maintained by the ATIH and used since 1996 to code diagnoses in the standardised records of the PMSI~\citep{atih_cim10}.}, sort={CIM-10 (PMSI)}}
+\newglossaryentry{ccam}{name={CCAM}, description={The Classification commune des actes médicaux, the French national classification used since 2004 to code the medical and technical procedures performed by physicians~\citep{atih_ccam}.}, sort={CCAM}}
+\newglossaryentry{atc}{name={ATC classification}, description={The Anatomical Therapeutic Chemical classification maintained by the WHO Collaborating Centre for Drug Statistics Methodology, which classifies active substances into five hierarchical levels by the organ or system they act on and their therapeutic and chemical properties~\citep{whocc_atc}.}, sort={ATC classification}}
+\newglossaryentry{pmsi}{name={PMSI}, description={The Programme de médicalisation des systèmes d'information, the French scheme that produces a standardised synthetic description of hospital medical activity from systematically recorded medico-administrative data~\citep{atih_pmsi}.}, sort={PMSI}}
+\newglossaryentry{mesh}{name={MeSH}, description={Medical Subject Headings, a controlled and hierarchically organised vocabulary produced by the U.S. National Library of Medicine for indexing, cataloguing and searching biomedical information~\citep{nlm_mesh}.}, sort={MeSH}}
+\newglossaryentry{rcp}{name={réunion de concertation pluridisciplinaire (RCP)}, description={A meeting between health professionals, mandatory in French cancer care, at which a patient's situation and the possible treatments are discussed in light of current scientific evidence and their benefits and risks~\citep{inca_rcp}.}, sort={reunion de concertation pluridisciplinaire}}
+
+% --- Concepts added from the completeness sweep ---
+\newglossaryentry{knowledge-graph}{name={knowledge graph}, description={A graph of data intended to accumulate and convey knowledge of the real world, whose nodes represent entities of interest and whose edges represent relations between these entities~\citep{hogan_knowledge_2021}.}, sort={knowledge graph}}
+\newglossaryentry{ontology}{name={ontology}, description={An explicit specification of a conceptualisation, that is, of the objects, concepts, and relations assumed to exist in some area of interest and the relationships that hold among them~\citep{gruber_ontology_1993}.}, sort={ontology}}
+\newglossaryentry{entity-linking}{name={entity linking}, description={The task of linking a named-entity mention in text to its corresponding entry in a reference knowledge base, resolving the mention to the real-world entity it denotes~\citep{shen_entity_2015}.}, sort={entity linking}}
+\newglossaryentry{sequence-labeling}{name={sequence labeling}, description={The task of assigning a label to each element of an input sequence, modelled jointly over the whole sequence so that the prediction for one position depends on neighbouring labels~\citep{lafferty2001crf}.}, sort={sequence labeling}}
+\newglossaryentry{multi-label-classification}{name={multi-label classification}, description={A classification task in which each instance may be associated with a set of several labels at once, rather than with a single mutually exclusive class~\citep{tsoumakas_multilabel_2007}.}, sort={multi-label classification}}
+\newglossaryentry{nested-entities}{name={nested entities}, description={In named entity recognition, entity mentions that contain other entity mentions within their span, so that a single token can belong to more than one entity at once~\citep{finkel_nested_2009}.}, sort={nested entities}}
+\newglossaryentry{catastrophic-forgetting}{name={catastrophic forgetting}, description={The tendency of a connectionist network to abruptly lose previously learned knowledge when it is trained on new information~\citep{mccloskey1989catastrophic}.}, sort={catastrophic forgetting}}
+\newglossaryentry{scaling-laws}{name={scaling laws}, description={Empirical power-law relationships showing that the cross-entropy loss of a language model decreases predictably with model size, dataset size, and training compute~\citep{kaplan_scaling}.}, sort={scaling laws}}
+\newglossaryentry{benchmark-contamination}{name={benchmark contamination}, description={The situation in which test or benchmark data has leaked into a model's training corpus, so that evaluation scores reflect memorisation rather than genuine generalisation~\citep{xu2024contaminationsurvey}.}, sort={benchmark contamination}}
+\newglossaryentry{micro-macro-averaging}{name={micro- and macro-averaging}, description={Two ways of aggregating a per-class measure such as precision, recall, or F1 over several classes: micro-averaging pools the individual decisions first, giving equal weight to each instance, whereas macro-averaging computes the measure per class and then averages, giving equal weight to each class~\citep{sokolova_systematic_2009}.}, sort={micro and macro averaging}}
+\newglossaryentry{sublanguage}{name={sublanguage}, description={The specialised form of a natural language used by a particular community within a restricted subject domain, with its own restricted vocabulary, grammar, and patterns of co-occurrence~\citep{kittredge_sublanguages_1982}.}, sort={sublanguage}}
+\newglossaryentry{register}{name={register}, description={A variety of language associated with a particular situation of use, characterised by distinctive patterns of lexical and grammatical features that vary with communicative purpose and context~\citep{biber_finegan_1994}.}, sort={register}}
+\newglossaryentry{genre}{name={genre}, description={A class of communicative events whose members share a set of communicative purposes recognised by a discourse community, which shape the structure and constrain the content and style of the discourse~\citep{swales_genre_1990}.}, sort={genre}}
+\newglossaryentry{entity-normalization}{name={entity normalization}, description={The task of mapping an entity mention in text to a unique controlled-vocabulary concept identifier, so that lexically different mentions of the same concept receive the same normalised identifier~\citep{dogan2014ncbi}.}, sort={entity normalization}}
+\newglossaryentry{drug-leaflet}{name={drug leaflet}, description={The package leaflet (\textit{notice}) accompanying a medicinal product, a document written for the patient that must be included in the packaging and drafted in clear, understandable terms~\citep{ec_directive_2001_83}.}, sort={drug leaflet}}
