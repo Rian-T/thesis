@@ -10,38 +10,84 @@ To keep the judge honest we seed the pool with controls: real clinical entities 
 
 \begin{figure}[t]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     font=\small\sffamily,
-    box/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!12, rounded corners=2pt,
-                line width=0.7pt, align=center, inner sep=6pt, minimum width=2.7cm},
-    proc/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
-                 line width=0.7pt, align=center, inner sep=6pt, minimum width=2.4cm},
-    judge/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18, rounded corners=2pt,
-                  line width=0.9pt, align=center, inner sep=7pt, minimum width=2.4cm},
-    res/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!18, rounded corners=2pt,
-                line width=0.7pt, align=center, inner sep=5pt, minimum width=3.0cm},
-    flow/.style={-{Stealth[length=2.4mm]}, ThesisInk, line width=0.8pt}]
+    >=Stealth,
+    inbox/.style={pipe box, draw=ThesisSecondaryDark, fill=ThesisSecondary!15,
+               rounded corners=2pt, line width=0.7pt, align=center,
+               inner sep=5pt, minimum width=2.6cm, minimum height=0.78cm, text=ThesisInk},
+    proc/.style={pipe box, draw=ThesisTertiaryDark, fill=ThesisTertiary!15,
+                 rounded corners=2pt, line width=0.7pt, align=center,
+                 inner sep=6pt, minimum width=2.4cm, minimum height=1.2cm, text=ThesisInk},
+    judge/.style={pipe box, draw=ThesisPrimaryDark, fill=ThesisPrimary!18,
+                  rounded corners=3pt, line width=1.1pt, align=center,
+                  inner sep=7pt, minimum width=2.4cm, minimum height=1.4cm, text=ThesisInk},
+    res/.style={pipe box, draw=ThesisNeutral, fill=ThesisPaper,
+                rounded corners=2pt, line width=0.7pt, align=center,
+                inner sep=4pt, minimum width=2.9cm, minimum height=0.56cm, text=ThesisInk},
+    score/.style={pipe box, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
+                  rounded corners=2pt, line width=0.8pt, align=center,
+                  inner sep=5pt, minimum width=2.55cm, minimum height=1.0cm, text=ThesisInk},
+    flow/.style={->, line width=0.9pt, ThesisInk!45, shorten >=2pt, shorten <=2pt},
+    thin/.style={-, line width=0.7pt, ThesisInk!35},
+    runlbl/.style={font=\scriptsize\itshape, ThesisInk!60}]
 
-  \node[box] (preds) at (0,1.4) {predicted span};
-  \node[box] (type)  at (0,0.0) {type description};
+  \def\xin{0}
+  \def\xpool{4.0}
+  \def\xjudge{8.0}
+  \def\xres{12.0}
+  \def\xscore{15.4}
 
-  \node[proc] (pool) at (4.2,0.7) {pooled,\\blind};
-  \node[judge] (judge) at (8.4,0.7) {language-model\\judge};
+  % inputs
+  \node[inbox] (preds) at (\xin, 1.05) {predicted span};
+  \node[inbox] (type)  at (\xin,-0.55) {type description};
 
-  \node[res] (v1) at (12.8, 2.3) {correct};
-  \node[res] (v2) at (12.8, 1.1) {wrong type};
-  \node[res] (v3) at (12.8,-0.1) {wrong boundary};
-  \node[res] (v4) at (12.8,-1.3) {not an entity};
+  % pooling
+  \node[proc] (pool) at (\xpool, 0.25) {pooled\\de-duplicated\\blind};
 
-  \draw[flow] (preds.east) -- (pool.west |- preds.east) -- ([yshift=2pt]pool.north);
-  \draw[flow] (type.east)  -- (pool.west |- type.east)  -- ([yshift=-2pt]pool.south);
+  % judge (heart of the figure)
+  \node[judge] (judge) at (\xjudge, 0.25) {language-model\\judge};
+
+  % verdicts
+  \node[res] (v1) at (\xres, 2.05) {correct};
+  \node[res] (v2) at (\xres, 1.05) {wrong type};
+  \node[res] (v3) at (\xres, 0.05) {wrong boundary};
+  \node[res] (v4) at (\xres,-0.95) {not an entity};
+
+  % scores
+  \node[score] (map) at (\xscore, 0.55) {mean average\\precision};
+  \node[score, draw=ThesisTertiaryDark, fill=ThesisTertiary!12]
+        (gap) at (\xscore,-1.15) {overfit gap\\\scriptsize common $-$ novel};
+
+  % inputs -> pool
+  \draw[flow] (preds.east) -- ([yshift=4pt]pool.west);
+  \draw[flow] (type.east)  -- ([yshift=-4pt]pool.west);
+  % pool -> judge
   \draw[flow] (pool.east) -- (judge.west);
-  \draw[flow] (judge.east) -- (v1.west);
-  \draw[flow] (judge.east) -- (v2.west);
-  \draw[flow] (judge.east) -- (v3.west);
-  \draw[flow] (judge.east) -- (v4.west);
-\end{tikzpicture}
-\caption{The reference-free judge. Each predicted span is paired with its type description; the spans from all systems are pooled, de-duplicated, and stripped of their provenance, then a blind language-model judge labels each one correct, wrong type, wrong boundary, or not an entity. Common and novel types are judged in separate runs and summarised by mean average precision and the common-minus-novel overfit gap.}
+  % judge -> verdicts
+  \coordinate (hub) at (judge.east);
+  \draw[flow] (hub) -- (v1.west);
+  \draw[flow] (hub) -- (v2.west);
+  \draw[flow] (hub) -- (v3.west);
+  \draw[flow] (hub) -- (v4.west);
+  % verdicts collected on a bus, then one arrow to the score
+  \coordinate (rail) at ($(\xres+1.6,0.55)$);
+  \draw[thin] (v1.east) -- (v1.east -| rail);
+  \draw[thin] (v2.east) -- (v2.east -| rail);
+  \draw[thin] (v3.east) -- (v3.east -| rail);
+  \draw[thin] (v4.east) -- (v4.east -| rail);
+  \draw[thin] (v1.east -| rail) -- (v4.east -| rail);
+  \draw[flow] (rail) -- (map.west);
+  % score -> gap (taken across the two runs)
+  \draw[flow] (map.south) -- (gap.north);
+
+  % the judge step is run twice (common / novel types)
+  \node[runlbl, align=center] at ($(\xpool,-1.15)!0.5!(\xjudge,-1.15)$)
+        {run twice:\\common $\cdot$ novel types};
+
+\end{tikzpicture}}
+\caption{The reference-free judge. Each predicted span is paired with its type description; the spans from all systems are pooled, de-duplicated, and stripped of their provenance, then a blind language-model judge labels each one correct, wrong type, wrong boundary, or not an entity, run once for common types and once for novel ones, and summarised by mean average precision and the common-minus-novel overfit gap.}
 \label{fig:judge-schema}
 \end{figure}
 
@@ -109,7 +155,71 @@ Inter-judge (Qwen vs MedGemma) & 0.728 \\
 \end{tabular}
 \caption{The judge agrees with human gold at a Cohen's kappa of $0.532$ overall and $0.797$ on the cleanest set, and the two judges agree with each other at $0.728$.}
 \label{tab:judge-validity}
-\end{table} Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. And where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
+\end{table} Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. Where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
+
+What a convention looks like is easiest to see in the disagreements (\Cref{fig:judge-disagreements}). The word \textit{hépatique} (hepatic) is marked as an anatomical entity because the guideline projects a relational adjective onto the organ it modifies. The participle \textit{traités} (treated) is marked as a procedure because the guideline extends the type to inflected forms of a treatment. The phrase \textit{sans particularité} (unremarkable) is marked as an examination value. Given a plain description of each type, the judge rejects all three, since the word is not an organ, an act, or a measurement. In every case the judge is right about what the type means, and the gold is following a labeling convention.
+
+\begin{figure}[t]
+\centering
+% displaCy-style: whole passage, gold spans in lavender with type tag above;
+% solid border = judge agrees, dashed peach + verdict below = judge refuses the type.
+\providecommand{\gtafull}[1]{\raisebox{0.15ex}{\scriptsize\textsc{\textcolor{ThesisPrimaryDark}{#1}}}}
+\providecommand{\jtafull}[1]{\scriptsize\textsc{\textcolor{ThesisTertiaryDark}{#1}}}
+\begin{tikzpicture}[font=\normalsize\sffamily, text=ThesisInk,
+  ok/.style ={fill=ThesisPrimary!28, draw=ThesisPrimaryDark, rounded corners=3pt,
+              line width=0.6pt, inner xsep=4pt, inner ysep=2.5pt},
+  bad/.style={fill=ThesisPrimary!28, draw=ThesisTertiaryDark, dashed, rounded corners=3pt,
+              line width=0.8pt, inner xsep=4pt, inner ysep=2.5pt},
+  gtag/.style={anchor=base, font=\scriptsize\sffamily},
+  jtag/.style={fill=ThesisTertiary!22, draw=ThesisTertiaryDark, rounded corners=2.5pt,
+               line width=0.5pt, inner xsep=3.5pt, inner ysep=2pt, font=\scriptsize\sffamily},
+  drop/.style={-{Stealth[length=1.7mm]}, ThesisTertiaryDark!70, line width=0.6pt,
+               shorten >=1pt, shorten <=1pt}]
+  \def\rh{2.35}
+  % row 1
+  \node[anchor=base west] (a) at (0,0) {Patient suivi pour un };
+  \node[ok, anchor=base west] (lymphome) at (a.base east) {lymphome};
+  \node[anchor=base west] (b) at (lymphome.base east) {, };
+  \node[bad, anchor=base west] (traite) at (b.base east) {traité};
+  \node[anchor=base west] (c) at (traite.base east) { par };
+  \node[ok, anchor=base west] (rchop) at (c.base east) {R-CHOP};
+  \node[anchor=base west] (d) at (rchop.base east) {.};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]lymphome.north) {\gtafull{disease}};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]rchop.north)   {\gtafull{drug}};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]traite.north)  {\gtafull{procedure}};
+  \node[jtag, anchor=north] (jt1) at ([yshift=-5.5mm]traite.south) {\jtafull{wrong type}};
+  \draw[drop] (traite.south) -- (jt1.north);
+  % row 2
+  \node[anchor=base west] (e) at (0,-\rh) {La fonction };
+  \node[bad, anchor=base west] (hepa) at (e.base east) {hépatique};
+  \node[anchor=base west] (f) at (hepa.base east) { est normale et l'};
+  \node[ok, anchor=base west] (exam) at (f.base east) {examen clinique};
+  \node[anchor=base west] (g) at (exam.base east) { est };
+  \node[bad, anchor=base west] (sp) at (g.base east) {sans particularité};
+  \node[anchor=base west] (h) at (sp.base east) {.};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]hepa.north) {\gtafull{anatomy}};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]exam.north) {\gtafull{exam}};
+  \node[gtag, anchor=base] at ([yshift=4.5mm]sp.north)   {\gtafull{value}};
+  \node[jtag, anchor=north] (jt2) at ([yshift=-5.5mm]hepa.south) {\jtafull{wrong type}};
+  \draw[drop] (hepa.south) -- (jt2.north);
+  \node[jtag, anchor=north] (jt3) at ([yshift=-5.5mm]sp.south) {\jtafull{not an entity}};
+  \draw[drop] (sp.south) -- (jt3.north);
+  % legend
+  \coordinate (lx) at (0,-2*\rh-0.2);
+  \node[ok, anchor=west, minimum width=5mm, minimum height=3.5mm] (lg1) at (lx) {};
+  \node[anchor=west, font=\scriptsize] at (lg1.east) {gold span, judge agrees};
+  \node[bad, anchor=west, minimum width=5mm, minimum height=3.5mm] (lg2) at ([xshift=5.2cm]lx) {};
+  \node[anchor=west, font=\scriptsize] at (lg2.east) {gold span, judge refuses the type};
+\end{tikzpicture}
+\caption{The same clinical passage under two annotation layers: most gold spans
+match the judge, and the three it refuses (a participle, a relational adjective,
+a qualitative negation) diverge on labeling convention rather than fact.}
+\label{fig:judge-disagreements}
+\end{figure}
+
+The papers behind these gold sets already grant that their labels are conventional. The authors of QUAERO state that there is no consensus on what counts as an entity and that their scheme is a deliberate choice~\citep{neveol14quaero}. The DEFT~2020 campaign supplies the clinical-entity labels we use over the case reports of CAS~\citep{grabar_cas_2018}. Its two human annotators agreed at only $0.67$ in strict scoring, and at $0.80$ once boundaries were allowed to differ slightly~\citep{cardon_presentation_2020}. They report diseases and signs as the hardest categories to annotate consistently, down to spans where one annotator wrote a word and another a synonym and the two counted as a disagreement. The E3C corpus goes one step further and separates a fully manual gold layer from a mostly automatic silver one~\citep{magnini_e3c_2021}. Each of these grants that the gold is conventional, yet none measures how much of a model's apparent error is convention rather than mistake. The reference-free judge supplies that measurement, and most of the error is convention.
+
+This low ceiling on human agreement is the reason a benchmark cannot do the work in its place. When two trained annotators agree only $0.67$ of the time in strict scoring, exact match against either of them is bounded well below a model's real ability, and a model can be right about the medicine and still be scored as wrong. It also explains why the judge agrees with the gold most where the gold is cleanest: a kappa of $0.797$ on the carefully annotated E3C set against $0.257$ on the noisiest one. Agreement rises with the quality of the gold.
 
 The judge is conservative: it under-credits correct spans, so the absolute scores understate real performance while the rankings between models stay stable. One limit remains. The human check covers only the common types, so the headline claim about novel types has no direct human anchor yet, and a small human study of novel-type judgements is the most useful next step.
 
