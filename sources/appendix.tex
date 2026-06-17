@@ -1,3 +1,535 @@
+\chapter{Content-Type Annotation and Classifiers}
+\label{app:content-types}
+
+This appendix gives the configuration behind the content-type work of
+\Cref{chap:quality,chap:mcbio}: how paragraphs are annotated by a teacher model,
+how the annotations are distilled into a small classifier, and how that classifier
+is run at corpus scale. Two iterations exist. The first, behind Biomed-Enriched,
+annotates PubMed Central with Llama-3.1-70B-Instruct over three dimensions and
+distils into a multilingual XLM-RoBERTa-base classifier. The second, behind the
+French corpus of \Cref{chap:mcbio}, annotates with MedGemma over a richer
+twenty-dimension schema and distils into a CamemBERTv2-base classifier.
+
+\section{Annotation}
+
+In both iterations the unit is the paragraph, with its section title and an exact
+path inside the document tree. The teacher model returns a structured label per
+paragraph: for Biomed-Enriched a document type (clinical case, study, review or
+other), a domain (clinical, biomedical or other) and an educational score from one
+to five; for the French iteration a JSON object over twenty fields, produced by
+guided decoding against a fixed schema, that adds a fine content type (with a
+\texttt{patient\_case} class), a medical subfield over forty-five specialties,
+writing style, and a set of quality scores. The full French annotation prompt and
+schema are reproduced in \Cref{app:gliner-prompts}. Biomed-Enriched annotates about
+$400{,}000$ paragraphs; the French iteration annotates $433{,}915$.
+
+\section{Content-type classifier}
+
+The annotations train a small encoder with one head per dimension, sharing the
+encoder and a pooled \texttt{[CLS]} representation. The classification heads use a
+cross-entropy loss and the scalar heads a mean-squared error, summed across tasks.
+\Cref{tab:ct-classifier} gives the settings for the twenty-task French classifier,
+read from its training run. On a held-out tenth of the data it reaches a content-type
+accuracy of $0.84$, with the easy dimensions near saturation (sex $0.98$, interactive
+elements $0.996$) and the hardest, the forty-five-way medical subfield, at $0.77$.
+
+\begin{table}[t]
+  \centering
+  \caption{Training settings for the twenty-task content-type classifier.}
+  \label{tab:ct-classifier}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    backbone           & CamemBERTv2-base (French, RoBERTa family) \\
+    head               & shared encoder + 20 linear heads \\
+    objective          & $\sum$ cross-entropy (10) + MSE (10) \\
+    train / eval       & 390505 / 43391 paragraphs \\
+    epochs             & 3 \\
+    optimizer          & fused AdamW \\
+    learning rate      & 2e\text{-}5, linear decay, 10\% warmup \\
+    betas / epsilon    & 0.9, 0.999 / 1e\text{-}8 \\
+    weight decay       & 0 \\
+    batch size         & 8 \\
+    sequence length    & 512 \\
+    precision          & fp16 \\
+    seed               & 42 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\Cref{fig:ct-training} shows the training: the loss under the warmup-then-linear-decay
+schedule, and the held-out accuracy of a few dimensions over the run.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{plots/appendix/biomed_classifier_training.pdf}
+  \caption{Training of the twenty-task content-type classifier: training loss with
+  its learning-rate schedule (left) and held-out accuracy for three dimensions
+  (right).}
+  \label{fig:ct-training}
+\end{figure}
+
+The Biomed-Enriched classifier shares this multi-task design but uses the
+multilingual XLM-RoBERTa-base backbone, since its corpus spans many languages.
+
+\section{Propagation and pretraining data}
+
+The trained classifier is served as a small inference service and run over the whole
+corpus to attach labels to every paragraph, in fp16 at a sequence length of $512$, on
+a single node of eight A100 GPUs with dynamic batching. Propagated over PubMed Central
+this yields the $146$ million labelled paragraphs of Biomed-Enriched, of which
+$2.12$ million are clinical-case paragraphs.
+
+The continued-pretraining variants built from these labels (educational filtering,
+clinical and French upsampling, metadata prefixing) and their downstream results are
+reported in \Cref{chap:quality}; this appendix covers the annotation and propagation
+machinery that produces the labels.
+
+\section{Implementation details}
+
+The propagation pipeline is built on HuggingFace datatrove, reading the PubMed Central
+open-access XML and preserving per-paragraph provenance (article identifier, license,
+language, exact path), so the non-commercial split can ship without text and be
+repopulated from a local dump. The multi-task classifier is registered as a custom
+model whose encoder is resolved from the backbone type, which is what lets the
+multilingual and French iterations share one codebase. The Gopher and FineWeb quality
+filters are present in the pipeline but disabled during propagation: every paragraph is
+kept and filtering happens later, when the pretraining variants are built.
+
+\chapter{Pretraining Configurations for the CLM Detour}
+\label{app:clm-pretraining}
+
+This appendix gives the full training configuration of the encoders studied in
+\Cref{chap:objectives}: the French \emph{ModernCamemBERT-bio} and the English
+\emph{ModernBERT-bio}, each in a base and a large size, together with the matched
+MLM twins that serve as their baselines. \Cref{chap:objectives} describes the
+objective and the CLM detour itself; the tables below collect the settings that
+back those experiments.
+
+\section{Architecture}
+
+The architecture is unchanged from upstream ModernBERT for each
+size~\citep{modernbert}; continued pretraining touches the objective and data only.
+\Cref{tab:clm-arch} lists the settings that are not the framework defaults.
+
+\begin{table}[t]
+  \centering
+  \caption{Architecture of the base and large encoders, identical to ModernBERT.}
+  \label{tab:clm-arch}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Setting & Base & Large \\
+    \midrule
+    layers                 & 22 & 28 \\
+    hidden size            & 768 & 1024 \\
+    intermediate size (GLU) & 1152 & 2624 \\
+    attention heads        & 12 & 16 \\
+    attention              & RoPE, prenorm, GLU MLP & same \\
+    global RoPE $\theta$   & 160000 & 160000 \\
+    local RoPE $\theta$    & 10000 & 10000 \\
+    sliding window         & 128 & 128 \\
+    global attention every & 3 layers & 3 layers \\
+    vocabulary             & 32768 (FR) / 50368 (EN) & same \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Objective and optimisation}
+
+The objective is selected by three configuration switches, leaving the body
+untouched: the causal phase runs the encoder with a causal attention mask and a
+next-token head and disables all masking, while the masked phases use the standard
+bidirectional masked head. \Cref{tab:clm-obj} gives the masking rates and
+\Cref{tab:clm-optim} the optimisation, which is shared across all four models and
+both objectives.
+
+\begin{table}[t]
+  \centering
+  \caption{The objective switches across phases. The causal detour sees a gradient at every position; the masked phases at a fraction of positions.}
+  \label{tab:clm-obj}
+  \small
+  \setlength{\tabcolsep}{10pt}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Phase & Attention & Masking rate \\
+    \midrule
+    CLM detour (phase 1, released model) & causal & 0\% (next token) \\
+    MLM twin (phase 1, baseline)         & bidirectional & 30\% \\
+    MLM decay (phase 2, both)            & bidirectional & 15\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[t]
+  \centering
+  \caption{Optimisation and schedule, shared across all four models and both objectives.}
+  \label{tab:clm-optim}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Hyperparameter & Value \\
+    \midrule
+    optimizer            & decoupled AdamW \\
+    learning rate        & 2e\text{-}4, constant \\
+    betas                & 0.9, 0.98 \\
+    epsilon              & 1e\text{-}6 \\
+    weight decay         & 1e\text{-}5 (none on bias or norm) \\
+    phase-1 schedule     & constant with 100M-token warmup \\
+    decay schedule       & $1-\sqrt{\cdot}$ cooldown to 2e\text{-}5 \\
+    sequence length      & 8192 \\
+    global batch         & 384 sequences ($\approx$ 3.15M tokens / step) \\
+    precision            & bf16 mixed precision \\
+    training seed        & 17 \\
+    data shuffle seed    & 42 (shared by the CLM and MLM twins) \\
+    sequence packing     & enabled \\
+    hardware             & 1 node $\times$ 4 NVIDIA H100 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Per-model recipe and data}
+
+\Cref{tab:clm-permodel} gives, for each model, the checkpoint it continues from,
+the token budgets of the two phases, and the training data mixture. The French data
+is filtered for quality and the English data combines literature, medical
+instruction sets and clinical notes.
+
+\begin{table}[t]
+  \centering
+  \caption{Initialisation, token budgets and data mixture of the four encoders.}
+  \label{tab:clm-permodel}
+  \small
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    & ModernCamemBERT-bio (FR) & ModernBERT-bio (EN) \\
+    \midrule
+    init (base)   & ModernCamemBERT-base & answer.ai ModernBERT-base \\
+    init (large)  & ModernCamemBERT-large & answer.ai ModernBERT-large \\
+    CLM detour    & 10B tokens & 50B tokens \\
+    MLM decay     & 1B tokens & 5B tokens \\
+    \midrule
+    data mixture  & MC-Bio 70\% & PubMed 60\% \\
+                  & medical QA 20\% & medical instructions 20\% \\
+                  & E3C 4\%, EMEA 6\% & MIMIC notes 20\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Implementation details}
+
+The models are trained with the Composer framework on the ModernBERT research code,
+with Flash-Attention~2, fused cross-entropy and \texttt{torch.compile} enabled. The
+causal detour is obtained by running the same body with a causal attention mask and
+the masking collator turned off, and the decay phase rebuilds the bidirectional
+masked head and continues from the causal checkpoint. Documents are packed into
+8192-token sequences. The French models carry a content-type field used for
+data handling; the English models do not. Checkpoints are exported to the
+\texttt{ModernBertForMaskedLM} format in bf16 with mean pooling, carrying the RoPE
+and sliding-window settings through.
+
+The recipe differs from from-scratch ModernBERT in the ways expected of continued
+pretraining: a single short warmup rather than a full warmup-stable-decay over the
+whole run, a lower constant learning rate of 2e\text{-}4, and a masking curriculum
+that drops from 30\% in the masked baseline to 15\% in the short decay. The decay
+length is about a tenth of the detour, confirmed at two scales, with a 10B detour
+decaying best over 1B and a 25B detour over 2.5B, and a longer decay does not help.
+When a long English run exceeded the cluster wall-time, it was resumed from the last
+checkpoint into a fresh run with a reset timer and no further warmup, rather than
+restarted.
+
+On four H100 GPUs a base model takes about $4.5$ hours and a large model about
+$8$ hours, and the causal and masked objectives cost the same per step (measured at
+$3$h$25$ against $3$h$11$ for a base 10B phase), so the comparison between them is
+matched in wall-clock and not only in tokens. The representational-divergence
+analysis behind the chapter is computed in double precision with mean pooling over
+held-out paragraphs; a single-precision or reshape-based computation underflows on
+the deep layers and was the source of an early miscount, so the precision and pooling
+matter for reproducing those numbers.
+
+\section{Generality across architectures and domains}
+
+The detour was tested beyond the French biomedical ModernBERT setting. Applied to a
+vanilla RoBERTa encoder (CamemBERTv2-base) with the same French data and recipe, it
+improves the average over the eight French biomedical tasks by $1.48$ points and wins
+on all eight, so the effect is not specific to the ModernBERT architecture. It was
+also applied to two unrelated domains by continued pretraining on in-domain text,
+cybersecurity (Primus and CIRCL) and finance (SEC 10-K filings), against a vanilla and
+a domain-specific baseline. \Cref{tab:clm-generality} collects the results. The domain
+averages are positive but not significant across tasks; the gain is clearest on the
+single task whose corpus is closest to the pretraining text, AnnoCTR in cybersecurity
+($+2.3$ points), so these are reported as directional rather than as domain-wide wins.
+
+\begin{table}[t]
+  \centering
+  \caption{The detour applied beyond French biomedical ModernBERT. The cross-architecture result is significant; the two new domains are positive but not significant on the task average.}
+  \label{tab:clm-generality}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    Setting & tasks & $\Delta$ (CLM $-$ MLM) & across-task $p$ \\
+    \midrule
+    CamemBERTv2 (RoBERTa), FR biomed & 8 & +1.48 & 0.010 \\
+    Cybersecurity                    & 4 & +0.68 & 0.35 \\
+    Finance                          & 3 & +0.40 & 0.21 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Explorations before the detour}
+
+Before changing the objective, several ways of changing the data or the loss while
+staying inside masked language modeling were tried, all at the 1B-token scale on French
+ICD coding. \Cref{tab:clm-preclm} lists them. Per-token loss weights derived from the
+corpus quality subscores did not improve downstream coding and showed signs of degrading
+named-entity recognition. Filtering documents by any single quality signal moved the
+average by at most one point, within seed noise (\Cref{fig:quality-ablation}). Choosing enriched against hard-filtered
+data changed results by under $1.5$ points. Loss shaping that forced long-range use, by
+masking a token together with its local context, combined with grounded ICD walks and a
+weighted walk loss, did not beat a plain masked baseline. Across all of these the
+downstream coding score stayed essentially flat while the masked-loss curves differed,
+and this is what motivated changing the objective rather than the data.
+
+\begin{table}[t]
+  \centering
+  \caption{Explorations inside the masked objective that preceded the detour, all neutral or negative on downstream ICD coding.}
+  \label{tab:clm-preclm}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Approach & Downstream effect \\
+    \midrule
+    per-token quality-weighted loss        & no gain, some NER degradation \\
+    quality-signal document filtering       & neutral ($\leq 1$ point spread) \\
+    data selection (enriched vs filtered)    & under 1.5 points \\
+    long-range loss shaping + grounded walks & at or below the masked baseline \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{plots/appendix/quality_ablation_flat.pdf}
+  \caption{Filtering the pretraining corpus by any single quality signal leaves
+  downstream ICD coding inside the seed-noise band: the quality signals do not move
+  the result.}
+  \label{fig:quality-ablation}
+\end{figure}
+
+\section{Supporting results}
+
+This section collects the full results that the chapter summarizes. The detour leaves
+its mark on the early layers: \Cref{tab:cka-region} compares the representational
+divergence of the CLM-versus-MLM pair against a same-objective seed-noise control, by
+layer region, and the early block is where the two diverge about ten times more than
+the control.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{l S[table-format=2.2] S[table-format=2.2]}
+    \toprule
+    Layer region & {Control divergence (\%)} & {CLM--MLM divergence (\%)} \\
+    \midrule
+    Early (L0--7)   & 1.57  & \bfseries 14.99 \\
+    Mid (L8--14)    & 65.97 & 79.97 \\
+    Deep (L15--21)  & 88.48 & 98.16 \\
+    \midrule
+    Whole model     & 49.71 & \bfseries 62.13 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Per-region representational divergence ($1-$CKA, float64, held-out
+  DiaMED and FrACCO, 3 seeds): a same-objective seed-noise control against the
+  CLM-versus-MLM comparison; the early-layer gap, about ten times the control, is where
+  the detour leaves its mark.}
+  \label{tab:cka-region}
+\end{table}
+
+A needle-in-a-haystack retrieval test confirms the effect end to end.
+\Cref{tab:needle} shows the detour helping at every context length and needle position,
+most at mid-document and mid-length.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{l S[table-format=2.1] S[table-format=2.1] S[table-format=+2.1]}
+    \toprule
+    Slice & {CLM (\%)} & {MLM (\%)} & {$\Delta$ (pp)} \\
+    \midrule
+    \multicolumn{4}{l}{\itshape By context length} \\
+    512   & 64.3 & 57.1 & +7.2 \\
+    1024  & \bfseries 76.3 & 52.6 & +23.7 \\
+    2048  & 61.2 & 55.1 & +6.1 \\
+    4096  & 60.0 & 51.1 & +8.9 \\
+    8192  & 52.9 & 43.1 & +9.8 \\
+    \midrule
+    \multicolumn{4}{l}{\itshape By needle position} \\
+    Begin  & 63.3 & 53.3 & +10.0 \\
+    Middle & \bfseries 70.3 & 52.7 & +17.6 \\
+    End    & 54.9 & 49.5 & +5.4 \\
+    \midrule
+    \bfseries Global  & \bfseries 62.2 & 51.6 & \bfseries +10.7 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Needle-in-a-haystack retrieval accuracy (10B detour, 1B decay), by context
+  length and by needle position; the detour helps everywhere, most at mid-document and
+  mid-length.}
+  \label{tab:needle}
+\end{table}
+
+An English MIMIC-only run repeats the recipe on clinical notes
+(\Cref{tab:mimic-only}). The detour helps most on de-identification and is not
+significant on the eleven-task average.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=+1.2] l}
+    \toprule
+    Task & {CLM} & {MLM} & {$\Delta$ (pp)} & {sig.} \\
+    \midrule
+    DEID  & \bfseries 82.66 & 79.89 & +2.77 & ** \\
+    GAD   & 77.53 & 75.69 & +1.84 & ns \\
+    HoC   & 68.39 & 66.77 & +1.62 & ns \\
+    \midrule
+    Overall (11 tasks) & {} & {} & \bfseries +0.56 & ns \\
+    \bottomrule
+  \end{tabular}
+  \caption{English MIMIC-only continued pretraining (10B detour, 1B decay, 5 seeds):
+  the detour helps most on de-identification ($+2.77$, $p<0.01$) but is not significant
+  on the eleven-task average ($p=0.11$).}
+  \label{tab:mimic-only}
+\end{table}
+
+\chapter{OntoBook Generation and Pretraining}
+\label{app:ontobook-details}
+
+This appendix gives the configuration behind \Cref{chap:ontobook}: how the
+ontology walks are turned into synthetic textbooks, and how the resulting model is
+trained. The released model uses the French CIM-10 ontology; the same pipeline is
+applied to CCAM and ATC for the cross-ontology study.
+
+\section{Walk generation}
+
+The three ontologies are the French CIM-10 (PMSI), CCAM and ATC terminologies
+published in RDF by the national health agency. Walks are biased random walks over
+the RDF graph: at each step a neighbour is drawn by roulette over edge-type weights,
+so that the rare semantic edges are traversed often enough, and the walk length is
+drawn uniformly between 8 and 20 steps. A visited set avoids cycles, with a fallback
+that allows revisiting once every neighbour has been seen, and walks shorter than
+300 characters are dropped. CIM-10 uses five walk types (etiology, differential
+diagnosis, syndrome, cross-chapter and double coding), while CCAM and ATC, which are
+almost purely hierarchical, use three each. \Cref{tab:ob-walks} gives the volumes.
+
+\begin{table}[t]
+  \centering
+  \caption{Ontologies and generated walk volumes.}
+  \label{tab:ob-walks}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    & CIM-10 & CCAM & ATC \\
+    \midrule
+    walks per code    & 21 & 20 & 20 \\
+    walks generated   & 402328 & 762958 & 138980 \\
+    walk types        & 5 & 3 & 3 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Textbook reformulation}
+
+Each walk is rewritten into continuous prose by a large language model under a strict
+prompt that forbids adding any information, requires every definition, code, note,
+inclusion and exclusion to be preserved, and bans markdown, lists and any mention of
+the walk structure. \Cref{tab:ob-gen} gives the generation settings. A walk longer
+than 12000 characters is skipped, and a reformulation is kept only if it is at least
+50 characters long and mentions the source codes.
+
+\begin{table}[t]
+  \centering
+  \caption{Textbook reformulation settings.}
+  \label{tab:ob-gen}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    generator        & Qwen3-235B-A22B-Instruct~\citep{yang2025qwen3} \\
+    quantisation     & FP8, served with vLLM~\citep{kwon2023vllm} \\
+    decoding         & greedy (temperature 0), guided JSON \\
+    max output / context & 8192 / 8192 tokens \\
+    thinking mode    & off \\
+    hardware         & 4 NVIDIA H100 (tensor parallel 4) \\
+    generation time  & $\approx$ 20 hours \\
+    walks reformulated & 1304266 ($\approx$ 1.3B tokens) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Pretraining and evaluation}
+
+The released model continues pretraining from ModernCamemBERT with a multi-task
+objective, $L = L_{\text{MLM}} + \lambda\, L_{\text{rel}}$, alternating one masked
+step and one relation step. The masked term masks 15\% of tokens with the standard
+80/10/10 split. The relation term classifies the link between two codes from the
+input \texttt{[CLS] A [SEP] B [SEP]}, where the two segments are the textbook
+reformulations of the two codes with the codes themselves stripped out to prevent
+leakage, over the six CIM-10 relation classes on 282907 pairs. \Cref{tab:ob-train}
+gives the hyperparameters; the released model takes $\lambda = 1$ and the epoch-2
+checkpoint.
+
+\begin{table}[t]
+  \centering
+  \caption{OntoBook pretraining and downstream fine-tuning settings.}
+  \label{tab:ob-train}
+  \small
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    initialisation     & ModernCamemBERT (base, vocab 32768) \\
+    objective          & MLM (15\%) + relation ($\lambda = 1$) \\
+    optimizer          & AdamW, LR 2e\text{-}5, 1000-step warmup \\
+    betas / epsilon    & 0.9, 0.999 / 1e\text{-}8 \\
+    weight decay       & 0.01 \\
+    sequence length    & 2048 \\
+    global batch       & 128 (32 per GPU $\times$ 4 accumulation) \\
+    precision          & bf16 \\
+    hardware           & 1 NVIDIA H100, $\approx$ 4h / epoch \\
+    selected checkpoint & epoch 2 \\
+    \midrule
+    fine-tuning        & linear head, 10 epochs \\
+    fine-tuning LR / batch & 2e\text{-}5 / 16 \\
+    seeds / metric     & 3 (our models) / micro-F1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Implementation details}
+
+The model uses the same FlexBERT/ModernBERT code as \Cref{app:clm-pretraining}.
+Masked-language data is stored in the MosaicML streaming (MDS) format and the
+relation pairs in Parquet with on-the-fly tokenisation. Sequence packing is available
+but is not used for the French model. The relation pairs are built by parsing the raw
+walks for relation markers and mapping them to the six classes, then removing every
+code string from the two segments so the classifier learns the medical semantics
+rather than the code strings. Two comparison variants appear in the chapter's
+analysis and are implemented in the same codebase: a code-infilling baseline that
+masks and reconstructs the ontology codes themselves, and a three-objective variant
+that adds a hierarchical pseudo-label loss on top of the masked and relation losses.
+
 \chapter{Annotation Prompts}
 \label{app:gliner-prompts}
 
