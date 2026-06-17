@@ -362,6 +362,18 @@ the control.
   \label{tab:cka-region}
 \end{table}
 
+\Cref{fig:cka-raw} gives the same comparison layer by layer, as raw CKA with the
+band spanning the three seeds.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.78\textwidth]{plots/chapter5/cka_raw_curves.pdf}
+  \caption{Per-layer linear CKA on held-out clinical text: the CLM-versus-MLM pair
+  sits below the same-objective seed-noise control, most clearly in the early layers;
+  the band spans the three seeds.}
+  \label{fig:cka-raw}
+\end{figure}
+
 A needle-in-a-haystack retrieval test confirms the effect end to end.
 \Cref{tab:needle} shows the detour helping at every context length and needle position,
 most at mid-document and mid-length.

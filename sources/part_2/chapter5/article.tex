@@ -312,9 +312,18 @@ A ratio of 1 means no CLM-specific effect. Low layers (0--7) show ratios of 5--4
 \subsection{Causal Evidence: Freeze Interventions}
 \label{sec:freeze-results}
 
-% TODO: include freeze figure from figures/tikz_figure1.tex
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{plots/chapter5/freeze.pdf}
+  \caption{Freeze interventions (French Base, 8 tasks, 9 seeds). Freezing the low
+  layers during the CLM phase drops the model back onto the MLM baseline, while
+  freezing the mid layers, or freezing the low layers during the decay, keeps the
+  full gain: the low layers are necessary during the causal phase, the mid layers
+  are not.}
+  \label{fig:freeze}
+\end{figure}
 
-Do these low-layer changes actually drive the downstream improvement? We answer with the freeze interventions described in \S\ref{sec:freeze}, summarized in \Cref{tab:freeze}.
+Do these low-layer changes actually drive the downstream improvement? We answer with the freeze interventions described in \S\ref{sec:freeze}, summarized in \Cref{fig:freeze} and \Cref{tab:freeze}.
 
 \begin{table}[t]
 \centering
