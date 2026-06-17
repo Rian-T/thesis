@@ -248,7 +248,14 @@ We sweep the decay length from 2.5\% to 50\% of the CLM phase at two scales, eva
 
 \subsection{Needle-in-a-Haystack}
 
-% TODO: include needle figure from figures/output/fig2_needle.pdf
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{plots/chapter5/needle.pdf}
+  \caption{Needle-in-a-haystack retrieval in French, binary accuracy of a frozen-encoder
+  probe. The CLM detour stays above the MLM-only model at every context length (left) and
+  at every needle position (right), with the largest margin at mid-document.}
+  \label{fig:needle}
+\end{figure}
 
 Long-context encoding is critical in biomedical NLP, where clinical documents routinely span thousands of tokens and key information (diagnoses, coding labels) can appear anywhere in the document. We design a synthetic needle-in-a-haystack task in French to evaluate long-context retrieval without entity-type confounds.
 
@@ -264,7 +271,7 @@ Long-context encoding is critical in biomedical NLP, where clinical documents ro
 
 We generate 1,500 balanced positive/negative pairs across 5 lengths (512--8,192 tokens) and 3 positions (start, middle, end), split 70/15/15 for train/validation/test. We freeze each encoder and train a 2-layer MLP probe (Dropout $\to$ Linear $\to$ GELU $\to$ Dropout $\to$ Linear) on CLS representations for 3 epochs (lr $= 2 \times 10^{-5}$, batch size 4, AdamW), selecting the best checkpoint by validation accuracy.
 
-\paragraph{Results.} CLM outperforms MLM at every context length and position (+10.7pp overall: 62.2\% vs 51.6\%). MLM accuracy degrades monotonically with document length (57\% at 512 tokens to 43\% at 8,192), while CLM degrades more slowly and remains above MLM throughout. The CLM advantage is largest at mid-document positions, where the inserted fact is farthest from both sequence boundaries. This is consistent with the downstream pattern: the French tasks with the largest CLM gains (FrACCO, CANTEMIST) use sequence lengths of 4,096 tokens during fine-tuning.
+\paragraph{Results.} CLM outperforms MLM at every context length and position (\Cref{fig:needle}; +10.7pp overall: 62.2\% vs 51.6\%). MLM accuracy degrades monotonically with document length (57\% at 512 tokens to 43\% at 8,192), while CLM degrades more slowly and remains above MLM throughout. The CLM advantage is largest at mid-document positions, where the inserted fact is farthest from both sequence boundaries. This is consistent with the downstream pattern: the French tasks with the largest CLM gains (FrACCO, CANTEMIST) use sequence lengths of 4,096 tokens during fine-tuning.
 
 
 \section{Analysis: Why Does the CLM Detour Work?}
@@ -282,9 +289,19 @@ We report divergence $d = 1 - \text{CKA}$, so higher values indicate greater rep
 \subsection{The CLM Imprint Persists in Low Layers}
 \label{sec:persistence}
 
-% TODO: include CKA figure from figures/output/fig10_cka_combined.pdf
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{plots/chapter5/cka_mechanism.pdf}
+  \caption{Where the detour leaves its mark, measured by representational divergence
+  ($1-\text{CKA}$, held-out clinical text, three seeds). Left: per layer, the CLM-vs-MLM
+  pair against a same-objective seed-noise control; the early layers diverge several times
+  more than the noise floor. Right: during the MLM decay the divergence plateaus well above
+  the seed-noise floor, so decaying back to masked training does not return the model to an
+  MLM-like state.}
+  \label{fig:cka-mechanism}
+\end{figure}
 
-Comparing layer-by-layer CKA between CLM-detour and MLM-only models, the CLM phase modifies low-layer representations in a way that subsequent MLM training does not undo, even when the decay budget matches the CLM phase. CKA divergence reaches approximately 56.5\% after 1.5B tokens of MLM decay and remains stable, with only 0.6pp variation over 8B additional tokens.
+Comparing layer-by-layer CKA between CLM-detour and MLM-only models (\Cref{fig:cka-mechanism}), the CLM phase modifies low-layer representations in a way that subsequent MLM training does not undo, even when the decay budget matches the CLM phase. CKA divergence reaches approximately 56.5\% after 1.5B tokens of MLM decay and remains stable, with only 0.6pp variation over 8B additional tokens.
 
 To isolate where CLM differs from MLM \emph{specifically} rather than just from training noise, we normalize each layer's CLM-MLM divergence by a seed-noise control (two MLM models trained with different random seeds on identical data):
 \[

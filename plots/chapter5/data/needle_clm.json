@@ -1,0 +1,48 @@
+{
+  "model": "/lustre/fsn1/projects/rech/rua/uvb79kr/hf-exports/ModernCamemBERT-CLM-10B-decay1B",
+  "train_metrics": {
+    "best_val_accuracy": 0.5911111111111111
+  },
+  "test_metrics": {
+    "accuracy": 0.6222222222222222,
+    "f1": 0.4444444444444444,
+    "precision": 0.7391304347826086,
+    "recall": 0.3177570093457944,
+    "by_length": {
+      "512": {
+        "accuracy": 0.6428571428571429,
+        "n": 42
+      },
+      "1024": {
+        "accuracy": 0.7631578947368421,
+        "n": 38
+      },
+      "2048": {
+        "accuracy": 0.6122448979591837,
+        "n": 49
+      },
+      "4096": {
+        "accuracy": 0.6,
+        "n": 45
+      },
+      "8192": {
+        "accuracy": 0.5294117647058824,
+        "n": 51
+      }
+    },
+    "by_position": {
+      "end": {
+        "accuracy": 0.5494505494505495,
+        "n": 91
+      },
+      "middle": {
+        "accuracy": 0.7027027027027027,
+        "n": 74
+      },
+      "start": {
+        "accuracy": 0.6333333333333333,
+        "n": 60
+      }
+    }
+  }
+}
