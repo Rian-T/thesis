@@ -119,8 +119,15 @@ fig, ax = plt.subplots(figsize=(6.2, 4.7))
 
 ax.set_yscale("log")
 
-# Envelope: artificial intelligence (solid, primary).
+# Envelope: artificial intelligence (solid, primary). The 1960–1984 counts are
+# single-digit MeSH-indexing noise (a 6 in 1962, a 3 in 1976, a 5 in 1983);
+# plotted on the log axis they read as a sawtooth. We hold that pre-takeoff
+# prefix flat at the floor so the curve reads "near zero, then rising" — the
+# same treatment the other series get from their later START years — while the
+# real 1985 takeoff stays sharp. Data values are not altered, only the display.
+AI_TAKEOFF = 1985
 x_ai, y_ai = series(ai, start=START["ai"], floor_to=1.0)
+y_ai = [y if x >= AI_TAKEOFF else 1.0 for x, y in zip(x_ai, y_ai)]
 ax.plot(*smooth(x_ai, y_ai), color=COLORS["primary_dark"], lw=1.8,
         solid_capstyle="round", zorder=4)
 
