@@ -29,7 +29,7 @@ Based on the Biomed-Enriched (ACL 2026) tables. Clean, professional, color-accen
 - **Bold** best results, **underline** second-best
 - Use `\small` or `\normalsize` inside tables — never `\tiny`
 - Use `\resizebox{\textwidth}{!}{...}` for wide tables (full-page `table*`)
-- Captions always **below** tables
+- Captions go **above** tables (and **below** figures), matching the manuscript and standard academic convention (IEEE/APA/KOMA). Place `\caption` before `\begin{tabular}`.
 - Every table has a `\label{tab:...}` and is referenced before it appears
 
 ### 1.4 Section Headers in Tables
