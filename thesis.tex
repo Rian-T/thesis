@@ -217,10 +217,15 @@
 
 \begingroup
 \let\clearpage\relax
+% Capitalise the first letter of entry names (glossary term titles) and of
+% descriptions (acronym expansions); no-op where already capitalised.
+\renewcommand*{\glossentryname}[1]{\glsnamefont{\Glsentryname{#1}}}
+\renewcommand*{\glossentrydesc}[1]{\Glsentrydesc{#1}}
 \glsaddall
 \printglossary[type=\acronymtype]
 \newpage
-\printglossary
+\renewcommand{\glsnamefont}[1]{\textbf{#1}}
+\printglossary[style=altlist]
 \endgroup
 
 
