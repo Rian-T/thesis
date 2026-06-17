@@ -10,84 +10,59 @@ To keep the judge honest we seed the pool with controls: real clinical entities 
 
 \begin{figure}[t]
 \centering
+\providecommand{\jcand}[2]{{\ttfamily\small #1}\;\raisebox{0.2ex}{\scriptsize\textsc{\color{ThesisNeutral}#2}}}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    font=\small\sffamily,
-    >=Stealth,
-    inbox/.style={pipe box, draw=ThesisSecondaryDark, fill=ThesisSecondary!15,
-               rounded corners=2pt, line width=0.7pt, align=center,
-               inner sep=5pt, minimum width=2.6cm, minimum height=0.78cm, text=ThesisInk},
-    proc/.style={pipe box, draw=ThesisTertiaryDark, fill=ThesisTertiary!15,
-                 rounded corners=2pt, line width=0.7pt, align=center,
-                 inner sep=6pt, minimum width=2.4cm, minimum height=1.2cm, text=ThesisInk},
-    judge/.style={pipe box, draw=ThesisPrimaryDark, fill=ThesisPrimary!18,
-                  rounded corners=3pt, line width=1.1pt, align=center,
-                  inner sep=7pt, minimum width=2.4cm, minimum height=1.4cm, text=ThesisInk},
-    res/.style={pipe box, draw=ThesisNeutral, fill=ThesisPaper,
-                rounded corners=2pt, line width=0.7pt, align=center,
-                inner sep=4pt, minimum width=2.9cm, minimum height=0.56cm, text=ThesisInk},
-    score/.style={pipe box, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
-                  rounded corners=2pt, line width=0.8pt, align=center,
-                  inner sep=5pt, minimum width=2.55cm, minimum height=1.0cm, text=ThesisInk},
-    flow/.style={->, line width=0.9pt, ThesisInk!45, shorten >=2pt, shorten <=2pt},
-    thin/.style={-, line width=0.7pt, ThesisInk!35},
-    runlbl/.style={font=\scriptsize\itshape, ThesisInk!60}]
-
-  \def\xin{0}
-  \def\xpool{4.0}
-  \def\xjudge{8.0}
-  \def\xres{12.0}
-  \def\xscore{15.4}
-
-  % inputs
-  \node[inbox] (preds) at (\xin, 1.05) {predicted span};
-  \node[inbox] (type)  at (\xin,-0.55) {type description};
-
-  % pooling
-  \node[proc] (pool) at (\xpool, 0.25) {pooled\\de-duplicated\\blind};
-
-  % judge (heart of the figure)
-  \node[judge] (judge) at (\xjudge, 0.25) {language-model\\judge};
-
-  % verdicts
-  \node[res] (v1) at (\xres, 2.05) {correct};
-  \node[res] (v2) at (\xres, 1.05) {wrong type};
-  \node[res] (v3) at (\xres, 0.05) {wrong boundary};
-  \node[res] (v4) at (\xres,-0.95) {not an entity};
-
-  % scores
-  \node[score] (map) at (\xscore, 0.55) {mean average\\precision};
-  \node[score, draw=ThesisTertiaryDark, fill=ThesisTertiary!12]
-        (gap) at (\xscore,-1.15) {overfit gap\\\scriptsize common $-$ novel};
-
-  % inputs -> pool
-  \draw[flow] (preds.east) -- ([yshift=4pt]pool.west);
-  \draw[flow] (type.east)  -- ([yshift=-4pt]pool.west);
-  % pool -> judge
-  \draw[flow] (pool.east) -- (judge.west);
-  % judge -> verdicts
-  \coordinate (hub) at (judge.east);
-  \draw[flow] (hub) -- (v1.west);
-  \draw[flow] (hub) -- (v2.west);
-  \draw[flow] (hub) -- (v3.west);
-  \draw[flow] (hub) -- (v4.west);
-  % verdicts collected on a bus, then one arrow to the score
-  \coordinate (rail) at ($(\xres+1.6,0.55)$);
-  \draw[thin] (v1.east) -- (v1.east -| rail);
-  \draw[thin] (v2.east) -- (v2.east -| rail);
-  \draw[thin] (v3.east) -- (v3.east -| rail);
-  \draw[thin] (v4.east) -- (v4.east -| rail);
-  \draw[thin] (v1.east -| rail) -- (v4.east -| rail);
-  \draw[flow] (rail) -- (map.west);
-  % score -> gap (taken across the two runs)
-  \draw[flow] (map.south) -- (gap.north);
-
-  % the judge step is run twice (common / novel types)
-  \node[runlbl, align=center] at ($(\xpool,-1.15)!0.5!(\xjudge,-1.15)$)
-        {run twice:\\common $\cdot$ novel types};
-
+  font=\sffamily, text=ThesisInk, >={Stealth[length=2mm]},
+  cbox/.style={draw=ThesisNeutral!70, fill=ThesisPaper, rounded corners=2pt,
+               line width=0.6pt, inner sep=5pt, anchor=west},
+  good/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!45, rounded corners=2pt,
+               line width=0.7pt, inner sep=4pt, font=\small, anchor=west},
+  badt/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!35, rounded corners=2pt,
+               line width=0.7pt, inner sep=4pt, font=\small, anchor=west},
+  none/.style={draw=ThesisNeutral!60, fill=white, rounded corners=2pt,
+               line width=0.6pt, inner sep=4pt, font=\small, text=ThesisNeutral, anchor=west},
+  judge/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!30, rounded corners=4pt,
+                line width=1.3pt, align=center, font=\sffamily\bfseries},
+  score/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!28, rounded corners=2pt,
+                line width=0.7pt, inner sep=5pt, align=center, font=\small},
+  thru/.style={->, ThesisInk!65, line width=0.8pt, shorten >=1.5pt, shorten <=1.5pt},
+]
+  \def\ya{2.55} \def\yb{1.55} \def\yc{0.55} \def\yd{-0.45}
+  \coordinate (mid) at (0,1.05);
+  % pooled, de-identified candidates (a span with a candidate type), left column
+  \node[cbox] (c1) at (0,\ya) {\jcand{R-CHOP}{drug}};
+  \node[cbox] (c2) at (0,\yb) {\jcand{B-cell}{disease}};
+  \node[cbox] (c3) at (0,\yc) {\jcand{hépatique}{anatomy}};
+  \node[cbox] (c4) at (0,\yd) {\jcand{sans particularité}{value}};
+  % judge band placed 0.8cm right of the widest candidate (c4), centred on the band
+  \node[judge, anchor=west, minimum width=2.2cm, minimum height=4.2cm]
+     (J) at ([xshift=0.8cm]c4.east |- mid) {language-model\\[1pt]judge};
+  % verdicts placed 0.8cm right of the judge, one per lane (left edges aligned on v1)
+  \node[good] (v1) at ([xshift=0.8cm]J.east |- c1) {correct};
+  \node[badt] (v2) at (v1.west |- c2) {wrong boundary};
+  \node[badt] (v3) at (v1.west |- c3) {wrong type};
+  \node[none] (v4) at (v1.west |- c4) {not an entity};
+  % top tags, anchored to the columns so they cannot collide
+  \node[font=\sffamily\scriptsize\itshape, text=ThesisNeutral, anchor=west] at (c1.north west |- 0,3.45)
+     {pooled $\cdot$ blind candidates};
+  \node[font=\sffamily\scriptsize\itshape, text=ThesisNeutral] at ([yshift=6pt]J.north) {one verdict each};
+  \foreach \c/\v in {c1/v1, c2/v2, c3/v3, c4/v4}{
+    \draw[thru] (\c.east) -- (J.west |- \c.east);
+    \draw[thru] (J.east |- \v.west) -- (\v.west);
+  }
+  % only the correct verdicts are scored; score column 1.0cm right of the widest verdict (v2)
+  \node[score, anchor=west] (map) at ([xshift=1.0cm]v2.east |- c1) {mean average\\precision};
+  \node[score, anchor=west] (gap) at (map.west |- mid) {overfit gap\\[1pt]{\footnotesize common $-$ novel}};
+  \draw[thru, ThesisSecondaryDark] (v1.east) --
+     node[font=\sffamily\scriptsize\itshape, text=ThesisNeutral, above=0pt]{kept} (map.west);
+  \draw[->, ThesisInk!65, line width=0.8pt] (map.south) -- (gap.north);
 \end{tikzpicture}}
-\caption{The reference-free judge. Each predicted span is paired with its type description; the spans from all systems are pooled, de-duplicated, and stripped of their provenance, then a blind language-model judge labels each one correct, wrong type, wrong boundary, or not an entity, run once for common types and once for novel ones, and summarised by mean average precision and the common-minus-novel overfit gap.}
+\caption{The reference-free judge. Each pooled, de-identified candidate, a span with a
+candidate type, is labelled by a blind language-model judge as correct, wrong type, wrong
+boundary, or not an entity; only the spans judged correct enter the mean average precision,
+and the common-minus-novel gap measures overfitting. The judge is run once for the common
+types and once for the novel ones.}
 \label{fig:judge-schema}
 \end{figure}
 
