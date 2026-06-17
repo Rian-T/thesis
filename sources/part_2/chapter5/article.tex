@@ -15,22 +15,18 @@ The CLM phase leaves a lasting imprint on low transformer layers. CKA analysis s
 
 \section{Motivation}
 
-\subsection{When Decoder Continue-Pretraining Stops Working}
+\subsection{When Decoder Continued Pretraining Stops Working}
 \label{sec:decoder-cpt-stops}
 
-% TODO: Write content. Key points to cover:
-%   - BioMistral -0.9 pts after CPT (recovered only via model merging)
-%   - Meditron-70B: 128 A100 GPUs for 332 hours, +1.8 pts on biomed benchmarks
-%   - Dorfner et al. 2024: OpenBioLLM-8B 30% vs Llama-3-8B 64% on NEJM
-%   - Forgetting: CPT destroys instruct capabilities (catastrophic forgetting of
-%     instruction following, not classical knowledge forgetting)
-%   - Data overlap: LLMs have already seen PubMed/PMC during initial pretraining,
-%     so CPT shows them data they already know — explains the diminishing returns
-%   - Compute-performance trade-off: encoders give more F1 for less compute
-%   - Why encoders still matter for clinical IE (Lehman et al. 2023):
-%     deployment constraints, confidentiality, smaller models inside hospitals
-%   - Conclusion: this asymmetry between encoders and decoders motivates building
-%     better encoders, not forcing decoders to specialize
+The obvious way to bring a model to French biomedical text today is not to train an encoder at all. It is to take one of the large generalist decoders and continue its pretraining on biomedical data, the recipe behind models such as BioMistral and Meditron. We argue that this route has reached diminishing returns, and that what it costs no longer matches what it returns. That is what sends us back to encoders.
+
+The large models have, for the most part, already read the biomedical literature: PubMed abstracts and PubMed Central are part of the web corpora these models are pretrained on, so continued pretraining largely shows them text they have already seen. The measured effect is often negative. \citet{dorfner2024biomedical} compare biomedical models against the general models they were built from and find the biomedical versions usually worse, with OpenBioLLM-8B scoring 30.0\% on clinical case questions against 64.3\% for Llama-3-8B. \citet{labrak-etal-2024-biomistral} report the same for BioMistral, whose accuracy on medical multiple-choice questions falls well below the Mistral model it continues and is recovered only by merging the two back together.
+
+Continued pretraining also damages what made the generalist useful. A large model earns its value by following instructions and reasoning across domains, and training it on a narrow corpus erodes exactly those abilities, a forgetting of skills rather than of facts. \citet{jindal_balancing_2024} measure a drop of about ten points on an instruction-following benchmark after only a billion tokens of continued pretraining, even as a knowledge proxy improves; replay and merging recover part of the loss but are unreliable at scale. And the price is steep: Meditron-70B took on the order of forty thousand A100-hours of continued pretraining for an average gain of under two points on biomedical benchmarks~\citep{chen2023meditron}. These are not early-days artefacts. On a new French health corpus, \citet{mannion_biomedical_2026} find that domain-adaptive pretraining of decoders helps only the smallest models and that its benefit has vanished by the eight-billion-parameter scale.
+
+For the task at the centre of this thesis, clinical information extraction, the comparison runs the other way. A small encoder fine-tuned on the task still matches or beats a much larger decoder at a fraction of the compute: \citet{obeidat_do_2025} report that encoders trail eight-billion-parameter models by only a few points on biomedical named entity recognition while running tens to hundreds of times faster, and win outright on several datasets. \citet{lehman_we_2023} had already shown that a small in-domain clinical model beats in-context learning with a far larger one, even under limited annotation. Deployment settles the rest, since a clinical extractor has to run inside the hospital, on modest hardware, on data that cannot be sent to an outside provider.
+
+The productive move is therefore not to force a decoder to specialise, but to build a better encoder.
 
 \subsection{Architecture and Objective}
 
