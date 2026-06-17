@@ -291,6 +291,30 @@
   \endgroup
 }
 
+%% Unnumbered illustrated part opening (e.g. appendices): same plate, but no
+%% "Part N" label and an unnumbered table-of-contents entry.
+%% \illustratedpartnonum{title}{image path}{image credit}
+\newcommand{\illustratedpartnonum}[3]{%
+  \cleardoublepage
+  \addcontentsline{toc}{part}{#1}%
+  \partmark{#1}%
+  \thispagestyle{plain}%
+  \begingroup
+    \setlength{\parindent}{0pt}%
+    \vspace*{0.04\textheight}%
+    \begin{minipage}[b][0.56\textheight][b]{\textwidth}%
+      \centering
+      \includegraphics[width=\textwidth]{#2}%
+    \end{minipage}\par
+    \vspace{1.2ex}%
+    {\raggedright\fontsize{7.5}{9.5}\selectfont\color{ThesisNeutral}#3\par}%
+    \vfill
+    {\raggedright\normalfont\color{ThesisInk}%
+      {\Huge\scshape #1\par}%
+    }%
+  \endgroup
+}
+
 %% ============================================================
 %% ERROR BAR STYLE
 %% ============================================================
