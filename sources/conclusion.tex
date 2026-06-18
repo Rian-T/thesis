@@ -15,18 +15,21 @@ incompletely digested.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 \label{sec:conclusion-evaluation}
 
 \begin{reviewrewrite}
-If medical language models become easy to run inside hospitals, the evaluation
-problem changes. A model can answer an isolated exam question and still fail
-when the same fact appears in a prescription, a hospital note, a patient message,
-or a triage list. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and DrBenchmark mostly
-test factual medical knowledge through clean questions or biomedical
-understanding tasks~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
+The next step is not only larger medical models. It is models used as agents,
+inside real clinical workflows, with access to context, tools, patient messages,
+and local hospital systems. At that point, the problem is no longer only whether
+the model knows the right medical fact. It is whether the model keeps safe
+behaviour when the fact is embedded in a prescription, a hospital note, a
+patient message, or a triage list. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and
+DrBenchmark mostly test factual medical knowledge through clean questions or
+biomedical understanding
+tasks~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
 HealthBench and CARES move closer to use by testing safety, refusal, harmful
 advice, and difficult clinical questions at larger scale~\citep{arora2025healthbench,chen2025cares}.
 For drug interactions, \citet{sicard2025ddi} report high sensitivity but limited
 specificity when commercial LLMs are tested on pharmacovigilance cases.
-They still leave a narrow but practical question. When the medical fact is
-unchanged, does the model keep the same behaviour?
+They still leave a narrow but practical safety question. When the medical fact
+is unchanged, does the model keep the same behaviour?
 \end{reviewrewrite}
 
 \begin{reviewrewrite}
