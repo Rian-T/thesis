@@ -3,9 +3,13 @@
 \label{chap:contributions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{reviewrewrite}
 Most modern natural language processing starts by pretraining a language model on large collections of raw text, before adapting it to a task. In the clinical setting this path is hard to follow. Real clinical notes are personal data and cannot be shared, so France has no public corpus of them to pretrain on. A model trained inside one hospital on its own records carries the same constraint and cannot be released to others. A shareable clinical model has to be built from public text.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 This thesis asks one question: can public data support language models for French clinical information extraction, without training on sensitive clinical records? The manuscript answers it through three questions.
+\end{reviewrewrite}
 
 \begin{itemize}
   \item Can we assemble a useful public French biomedical corpus, and does its content and quality change what the model learns?
@@ -13,7 +17,9 @@ This thesis asks one question: can public data support language models for Frenc
   \item How can we adapt these models to clinical extraction tasks when labelled clinical data is scarce, through model architecture and synthetic data?
 \end{itemize}
 
+\begin{reviewrewrite}
 This thesis makes seven contributions.
+\end{reviewrewrite}
 
 \begin{itemize}
   \item \emph{biomed-fr}, a public French biomedical corpus of 413 million words, used to train CamemBERT-bio. The adapted model finds biomedical terms in French text, such as drugs and diseases, more accurately than the general model it started from, with a 2.54-point average gain and at a fraction of the cost of training from scratch~\citep{touchent2023camembertbio}.
@@ -25,4 +31,6 @@ This thesis makes seven contributions.
   \item A method for generating synthetic clinical reports by rewriting public biomedical text into hospital style, so that extractors can be trained without access to real hospital data.
 \end{itemize}
 
+\begin{reviewrewrite}
 The parts follow these questions. After this introduction, the first part asks what biomedical text is and how far its public forms are from the clinical notes we care about. The second part builds and studies a public French biomedical corpus. The third part pretrains language models on it, through model adaptation, training objectives, and knowledge enrichment. The final part adapts these models to clinical extraction tasks under scarce labelled data, through model architecture and synthetic data, before the conclusion.
+\end{reviewrewrite}

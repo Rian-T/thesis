@@ -20,6 +20,71 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \RequirePackage{listings}
+\RequirePackage{marginnote}
+\let\st\relax
+\RequirePackage{soul}
+
+%% ============================================================
+%% REVIEW MARKS
+%% ============================================================
+%% Turn all thesis-wide review highlights off with:
+%%   \thesisreviewmarksfalse
+%% after \usepackage{thesis-style} in thesis.tex.
+%%
+%% Use in text:
+%%   \begin{reviewread}
+%%   Paragraph to reread.
+%%   \end{reviewread}
+%%
+%%   \begin{reviewrewrite}
+%%   Paragraph to polish.
+%%   \end{reviewrewrite}
+\newif\ifthesisreviewmarks
+\thesisreviewmarkstrue
+
+\definecolor{ThesisReviewRead}{RGB}{210, 236, 190}
+\definecolor{ThesisReviewReadDark}{RGB}{95, 130, 40}
+\definecolor{ThesisReviewRewrite}{RGB}{252, 230, 150}
+\definecolor{ThesisReviewRewriteDark}{RGB}{168, 122, 28}
+
+\soulregister\Cref7
+\soulregister\cref7
+\soulregister\ref7
+\soulregister\citep7
+\soulregister\citet7
+\soulregister\emph7
+\soulregister\textit7
+\soulregister\textbf7
+\soulregister\texttt7
+\soulregister\textsc7
+
+\newcommand{\thesisreviewlabel}[3]{%
+  \marginnote{%
+    \raggedright
+    \setlength{\fboxsep}{2.5pt}%
+    \colorbox{#1!28}{%
+      \scriptsize\sffamily\bfseries\textcolor{#2}{#3}%
+    }%
+  }%
+}
+
+\NewDocumentEnvironment{reviewread}{+b}{%
+  \ifthesisreviewmarks
+    \thesisreviewlabel{ThesisReviewRead}{ThesisReviewReadDark}{à relire}%
+    {\setulcolor{ThesisReviewRead!80}\setul{0.45ex}{0.9pt}\ul{#1}}%
+  \else
+    #1%
+  \fi
+}{}
+
+\NewDocumentEnvironment{reviewrewrite}{+b}{%
+  \ifthesisreviewmarks
+    \thesisreviewlabel{ThesisReviewRewrite}{ThesisReviewRewriteDark}{à polir}%
+    {\setulcolor{ThesisReviewRewrite!90}\setul{0.45ex}{0.9pt}\ul{#1}}%
+  \else
+    #1%
+  \fi
+}{}
 
 %% ============================================================
 %% CODE / PROMPT LISTINGS — Tufte-clean (thin left rule, no box,

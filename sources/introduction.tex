@@ -37,13 +37,21 @@ into a definite disease category [\ldots]''
 \end{center}
 \medskip
 
+\begin{reviewrewrite}
 Those are the words of a doctor, explaining how he makes a diagnosis. They were set down in 1959 by Robert Ledley and Lee Lusted, in the journal \emph{Science}~\citep{ledley_lusted_1959}. Their claim was simple: a diagnosis is a set of steps, and steps can be written down and even carried out by a machine, with the help of logic and probability. Artificial intelligence was a new idea at the time. A 1956 workshop at Dartmouth College had just given it its name, with broad goals like language and learning. Ledley and Lusted set a medical goal of their own: a computer that could weigh a patient's signs toward a likely disease. Their question is also the question of this thesis: where does the knowledge that drives such a system come from, and can a machine be given enough of it to be useful in care?
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 In 1961, Homer Warner, a cardiologist at the Latter-Day Saints Hospital in Salt Lake City, built one of the first medical diagnosis programs. It applied probability to a patient's signs and estimated which congenital heart defect was the most likely~\citep{warner_1961}. The idea was Bayesian: from a table of past cases the program knew how often each sign went with each disease, and it used those frequencies to rank the candidates for a new patient. Its knowledge was the table of frequencies, and the table came from records of patients seen before. A program of this kind could only know what its records had shown it.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 In 1972, F.~T. de Dombal's group in Leeds tested the same idea on abdominal pain. Their system worked on the acute abdomen, the urgent problem of telling appendicitis apart from other causes of abdominal pain. In a prospective trial on 304 patients it reached 91.8\% diagnostic accuracy, against 79.6\% for the most senior clinician to see each case~\citep{dedombal_1972}. In Leeds, the program out-diagnosed the doctors. The reason for caution is in how it worked: it reasoned with probabilities estimated from Leeds cases, so its accuracy was tied to the patients it had been trained on. When training data and test patients come from the same hospital, this dependence is hard to measure. The multicentre trial described below measured it directly.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 In the 1970s, medical AI shifted toward \emph{expert systems}: programs that stored specialist knowledge as explicit rules. MYCIN, written at Stanford by Edward Shortliffe as part of his doctoral work, advised physicians on antibiotics for serious blood and brain infections. Its knowledge was a body of IF--THEN rules, each linking observations such as the site of the infection and the shape and staining of the organism to a conclusion about the likely pathogen and the drug to give~\citep{mycin_1975}. \Cref{fig:mycin-rule} shows one such rule. The original system held about 200 rules, a number the project reports as having grown to almost 500 by 1978~\citep{mycin_book_1984}. Each rule was written and checked by hand with infectious-disease physicians.
+\end{reviewrewrite}
 
 \begin{center}
 \begin{tikzpicture}[
@@ -85,17 +93,29 @@ with certainty factor 0.8~\citep{mycin_book_1984}.}
 \end{center}
 \medskip
 
+\begin{reviewrewrite}
 Real cases are uncertain, and a rule rarely points to a single answer. To handle this, MYCIN attached a \emph{certainty factor} to its inferences, a number from $-1$ to $+1$ that recorded how strongly the evidence supported a conclusion~\citep{mycin_book_1984}. A certainty factor near $+1$ meant the evidence was strong, a value near $-1$ meant it spoke against the conclusion, and values in between let the program combine several weak signs into one graded judgement. With this calculus MYCIN could reason from partial evidence rather than demand certainty, which is what a physician facing an incomplete picture has to do.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 The system was then put to a blind test. Yu and colleagues took ten meningitis cases and collected a therapy recommendation for each from ten prescribers: the therapy actually given, MYCIN, a medical student, and seven Stanford physicians. Eight outside infectious-disease specialists then rated every recommendation without knowing which came from a person and which from a program~\citep{mycin_eval_1979}. The evaluators judged MYCIN's recommendations acceptable in 65\% of cases. The faculty specialists in the same test averaged 55.5\%, in a range from 42.5\% to 62.5\%, and the actual therapy given scored 57.5\%. By the stricter test of being rated acceptable by a majority of the eight evaluators, MYCIN scored 70\% against a faculty mean of 44\%. On this narrow task the machine matched or beat the specialists. The authors were careful about what the result did and did not show. They named the small number of cases as the main limitation, and they wrote that the program's acceptability to practising physicians, its effect on care, and its cost and legal standing all ``remain to be answered''~\citep{mycin_eval_1979}. MYCIN passed the benchmark and was never used to treat a patient.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 INTERNIST-1 applied the same rule-based approach to internal medicine. Built at the University of Pittsburgh by the internist Jack Myers and the computer scientist Harry Pople, it aimed to diagnose across the whole specialty. Its knowledge base described 570 diseases and the findings that point to them, entered by hand over years, largely from Myers's own expertise~\citep{internist1_1982,qmr_status_1986}. Tested on nineteen published case records, it diagnosed about as well as the hospital clinicians but worse than the senior discussants, and its own authors concluded that the program was ``not sufficiently reliable for clinical applications''~\citep{internist1_1982}. They listed where it broke. It could not reason about anatomy or about time. It could not build a single explanation for a patient with several diseases at once, so it sometimes blamed findings on the wrong cause. It could not explain its own conclusions, which left a physician with an answer and no way to check it.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 This lack of explanation mattered to physicians. Teach and Shortliffe surveyed physicians about what they would accept from a consultation program, and found that doctors wanted a system that explained its advice and left them in control, and rejected one that simply handed down answers~\citep{teach_shortliffe_1981}. Miller and Masarie later gave the rejected design a name, the ``Greek Oracle'' model, a program that pronounces a verdict to be obeyed~\citep{miller_masarie_1990}. The MYCIN evaluators had pointed to the same problem when they wrote that acceptability remained to be answered. A program could win a blind benchmark and still be unusable, because winning the benchmark was not what physicians were asking for.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 The main limit was the hand-built knowledge base. These programs ran on knowledge that experts had typed in by hand, one rule or one disease at a time. Building it was slow and costly, and it was never complete, so the programs broke on cases no one had thought to encode and fell behind as medicine changed. Hand-built knowledge did not scale. The records such a program needed were still mostly on paper, and there was no clear answer to who is responsible when a program recommends a dose. HELP was different because it was built into hospital work. Warner's group wired it into the Latter-Day Saints Hospital information system, where it ran in daily use for years~\citep{help_1975}. It survived because it was part of the record and the workflow, not a consultant a physician had to choose to call.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 The Leeds result did not transfer cleanly to other hospitals. The acute-abdomen system, which had reached 91.8\% accuracy at a single centre in 1972, was taken to a multicentre trial. Across eight centres, with more than 250 participating doctors and 16{,}737 patients, the unaided clinicians' baseline accuracy was only 45.6\%, and even with the computer aid in place accuracy rose only to 65.3\%~\citep{adams_1986}. The trial was reported as a success for clinical practice, because the aid lowered the rate of unnecessary surgery and of missed perforations. But the headline single-centre number did not survive the move. A system tuned on Leeds patients did not carry its 91.8\% to other hospitals, because the probabilities it relied on came from one place and the new patients came from many. A learning system depends on the data its knowledge was built from, so a result measured in one setting may not hold in another.
+\end{reviewrewrite}
 
 \begin{figure}[t]
     \centering
@@ -105,6 +125,10 @@ The Leeds result did not transfer cleanly to other hospitals. The acute-abdomen 
     \label{fig:ai-health-pubs}
 \end{figure}
 
+\begin{reviewrewrite}
 Around the same years, public support for artificial intelligence collapsed twice, in periods later called the AI winters. The first followed the 1973 Lighthill survey, which reported that most workers in the field confessed ``a pronounced feeling of disappointment in what has been achieved'', and blamed the failure to anticipate how fast the number of possibilities grows as a problem gets larger~\citep{lighthill_1973}. The second came in the mid- to late 1980s, after a commercial boom in expert systems and the specialised machines built to run them. Membership in the main AI society rose to a peak in 1987 and then fell back to roughly where it had started, the machine vendors lost their market, and government research budgets were cut~\citep{nilsson_2010}. Medical expert systems left routine care largely untouched. \Cref{fig:ai-health-pubs} tracks the same rise and fall in the biomedical literature: papers on expert systems climb through the 1980s, peak around 1991, and then settle into a long plateau.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 Machine learning changed how systems acquired knowledge. Instead of being told the rules, systems learned what to do from large sets of examples, and the gains were large. By 2016, a neural network trained on 128{,}175 retinal photographs read them for diabetic eye disease about as accurately as ophthalmologists~\citep{gulshan_2016}. A year later, a network trained on 129{,}450 images matched board-certified dermatologists at telling skin cancers apart~\citep{esteva_2017}. The same curve in \Cref{fig:ai-health-pubs} shows the handover: as the expert-system line flattens, a deep-learning line that was near zero before 2015 climbs past twenty thousand papers a year. These results showed that learning from examples could set aside much of the hand-built knowledge the field had spent decades assembling. They also raised a new requirement, the one that organises this thesis: a system that learns from examples needs many well-matched examples, and clinical text does not circulate freely.
+\end{reviewrewrite}

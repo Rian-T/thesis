@@ -47,6 +47,7 @@ Cardiology, Intensive Care\\ Stay: 03/11--08/11/2024\\[4pt]
 \medskip
 
 % === P1 — HOOK ===
+\begin{reviewread}
 \Cref{fig:bt-clinical-note} is a letter from one cardiologist to a colleague. For an
 ordinary French reader, it is a text that is very hard to read and to understand. It
 has very few verbs, few adverbs, and sometimes neither. The sentences are telegraphic,
@@ -56,23 +57,29 @@ attention. There is some truth to that, but in reality, it is a style of
 communication specially tuned for the community it is written for. The writer and the reader
 share enough knowledge that the writer can give just the precise information he knows
 the other needs and go straight to what matters clinically.
+\end{reviewread}
 
 % === P2 ===
+\begin{reviewread}
 Studying how specialised communities write, the linguist Zellig Harris observed in the 1960s that a technical field has a language of its own, governed by its own grammar and restricted rules for which words may combine \citep{harris_mathematical_1968}.
 He called it a \emph{sublanguage}: the text a community produces about a specialised domain, following its own rules for how words combine.
 Some of these rules are stricter than usual, and some ignore the usual rules entirely.
 Harris and his colleagues later made this concrete by reconstructing the grammar of a small body of immunology articles.
 They showed that its recurring sentence structures encoded the domain's entities and the relations between them, revealing how its knowledge developed over time \citep{harris_immunology_1989}.
+\end{reviewread}
 
 % === P3 ===
+\begin{reviewread}
 The clinical note is the best-documented case of this.
 One of the earliest attempts to make computers read medical records, Naomi Sager's Linguistic String Project at New York University, set out to turn free-text clinical reports into structured data, and in the process found that the notes already followed a specific grammar \citep{sager_nlip_1981, sager_mlp_1987}.
 To read them, the program needed rules for the short, verbless phrases that notes use but everyday language does not, together with categories taken from medicine, such as patient, finding, and treatment, all visible in \Cref{fig:bt-clinical-note}.
 A line like \emph{afebrile, chest clear} is not broken language; it is written this way for a reason.
 The style takes hold within a community that shares the same specialised knowledge and keeps up its patterns of usage \citep{kittredge_sublanguages_1982}.
 A grammar like this can live inside a hospital, kept up and extended by the people who use it.
+\end{reviewread}
 
 % === P4 ===
+\begin{reviewread}
 Consider again the idea of \emph{carelessness}.
 If this style was the result of a lack of care, its missing words would be scattered at random through the document, with no logic behind them.
 Instead, the omissions follow a pattern.
@@ -80,22 +87,28 @@ Instead, the omissions follow a pattern.
 \emph{Chest films normal} stands for \emph{the chest films were normal}; \emph{no bone pain} stands for \emph{the patient has no bone pain}.
 What disappears is the part the reader already knows.
 A note is a form of \emph{compression}.
+\end{reviewread}
 
 % === P5 ===
+\begin{reviewread}
 This works because the reader is an expert of the same domain.
 Writing for a colleague who went through the same training, the clinician can leave out whatever the other already knows, and say only what is needed \citep{grice_logic_1975, sperber_relevance_1995}.
 This means that same words can behave differently depending on who reads them.
 \emph{Afebrile, vitals stable, continue antibiotics} is complete for a physician and almost empty for anyone else.
+\end{reviewread}
 
 % === P6 (common ground + performativity, merged) ===
+\begin{reviewread}
 That shared background is what linguists call \emph{common ground}.
 The note records only what is new, leaving out what the writer and reader already know: medicine, the patient's history, and how the hospital works \citep{stalnaker_common_2002}.
 A clinical note is also performative.
 Written by a doctor, it can also declare or set off an action \citep{austin_words_1962, searle_speech_1969}.
 A prescription lets the patient obtain the medication, and an order to transfer a patient sets the transfer in motion.
 The note is a document with real authority, signed and legally binding.
+\end{reviewread}
 
 % === P8 ===
+\begin{reviewread}
 The text describes the illness by moving through the parts of the heart it affects.
 In \Cref{fig:bt-clinical-note}, the ECG first locates the problem in the anterior wall, the angiogram then finds a blockage in the LAD (IVA) artery, and the ultrasound shows damage to the left ventricle.
 Each test identifies another affected location.
@@ -105,8 +118,10 @@ When the modern hospital took shape, doctors learned to see illness as something
 Foucault called this trained way of looking the \emph{clinical gaze}.
 He argued that it changed how doctors spoke and what could be said about disease at all \citep{foucault_clinique_1963}.
 The finding-to-site structure of the note is the daily trace of that gaze.
+\end{reviewread}
 
 % === P9 ===
+\begin{reviewread}
 All of this makes the note worth studying, but it also makes it hard to obtain.
 The note rarely leaves the hospital that produced it, because it is full of personal data.
 A single report can hold the patient's name, age, and dates, a home address, a family situation, and a diagnosis rare enough to point to one person.
@@ -114,13 +129,16 @@ Removing the obvious identifiers does not fix this.
 A pseudonymised note is still not anonymous.
 A malicious actor may combine the details it contains with other information to identify the patient.
 Confidentiality is inherent to this document type.
+\end{reviewread}
 
 % === P10 ===
+\begin{reviewread}
 For French the problem is worse.
 There is no shareable corpus of real French hospital records, nothing like what exists for English \citep{neveol_clinical_2018}.
 Public data is an alternative: published case reports, drug leaflets, article abstracts.
 But a case report is written to teach.
 It reads like a short story, in full sentences and the past tense.
+\end{reviewread}
 
 \begin{center}
 \begin{tikzpicture}
@@ -162,21 +180,29 @@ with its lower end convex downwards (Figure 1).}
 \end{center}
 \medskip
 
+\begin{reviewread}
 In \Cref{fig:bt-published-case}, the patient is introduced, the symptoms are told in order, and the examinations are explained in complete sentences.
 The gap is easy to see when compared with the clipped lines in \Cref{fig:bt-clinical-note}.
+\end{reviewread}
 
+\begin{reviewread}
 Whether these stand-ins really match sufficiently hospital notes is still being argued.
 They say the clinical part of a published case can be close enough to a real note that tools built on it still work on hospital text \citep{grabar_cas_2020}.
 Real notes are full of misspellings, carry administrative boilerplate, and lay out examinations and lab values in tables, while a published case rewrites all of this as clean sentences.
 A more recent project sees it differently.
 In building PARHAF, a corpus of 7{,}394 fictitious reports written by hand by 104 medical residents, its authors say plainly that ``the style of case reports [\ldots] is quite different from that of electronic health records'' \citep{tannier_parhaf_2026}.
 They wrote the reports from scratch so that they could be shared safely.
+\end{reviewread}
 
 % === P11 ===
+\begin{reviewread}
 Taken together, these alternatives and the traits described above explain why our target text is so hard to obtain.
 Clinical notes are private by nature: they are written for a closed group of experts, contain personal data, and carry legal weight.
+\end{reviewread}
 
 % === P12 ===
+\begin{reviewread}
 However, if we are willing to step slightly beyond the clinical domain, we find that medicine actually produces an enormous amount of text.
 This vast, freely available literature documents the state of medical knowledge.
 But how far is its language from the clinical text we ultimately want to model? 
+\end{reviewread}

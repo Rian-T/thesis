@@ -51,6 +51,8 @@ atih_cim10                      # ATIH CIM-10 FR page (org source, FR)
 atih_ccam                       # ATIH CCAM page (org source, FR)
 inca_rcp                        # INCa RCP référentiel (org source, FR)
 gdpr_art4                       # GDPR Art. 4(5) pseudonymisation (legal, like gdpr_art9)
+ansm2023thesaurus               # ANSM drug-interaction thesaurus, institutional source (no DOI)
+bdpm2024                        # BDPM public French drug database, institutional source (no DOI)
 finkel_nested_2009              # real ACL EMNLP 2009 (D09-1015, curl-verified); checkbib title-matches a different 2025 survey
 
 # --- checkbib-all false positives (real refs; no DOI/arXiv or fuzzy-matched to a wrong record) ---

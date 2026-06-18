@@ -3,19 +3,33 @@
 \label{chap:modern-ai}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{reviewrewrite}
 The expert systems of the last chapter rarely reached routine care. One reason was practical: patient records were still on paper, with little for a program to read. Hospitals now store their records as digital files, and many have built clinical data warehouses. A clinical data warehouse is a large database that brings a hospital's records together in one place so they can be reused for research, separate from the systems used for day-to-day care. Hospitals build them because the records are already there, collected during care, and a warehouse turns that material into something a study can query. The warehouse at the AP-HP, the Paris public hospital group, gathers records from about 38 hospitals~\citep{aphp_cdw, aphp_eds_scale}. Single studies from that one warehouse have drawn on 333{,}852 cancer patients and 109{,}448 patients screened for epilepsy~\citep{aphp_eds_scale}. The data now exists, and most of it is free text: the notes a clinician writes in plain prose, rather than values entered into fixed fields.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 The structured fields of a record hold lab values, dates, and code lists. The diagnosis in context, the reasoning behind it, and the response to treatment are written out as notes rather than coded. The clinically useful part of a record therefore sits mostly in those notes, and any task that needs that information has to read them.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 Clinical notes matter for several common tasks. In cohort and trial selection, two cancer trials found that most eligibility rules could not be checked from structured fields, and that free-text notes were needed for 59\% and 77\% of them~\citep{raghavan_how_2014}. In automatic coding, every French hospital stay is coded into the national classifications of diagnoses and procedures, a system called the PMSI, which records each stay for hospital funding and statistics. These codes set how much the hospital is paid, and they are still produced by hand from the discharge summary. In report structuring, discharge, pathology, and radiology reports are dense prose, and pulling out the diagnoses, drugs, and dates makes the records searchable for registries and quality monitoring. In each task, the signal is in the narrative, so the task is limited by how well a model can read clinical notes.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 Hospitals have begun to train models on this data. The AP-HP, for example, has continued the pretraining of a French language model on 21 million clinical documents from its warehouse~\citep{dura_learning_2022}. A model trained on real patient records carries the same restriction as the records: it has seen personal data, so it cannot leave the hospital or be shared with another institution. Each hospital that wants such a model has to build it again on its own data, behind its own walls.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 A clinical note is personal data of the most protected kind. Under European law, health data is a special category that may not be processed at all unless a narrow exception applies. The General Data Protection Regulation, the GDPR, lists health data among the categories whose processing ``shall be prohibited'', and then sets out the exceptions that allow it, including scientific research~\citep{gdpr_art9}. In France, research reuse of health data runs through standing frameworks set by the data-protection authority, the CNIL. A researcher who follows one of these reference methodologies, such as the one for studies that do not require individual consent, can reuse the data by committing to its rules rather than asking for case-by-case approval~\citep{cnil_mr004}. These rules prevent a French hospital from publishing its notes as an open dataset, even after removing names.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 These rules also make centralised resources difficult to build. France created a national platform for health data, the Health Data Hub, by the health-system law of 24 July 2019, with the aim of bringing the country's health data together for research~\citep{hdh_loi}. The platform was first hosted on Microsoft Azure, and that choice was challenged before the Conseil d'\'Etat, the highest administrative court. In an order of 13 October 2020, the court examined the risk that a US-owned host could be compelled to hand over data under US law~\citep{ce_hdh}. Even centralising French health data inside one public structure is contested, which is one more reason no large shared corpus of French clinical text exists.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 A trained model can also leak patient data. Models can memorise parts of their training data, and work on clinical models has shown that sensitive details about real patients can be recovered from one~\citep{lehman_naacl_2021}. Releasing the model may still expose the data it was trained on. A shareable model therefore cannot be trained on real clinical data, so the remaining source is public text.
+\end{reviewrewrite}
 
 \begin{figure}[t]
     \centering
@@ -26,6 +40,10 @@ A trained model can also leak patient data. Models can memorise parts of their t
     \label{fig:scarcity-gap}
 \end{figure}
 
+\begin{reviewrewrite}
 \Cref{fig:scarcity-gap} counts the public text available in English and in French, on a log scale. PubMed indexes about 29.1 million article records that carry an abstract, and the open-access part of PubMed Central holds about 7.95 million full-text articles~\citep{pubmed_eutils}. These are mostly in English, but they are real, large, and free to use. French biomedical text is far smaller: the public biomed-fr corpus used in this thesis holds about 413 million words, drawn from journal articles, drug leaflets, and clinical cases. Public French clinical text is smaller again. The CAS corpus of published French clinical cases holds about 0.4 million words~\citep{grabar_cas_2018}, and it is made of teaching cases written for publication, not routine hospital notes. Real clinical notes do exist as an open resource in English: the MIMIC database, drawn from one Boston hospital, releases 331{,}794 de-identified discharge summaries and 2{,}321{,}355 radiology reports under a data-use agreement~\citep{johnson2016mimiciii, johnson_mimiciv_2023}. Nothing of the kind is public in French. The series therefore collapses from tens of millions of public documents down to a French clinical-case slice of less than half a million words, and then to zero for real French clinical text. That collapse is why this thesis builds from public text: it is the material that actually exists at scale.
+\end{reviewrewrite}
 
+\begin{reviewrewrite}
 This thesis is part of OncoLab, a French project that makes oncology records usable for research. Partner hospitals provide the data, industry partners build the warehouses and the tools to run studies, and INRIA works on pseudonymisation and information extraction. The goal is a model that runs inside the hospital, trained on little data, with the records never leaving. Since real clinical data cannot be shared, such a model has to be built mostly from public text. To use public text well, we first need to know what biomedical text is, and how far its different forms are from the clinical notes we care about. That question is the subject of the next part.
+\end{reviewrewrite}

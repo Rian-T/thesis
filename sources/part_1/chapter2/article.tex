@@ -9,7 +9,9 @@
 
 \section{Introduction}
 
+\begin{reviewread}
 For web data, the question of what to keep and what to discard has a straightforward answer. FineWeb-Edu~\citep{penedo2024fineweb} showed that filtering entire documents by educational quality, discarding 92\% of the data, actually improves downstream performance. A low-quality web page is low-quality throughout: if the source is bad, every paragraph is bad. But a scientific article is not a web page.
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -74,11 +76,17 @@ A 27-year-old female presented with four episodes of exertional syncope. Cathete
 \end{figure}
 % TODO: replace example paragraphs with real extracts from a single PMC article
 
+\begin{reviewread}
 \Cref{fig:motivation} illustrates the difference. A web page about astronomy scores low throughout and can be safely discarded. A PMC article on pulmonary hypertension, by contrast, contains a textbook-quality review paragraph, a boilerplate committee note, and a clinical case report with real diagnostic values. Document-level filtering would either keep all three or discard all three. Neither is the right answer.
+\end{reviewread}
 
+\begin{reviewread}
 In the previous chapter, we assembled \textit{biomed-fr} by including all available documents from three public sources. This approach treats every paragraph equally. How much of this text actually helps, what types of content does it contain, and can we be smarter about what we include?
+\end{reviewread}
 
+\begin{reviewread}
 In this chapter, we introduce a paragraph-level annotation framework that distinguishes content types, domains, and educational quality within scientific articles. We show that selective pretraining on the most relevant paragraphs matches the performance of training on the full corpus using one-third of the tokens. We also extract 2 million clinical case paragraphs from PubMed Central, providing an openly available alternative to restricted hospital records. Finally, we investigate the risks of neural quality filtering: not all selection strategies are equally safe, and some can amplify benchmark contamination by a factor of 20.
+\end{reviewread}
 
 
 \section{Content Heterogeneity in Scientific Articles}
@@ -89,9 +97,13 @@ In this chapter, we introduce a paragraph-level annotation framework that distin
 % a clinical case paragraph, a methods paragraph, and a boilerplate
 % paragraph side by side, with their annotation scores.
 
+\begin{reviewread}
 Large language models for biomedicine are typically pretrained on PubMed Central (PMC) Open Access articles. While valuable, this corpus presents challenges including heterogeneous quality, predominance of English content (approximately 98\%), uneven representation of clinical cases, and variable educational value. Existing filtering approaches operate at the article level: BioMistral~\citep{labrak-etal-2024-biomistral} upsampled non-English articles, while Meditron~\citep{chen2023meditron} scored articles using MeSH tags, publication type, journal reputation, recency, and citation count. These methods assume that entire documents are either valuable or not.
+\end{reviewread}
 
+\begin{reviewread}
 This assumption does not hold for curated scientific corpora. Unlike web-scraped data where low-quality sources justify discarding entire documents, scientific articles are all potentially valuable. The real issue is variance \emph{within} articles. To quantify this, we analyzed 10,000 PMC articles (378,000 paragraphs) and found that 91.6\% of articles contain multiple document types (clinical case, study, review, other). Educational scores vary by 2.6 points on average within articles, spanning more than half of the 1--5 scale. Some paragraphs contain excellent educational or clinical content, while others add little domain knowledge but remain difficult to detect with simple heuristics.
+\end{reviewread}
 
 \begin{table}[t]
 \centering
@@ -120,12 +132,16 @@ Intra-article range & 2.61 & 2.86 \\
 \subsection{Data Collection and Preprocessing}
 \label{sec:data-collection}
 
+\begin{reviewread}
 We extracted text from the PubMed Central (PMC) Open Access Subset, containing approximately 4.5 million full-text scientific articles. Using a custom pipeline, we processed the raw XML files to extract article content, segment articles into 133 million individual paragraphs, filter out non-textual elements, and retain only paragraphs containing a minimum of 64 tokens.
+\end{reviewread}
 
 \subsection{Two-Stage Annotation Framework}
 \label{sec:annotation}
 
+\begin{reviewread}
 We follow a two-stage annotation process on a single 8$\times$A100 node: 160 GPU-hours for the first stage and 80 GPU-hours for the second.
+\end{reviewread}
 
 \paragraph{Stage 1: LLM annotation.}
 We used Llama-3.1-70B-Instruct~\citep{touvron2024llama3} to annotate a diverse subset of 400,000 paragraphs (approximately 0.33\% of the corpus) across multiple dimensions: type classification (clinical case, study, review, other), domain categorization (clinical, biomedical, other), and educational quality (1--5 scale). Language was identified separately using langdetect.
@@ -161,7 +177,9 @@ Document type & $F_1 = 0.925$, $\kappa = 0.821$ \\
 \subsection{Data Analysis}
 \label{sec:data-analysis}
 
+\begin{reviewread}
 Most PMC paragraphs receive an educational score of 4, with a mean of 3.48 and median of 4.00. This distribution varies by content type: reviews and studies contain the highest proportion of educational content (86.9\% and 78.7\% scoring 4, respectively), while clinical cases show more variance (57.0\% rated 4). Domain-wise, biomedical paragraphs score higher (75.3\% at score 4) than clinical text (44.0\%), and content labeled ``other'' rarely reaches high scores (2.1\%). These patterns support the score threshold ($\geq 3$) used in BE-Educational and BE-All, and explain why combining domain and quality filters yields consistent gains across tasks.
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -173,7 +191,9 @@ Most PMC paragraphs receive an educational score of 4, with a mean of 3.48 and m
 \subsection{Dataset Construction}
 \label{sec:dataset}
 
+\begin{reviewread}
 Using the distilled model, we annotated the full PMC corpus and constructed several dataset variants through strategic filtering and upsampling, summarized in \Cref{tab:be-variants}. Upsampling refers to duplicating articles in the training corpus, proportionally increasing their sampling probability.
+\end{reviewread}
 
 % TODO: add example of a clinical case paragraph extracted from a
 % genomics article — showing that clinical content hides in unexpected places
@@ -199,25 +219,37 @@ BE-All & Combines quality filtering (score $\geq 3$), upsampling of clinical con
 \label{tab:be-variants}
 \end{table}
 
+\begin{reviewread}
 For all variants, we preserved the original structure of the article and employed an 8K context window during pre-training. This ensures that models can process complete scientific articles, capturing dependencies where information presented in earlier paragraphs is essential for understanding later content.
+\end{reviewread}
 
 
 \section{Experimental Setup}
 \label{sec:experimental-setup}
 
+\begin{reviewread}
 Continual pre-training served as a method to evaluate the relevance and utility of our annotations. Our evaluation focuses on isolating the effects of data curation rather than pursuing state-of-the-art scores on benchmarks. A more powerful foundation model would likely yield higher absolute scores, but would probably obscure the precise impact of our dataset.
+\end{reviewread}
 
 \subsection{Decoder Setup}
 
+\begin{reviewread}
 We selected OLMo2-7B-stage1~\citep{olmo2025furious} as our foundation model for continual pre-training, strategically choosing this intermediate checkpoint to more clearly attribute performance changes to our data curation. Although stage~1 has already developed strong language modeling capabilities, it precedes the knowledge-intensive tuning of stage~2, providing an ideal balance of baseline capabilities without the risk of catastrophic forgetting of instruction-following abilities during domain adaptation. Notably, the data mix used in stage~1 includes DCLM~\citep{li2024datacomp}, which is a dataset obtained by filtering web-data using a classifier trained on instruct-data. Hence, OLMo2-7B already has relatively strong question-answering capabilities after stage~1.
+\end{reviewread}
 
+\begin{reviewread}
 Each Biomed-Enriched variant was trained with exactly 33.6 billion tokens, using identical hyperparameters. We follow the annealing strategy of OLMo2 used in the mid-training phase. By maintaining strict parameter parity across experiments, we created a controlled environment focused solely on measuring the effectiveness of our different data curation strategies.
+\end{reviewread}
 
 \subsection{Encoder Setup}
 
+\begin{reviewread}
 We also conducted continual-pretraining experiments on encoder models. Starting from ModernBERT-base~\citep{modernbert} after its context extension phase, we followed exactly the same hyperparameters as BioClinical-ModernBERT phase~1. Our baseline reproduces their standard continual pretraining setup on public PubMed/PMC. Our clinical-upsample recipe additionally applies educational filtering (score $\geq 3$) and upsamples clinical cases 100$\times$ and clinical domain content 10$\times$.
+\end{reviewread}
 
+\begin{reviewread}
 \Cref{tab:hyperparams} summarizes the hyperparameters for both setups.
+\end{reviewread}
 
 \begin{table}[t]
 \centering
@@ -269,9 +301,13 @@ Tokens & 70B \\
 
 \subsection{Evaluation}
 
+\begin{reviewread}
 For decoders, our evaluation consists of zero-shot testing on MMLU medical subcategories, MedQA~\citep{jin2021medqa}, MedMCQA~\citep{pal2022medmcqa}, and PubMedQA~\citep{jin2019pubmedqa}. For the French adaptation assessment, we use 5-shot evaluation on FrenchMedMCQA~\citep{labrak-etal-2022}. We compare our models against three baselines: OLMo2-7B-stage1, Llama-3.1-8B, and Meditron-70B.
+\end{reviewread}
 
+\begin{reviewread}
 For the encoder models, we evaluate on 11 tasks spanning clinical and biomedical domains. Clinical tasks include ChemProt, Phenotype, COS, SocialHistory, and DEID. Biomedical tasks include AnatEM, BC5CDR, JNLPBA, NCBI Disease, GAD, and Hallmarks of Cancer. Following the evaluation recipe of BioClinical-ModernBERT, we finetune for 10 epochs on clinical tasks and 20 epochs on biomedical tasks, with early stopping patience of 3 epochs for all. We compare against BioClinical-ModernBERT~\citep{sounack2025bioclinicalmodernbert}, which was trained on 169B tokens from PubMed, PMC, and 20 clinical datasets including MIMIC-III, MIMIC-IV, CheXpert Plus radiology reports, and various clinical notes from multiple institutions, most requiring data use agreements.
+\end{reviewread}
 
 
 \section{Results}
@@ -279,7 +315,9 @@ For the encoder models, we evaluate on 11 tasks spanning clinical and biomedical
 
 \subsection{Decoder Results}
 
+\begin{reviewread}
 \Cref{tab:decoder-qa,tab:decoder-mmlu} present decoder results on medical QA and MMLU benchmarks. The combined strategy BE-All achieves the best average performance (61.08\%), with the strongest gains on MedQA (+2.4 pts) and MMLU Clinical Knowledge (+1.5 pts). Different enrichment strategies show complementary strengths: clinical upsampling yields a +4 point improvement on MMLU Professional Medicine, while educational filtering improves Medical Genetics by +2 points and MedMCQA by +1.2 points. BE-All reaches target performance using roughly one-third of the training tokens compared to BE-Base, with stable improvements visible from early checkpoints. BE-French also demonstrates successful adaptation to French medical QA (40.5\% vs 38.3\% baseline, \Cref{fig:french-performance}), showing that language-specific upsampling generalizes beyond English.
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -367,9 +405,13 @@ OLMo2-7B-stage1 & 54.81 & 63.40 & \underline{69.44} & 53.18 & \underline{69.00} 
 
 \subsection{Encoder Results}
 
+\begin{reviewread}
 \Cref{tab:encoder-clinical,tab:encoder-biomed} present encoder results across 11 clinical and biomedical benchmarks. Our BE-Clinical recipe achieves 77.08\% average $F_1$, matching BioClinical-ModernBERT (77.05\%) while using 2.5$\times$ fewer tokens and only public PubMed/PMC data. Adding a decay phase with high-quality educational content brings slight additional gains: the Biomedical decay variant (edu $\geq 4$) achieves 77.32\%.
+\end{reviewread}
 
+\begin{reviewread}
 Different decay targets show task-specific strengths: Study decay yields the best results on AnatEM (79.7\%) and NCBI Disease (81.2\%), Review decay excels on GAD (80.2\%), and Clinical Case decay achieves the highest SocialHistory score (57.0\%). These results suggest that public PMC data has more potential for clinical NLP than commonly exploited, and that targeted curation can close the gap with models trained on restricted datasets.
+\end{reviewread}
 
 \begin{table}[t]
 \centering
@@ -457,22 +499,34 @@ BE-Clinical & 78.5 & 88.1 & 74.6 & 79.4 & 77.7 & 68.5 & 77.80 \\
 \section{Discussion}
 \label{sec:discussion}
 
+\begin{reviewread}
 The core advantage of paragraph-level annotation lies in its ability to identify valuable content that would be missed by document-level approaches. Clinical case descriptions, for instance, often appear in isolated sections of broader scientific articles. By operating at the paragraph level, we extracted 2 million clinical case paragraphs from PMC Open Access. This content is otherwise difficult to obtain at scale due to privacy restrictions on hospital records.
+\end{reviewread}
 
+\begin{reviewread}
 For decoders, our results reveal clear task-specific benefits from different enrichment strategies. Educational filtering improves knowledge-intensive QA tasks, clinical upsampling enhances clinical reasoning benchmarks, and the combination of both yields the best overall performance with faster convergence. The successful French adaptation through targeted upsampling further demonstrates that this framework generalizes beyond English. However, aggressive clinical upsampling can reduce performance on general biomedical tasks like College Biology, suggesting a trade-off between specialization and breadth.
+\end{reviewread}
 
+\begin{reviewread}
 For encoders, the decay phase experiments reveal that different paragraph types benefit different downstream tasks: Study paragraphs improve NER performance, Clinical Case paragraphs improve social history extraction, and Review paragraphs excel on relation extraction. The distinct task-specific strengths of each decay variant suggest a promising direction: model merging or checkpoint averaging could combine the benefits of specialized training runs without requiring additional compute. Rather than training general-purpose models on massive undifferentiated corpora, these findings support a more modular approach where data composition is tailored to downstream requirements.
+\end{reviewread}
 
 
 \section{The Risks of Neural Quality Filtering}%
 \footnote{This section is based on our contribution to \citet{godey_gaperon_2026}.}
 \label{sec:biahs}
 
+\begin{reviewread}
 The results above show that selecting content by type and educational quality can improve pretraining efficiency. A natural next step is to apply neural quality classifiers, as done by FineWeb-Edu~\citep{penedo2024fineweb} and DCLM~\citep{li2024datacomp}, to filter pretraining data more aggressively. However, this raises a question: do these classifiers treat all content equally, or do they have blind spots?
+\end{reviewread}
 
+\begin{reviewread}
 To investigate this, we designed Benchmark-In-A-HayStack (BiaHS), an experiment to test how different text-quality classifiers rank benchmark-like content within a large web corpus. We sampled 35 benchmark instances from three datasets: 15 samples from MMLU (3 samples each from anatomy, computer security, high school geography, moral scenarios, and college physics), 10 from GSM8K~\citep{cobbe2021gsm8k}, and 10 from GPQA~\citep{rein2023gpqa}. Each benchmark sample was formatted as a standalone document containing the question, answer choices, and reference solution. These 35 benchmark documents were inserted as independent entries into a corpus of 99,965 documents sampled from FineWeb, yielding a final evaluation set of 100,000 documents where benchmarks constituted 0.035\% of the total.
+\end{reviewread}
 
+\begin{reviewread}
 We scored all documents using four quality classifiers: DCLM (FastText-based, used to filter OLMo~2 training data), Textbook (FastText-based, used to filter OLMo~1 training data), FineWeb-Edu (transformer-based), and the GAPeron classifier (transformer-based). Each classifier produced a full ranking of all documents based on their predicted quality score.
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -481,27 +535,41 @@ We scored all documents using four quality classifiers: DCLM (FastText-based, us
 \label{fig:biahs}
 \end{figure}
 
+\begin{reviewread}
 The results reveal a striking pattern. The DCLM classifier ranks all MMLU and GSM8K samples in the top-5 percentiles. If only the top 5\% of documents are selected through filtering, the probability of encountering a benchmark sample in a training batch increases by a factor of approximately 20. The FineWeb-Edu classifier also ranks benchmark samples consistently higher, likely because its annotation prompt explicitly asks for documents with high educational value, which naturally favors exam-style items and step-by-step solutions.
+\end{reviewread}
 
+\begin{reviewread}
 The DCLM classifier pushes benchmark samples even higher and more consistently. Its FastText model is trained to separate synthetically generated instructions from high-scoring Reddit posts, from general web text. This training objective naturally favors solved Q\&A structures with a short question, a direct answer, and brief reasoning, which aligns with the format of common benchmark datasets.
+\end{reviewread}
 
+\begin{reviewread}
 In contrast, the GAPeron classifier does not significantly push benchmark samples. It was trained on annotations focused on general content quality across multiple dimensions: accuracy, clarity, coherence, grammar, depth of information, and overall usefulness. This broader framing does not specifically reward the structured question-answer format typical of benchmark samples.
+\end{reviewread}
 
 \paragraph{Implications.} This experiment suggests that the way quality classifiers are trained can strongly influence contamination risks. As neural quality filtering becomes a standard step in data curation, these design choices deserve closer examination. For the Biomed-Enriched work presented earlier in this chapter, we rely on content-type classification and educational quality scoring rather than general quality filtering, which avoids this particular risk.
 
 
 \section{Limitations}
 
+\begin{reviewread}
 Our decoder experiments used 7B parameter models. Larger models may respond differently to data curation choices. The two-stage annotation pipeline relies on XLM-RoBERTa-base, which may have limited capacity for nuanced paragraph classification. Our clinical case paragraphs come from published case reports, which may differ stylistically from actual hospital records. The educational quality scores are neural heuristics rather than gold-standard pedagogical assessments.
+\end{reviewread}
 
+\begin{reviewread}
 For the BiaHS experiment, the evaluation was conducted on a relatively small number of benchmark samples (35) inserted into a single web corpus (FineWeb). While the results are directionally clear, a larger-scale study across multiple corpora would strengthen the conclusions.
+\end{reviewread}
 
 
 \section*{Conclusion}
 
+\begin{reviewread}
 Two findings emerge from this chapter. First, paragraph-level annotation reveals that scientific articles are far more heterogeneous than their metadata suggests: 91.6\% mix content types, and educational quality varies by 2.6 points within a single article. Selecting the right paragraphs allows matching full-corpus performance with a third of the tokens, and extracting 2 million clinical case paragraphs provides public clinical text without data use agreements.
+\end{reviewread}
 
+\begin{reviewread}
 Second, not all filtering is created equal. Neural quality classifiers trained on instructional or educational content can amplify benchmark contamination by a factor of 20, effectively turning a data curation step into a memorization accelerator. Content-type classification, by contrast, selects for relevance rather than format, and does not carry this risk.
+\end{reviewread}
 
 \vspace{2em}
 

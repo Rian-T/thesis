@@ -72,9 +72,13 @@
 \section{Introduction}
 \label{sec:intro}
 
+\begin{reviewread}
 Medical coding is the task of assigning standardized codes from medical ontologies to clinical documents. It is central to hospital billing, epidemiological surveillance, and clinical research. In France, over 30 million hospital stays per year require accurate coding using the CIM-10 classification (the French adaptation of ICD-10), CCAM procedure codes, and ATC medication codes. This task requires understanding not only medical vocabulary but also the relational structure of medical ontologies: hierarchical links between codes, causal associations, differential diagnoses, and exclusion rules. These relationships are explicitly encoded in ontology graphs but are absent from clinical text corpora.
+\end{reviewread}
 
+\begin{reviewread}
 Pretrained biomedical language models such as BioBERT \citep{lee_biobert_2019}, PubMedBERT \citep{gu_domain-specific_2022}, and CamemBERT-bio \citep{touchent2023camembertbio} learn medical vocabulary from large text corpora. However, they do not capture the relational structure of medical ontologies, since this structure is not expressed in running text. Knowledge graph approaches such as RDF2Vec \citep{ristoski2016rdf2vec} and Snomed2Vec \citep{agarwal2019snomed2vec} encode ontology structure through random walks, but produce static, non-contextualized embeddings that cannot benefit from transformer pretraining. Knowledge-enhanced transformers such as DRAGON \citep{yasunaga2022dragon} and KEPLER \citep{wang2021kepler} integrate knowledge graph structure into language model pretraining, but they rely on existing text-graph alignment rather than generating new training data from ontology structure alone.
+\end{reviewread}
 
 We propose \method, a pretraining method that converts medical ontology structure into training signal for encoder language models. Our approach proceeds in three stages. First, we generate random walks through ontology graphs to produce sequences that capture hierarchical, causal, and differential relationships between medical codes. Second, we reformulate these walks into fluent medical prose using a large language model, creating synthetic textbooks grounded in ontology structure. Third, we train an encoder with two objectives on the same textbook data: masked language modeling and relation prediction between code pairs. We refer to this co-training on shared data as \emph{alignment}, and our experiments show that it is a necessary condition for the method to work.
 
@@ -82,23 +86,35 @@ We evaluate \method on three French medical coding benchmarks and present ablati
 \section{Related Work}
 \label{sec:related}
 
+\begin{reviewread}
 This section reviews three research directions: biomedical language model pretraining, knowledge-enhanced language models, and automatic medical coding.
+\end{reviewread}
 
 \subsection{Biomedical Pretrained Language Models}
 
+\begin{reviewread}
 Domain-specific pretraining has proven essential for biomedical NLP. BioBERT \citep{lee_biobert_2019} further pretrained BERT on PubMed abstracts and PMC full-text articles, improving named entity recognition and relation extraction. PubMedBERT \citep{gu_domain-specific_2022} demonstrated that pretraining from scratch on in-domain text outperforms mixed-domain initialization. ClinicalBERT \citep{huang2019clinicalbert} targeted clinical notes from MIMIC-III. For French, CamemBERT-bio \citep{touchent2023camembertbio} adapted CamemBERT \citep{martin-etal-2020-camembert} to biomedical text, while DrBERT \citep{labrak2023drbert} was trained on French biomedical and clinical text from the NACHOS corpus. These models learn from flat text corpora and do not capture the hierarchical structure of medical ontologies.
+\end{reviewread}
 
 \subsection{Knowledge-Enhanced Language Models}
 
+\begin{reviewread}
 Random walks on knowledge graphs generate sequences capturing relational structure. RDF2Vec \citep{ristoski2016rdf2vec} adapted the walk-then-embed paradigm to RDF graphs. In the biomedical domain, Snomed2Vec \citep{agarwal2019snomed2vec} applied random walk and Poincar\'e embeddings to SNOMED-CT for clinical prediction tasks. OWL2Vec* \citep{chen2021owl2vec} combined random walk sequences with lexical and logical features from OWL ontologies. These methods produce static embeddings (Word2Vec-style) and cannot be used for transformer pretraining.
+\end{reviewread}
 
+\begin{reviewread}
 Several approaches inject knowledge graph structure into transformers. ERNIE \citep{zhang2019ernie} aligns entity embeddings with text representations. K-BERT \citep{liu2020kbert} injects knowledge triples into the input sequence using soft-position indices and a visibility mask. For multi-task pretraining, KEPLER \citep{wang2021kepler} combines MLM with TransE-style knowledge embedding on Wikidata. DRAGON \citep{yasunaga2022dragon} jointly trains MLM and knowledge graph link prediction, with a biomedical variant on UMLS achieving +3\% on MedQA. CODER \citep{yuan2021coder} uses UMLS relation triplets for contrastive pretraining, and SAPBERT \citep{liu2021sapbert} uses contrastive learning on UMLS synonyms for biomedical entity linking. Closest to the present work, BioOntoBERT \citep{shashikumar2023bioontobert} generates sentences from biomedical ontologies using Onto2Sen templates and pretrains BERT with MLM on the resulting corpus. However, the template-based generation produces formulaic sentences (e.g., ``X is a type of Y'') rather than fluent prose, and the method uses only MLM without multi-task relation prediction.
+\end{reviewread}
 
+\begin{reviewread}
 Recent work has explored synthetic data generation from knowledge sources. The Phi series \citep{gunasekar2023textbooks} demonstrated that LLM-generated textbook-quality data enables strong small-model performance. EntiGraph \citep{yang2025entigraph} generates entity-centric synthetic data from knowledge sources but targets decoder language models rather than encoder pretraining.
+\end{reviewread}
 
 \subsection{Automatic Medical Coding}
 
+\begin{reviewread}
 Medical coding assigns ICD, procedure, or medication codes to clinical text. CAML \citep{mullenbach2018caml} introduced label-wise attention for explainable predictions. PLM-ICD \citep{huang2022plmicd} showed that fine-tuning pretrained encoders with label attention directly improves coding performance. \citet{kirchler2026grasp} recently demonstrated that LLM embeddings improve transferability of EHR-based predictions across countries and coding systems, highlighting the importance of encoding medical knowledge structure for cross-system generalization. These methods improve the classification head or the input representations but rely on generic encoders pretrained on flat text corpora.
+\end{reviewread}
 
 Table~\ref{tab:related_comparison} summarizes how \method combines components not jointly present in prior work.
 
@@ -134,9 +150,13 @@ Phi-1 & & \checkmark & \\
 \subsection{Medical Ontologies}
 \label{sec:ontologies}
 
+\begin{reviewread}
 We use three French medical ontologies published by the Agence du Num\'erique en Sant\'e (ANS) through its terminology server (SMT) in RDF/OWL format. CIM-10 FR PMSI is the French adaptation of the WHO's ICD-10, enriched by the Agence Technique de l'Information sur l'Hospitalisation (ATIH) for the French hospital information system (Programme de M\'edicalisation des Syst\`emes d'Information, PMSI). It contains 19,161 diagnostic codes organized in a 5-level hierarchy (chapters, blocks, categories, subcategories), with textual annotations including 23,282 synonyms, 8,171 inclusion notes, and 381 definitions. CIM-10 is the only ontology with semantic edges beyond the hierarchy: 1,317 causal edges (e.g., E11 type 2 diabetes \textit{causes} N08.3 diabetic glomerulopathy), 5,739 exclusion edges, and 341 manifestation edges, yielding a mean node degree of 2.77 compared to 2.00 for the purely hierarchical ontologies.
+\end{reviewread}
 
+\begin{reviewread}
 CCAM (Classification Commune des Actes M\'edicaux) is the French procedure classification maintained by the Caisse Nationale d'Assurance Maladie (CNAM), containing 38,191 procedure codes in a 4-level hierarchy with 8,991 synonyms and 1,188 disjointness constraints between mutually exclusive procedures. ATC (Anatomical Therapeutic Chemical) is the WHO medication classification with 6,950 substance codes in a strict 5-level hierarchy from anatomical group to chemical substance, with no semantic edges, no synonyms, and no definitions beyond labels. This contrast in relational richness directly shapes the walk generation strategy: CIM-10 walks can follow causal and differential diagnosis paths, whereas CCAM and ATC walks are limited to hierarchical and sibling traversals. Table~\ref{tab:ontology_stats} summarizes the structural properties of the three ontologies.
+\end{reviewread}
 
 \begin{table}[t]
 \centering
@@ -170,16 +190,24 @@ Definitions & 381 & 151 & 0 \\
 \subsection{Ontology Walk Generation}
 \label{sec:walks}
 
+\begin{reviewread}
 We generate random walks through ontology graphs to capture relational structure in a sequential format suitable for language model pretraining. We sample walks starting from each code in the ontology. At each step, the next node is selected via weighted sampling where edge type weights depend on the walk type. This biased sampling is necessary because semantic edges are rare (Table~\ref{tab:ontology_stats}), and a uniform walk would rarely traverse them. Each walk records the traversed codes along with their labels and the relation types connecting them. Walk length is sampled uniformly between 8 and 20 steps. We track visited nodes to avoid cycles, with a fallback that allows revisiting nodes when all neighbors have been explored.
+\end{reviewread}
 
+\begin{reviewread}
 For CIM-10, we define five walk types, each emphasizing different aspects of medical knowledge: \textit{Etiologie} (causal chains), \textit{Diagnostic Diff\'erentiel} (codes to distinguish clinically), \textit{Codage Double} (mandatory code pairs linking etiology to manifestation), \textit{Syndrome} (multi-system manifestations), and \textit{Cross-Chapter} (connections between different ICD chapters, e.g., diabetes E11 to its renal complication N08). We generate 402,328 walks for CIM-10 (average 4,830 characters), 762,958 for CCAM, and 138,980 for ATC, totaling 1,304,266 walks.
+\end{reviewread}
 
 \subsection{Textbook Generation}
 \label{sec:textbook}
 
+\begin{reviewread}
 Raw walks contain structured markers (e.g., ``\texttt{>> \`A distinguer de:}'') that are useful for parsing but not natural for language model pretraining. We use a large language model to reformulate walks into fluent medical prose resembling textbook paragraphs.
+\end{reviewread}
 
+\begin{reviewread}
 We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. This ensures the textbook content remains grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4 NVIDIA H100 GPUs using vLLM \citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies. Figure~\ref{fig:textbook_example} shows an example transformation.
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -210,7 +238,9 @@ We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization t
 \label{fig:textbook_example}
 \end{figure}
 
+\begin{reviewread}
 Figure~\ref{fig:prompt} shows the system prompt used for CIM-10 walks (translated from French for readability; prompts for CCAM and ATC follow the same structure with ontology-specific terminology).
+\end{reviewread}
 
 \begin{figure}[t]
 \centering
@@ -236,7 +266,9 @@ Reformulate the provided CIM-10 walk into fluent, textbook-quality medical prose
 \subsection{\method Training}
 \label{sec:training}
 
+\begin{reviewread}
 We train a ModernCamemBERT-base encoder \citep{music2025moderncamembert}, initialized from a French checkpoint trained on 1 trillion tokens.
+\end{reviewread}
 
 The model optimizes two objectives jointly. The first, $\mathcal{L}_{\text{MLM}}$, follows standard masked language modeling \citep{devlin_bert_2019}: we mask 15\% of tokens from textbook paragraphs and train to predict them. The second, $\mathcal{L}_{\text{rel}}$, classifies the relationship between pairs of medical codes. Our main model uses CIM-10; we explore transfer from CCAM and ATC in Section~\ref{sec:multi_onto}. We extract 282,907 code pairs from the CIM-10 ontology across 6 relation types: \textsc{Parent}, \textsc{Child}, \textsc{Sibling}, \textsc{Differential Diagnosis}, \textsc{Causes}, and \textsc{Caused\_By}. For each pair, we retrieve the corresponding textbook descriptions generated in Section~\ref{sec:textbook}. The input format is "$[\texttt{CLS}]~\text{text}_A~[\texttt{SEP}]~\text{text}_B~[\texttt{SEP}]$", where $\text{text}_A$ and $\text{text}_B$ are the textbook descriptions of the two codes, and a separate linear classification head on the $[\texttt{CLS}]$ token predicts the relation type, trained with cross-entropy loss over the 6 classes.
 
@@ -258,7 +290,9 @@ We evaluate on the standard French medical coding evaluation suite:
 \item \textbf{Cantemist-FR} \citep{zaghir2023frasimed}: the French adaptation of the Spanish tumor coding task \citep{miranda2020cantemist}, with 2,051 clinical documents.
 \item \textbf{Distemist-FR} \citep{zaghir2023frasimed}: the French adaptation of the disease mention coding task \citep{miranda2022distemist}.
 \end{itemize}
+\begin{reviewread}
 Cantemist-FR and Distemist-FR are cross-lingual projections from Spanish. FRACCO is the only native French benchmark. All results are micro-F1 scores averaged over 3 random seeds.
+\end{reviewread}
 
 \paragraph{Baselines.}
 We compare against French biomedical language models: CamemBERT-bio \citep{touchent2023camembertbio}, DrBERT \citep{labrak2023drbert}, and ModernCamemBERT \citep{music2025moderncamembert} (which serves as our initialization checkpoint). We also report results for three ablations of our method: MLM-only (trained with $\mathcal{L}_{\text{MLM}}$ only on our textbooks), Rel-only (trained with $\mathcal{L}_{\text{rel}}$ only), and CodeInfill+MLM, which replaces relation prediction with a code infilling objective that masks medical code tokens (e.g., ``E11'', ``N08.3'') in textbook text and trains the model to predict them. We do not compare against knowledge-enhanced models such as DRAGON \citep{yasunaga2022dragon} or SAPBERT \citep{liu2021sapbert} as they are English encoders that cannot be applied to French text.
@@ -416,7 +450,9 @@ ATC only & \textbf{59.66} & 63.03 & \textbf{36.05} & 52.91 \\
 \label{tab:ontology_results}
 \end{table}
 
+\begin{reviewread}
 All three individual ontologies improve over the MLM-only baseline, indicating that the pipeline generalizes across different medical knowledge structures. ATC (medications) yields the best Distemist score (+3.81 over CIM-10), despite Distemist being a disease coding task, suggesting that drug-disease relationships transfer well to disease understanding. CCAM (procedures) achieves the best average micro-F1 (53.13). Combining all three ontologies does not outperform the best individual ontologies. We hypothesize that this is because the relation prediction head must accommodate heterogeneous edge types across ontologies.
+\end{reviewread}
 
 \subsection{Probing Analysis}
 \label{sec:probing}
@@ -447,12 +483,16 @@ Rel-only & 98.0 & 98.2 & 0.203 \\
 \label{tab:probing}
 \end{table}
 
-CodeInfill+MLM achieves the best probing metrics ($\rho=0.397$) but the worst downstream performance among our models (47.6 average micro-F1, Table~\ref{tab:main_results}), while \method has lower distance correlation ($\rho=0.073$) despite achieving the best downstream performance (52.5 micro-F1). This inverse relationship suggests that for encoder pretraining, representational flexibility is more valuable than strict geometric preservation of ontology structure.\section{Discussion}
+CodeInfill+MLM achieves the best probing metrics ($\rho=0.397$) but the worst downstream performance among our models (47.6 average micro-F1, Table~\ref{tab:main_results}), while \method has lower distance correlation ($\rho=0.073$) despite achieving the best downstream performance (52.5 micro-F1). This inverse relationship suggests that for encoder pretraining, representational flexibility is more valuable than strict geometric preservation of ontology structure.
+
+\section{Discussion}
 \label{sec:ontobook-discussion}
 
 The 30.50-point gap between aligned and misaligned training highlights the central role of objective alignment. When $\mathcal{L}_{\text{MLM}}$ trains on textbooks while $\mathcal{L}_{\text{rel}}$ trains on unrelated data, the model receives conflicting gradient signals: the MLM objective pushes representations toward textbook language patterns, while the relation objective pushes them toward a different data distribution. Aligned training avoids this conflict by ensuring both objectives reinforce the same semantic structure. Relation prediction guides attention toward ontologically meaningful patterns in the textbook text, while MLM ensures the model builds coherent representations of that text. This explains why relation prediction alone fails ($-$12.68 F1): it is a discriminative task that can exploit surface-level shortcuts, as demonstrated by the small gap between raw-walk and textbook MLM-only models (+0.59 F1). Combined with aligned MLM, however, it provides a complementary signal that improves downstream coding performance.
 
+\begin{reviewread}
 The cross-ontology transfer results suggest that our approach generalizes beyond CIM-10: training on CCAM or ATC alone also improves over the baseline despite targeting different medical domains. However, combining all ontologies does not outperform individual ones, possibly because the relation prediction head must accommodate heterogeneous edge types.
+\end{reviewread}
 
 The probing analysis reveals a tension between geometric organization and downstream performance. CodeInfill+MLM achieves the best probing metrics ($\rho=0.397$) but the worst downstream scores among our models (47.6 micro-F1), while \method achieves the opposite ($\rho=0.073$, 52.5 micro-F1). This suggests that for downstream coding tasks, flexible representations adapt better than rigid geometric structure that must be partially unlearned during fine-tuning.
 
