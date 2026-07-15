@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
 
@@ -100,7 +101,29 @@ def save_figure(
 ) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs = [output_dir / f"{stem}.pdf", output_dir / f"{stem}.png"]
-    fig.savefig(outputs[0], bbox_inches="tight")
-    fig.savefig(outputs[1], bbox_inches="tight", dpi=200)
-    plt.close(fig)
-    return outputs
+    publishing_started = False
+    try:
+        with TemporaryDirectory(
+            dir=output_dir, prefix=f".{stem}-"
+        ) as temporary_dir:
+            temporary_dir = Path(temporary_dir)
+            temporary_outputs = [
+                temporary_dir / f"{stem}.pdf",
+                temporary_dir / f"{stem}.png",
+            ]
+            fig.savefig(temporary_outputs[0], bbox_inches="tight")
+            fig.savefig(
+                temporary_outputs[1], bbox_inches="tight", dpi=180
+            )
+
+            publishing_started = True
+            for temporary, output in zip(temporary_outputs, outputs):
+                temporary.replace(output)
+        return outputs
+    except BaseException:
+        if publishing_started:
+            for output in outputs:
+                output.unlink(missing_ok=True)
+        raise
+    finally:
+        plt.close(fig)
