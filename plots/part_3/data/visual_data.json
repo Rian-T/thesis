@@ -8,70 +8,93 @@
     "mauve": {
       "pmc_patients": {
         "value": 0.040,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MAUVE; higher is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "synthetic_records": {
         "value": 0.017,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MAUVE; higher is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "e3c": {
         "value": 0.006,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MAUVE; higher is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       }
     },
     "fed": {
       "pmc_patients": {
         "value": 0.28,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "FED; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "synthetic_records": {
         "value": 0.35,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "FED; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "e3c": {
         "value": 0.74,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "FED; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
+      }
+    },
+    "mmd2": {
+      "pmc_patients": {
+        "value": 0.0002,
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MMD squared with an RBF kernel; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
+      },
+      "synthetic_records": {
+        "value": 0.0003,
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MMD squared with an RBF kernel; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
+      },
+      "e3c": {
+        "value": 0.0009,
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "MMD squared with an RBF kernel; lower is closer. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       }
     },
     "c2st": {
       "pmc_patients": {
         "value": 0.991,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "C2ST embedding accuracy; 0.5 is indistinguishable. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "synthetic_records": {
         "value": 0.988,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "C2ST embedding accuracy; 0.5 is indistinguishable. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       },
       "e3c": {
         "value": 0.985,
-        "status": "provisional",
-        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
-        "n": null,
-        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+        "status": "registered",
+        "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
+        "n": 1000,
+        "note": "C2ST embedding accuracy; 0.5 is indistinguishable. Terminology correction: PARHAF is human-written fictitious clinical text, not a real hospital-record corpus."
       }
     }
   },
@@ -248,38 +271,38 @@
   "data_efficiency": {
     "train_10": {
       "value": 0.182,
-      "status": "registered",
-      "source": "research/lymphome/07_RESULTATS.md:198; research/lymphome/data/preds_lym_lym-dataeff-10-de10.parquet",
+      "status": "provisional",
+      "source": "research/lymphome/07_RESULTATS.md:198",
       "n": 410,
-      "note": "Value-micro-F1 from 10 synthetic training records."
+      "note": "Dashboard-transcribed value-micro-F1 for 10 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_50": {
       "value": 0.485,
-      "status": "registered",
-      "source": "research/lymphome/07_RESULTATS.md:199; research/lymphome/data/preds_lym_lym-dataeff-50-de50.parquet",
+      "status": "provisional",
+      "source": "research/lymphome/07_RESULTATS.md:199",
       "n": 410,
-      "note": "Value-micro-F1 from 50 synthetic training records."
+      "note": "Dashboard-transcribed value-micro-F1 for 50 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_100": {
       "value": 0.544,
-      "status": "registered",
-      "source": "research/lymphome/07_RESULTATS.md:200; research/lymphome/data/preds_lym_lym-dataeff-100-de100.parquet",
+      "status": "provisional",
+      "source": "research/lymphome/07_RESULTATS.md:200",
       "n": 410,
-      "note": "Value-micro-F1 from 100 synthetic training records."
+      "note": "Dashboard-transcribed value-micro-F1 for 100 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_500": {
       "value": 0.603,
-      "status": "registered",
-      "source": "research/lymphome/07_RESULTATS.md:201; research/lymphome/data/preds_lym_lym-dataeff-500-de500.parquet",
+      "status": "provisional",
+      "source": "research/lymphome/07_RESULTATS.md:201",
       "n": 410,
-      "note": "Value-micro-F1 from 500 synthetic training records."
+      "note": "Dashboard-transcribed value-micro-F1 for 500 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_1540": {
       "value": 0.659,
-      "status": "registered",
-      "source": "research/lymphome/07_RESULTATS.md:202; research/lymphome/data/preds_lym_lym-dataeff-1540-de1540.parquet",
+      "status": "provisional",
+      "source": "research/lymphome/07_RESULTATS.md:202",
       "n": 410,
-      "note": "Value-micro-F1 from 1540 synthetic training records."
+      "note": "Dashboard-transcribed value-micro-F1 for 1540 synthetic training records; pending explicit rescore and registration in results.json."
     }
   }
 }

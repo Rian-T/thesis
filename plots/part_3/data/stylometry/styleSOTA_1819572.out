@@ -1,0 +1,11 @@
+
+===== SOTA distributionnel vs PARHAF (référence hospitalière réelle) =====
+source                           MAUVE↑     FED↓    MMD²↓   C2ST↓
+PMC-patients brut (seed)          0.040     0.28   0.0002   0.991
+NOTRE clinique synth (v2)         0.017     0.35   0.0003   0.988
+NOTRE brouillon synth             0.010     0.40   0.0004   0.997
+biomed scientifique (hal)         0.008     0.57   0.0005   0.993
+E3C (cas publiés)                 0.006     0.74   0.0009   0.985
+
+→ Source la plus SIMILAIRE à PARHAF = MAUVE le + haut, FED/MMD/C2ST les + bas.
+=== done ===
