@@ -253,3 +253,78 @@ def test_build_all_returns_nonzero_on_provisional_data(
 
     assert build_all.main(["--output-dir", str(tmp_path)]) != 0
     assert "principal visual data remain provisional" in capsys.readouterr().err
+
+
+def test_chapter9_prepares_registered_raw_stylometry_in_fixed_order():
+    from plots.part_3.plot_chapter9 import prepare_stylometry
+
+    panels = prepare_stylometry()
+
+    assert [panel.key for panel in panels] == [
+        "mauve",
+        "fed",
+        "mmd2",
+        "c2st",
+    ]
+    assert all(
+        panel.sources == ("PMC-Patients", "Dossiers synthétiques", "E3C")
+        for panel in panels
+    )
+    assert [panel.values for panel in panels] == [
+        pytest.approx((0.040, 0.017, 0.006)),
+        pytest.approx((0.28, 0.35, 0.74)),
+        pytest.approx((0.0002, 0.0003, 0.0009)),
+        pytest.approx((0.991, 0.988, 0.985)),
+    ]
+    assert all(panel.statuses == ("registered",) * 3 for panel in panels)
+    assert all(
+        panel.provenance
+        == ("plots/part_3/data/stylometry/styleSOTA_1819572.out",) * 3
+        for panel in panels
+    )
+
+
+def test_chapter9_render_keeps_source_labels_visible_with_shared_y_axis():
+    from plots.part_3.plot_chapter9 import _make_figure, prepare_stylometry
+
+    fig = _make_figure(prepare_stylometry())
+    try:
+        visible_labels = [
+            label.get_text()
+            for label in fig.axes[0].get_yticklabels()
+            if label.get_visible()
+        ]
+        assert visible_labels == [
+            "PMC-Patients",
+            "Dossiers synthétiques",
+            "E3C",
+        ]
+        assert all(
+            not label.get_visible()
+            for ax in fig.axes[1:]
+            for label in ax.get_yticklabels()
+        )
+    finally:
+        plt.close(fig)
+
+
+def test_chapter9_builds_stylometry_without_preliminary_watermark(
+    tmp_path, monkeypatch
+):
+    from plots.part_3 import plot_chapter9
+
+    preliminary_calls = []
+    monkeypatch.setattr(
+        plot_chapter9,
+        "mark_preliminary",
+        lambda fig: preliminary_calls.append(fig),
+    )
+
+    outputs = plot_chapter9.build(tmp_path, allow_provisional=True)
+
+    assert outputs == [
+        tmp_path / "fig06_stylometry.pdf",
+        tmp_path / "fig06_stylometry.png",
+    ]
+    assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
+    assert preliminary_calls == []
