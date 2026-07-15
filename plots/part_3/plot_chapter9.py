@@ -118,7 +118,7 @@ def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
             textcoords="offset points",
             ha="left",
             va="center",
-            fontsize=8,
+            fontsize=8.5,
             color=colors["neutral"],
         )
 
@@ -130,7 +130,7 @@ def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
         transform=ax.transAxes,
         ha="center",
         va="bottom",
-        fontsize=7.5,
+        fontsize=8,
         color=colors["neutral"],
     )
     ax.set_xlim(*panel.limits)
@@ -147,7 +147,7 @@ def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
     )
 
     ax.grid(axis="y", color=colors["neutral"], alpha=0.14, linewidth=0.6)
-    ax.tick_params(axis="x", labelsize=7.5, length=3, width=0.5)
+    ax.tick_params(axis="x", labelsize=8, length=3, width=0.5)
     ax.tick_params(axis="y", labelsize=8.5)
     ax.spines["left"].set_visible(False)
 
@@ -166,21 +166,21 @@ def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
             "indiscernables",
             ha="left",
             va="center",
-            fontsize=6.8,
+            fontsize=7.5,
             color=colors["neutral"],
         )
 
 
 def _make_figure(panels: tuple[StylometryPanel, ...]):
     fig, axes = plt.subplots(
-        1,
-        4,
-        figsize=(7.2, 2.65),
+        2,
+        2,
+        figsize=(5.5, 3.75),
         sharey=True,
-        gridspec_kw={"wspace": 0.22},
+        gridspec_kw={"wspace": 0.30, "hspace": 0.48},
     )
-    for index, (ax, panel) in enumerate(zip(axes, panels)):
-        _draw_panel(ax, panel, show_sources=index == 0)
+    for index, (ax, panel) in enumerate(zip(axes.flat, panels)):
+        _draw_panel(ax, panel, show_sources=index % 2 == 0)
     return fig
 
 

@@ -284,26 +284,38 @@ def test_chapter9_prepares_registered_raw_stylometry_in_fixed_order():
     )
 
 
-def test_chapter9_render_keeps_source_labels_visible_with_shared_y_axis():
+def test_chapter9_render_is_native_width_with_labels_on_both_left_panels():
     from plots.part_3.plot_chapter9 import _make_figure, prepare_stylometry
 
     fig = _make_figure(prepare_stylometry())
     try:
-        visible_labels = [
-            label.get_text()
-            for label in fig.axes[0].get_yticklabels()
-            if label.get_visible()
+        width, _height = fig.get_size_inches()
+        assert width == pytest.approx(5.5)
+        assert len(fig.axes) == 4
+        for index in (0, 2):
+            assert [
+                label.get_text()
+                for label in fig.axes[index].get_yticklabels()
+                if label.get_visible()
+            ] == ["PMC-Patients", "Dossiers synthétiques", "E3C"]
+        for index in (1, 3):
+            assert all(
+                not label.get_visible()
+                for label in fig.axes[index].get_yticklabels()
+            )
+        visible_text = [
+            text
+            for ax in fig.axes
+            for text in (
+                [ax.title]
+                + list(ax.texts)
+                + list(ax.get_xticklabels())
+                + list(ax.get_yticklabels())
+            )
+            if text.get_visible() and text.get_text()
         ]
-        assert visible_labels == [
-            "PMC-Patients",
-            "Dossiers synthétiques",
-            "E3C",
-        ]
-        assert all(
-            not label.get_visible()
-            for ax in fig.axes[1:]
-            for label in ax.get_yticklabels()
-        )
+        assert visible_text
+        assert min(text.get_fontsize() for text in visible_text) >= 7
     finally:
         plt.close(fig)
 
@@ -321,6 +333,28 @@ def test_chapter9_builds_stylometry_without_preliminary_watermark(
     )
 
     outputs = plot_chapter9.build(tmp_path, allow_provisional=True)
+
+    assert outputs == [
+        tmp_path / "fig06_stylometry.pdf",
+        tmp_path / "fig06_stylometry.png",
+    ]
+    assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
+    assert preliminary_calls == []
+
+
+def test_chapter9_final_build_accepts_registered_stylometry(
+    tmp_path, monkeypatch
+):
+    from plots.part_3 import plot_chapter9
+
+    preliminary_calls = []
+    monkeypatch.setattr(
+        plot_chapter9,
+        "mark_preliminary",
+        lambda fig: preliminary_calls.append(fig),
+    )
+
+    outputs = plot_chapter9.build(tmp_path, allow_provisional=False)
 
     assert outputs == [
         tmp_path / "fig06_stylometry.pdf",
