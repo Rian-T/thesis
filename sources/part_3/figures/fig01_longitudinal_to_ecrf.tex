@@ -1,0 +1,78 @@
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[scale=0.91, transform shape,
+    doc/.style={
+      rectangle, rounded corners=3pt, draw=ThesisNeutral!65,
+      fill=ThesisPaper, line width=0.65pt, text width=3.05cm,
+      minimum height=2.25cm, align=left, inner sep=5pt,
+      font=\scriptsize
+    },
+    field/.style={
+      rectangle, rounded corners=3pt, draw=ThesisPrimaryDark,
+      fill=ThesisPrimary!12, line width=0.7pt, text width=3.05cm,
+      minimum height=1.25cm, align=left, inner sep=5pt,
+      font=\scriptsize
+    },
+    map/.style={-{Stealth[length=1.7mm]}, line width=0.75pt,
+      draw=ThesisNeutral, shorten <=2pt, shorten >=2pt},
+    every node/.style={text=ThesisInk}
+  ]
+    \node[doc] (d1) at (-5.4,1.45) {%
+      \textbf{12 mai 2018 · consultation}\\[3pt]
+      Suspicion de lymphome; bilan diagnostique engagé.
+    };
+    \node[doc] (d2) at (-1.8,1.45) {%
+      \textbf{22 mai 2018 · RCP}\\[3pt]
+      Décision: début d'une \textcolor{ThesisPrimaryDark}{\textbf{chimiothérapie par protocole CHOEP-14}}, 8 cycles.
+    };
+    \node[doc] (d3) at (1.8,1.45) {%
+      \textbf{5 octobre 2018 · TEP-TDM}\\[3pt]
+      Réponse complète; score de Deauville~1.
+    };
+    \node[doc] (d4) at (5.4,1.45) {%
+      \textbf{25 avril 2032 · RCP}\\[3pt]
+      Après rechute: réintroduire 6 cycles de \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}.
+    };
+
+    \draw[line width=0.8pt, draw=ThesisNeutral!65]
+      (-6.9,-0.35) -- (6.9,-0.35);
+    \foreach \x/\date in {-5.4/12.05.18,-1.8/22.05.18,1.8/05.10.18,5.4/25.04.32} {
+      \draw[line width=0.8pt, draw=ThesisNeutral!65]
+        (\x,-0.48) -- (\x,-0.22);
+      \node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=north]
+        at (\x,-0.50) {\date};
+    }
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=east] at (-6.95,-0.35) {dossier};
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisPrimaryDark,
+      anchor=east] at (-6.95,-1.43) {eCRF};
+    \node[field] (f1) at (-5.4,-2.10) {%
+      \textbf{date du diagnostic}\\
+      12 mai 2018
+    };
+    \node[field] (f2) at (-1.8,-2.10) {%
+      \textbf{traitement, ligne 1}\\
+      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}
+    };
+    \node[field] (f3) at (1.8,-2.10) {%
+      \textbf{réponse, ligne 1}\\
+      réponse complète
+    };
+    \node[field] (f4) at (5.4,-2.10) {%
+      \textbf{traitement, ligne 2}\\
+      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}
+    };
+
+    \draw[map] (d1.south) -- (f1.north);
+    \draw[map, draw=ThesisPrimaryDark] (d2.south) -- (f2.north);
+    \draw[map] (d3.south) -- (f3.north);
+    \draw[map, draw=ThesisPrimaryDark] (d4.south) -- (f4.north);
+  \end{tikzpicture}
+  \caption{\textbf{Du dossier longitudinal au formulaire.}
+  Dans le dossier synthétique \texttt{lym\_76}, la même chaîne
+  \texttt{CHOEP-14} renseigne la première puis la deuxième ligne après
+  rechute: le champ dépend de la position de la mention dans la trajectoire,
+  pas de sa seule forme locale.}
+  \label{fig:p3-task}
+\end{figure}

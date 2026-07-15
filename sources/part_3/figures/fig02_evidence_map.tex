@@ -1,0 +1,77 @@
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[scale=0.97, transform shape,
+    proxy/.style={
+      rectangle, rounded corners=3pt, draw=ThesisNeutral!65,
+      fill=ThesisPaper, line width=0.65pt, text width=5.15cm,
+      minimum height=2.20cm, align=left, inner sep=6pt,
+      font=\scriptsize
+    },
+    target/.style={
+      rectangle, rounded corners=4pt, draw=ThesisNeutral,
+      fill=ThesisNeutral!8, dashed, line width=1pt, text width=4.25cm,
+      minimum height=2.15cm, align=center, inner sep=7pt,
+      font=\scriptsize
+    },
+    evidence/.style={-{Stealth[length=1.8mm]}, line width=0.8pt,
+      draw=ThesisNeutral, shorten <=3pt, shorten >=3pt},
+    every node/.style={text=ThesisInk}
+  ]
+    \node[proxy] (ecrf) at (-4.35,2.55) {%
+      \textbf{eCRF lymphome synthétique}\\[2pt]
+      \textcolor{ThesisSecondaryDark}{\textbf{Teste:}} 89 champs, rôles
+      longitudinaux et décodage du formulaire.\\[2pt]
+      \textcolor{ThesisNeutral}{\textbf{N'établit pas:}} annotation humaine
+      ni transfert vers le registre hospitalier réel.
+    };
+    \node[proxy] (parhaf) at (4.35,2.55) {%
+      \textbf{PARHAF}\\[2pt]
+      \textcolor{ThesisSecondaryDark}{\textbf{Teste:}} biomarqueurs dans des
+      comptes rendus fictifs rédigés par des internes.\\[2pt]
+      \textcolor{ThesisNeutral}{\textbf{N'établit pas:}} soins réels ni
+      stabilité des petits écarts ($n=31$).
+    };
+    \node[proxy] (fracco) at (-4.35,-3.00) {%
+      \textbf{FrACCO}\\[2pt]
+      \textcolor{ThesisSecondaryDark}{\textbf{Teste:}} transfert externe vers
+      un NER oncologique dense ($n=300$).\\[2pt]
+      \textcolor{ThesisNeutral}{\textbf{N'établit pas:}} remplissage
+      longitudinal d'un formulaire clinique.
+    };
+    \node[proxy] (judge) at (4.35,-3.00) {%
+      \textbf{Juge sans référence}\\[2pt]
+      \textcolor{ThesisSecondaryDark}{\textbf{Teste:}} compatibilité d'empans
+      avec des descriptions de types nouvelles.\\[2pt]
+      \textcolor{ThesisNeutral}{\textbf{N'établit pas:}} exactitude médicale
+      contre un gold humain.
+    };
+    \node[target] (target) at (0,-0.25) {%
+      \textbf{CIBLE SOUHAITÉE}\\[3pt]
+      dossiers hospitaliers français réels\\
+      $+$ eCRF annoté par des cliniciens\\[4pt]
+      \textcolor{ThesisNeutral}{\textbf{inaccessible publiquement}}
+    };
+
+    \draw[evidence] (ecrf.south east) --
+      node[midway, above, sloped, fill=white, inner sep=1.5pt,
+        font=\scriptsize\sffamily, text=ThesisNeutral]
+      {validité interne} (target.north west);
+    \draw[evidence] (parhaf.south west) --
+      node[midway, above, sloped, fill=white, inner sep=1.5pt,
+        font=\scriptsize\sffamily, text=ThesisNeutral]
+      {registre humain fictif} (target.north east);
+    \draw[evidence] (fracco.north east) --
+      node[midway, below, sloped, fill=white, inner sep=1.5pt,
+        font=\scriptsize\sffamily, text=ThesisNeutral]
+      {transfert externe} (target.south west);
+    \draw[evidence] (judge.north west) --
+      node[midway, below, sloped, fill=white, inner sep=1.5pt,
+        font=\scriptsize\sffamily, text=ThesisNeutral]
+      {types nouveaux} (target.south east);
+  \end{tikzpicture}
+  \caption{\textbf{Un faisceau de preuves autour d'une cible inaccessible.}
+  Les quatre régimes testent des dimensions complémentaires, mais aucun ne
+  mesure la validité clinique sur de vrais dossiers hospitaliers français
+  annotés par des cliniciens.}
+  \label{fig:p3-evidence}
+\end{figure}

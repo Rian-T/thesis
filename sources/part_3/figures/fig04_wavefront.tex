@@ -1,0 +1,81 @@
+\usetikzlibrary{patterns}
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[scale=0.97, transform shape,
+    panel/.style={
+      rectangle, rounded corners=4pt, draw=ThesisNeutral!60,
+      fill=ThesisPaper, line width=0.65pt, minimum width=3.25cm,
+      minimum height=5.10cm, inner sep=5pt
+    },
+    inner/.style={
+      rectangle, rounded corners=2pt, line width=0.55pt,
+      text width=2.65cm, align=left, inner sep=4pt,
+      font=\scriptsize
+    },
+    flow/.style={-{Stealth[length=1.8mm]}, line width=0.8pt,
+      draw=ThesisNeutral, shorten <=3pt, shorten >=3pt},
+    every node/.style={text=ThesisInk}
+  ]
+    \node[panel] (p1) at (-5.45,0) {};
+    \node[panel] (p2) at (-1.82,0) {};
+    \node[panel] (p3) at (1.82,0) {};
+    \node[panel] (p4) at (5.45,0) {};
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=north] at ([yshift=-5pt]p1.north) {1 · CAS SOURCE};
+    \node[inner, draw=ThesisNeutral!55, fill=white,
+      anchor=north] at ([yshift=-0.65cm]p1.north) {%
+      \textbf{Trame source}\\[3pt]
+      diagnostic\\
+      $\downarrow$ traitement\\
+      $\downarrow$ rémission\\
+      $\downarrow$ rechute\\[4pt]
+      \textcolor{ThesisNeutral}{Cas PMC-Patients; texte source non reproduit ici.}
+    };
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=north] at ([yshift=-5pt]p2.north) {2 · CHRONOLOGIE};
+    \node[inner, draw=ThesisSecondaryDark, fill=ThesisSecondary!12,
+      anchor=north] at ([yshift=-0.65cm]p2.north) {%
+      \textbf{12.05.2018} diagnostic\\[2pt]
+      \textbf{22.05.2018} CHOEP-14 décidé\\[2pt]
+      \textbf{05.10.2018} réponse complète\\[2pt]
+      \textbf{18.04.2032} suspicion de rechute
+    };
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisTertiaryDark,
+      anchor=north] at ([yshift=-5pt]p3.north) {3 · VUE AU TEMPS $t$};
+    \node[inner, draw=ThesisSecondaryDark, fill=ThesisSecondary!12,
+      anchor=north] (past) at ([yshift=-0.65cm]p3.north) {%
+      \textbf{Visible à $t=22.05.2018$}\\[2pt]
+      diagnostic; stade IV; décision CHOEP-14
+    };
+    \node[inner, draw=ThesisNeutral!70, pattern=north east lines,
+      pattern color=ThesisNeutral!30, densely dashed, anchor=north]
+      (future) at ([yshift=-0.28cm]past.south) {%
+      \textcolor{ThesisNeutral}{\textbf{FUTUR MASQUÉ}}\\[2pt]
+      \textcolor{ThesisNeutral}{réponse complète; rechute}
+    };
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=north] at ([yshift=-5pt]p4.north) {4 · DOSSIER FINAL};
+    \node[inner, draw=ThesisNeutral!55, fill=white,
+      anchor=north] at ([yshift=-0.65cm]p4.north) {%
+      \textbf{15.05 · anat-path}\\
+      ALCL, ALK+\\[4pt]
+      \textbf{22.05 · RCP}\\
+      \og début d'une chimiothérapie par protocole \textbf{CHOEP-14}\fg{}\\[4pt]
+      \textbf{05.10 · TEP-TDM}\\
+      réponse complète
+    };
+
+    \draw[flow] (p1) -- (p2);
+    \draw[flow] (p2) -- (p3);
+    \draw[flow] (p3) -- (p4);
+  \end{tikzpicture}
+  \caption{\textbf{Génération longitudinale en front d'onde.}
+  Chaque compte rendu n'est conditionné que par les événements disponibles à
+  sa date; les événements futurs restent masqués. L'extrait final provient du
+  dossier synthétique vérifié \texttt{lym\_76}.}
+  \label{fig:p3-wavefront}
+\end{figure}

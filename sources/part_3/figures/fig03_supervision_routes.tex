@@ -1,0 +1,73 @@
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[scale=0.97, transform shape,
+    box/.style={
+      rectangle, rounded corners=3pt, line width=0.7pt,
+      text width=2.55cm, minimum height=1.55cm, align=center,
+      inner sep=5pt, font=\scriptsize
+    },
+    source/.style={box, draw=ThesisNeutral!70, fill=ThesisPaper},
+    llm/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!18},
+    supervision/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!18},
+    encoder/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!18},
+    flow/.style={-{Stealth[length=1.8mm]}, line width=0.85pt,
+      draw=ThesisNeutral, shorten <=3pt, shorten >=3pt},
+    every node/.style={text=ThesisInk}
+  ]
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=west] at (-7.15,2.65) {VOIE GÉNÉRALISTE · texte public};
+    \node[source] (public) at (-5.85,1.55) {%
+      \textbf{Paragraphes publics}\\
+      HAL, ISTEX, cas, encyclopédie, terminologies
+    };
+    \node[llm] (annotate) at (-2.75,1.55) {%
+      \textbf{Annotation LLM}\\
+      entités $+$\\ descriptions de types
+    };
+    \node[supervision] (ground) at (0.35,1.55) {%
+      \textbf{Ancrage et déduplication}\\
+      chaînes localisées;\\ négatifs conservés
+    };
+    \node[encoder] (generalist) at (3.45,1.55) {%
+      \textbf{Extracteur généraliste}\\
+      118\,687 documents\\
+      14,7 mentions/doc.
+    };
+
+    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
+      anchor=west] at (-7.15,-0.80) {VOIE CAPSTONE · trajectoires patient};
+    \node[source] (pmc) at (-5.85,-1.90) {%
+      \textbf{PMC-Patients}\\
+      167\,034 cas publics; trajectoires riches sélectionnées
+    };
+    \node[llm] (wave) at (-2.75,-1.90) {%
+      \textbf{Génération longitudinale}\\
+      chronologie puis comptes rendus en front d'onde
+    };
+    \node[supervision] (tapdl) at (0.35,-1.90) {%
+      \textbf{TAPDL}\\
+      237\,194 empans\\
+      89 champs
+    };
+    \node[encoder] (specialist) at (5.65,-1.90) {%
+      \textbf{Spécialiste eCRF}\\
+      généraliste spécialisé sur 2\,050 dossiers synthétiques
+    };
+
+    \draw[flow] (public) -- (annotate);
+    \draw[flow] (annotate) -- (ground);
+    \draw[flow] (ground) -- (generalist);
+    \draw[flow] (pmc) -- (wave);
+    \draw[flow] (wave) -- (tapdl);
+    \draw[flow] (tapdl) --
+      node[above, font=\scriptsize\sffamily, text=ThesisNeutral]
+      {spécialisation} (specialist);
+    \draw[flow, draw=ThesisPrimaryDark]
+      (generalist.south east) -- ++(0,-0.40) -| (specialist.north);
+  \end{tikzpicture}
+  \caption{\textbf{Deux voies de supervision, deux fonctions.}
+  L'annotation du texte public forme l'extracteur à vocabulaire ouvert;
+  PMC-Patients, la génération longitudinale et TAPDL fournissent ensuite la
+  tâche cible. Les voies ne convergent qu'à la spécialisation eCRF.}
+  \label{fig:p3-supervision-routes}
+\end{figure}
