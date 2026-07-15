@@ -75,7 +75,7 @@
 
 > **Figure 4 — génération longitudinale en front d'onde.** Au temps $t$, le prompt ne voit que l'identité fictive et les événements déjà survenus ; les événements futurs restent masqués. La succession de vues partielles, et non une réécriture globale du cas, empêche la fuite du futur vers les comptes rendus antérieurs.
 
-- La production contient 2 050 dossiers. La médiane est de huit comptes rendus, dix-huit événements et 22 314 caractères par dossier. Trente et un pour cent des dossiers contiennent une deuxième ligne de traitement. Le taux de rechute annoncé à 91 % doit être recompté depuis la production avant d'être figé dans le manuscrit.
+- La production contient 2 050 dossiers. La médiane est de huit comptes rendus et 22 314 caractères par dossier. Trente et un pour cent des dossiers contiennent une deuxième ligne de traitement. Le taux de rechute doit être recompté depuis la production avant d'être rapporté.
 - Un exemple du pipeline part d'un cas publié décrivant un lymphome lymphocytique traité par FC puis rituximab-bendamustine. La sortie contient cinq documents français, dont un compte rendu anatomo-pathologique avec microscopie et immunohistochimie.
 
 ### Construire la référence silver avec TAPDL
@@ -115,7 +115,7 @@
 | dossiers synthétiques | 0.017 | 0.35 | 0.0003 | 0.988 |
 | E3C, cas cliniques publiés | 0.006 | 0.74 | 0.0009 | 0.985 |
 
-- Le C2ST est proche de 0,99 pour toutes les sources. Elles sont donc facilement distinguables de PARHAF. Les dossiers synthétiques sont plus proches que les cas publiés E3C, mais moins proches que leur propre source PMC-Patients. La génération fournit une supervision adaptée à la tâche sans reproduire le registre hospitalier.
+- MAUVE, FED et MMD² donnent le même ordre de proximité à PARHAF : PMC-Patients, puis les dossiers synthétiques, puis E3C. Le C2ST inverse faiblement cet ordre, avec 0,985 pour E3C, 0,988 pour les dossiers synthétiques et 0,991 pour PMC-Patients. Mais les trois valeurs restent proches d'une séparabilité parfaite : aucune métrique n'autorise à conclure que la génération reproduit le registre hospitalier, et leur désaccord interdit un classement unique de proximité.
 - Le chapitre suivant étudie l'autre moitié du problème. Même avec des données annotées, une couche de sortie fixe ne peut pas répondre à un formulaire dont les champs changent.
 
 ## Chapitre 2 — Extraction à vocabulaire ouvert
@@ -143,16 +143,16 @@
 
 ![](../../plots/part_3/output/fig08_supervision_signal.png)
 
-*Figure 8. La densité d'annotation apprend d'abord combien d'entités proposer, tandis que l'apport du texte clinique public se concentre sur les champs de traitement et disparaît dans une moyenne globale.*
+*Figure 8. APERÇU PROVISOIRE — La densité d'annotation semble apprendre d'abord combien d'entités proposer, tandis que l'apport du texte clinique public paraît se concentrer sur les champs de traitement. L'ablation clinique n'est pas encore enregistrée dans `results.json` et ne peut pas soutenir une conclusion définitive.*
 
 **Tableau 5 — Les interventions n'autorisent une interprétation mécanistique que lorsque leur contrôle isole effectivement le facteur annoncé.**
 
-| intervention | constat | interprétation autorisée |
-|---|---|---|
-| densité et documents vides | 22,5 % de documents vides conduisent à une sous-prédiction ; corriger la densité restaure le volume | la densité d'annotation apprend en partie au modèle combien d'entités proposer |
-| étage contrastif | MedEmbed apporte +0,049 de MAP sur les types nouveaux et environ +0,023 sur l'eCRF dans l'A/B courant | l'espace des descriptions contribue à la généralisation ; chiffres encore à enregistrer dans `results.json` |
-| texte clinique public | l'ablation globale est faible, mais les sections de traitement tombent à 0 en zéro-shot sans ce contenu | le signal est concentré sur le parcours thérapeutique ; résultat mesuré sur 200 dossiers |
-| focal loss | elle empêche le collapse de GLiNER v1 et améliore GLiNER2 sur les jeux externes | finding ouvert : les budgets et plusieurs paramètres d'architecture ne sont pas complètement appariés |
+| intervention | constat | qualité du contrôle / statut | interprétation autorisée |
+|---|---|---|---|
+| densité et documents vides | 22,5 % de documents vides conduisent à une sous-prédiction ; corriger la densité restaure le volume | statistique mesurée localement, non enregistrée dans `results.json` | hypothèse provisoire : la densité apprend en partie combien d'entités proposer |
+| étage contrastif | MedEmbed apporte +0,049 de MAP sur les types nouveaux et environ +0,023 sur l'eCRF dans l'A/B courant | A/B provisoire, valeurs à enregistrer | l'espace des descriptions pourrait contribuer à la généralisation |
+| texte clinique public | l'ablation globale est faible, mais les sections de traitement tombent à 0 en zéro-shot sans ce contenu | 200 dossiers, résultat issu du dashboard et non enregistré | signal local sur le parcours thérapeutique, à confirmer depuis les prédictions |
+| focal loss | elle empêche le collapse de GLiNER v1 et améliore GLiNER2 sur les jeux externes | budgets et paramètres d'architecture imparfaitement appariés | finding ouvert, sans attribution causale isolée |
 
 - L'ablation du contenu clinique relie directement cette partie à la construction du corpus. L'effet global est de 0,138 contre 0,117, mais la moyenne masque un effet local : les premières et deuxièmes lignes de traitement tombent à 0, tandis que la section `history`, qui représente 46 % du gold, reste pratiquement inchangée.
 
@@ -179,12 +179,12 @@
 ### La spécialisation efface l'ouverture
 
 - La qualité du généraliste ne prédit pas la performance du spécialiste. Plusieurs généralistes très différents finissent entre 0,646 et 0,657 après spécialisation sur l'eCRF.
-- En sens inverse, la spécialisation lymphome détruit une grande partie du transfert zéro-shot vers les types PARHAF. Le modèle spécialisé sans mélange cesse de prédire ces types. Le mélange de données généralistes limite la perte, mais ne la supprime pas.
-- Le résultat est donc un compromis. L'étage contrastif améliore le transfert sans supervision spécifique, tandis que l'adaptation à un formulaire précis réduit cette capacité. Le capstone doit mesurer la performance spécialisée et la capacité générale séparément.
+- En sens inverse, l'analyse actuelle suggère que la spécialisation lymphome détruit une grande partie du transfert zéro-shot vers les types PARHAF : le spécialiste évalué cesse de prédire ces types. Cet endpoint n'est pas encore enregistré dans `results.json` et doit rester provisoire.
+- Le contraste généraliste–spécialiste suggère donc un compromis entre adaptation au formulaire et ouverture. Le capstone doit mesurer la performance spécialisée et la capacité générale séparément ; les données actuelles ne permettent pas de quantifier un éventuel effet protecteur du mélange sur PARHAF.
 
 ![](../../plots/part_3/output/fig10_specialization_tradeoff.png)
 
-*Figure 10. Les spécialistes convergent sur le formulaire cible tout en perdant l'essentiel de leur transfert PARHAF ; le mélange amortit cette fermeture sans conserver entièrement l'ouverture du généraliste.*
+*Figure 10. APERÇU PROVISOIRE — Le généraliste conserve un transfert PARHAF que le spécialiste lymphome évalué perd, tandis que les systèmes spécialisés convergent sur le formulaire cible. L'endpoint PARHAF du spécialiste doit être enregistré avant d'établir ce compromis ; aucun effet du mélange sur l'ouverture n'est revendiqué.*
 
 - Une architecture à vocabulaire ouvert peut demander de nouveaux types. Elle ne résout pas encore le liage entre une valeur et son rôle dans le parcours du patient. Le dernier chapitre porte donc sur le formulaire complet.
 
@@ -218,7 +218,7 @@
 
 ### Les modèles sont déjà proches avant le décodage
 
-- Les familles reçoivent la même tâche et une supervision alignée, mais pas un entraînement identique : leurs formats, objectifs et recettes d'optimisation diffèrent. Nous comparons les extracteurs d'empans, quatre tailles de Qwen3.5, deux modèles de QA extractive et la baseline `gliner-biomed`.
+- Les familles reçoivent la même tâche et une supervision alignée, mais pas un entraînement identique : leurs formats, objectifs et recettes d'optimisation diffèrent. La comparaison enregistrée porte sur dix systèmes : six systèmes extractifs non génératifs — trois variantes de notre extracteur, deux modèles de QA extractive et `gliner-biomed` — et quatre tailles de Qwen3.5.
 - Sur les parquets actuels et avant la compétition entre champs, Qwen3.5-9B atteint 0,665 et l'encodeur publié de 150 M atteint 0,633 en value-$F_1$. L'écart est de 3,2 points pour un facteur 60 en nombre de paramètres. Le grand modèle mène, mais le petit encodeur est déjà proche avant d'exploiter la structure du formulaire.
 - Cette comparaison brute est importante. Le décodage structurel ne crée pas à lui seul la compétitivité du modèle ; il ferme un écart initial limité.
 
@@ -227,7 +227,7 @@
 - Le score brut ignore deux contraintes du formulaire : un empan ne doit documenter qu'un champ, et chaque champ ne conserve qu'une valeur finale. Dans le post-traitement, les champs qui réclament des empans fortement chevauchants entrent en compétition, puis la prédiction la plus confiante est gardée.
 - Dans `lym_10`, le caractère « 2 » d'un SUVmax de 3,2 est proposé pour `history_bcl2_fish` avec une confiance de 0,792 et pour `history_bcl2_ihc` avec 0,415. La compétition garde le premier champ. L'exemple montre également que la contrainte ne corrige pas un empan cliniquement faux : elle choisit seulement entre deux affectations concurrentes.
 
-- Sur les douze modèles étudiés, la compétition aide les huit extracteurs d'empans et dégrade les quatre grands modèles. Le générateur produit déjà une réponse conjointe dans un JSON guidé ; lui appliquer ensuite une compétition entre valeurs est redondant.
+- Sur les dix systèmes enregistrés, la compétition aide les six systèmes extractifs non génératifs et dégrade les quatre LLM. Le générateur produit déjà une réponse conjointe dans un JSON guidé ; lui appliquer ensuite une compétition entre valeurs est redondant.
 - Pour le modèle publié, le décodage fait passer le value-$F_1$ d'environ 0,633 à 0,647, soit +0,014. Pour Qwen3.5-9B, il le fait passer d'environ 0,665 à 0,646, soit -0,019. Ces valeurs remplacent la table plus ancienne calculée sur un autre point de départ et un ancien run du LLM.
 - Le bootstrap apparié courant donne un gain de +0,0136 pour l'encodeur, avec un IC 95 % de [+0,0107 ; +0,0163], et une baisse de -0,0190 pour Qwen, avec un IC de [-0,0216 ; -0,0166]. Après décodage, la différence entre l'encodeur et Qwen est de +0,0007, avec un IC de [-0,0068 ; +0,0084]. Aucun modèle n'est supérieur de manière établie sur le value-$F_1$ final.
 - TAPDL résout lui-même les collisions de la référence selon une contrainte proche. Le décodeur et le gold sont donc co-conçus autour du même schéma. Ce choix est cohérent pour remplir ce formulaire, mais il ne démontre pas que la compétition est une propriété générale de l'extraction clinique.
@@ -236,7 +236,7 @@
 
 ![](../../plots/part_3/output/fig12_capstone.png)
 
-*Figure 12. APERÇU PROVISOIRE — Avant la compétition entre champs, Qwen3.5-9B devance l'encodeur de 150 M de 3,2 points. La contrainte aide l'extracteur et dégrade le générateur ; après son application, leur différence de value-$F_1$ est indétectable dans l'intervalle de confiance courant, encore à enregistrer dans `results.json`.*
+*Figure 12. APERÇU PROVISOIRE — Sur les dix systèmes enregistrés, Qwen3.5-9B devance l'encodeur de 150 M de 3,2 points avant la compétition entre champs. La contrainte aide les six systèmes extractifs non génératifs et dégrade les quatre LLM ; après son application, l'intervalle apparié courant de la différence principale recouvre zéro et reste à enregistrer dans `results.json`.*
 
 **Tableau 8 — La comparaison complète sépare le value-$F_1$ du span-$F_1$ et réserve l'inférence appariée à la comparaison principale.**
 
@@ -253,7 +253,7 @@
 | gliner-biomed, baseline publiée | environ 200 M | 0,382 | 0,397 | fenêtres glissantes |
 | QA extractif général | 150 M | 0,338 | 0,312 | — |
 
-- L'encodeur publié et Qwen3.5-9B sont à égalité dans le bruit sur le value-$F_1$, à 60 fois moins de paramètres pour l'encodeur. Le grand modèle conserve un meilleur span-$F_1$. Le mélange de données généralistes atteint 0,657 sans coût observé sur la tâche cible, mais il ne préserve qu'une partie de la capacité zéro-shot externe.
+- Dans l'intervalle apparié courant, encore provisoire, l'encodeur publié et Qwen3.5-9B ne sont pas distinguables sur le value-$F_1$, à 60 fois moins de paramètres pour l'encodeur. Le grand modèle conserve un meilleur span-$F_1$. Le mélange de données généralistes atteint 0,657 sans coût observé sur la tâche cible ; son effet sur la capacité zéro-shot externe n'est pas établi par un résultat enregistré.
 - La baseline `gliner-biomed` est évaluée par fenêtres glissantes afin de compenser son contexte de 2 048 tokens. Son score passe de 0,351 à 0,382 lorsque tout le dossier devient atteignable. L'écart restant porte donc principalement sur la discrimination des 89 champs.
 - Les résultats restent provisoires : le parquet GLiNER principal a été produit avec un seuil d'inférence de 0,1, et le run Qwen3.5-4B ne remplit que 71 des 89 champs.
 
@@ -312,7 +312,7 @@
 
 ## Conclusion de la partie
 
-- La supervision publique et générée permet à un encodeur de 150 M de s'approcher à 3,2 points d'un LLM de 9 B avant le décodage du formulaire. L'écart final devient indétectable après l'application des contraintes d'exclusivité propres à l'eCRF.
-- Le résultat vient de plusieurs éléments complémentaires : le texte public apporte un signal concentré sur certaines sections cliniques, MedEmbed améliore le transfert vers des descriptions nouvelles, la supervision synthétique adapte le modèle au formulaire et le décodage exploite la structure connue de sa sortie. Aucun de ces éléments n'explique seul la performance finale.
-- Le compromis reste net. Le grand modèle conserve un meilleur zéro-shot, de meilleures frontières, un meilleur liage au rôle et une meilleure calibration. La spécialisation du petit modèle réduit son ouverture, et la baseline publiée le dépasse largement sur le NER dense de FrACCO.
+- Dans le rescore courant, la supervision publique et générée permet à un encodeur de 150 M de s'approcher à 3,2 points d'un LLM de 9 B avant le décodage du formulaire. Après l'application des contraintes d'exclusivité propres à l'eCRF, l'intervalle apparié courant recouvre zéro ; cette égalité reste provisoire jusqu'à la confirmation des parquets GLiNER au seuil d'inférence 0,001 et à l'enregistrement de l'analyse.
+- Les analyses provisoires suggèrent plusieurs contributions complémentaires : le texte public semble apporter un signal concentré sur certaines sections cliniques et MedEmbed paraît améliorer le transfert vers des descriptions nouvelles ; la supervision synthétique adapte le modèle au formulaire et le décodage exploite la structure connue de sa sortie. Aucun de ces éléments n'explique seul la performance finale.
+- Le compromis reste net. Le grand modèle conserve un meilleur zéro-shot, de meilleures frontières, un meilleur liage au rôle et une meilleure calibration. L'analyse provisoire suggère que la spécialisation du petit modèle réduit son ouverture, et la baseline publiée le dépasse largement sur le NER dense de FrACCO.
 - Les expériences démontrent qu'un petit encodeur peut être compétitif sur un formulaire longitudinal synthétique avec une référence silver. Elles ne démontrent ni le transfert vers de vrais dossiers hospitaliers français, ni l'exactitude clinique contre une annotation humaine. Cette évaluation reste l'étape nécessaire avant tout déploiement.
