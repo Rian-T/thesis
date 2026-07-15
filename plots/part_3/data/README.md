@@ -32,6 +32,27 @@ Role-binding shares remain provisional until their prediction-level
 regeneration is recorded. Decoding deltas and paired bootstrap intervals remain
 provisional until they are registered in `research/lymphome/results.json`.
 
+## Chapter 7 capstone
+
+Figure 12 uses `chapter7/capstone_410doc.json`, reproduced by
+`chapter7/derive_capstone.py` from the exact current encoder and
+`Qwen3.5-9B-de1540v2` parquets plus `v5_test.jsonl`. The script imports the
+canonical `score_unified.py` functions, records input hashes and cross-fit
+thresholds, and checks final points by exact display/regime identity against
+`results.json`. Reproduce it with:
+
+```bash
+PYTHONPATH=. uv run --offline --python 3.12 --with pandas --with pyarrow \
+  python plots/part_3/data/chapter7/derive_capstone.py
+```
+
+The exact final span/value scores agree with the primary registry only at its
+four-decimal precision. The derived observations remain `provisional` because
+the registry lacks full-precision raw top-1 points and currently declares its
+results provisional. Existing paired intervals are manuscript leads, not
+prediction-artifact regenerations. Preview Figure 12 is therefore watermarked
+and final mode fails atomically.
+
 ## Stylometry primary artifacts
 
 The complete Jean Zay scoring provenance is tracked under `stylometry/`:

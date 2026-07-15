@@ -471,3 +471,56 @@ def test_chapter8_tradeoff_does_not_connect_unverified_checkpoint_identities():
         )
     finally:
         plt.close(fig)
+
+
+def test_chapter7_prepared_values_preserve_current_prediction_identity():
+    from plots.part_3 import plot_chapter7
+
+    data = plot_chapter7.prepare_capstone()
+
+    assert data.encoder.value == pytest.approx((0.6331050981187579, 0.6466740725330404))
+    assert data.qwen.value == pytest.approx((0.6650600379463285, 0.646012893119297))
+    assert data.encoder.final_span == pytest.approx(0.5074821907707991)
+    assert data.qwen.final_span == pytest.approx(0.5540968171691303)
+    assert data.raw_qwen_minus_encoder == pytest.approx(0.0319549398275706)
+    assert data.final_encoder_minus_qwen == pytest.approx(0.0006611794137434)
+    assert data.final_ci == pytest.approx((-0.0068, 0.0084))
+    assert data.provisional
+
+
+def test_chapter7_preview_builds_exact_outputs_and_marks_preliminary(tmp_path, monkeypatch):
+    from plots.part_3 import plot_chapter7
+
+    marked = []
+    monkeypatch.setattr(plot_chapter7, "mark_preliminary", lambda fig: marked.append(fig))
+    outputs = plot_chapter7.build(tmp_path, allow_provisional=True)
+
+    assert outputs == [tmp_path / "fig12_capstone.pdf", tmp_path / "fig12_capstone.png"]
+    assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
+    assert len(marked) == 1
+
+
+def test_chapter7_final_gate_fails_before_leaving_partial_outputs(tmp_path):
+    from plots.part_3 import plot_chapter7
+
+    with pytest.raises(ProvisionalDataError, match="Figure 12"):
+        plot_chapter7.build(tmp_path, allow_provisional=False)
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_chapter7_figure_is_native_width_with_legible_text():
+    from plots.part_3 import plot_chapter7
+
+    fig = plot_chapter7.make_preview_figure()
+    try:
+        assert fig.get_size_inches()[0] == pytest.approx(5.5)
+        visible_text = [
+            text for ax in fig.axes
+            for text in ([ax.title] + list(ax.texts) + list(ax.get_xticklabels()) + list(ax.get_yticklabels()))
+            if text.get_visible() and text.get_text()
+        ]
+        assert visible_text
+        assert min(text.get_fontsize() for text in visible_text) >= 7
+    finally:
+        plt.close(fig)

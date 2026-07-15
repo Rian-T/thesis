@@ -250,6 +250,28 @@
       }
     }
   },
+  "chapter7": {
+    "artifact_sha256": {
+      "plots/part_3/data/chapter7/derive_capstone.py": "f27ae71fc7e641eb2a7d7982297e7820d7b240a6b132f8c79903dbf6d0ee4fdc",
+      "plots/part_3/data/chapter7/capstone_410doc.json": "9afb42c7d312896bcbab8ad27b8479c00e718ec3c36deb9165a7b93fc7a53956"
+    },
+    "capstone": {
+      "encoder": {
+        "top1": {"value_f1": {"value": 0.6331050981187579, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1 value-F1, independently rescored from the exact prediction parquet."}},
+        "final": {
+          "value_f1": {"value": 0.6466740725330404, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1+competition value-F1; agrees with results.json at four decimals."},
+          "span_f1": {"value": 0.5074821907707991, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1+competition span-F1; agrees with results.json at four decimals."}
+        }
+      },
+      "qwen": {
+        "top1": {"value_f1": {"value": 0.6650600379463285, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1 value-F1 from de1540v2, never the obsolete lp410 output."}},
+        "final": {
+          "value_f1": {"value": 0.646012893119297, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1+competition value-F1 from de1540v2; agrees with results.json at four decimals."},
+          "span_f1": {"value": 0.5540968171691303, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1+competition span-F1 from de1540v2; agrees with results.json at four decimals."}
+        }
+      }
+    }
+  },
   "errors": {
     "role_binding_share": {
       "qwen_9b": {

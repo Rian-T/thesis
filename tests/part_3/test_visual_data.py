@@ -28,6 +28,10 @@ CHAPTER8_ARTIFACTS = {
     Path("plots/part_3/data/chapter8/scores_unified_410.json"):
         "dd003417b204155454372a502078caad8c79db879176c81f248be40497f555ed",
 }
+CHAPTER7_ARTIFACTS = {
+    Path("plots/part_3/data/chapter7/derive_capstone.py"),
+    Path("plots/part_3/data/chapter7/capstone_410doc.json"),
+}
 SECONDARY_ONLY_SOURCES = {
     "partie3_intra.md",
     "partie3_extra.md",
@@ -126,6 +130,40 @@ def test_chapter8_primary_artifact_contents_are_hash_locked():
     for artifact, expected_sha256 in CHAPTER8_ARTIFACTS.items():
         assert artifact.is_file(), artifact
         assert hashlib.sha256(artifact.read_bytes()).hexdigest() == expected_sha256
+
+
+def test_chapter7_artifacts_are_present_and_hash_locked_by_manifest():
+    payload = json.loads(DATA.read_text())
+    hashes = payload["chapter7"]["artifact_sha256"]
+    assert set(hashes) == {str(path) for path in CHAPTER7_ARTIFACTS}
+    for artifact in CHAPTER7_ARTIFACTS:
+        assert artifact.is_file()
+        assert hashlib.sha256(artifact.read_bytes()).hexdigest() == hashes[str(artifact)]
+
+
+def test_chapter7_observations_match_exact_derived_artifact_and_registry():
+    payload = json.loads(DATA.read_text())
+    chapter = payload["chapter7"]["capstone"]
+    derived_path = Path("plots/part_3/data/chapter7/capstone_410doc.json")
+    derived = json.loads(derived_path.read_text())
+    registry = json.loads(Path("research/lymphome/results.json").read_text())
+    expected = {
+        ("encoder", "top1", "value_f1"): 0.6331050981187579,
+        ("encoder", "final", "value_f1"): 0.6466740725330404,
+        ("qwen", "top1", "value_f1"): 0.6650600379463285,
+        ("qwen", "final", "value_f1"): 0.646012893119297,
+    }
+    for (model, variant, metric), value in expected.items():
+        observation = chapter[model][variant][metric]
+        assert observation["value"] == value == derived["systems"][model][variant][metric]
+        assert observation["status"] == "provisional"
+        assert observation["source"] == str(derived_path)
+        assert observation["n"] == derived["n_documents"] == 410
+    for model, display in {"encoder": "MC-bio-gliner (v3b)", "qwen": "Qwen3.5-9B"}.items():
+        matches = [row for row in registry["ecrf"].values() if row.get("display") == display and row.get("regime") == "capstone"]
+        assert len(matches) == 1
+        assert round(derived["systems"][model]["final"]["value_f1"], 4) == matches[0]["value"]
+        assert round(derived["systems"][model]["final"]["span_f1"], 4) == matches[0]["span"]
 
 
 def test_chapter8_ablation_uses_exact_200_document_intersection():

@@ -1,0 +1,84 @@
+{
+  "input_sha256": {
+    "encoder": "19aaffad4a29af7758103c7dc961a9f7e239331d8fc1542ab1d4514cbdb04826",
+    "gold": "f65ee070c2f70e7e213b9b6084963d5ec4b57547a3dbaffe4117a468251951aa",
+    "qwen": "832e372990467c385b3db58d869ea12072938f6567ca8ddb334eeba8a80e83c2",
+    "results_registry": "4288bc2dcd6c1e53c5b57740075eb8e51c15b5a82c650f97a2ffcb1c03b9621f",
+    "scorer": "863058884a52f23c84704d6883745dd5c2e0d73f749169fca1743bf404a4d836"
+  },
+  "n_documents": 410,
+  "schema": 1,
+  "scoring": "canonical score_unified.py; two-fold cross-fit thresholds",
+  "systems": {
+    "encoder": {
+      "final": {
+        "label": "top-1 + compete",
+        "span_f1": 0.5074821907707991,
+        "span_thresholds": [
+          0.5,
+          0.5
+        ],
+        "value_f1": 0.6466740725330404,
+        "value_thresholds": [
+          0.5,
+          0.5
+        ]
+      },
+      "registry_comparison": {
+        "display": "MC-bio-gliner (v3b)",
+        "exact_round4_match": true,
+        "regime": "capstone",
+        "registered_span_f1": 0.5075,
+        "registered_value_f1": 0.6467
+      },
+      "top1": {
+        "label": "top-1",
+        "span_f1": 0.49123774428037636,
+        "span_thresholds": [
+          0.6,
+          0.5
+        ],
+        "value_f1": 0.6331050981187579,
+        "value_thresholds": [
+          0.6,
+          0.5
+        ]
+      }
+    },
+    "qwen": {
+      "final": {
+        "label": "top-1 + compete",
+        "span_f1": 0.5540968171691303,
+        "span_thresholds": [
+          0.7,
+          0.7
+        ],
+        "value_f1": 0.646012893119297,
+        "value_thresholds": [
+          0.0,
+          0.5
+        ]
+      },
+      "registry_comparison": {
+        "display": "Qwen3.5-9B",
+        "exact_round4_match": true,
+        "regime": "capstone",
+        "registered_span_f1": 0.5541,
+        "registered_value_f1": 0.646
+      },
+      "top1": {
+        "label": "top-1",
+        "span_f1": 0.5587997517633125,
+        "span_thresholds": [
+          0.7,
+          0.7
+        ],
+        "value_f1": 0.6650600379463285,
+        "value_thresholds": [
+          0.7,
+          0.5
+        ]
+      }
+    }
+  }
+}
