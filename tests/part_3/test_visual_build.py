@@ -172,6 +172,43 @@ def test_save_figure_failure_cleans_outputs_and_closes(
     assert not plt.fignum_exists(figure_number)
 
 
+def test_save_figure_closes_when_output_directory_creation_fails(tmp_path):
+    output_file = tmp_path / "not-a-directory"
+    output_file.write_text("occupied")
+    fig = plt.figure()
+    figure_number = fig.number
+
+    with pytest.raises(FileExistsError):
+        save_figure(fig, "broken", output_file)
+
+    assert not plt.fignum_exists(figure_number)
+
+
+def test_save_figure_publication_failure_removes_both_outputs_and_closes(
+    tmp_path, monkeypatch
+):
+    fig = plt.figure()
+    figure_number = fig.number
+    original_replace = Path.replace
+    replacements = 0
+
+    def fail_second_replace(path, target):
+        nonlocal replacements
+        replacements += 1
+        if replacements == 2:
+            raise OSError("png publication failed")
+        return original_replace(path, target)
+
+    monkeypatch.setattr(Path, "replace", fail_second_replace)
+
+    with pytest.raises(OSError, match="png publication failed"):
+        save_figure(fig, "broken", tmp_path)
+
+    assert not (tmp_path / "broken.pdf").exists()
+    assert not (tmp_path / "broken.png").exists()
+    assert not plt.fignum_exists(figure_number)
+
+
 def test_build_all_calls_chapter_builders_and_prints_relative_paths(
     tmp_path, monkeypatch, capsys
 ):

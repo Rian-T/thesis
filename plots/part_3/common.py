@@ -99,10 +99,14 @@ def mark_preliminary(fig) -> None:
 def save_figure(
     fig, stem: str, output_dir: Path = DEFAULT_OUTPUT
 ) -> list[Path]:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    outputs = [output_dir / f"{stem}.pdf", output_dir / f"{stem}.png"]
+    outputs: list[Path] = []
     publishing_started = False
     try:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        outputs = [
+            output_dir / f"{stem}.pdf",
+            output_dir / f"{stem}.png",
+        ]
         with TemporaryDirectory(
             dir=output_dir, prefix=f".{stem}-"
         ) as temporary_dir:
