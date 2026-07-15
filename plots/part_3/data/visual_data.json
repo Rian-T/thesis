@@ -1,0 +1,285 @@
+{
+  "_meta": {
+    "schema": 1,
+    "created": "2026-07-15",
+    "final_requires_all_principal_registered": true
+  },
+  "stylometry": {
+    "mauve": {
+      "pmc_patients": {
+        "value": 0.040,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "synthetic_records": {
+        "value": 0.017,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "e3c": {
+        "value": 0.006,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      }
+    },
+    "fed": {
+      "pmc_patients": {
+        "value": 0.28,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "synthetic_records": {
+        "value": 0.35,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "e3c": {
+        "value": 0.74,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      }
+    },
+    "c2st": {
+      "pmc_patients": {
+        "value": 0.991,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "synthetic_records": {
+        "value": 0.988,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      },
+      "e3c": {
+        "value": 0.985,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:69-73",
+        "n": null,
+        "note": "Primary styleSOTA_1819572.out is not tracked; review render only."
+      }
+    }
+  },
+  "supervision": {
+    "tapdl": {
+      "raw_proposals": {
+        "value": 275544,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 16375,
+        "note": "Raw model extractions across all routed clinical reports."
+      },
+      "literal_misses": {
+        "value": 15868,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 16375,
+        "note": "Proposed spans not found literally in their clinical report."
+      },
+      "fuzzy_recoveries": {
+        "value": 7441,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 16375,
+        "note": "Literal misses recovered by approximate matching."
+      },
+      "raw_collisions": {
+        "value": 27491,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 16375,
+        "note": "Collisions resolved during deterministic assembly."
+      },
+      "final_spans": {
+        "value": 237194,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 2050,
+        "note": "Final gold spans across the complete synthetic cohort."
+      },
+      "fields": {
+        "value": 89,
+        "status": "registered",
+        "source": "research/lymphome/06_TAPDL.md:49-62",
+        "n": 2050,
+        "note": "All 89 form fields are covered."
+      }
+    },
+    "calibration": {
+      "qwen_9b": {
+        "aurc": {
+          "value": 0.228,
+          "status": "registered",
+          "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:93",
+          "n": 410,
+          "note": "AURC; lower is better; true token log-probabilities."
+        },
+        "precision_at_50_percent_coverage": {
+          "value": 0.813,
+          "status": "registered",
+          "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:93",
+          "n": 410,
+          "note": "Precision after retaining the most-confident 50 percent."
+        }
+      },
+      "encoder_150m": {
+        "aurc": {
+          "value": 0.313,
+          "status": "registered",
+          "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:94",
+          "n": 410,
+          "note": "AURC; lower is better."
+        },
+        "precision_at_50_percent_coverage": {
+          "value": 0.667,
+          "status": "registered",
+          "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:94",
+          "n": 410,
+          "note": "Precision after retaining the most-confident 50 percent."
+        }
+      }
+    }
+  },
+  "novel_types": {},
+  "decoding": {
+    "encoder_150m": {
+      "delta": {
+        "value": 0.0136,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Paired bootstrap value-F1 change after structural decoding; pending registration in results.json."
+      },
+      "ci95_low": {
+        "value": 0.0107,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Lower endpoint of the paired 95 percent bootstrap interval."
+      },
+      "ci95_high": {
+        "value": 0.0163,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Upper endpoint of the paired 95 percent bootstrap interval."
+      }
+    },
+    "qwen_9b": {
+      "delta": {
+        "value": -0.0190,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Paired bootstrap value-F1 change after structural decoding; pending registration in results.json."
+      },
+      "ci95_low": {
+        "value": -0.0216,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Lower endpoint of the paired 95 percent bootstrap interval."
+      },
+      "ci95_high": {
+        "value": -0.0166,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Upper endpoint of the paired 95 percent bootstrap interval."
+      }
+    },
+    "post_decoding_encoder_minus_qwen": {
+      "delta": {
+        "value": 0.0007,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Paired post-decoding value-F1 difference; pending registration in results.json."
+      },
+      "ci95_low": {
+        "value": -0.0068,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Lower endpoint of the paired 95 percent bootstrap interval."
+      },
+      "ci95_high": {
+        "value": 0.0084,
+        "status": "provisional",
+        "source": "research/lymphome/PARTIE3_INTRA.md:164",
+        "n": 410,
+        "note": "Upper endpoint of the paired 95 percent bootstrap interval."
+      }
+    }
+  },
+  "errors": {
+    "role_binding_share": {
+      "qwen_9b": {
+        "value": 0.405,
+        "status": "provisional",
+        "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:86",
+        "n": null,
+        "note": "Share of errors assigned to the wrong field; prediction-level regeneration not yet recorded."
+      },
+      "encoder_150m": {
+        "value": 0.605,
+        "status": "provisional",
+        "source": "research/lymphome/02_CHIFFRES_CANONIQUES.md:86",
+        "n": null,
+        "note": "Share of errors assigned to the wrong field; prediction-level regeneration not yet recorded."
+      }
+    }
+  },
+  "data_efficiency": {
+    "train_10": {
+      "value": 0.182,
+      "status": "registered",
+      "source": "research/lymphome/07_RESULTATS.md:198; research/lymphome/data/preds_lym_lym-dataeff-10-de10.parquet",
+      "n": 410,
+      "note": "Value-micro-F1 from 10 synthetic training records."
+    },
+    "train_50": {
+      "value": 0.485,
+      "status": "registered",
+      "source": "research/lymphome/07_RESULTATS.md:199; research/lymphome/data/preds_lym_lym-dataeff-50-de50.parquet",
+      "n": 410,
+      "note": "Value-micro-F1 from 50 synthetic training records."
+    },
+    "train_100": {
+      "value": 0.544,
+      "status": "registered",
+      "source": "research/lymphome/07_RESULTATS.md:200; research/lymphome/data/preds_lym_lym-dataeff-100-de100.parquet",
+      "n": 410,
+      "note": "Value-micro-F1 from 100 synthetic training records."
+    },
+    "train_500": {
+      "value": 0.603,
+      "status": "registered",
+      "source": "research/lymphome/07_RESULTATS.md:201; research/lymphome/data/preds_lym_lym-dataeff-500-de500.parquet",
+      "n": 410,
+      "note": "Value-micro-F1 from 500 synthetic training records."
+    },
+    "train_1540": {
+      "value": 0.659,
+      "status": "registered",
+      "source": "research/lymphome/07_RESULTATS.md:202; research/lymphome/data/preds_lym_lym-dataeff-1540-de1540.parquet",
+      "n": 410,
+      "note": "Value-micro-F1 from 1540 synthetic training records."
+    }
+  }
+}
