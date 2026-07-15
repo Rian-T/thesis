@@ -362,3 +362,112 @@ def test_chapter9_final_build_accepts_registered_stylometry(
     ]
     assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
     assert preliminary_calls == []
+
+
+def test_chapter8_preview_builds_exact_six_outputs(tmp_path):
+    from plots.part_3 import plot_chapter8
+
+    outputs = plot_chapter8.build(tmp_path, allow_provisional=True)
+
+    assert [path.name for path in outputs] == [
+        "fig08_supervision_signal.pdf",
+        "fig08_supervision_signal.png",
+        "fig09_novel_types.pdf",
+        "fig09_novel_types.png",
+        "fig10_specialization_tradeoff.pdf",
+        "fig10_specialization_tradeoff.png",
+    ]
+    assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
+
+
+def test_chapter8_final_gate_fails_before_leaving_partial_outputs(tmp_path):
+    from plots.part_3 import plot_chapter8
+
+    with pytest.raises(ProvisionalDataError, match="Chapter 8"):
+        plot_chapter8.build(tmp_path, allow_provisional=False)
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_chapter8_preview_marks_every_provisional_figure(
+    tmp_path, monkeypatch
+):
+    from plots.part_3 import plot_chapter8
+
+    marked = []
+    monkeypatch.setattr(
+        plot_chapter8,
+        "mark_preliminary",
+        lambda fig: marked.append(fig),
+    )
+
+    plot_chapter8.build(tmp_path, allow_provisional=True)
+
+    assert len(marked) == 3
+
+
+def test_chapter8_figures_are_native_width_with_legible_text():
+    from plots.part_3 import plot_chapter8
+
+    figures = plot_chapter8.make_preview_figures()
+    try:
+        assert len(figures) == 3
+        for fig in figures:
+            assert fig.get_size_inches()[0] == pytest.approx(5.5)
+            visible_text = [
+                text
+                for ax in fig.axes
+                for text in (
+                    [ax.title]
+                    + list(ax.texts)
+                    + list(ax.get_xticklabels())
+                    + list(ax.get_yticklabels())
+                )
+                if text.get_visible() and text.get_text()
+            ]
+            assert visible_text
+            assert min(text.get_fontsize() for text in visible_text) >= 7
+    finally:
+        for fig in figures:
+            plt.close(fig)
+
+
+def test_chapter8_prepared_values_preserve_metric_identity():
+    from plots.part_3 import plot_chapter8
+
+    supervision, novel_types, tradeoff = plot_chapter8.prepare_data()
+
+    assert supervision.global_values == pytest.approx(
+        (0.2051978175393421, 0.18263769421845683, 0.17001348588753293)
+    )
+    assert supervision.n_documents == 200
+    assert novel_types.metric == "LLM-judge MAP"
+    assert novel_types.medembed == pytest.approx((0.517, 0.382))
+    assert novel_types.mcbio == pytest.approx((0.478, 0.333))
+    points = {
+        point.label: (point.ecrf, point.parhaf, point.kind)
+        for point in tradeoff.points
+    }
+    assert points["v3b généraliste"][:2] == pytest.approx((0.2241, 0.2577))
+    assert points["FROMV3B spécialiste"][:2] == pytest.approx((0.6467, 0.0179))
+    assert points["v3e généraliste"][:2] == pytest.approx((0.1832, 0.1598))
+    assert points["MIX6 spécialiste"][:2] == pytest.approx((0.6574, 0.1531))
+    assert {value[2] for value in points.values()} == {
+        "généraliste",
+        "spécialisé",
+    }
+
+
+def test_chapter8_tradeoff_does_not_connect_unverified_checkpoint_identities():
+    from plots.part_3 import plot_chapter8
+
+    _supervision, _novel_types, tradeoff = plot_chapter8.prepare_data()
+    fig = plot_chapter8._make_tradeoff_figure(tradeoff)
+    try:
+        ax = fig.axes[0]
+        assert len(ax.lines) == 0
+        assert all(
+            getattr(text, "arrow_patch", None) is None for text in ax.texts
+        )
+    finally:
+        plt.close(fig)

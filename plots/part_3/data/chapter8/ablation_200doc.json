@@ -1,0 +1,192 @@
+{
+  "document_ids_sha256": "cad7430964a82fa03420d60722a18d416b513ec5c8d11b5a272cce4192ccd056",
+  "global": {
+    "biomed_matched": {
+      "crossfit_thresholds": [
+        0.0,
+        0.0
+      ],
+      "value_f1": 0.17001348588753293
+    },
+    "full": {
+      "crossfit_thresholds": [
+        0.2,
+        0.2
+      ],
+      "value_f1": 0.2051978175393421
+    },
+    "no_clinical": {
+      "crossfit_thresholds": [
+        0.0,
+        0.0
+      ],
+      "value_f1": 0.18263769421845683
+    }
+  },
+  "inputs": {
+    "gold": {
+      "path": "research/lymphome/data/v5_test.jsonl",
+      "sha256": "f65ee070c2f70e7e213b9b6084963d5ec4b57547a3dbaffe4117a468251951aa"
+    },
+    "predictions": {
+      "biomed_matched": {
+        "path": "research/lymphome/data/preds_lym_v3e-biomedmatched-ab20.parquet",
+        "sha256": "0d45f3262e17cd0eff975ba8e6379869bcc114d3e544dd6f678f0e0e7170ab07"
+      },
+      "full": {
+        "path": "research/lymphome/data/preds_lym_v3e-ab20.parquet",
+        "sha256": "1479c141cbe3f407c91f24aeea57d91c4d8ca844b8adfa81ffa69d4a9f1727b3"
+      },
+      "no_clinical": {
+        "path": "research/lymphome/data/preds_lym_v3e-biomedonly-ab20.parquet",
+        "sha256": "f3e9abd71c29c6ac6d6cdc5de72e199262dd60242d9d2173f4e84ce73a00c4b5"
+      }
+    },
+    "scorer": {
+      "path": "research/lymphome/score_unified.py",
+      "sha256": "863058884a52f23c84704d6883745dd5c2e0d73f749169fca1743bf404a4d836"
+    }
+  },
+  "method": "Canonical top1 plus two-fold cross-fit thresholds on the exact shared 200-document prediction intersection; section scores use the corresponding global model threshold in each report fold.",
+  "metric": "value-micro-F1",
+  "n_documents": 200,
+  "schema": 1,
+  "sections": {
+    "antecedents": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 1290,
+          "value_f1": 0.1167299349240781
+        },
+        "full": {
+          "n_raw_candidate_rows": 1255,
+          "value_f1": 0.14231840582815514
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 1582,
+          "value_f1": 0.13669838803651196
+        }
+      },
+      "n_gold_cells": 434
+    },
+    "demography": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 11939,
+          "value_f1": 0.1855389628544159
+        },
+        "full": {
+          "n_raw_candidate_rows": 2727,
+          "value_f1": 0.39504525571542554
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 11861,
+          "value_f1": 0.2914242786146319
+        }
+      },
+      "n_gold_cells": 839
+    },
+    "first": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 345,
+          "value_f1": 0.006392125228472528
+        },
+        "full": {
+          "n_raw_candidate_rows": 6259,
+          "value_f1": 0.21091994700412078
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 3,
+          "value_f1": 0.0
+        }
+      },
+      "n_gold_cells": 1680
+    },
+    "history": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 47339,
+          "value_f1": 0.23034769472437863
+        },
+        "full": {
+          "n_raw_candidate_rows": 8999,
+          "value_f1": 0.24176166773710123
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 42487,
+          "value_f1": 0.22799939886172127
+        }
+      },
+      "n_gold_cells": 3793
+    },
+    "imaging": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 9767,
+          "value_f1": 0.16601886366952762
+        },
+        "full": {
+          "n_raw_candidate_rows": 7864,
+          "value_f1": 0.1063135559292177
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 9567,
+          "value_f1": 0.1424126599389377
+        }
+      },
+      "n_gold_cells": 712
+    },
+    "news": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 243,
+          "value_f1": 0.04301257435434079
+        },
+        "full": {
+          "n_raw_candidate_rows": 1293,
+          "value_f1": 0.10573931700339712
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 1,
+          "value_f1": 0.0
+        }
+      },
+      "n_gold_cells": 322
+    },
+    "other": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 108,
+          "value_f1": 0.026200135226504398
+        },
+        "full": {
+          "n_raw_candidate_rows": 937,
+          "value_f1": 0.015503875968992248
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 209,
+          "value_f1": 0.0
+        }
+      },
+      "n_gold_cells": 86
+    },
+    "second": {
+      "models": {
+        "biomed_matched": {
+          "n_raw_candidate_rows": 295,
+          "value_f1": 0.0
+        },
+        "full": {
+          "n_raw_candidate_rows": 4842,
+          "value_f1": 0.049692622950819665
+        },
+        "no_clinical": {
+          "n_raw_candidate_rows": 0,
+          "value_f1": 0.0
+        }
+      },
+      "n_gold_cells": 360
+    }
+  }
+}

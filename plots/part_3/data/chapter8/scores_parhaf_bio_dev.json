@@ -1,0 +1,188 @@
+[
+  {
+    "model": "g2-bce-3ep-e1",
+    "variant": "ner",
+    "span": 0.2476,
+    "value": 0.2288
+  },
+  {
+    "model": "g2-bce-3ep-e2",
+    "variant": "ner",
+    "span": 0.2937,
+    "value": 0.3238
+  },
+  {
+    "model": "g2-focal-3ep-e1",
+    "variant": "ner",
+    "span": 0.4167,
+    "value": 0.3863
+  },
+  {
+    "model": "g2-focal-3ep-e2",
+    "variant": "ner",
+    "span": 0.3399,
+    "value": 0.331
+  },
+  {
+    "model": "gliner-biomed",
+    "variant": "ner",
+    "span": 0.4704,
+    "value": 0.468
+  },
+  {
+    "model": "gliner-biomed-parhafft",
+    "variant": "ner",
+    "span": 0.7478,
+    "value": 0.5731
+  },
+  {
+    "model": "llm_qwen3.5-0.8b-parhafbiozs.parquet",
+    "variant": "ner",
+    "span": 0.1749,
+    "value": 0.1285
+  },
+  {
+    "model": "llm_qwen3.5-2b",
+    "variant": "ner",
+    "span": 0.7631,
+    "value": 0.7401
+  },
+  {
+    "model": "llm_qwen3.5-2b-parhafbiozs.parquet",
+    "variant": "ner",
+    "span": 0.0,
+    "value": 0.0
+  },
+  {
+    "model": "llm_qwen3.5-4b-parhafbiozs.parquet",
+    "variant": "ner",
+    "span": 0.7566,
+    "value": 0.466
+  },
+  {
+    "model": "llm_qwen3.5-9b",
+    "variant": "ner",
+    "span": 0.7405,
+    "value": 0.7255
+  },
+  {
+    "model": "llm_qwen3.5-9b-parhafbiozs.parquet",
+    "variant": "ner",
+    "span": 0.7677,
+    "value": 0.5947
+  },
+  {
+    "model": "lym-V5FROMV3B",
+    "variant": "ner",
+    "span": 0.0595,
+    "value": 0.0179
+  },
+  {
+    "model": "lym-V5MIX",
+    "variant": "ner",
+    "span": 0.0472,
+    "value": 0.0836
+  },
+  {
+    "model": "lym-V5MIX6",
+    "variant": "ner",
+    "span": 0.1973,
+    "value": 0.1531
+  },
+  {
+    "model": "lym-V5base",
+    "variant": "ner",
+    "span": 0.0,
+    "value": 0.0
+  },
+  {
+    "model": "parhaf-bio-v3b",
+    "variant": "ner",
+    "span": 0.6998,
+    "value": 0.6923
+  },
+  {
+    "model": "parhaf-bio-v3e",
+    "variant": "ner",
+    "span": 0.665,
+    "value": 0.6545
+  },
+  {
+    "model": "parhaf-bio-v3f",
+    "variant": "ner",
+    "span": 0.725,
+    "value": 0.6953
+  },
+  {
+    "model": "qa_mcamembert-bio",
+    "variant": "ner",
+    "span": 0.2024,
+    "value": 0.1349
+  },
+  {
+    "model": "qa_mcamembert",
+    "variant": "ner",
+    "span": 0.1965,
+    "value": 0.1176
+  },
+  {
+    "model": "v1-focal-s14810",
+    "variant": "ner",
+    "span": 0.5804,
+    "value": 0.4511
+  },
+  {
+    "model": "v1-focal-s7405",
+    "variant": "ner",
+    "span": 0.5612,
+    "value": 0.5003
+  },
+  {
+    "model": "v3b-focal",
+    "variant": "ner",
+    "span": 0.3233,
+    "value": 0.3309
+  },
+  {
+    "model": "v3b-mw24",
+    "variant": "ner",
+    "span": 0.2639,
+    "value": 0.2439
+  },
+  {
+    "model": "v3b-pristine",
+    "variant": "ner",
+    "span": 0.2476,
+    "value": 0.2577
+  },
+  {
+    "model": "v3d",
+    "variant": "ner",
+    "span": 0.3223,
+    "value": 0.2847
+  },
+  {
+    "model": "v3e-large",
+    "variant": "ner",
+    "span": 0.0,
+    "value": 0.0
+  },
+  {
+    "model": "v3e",
+    "variant": "ner",
+    "span": 0.1851,
+    "value": 0.1598
+  },
+  {
+    "model": "v3f-bricole",
+    "variant": "ner",
+    "span": 0.0831,
+    "value": 0.0768
+  },
+  {
+    "model": "v3f-pristine",
+    "variant": "ner",
+    "span": 0.2942,
+    "value": 0.2462
+  }
+]

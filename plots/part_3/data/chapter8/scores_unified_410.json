@@ -1,0 +1,650 @@
+[
+  {
+    "model": "GLiNER-150M",
+    "variant": "top-1",
+    "span": 0.4883,
+    "value": 0.6276
+  },
+  {
+    "model": "GLiNER-150M",
+    "variant": "top-1 + compete",
+    "span": 0.512,
+    "value": 0.6511
+  },
+  {
+    "model": "GLiNER-400M",
+    "variant": "top-1",
+    "span": 0.4886,
+    "value": 0.6206
+  },
+  {
+    "model": "GLiNER-400M",
+    "variant": "top-1 + compete",
+    "span": 0.507,
+    "value": 0.6357
+  },
+  {
+    "model": "GLiNER-150M-mcbio",
+    "variant": "top-1",
+    "span": 0.4686,
+    "value": 0.602
+  },
+  {
+    "model": "GLiNER-150M-mcbio",
+    "variant": "top-1 + compete",
+    "span": 0.4939,
+    "value": 0.6283
+  },
+  {
+    "model": "GLiNER-150M (v3b)",
+    "variant": "top-1",
+    "span": 0.4912,
+    "value": 0.6331
+  },
+  {
+    "model": "GLiNER-150M (v3b)",
+    "variant": "top-1 + compete",
+    "span": 0.5075,
+    "value": 0.6467
+  },
+  {
+    "model": "GLiNER-150M (MIX6)",
+    "variant": "top-1",
+    "span": 0.4955,
+    "value": 0.6498
+  },
+  {
+    "model": "GLiNER-150M (MIX6)",
+    "variant": "top-1 + compete",
+    "span": 0.5073,
+    "value": 0.6574
+  },
+  {
+    "model": "GLiNER-150M (v3f)",
+    "variant": "top-1",
+    "span": 0.4911,
+    "value": 0.6365
+  },
+  {
+    "model": "GLiNER-150M (v3f)",
+    "variant": "top-1 + compete",
+    "span": 0.5058,
+    "value": 0.6457
+  },
+  {
+    "model": "Qwen-0.8B",
+    "variant": "top-1",
+    "span": 0.4927,
+    "value": 0.5857
+  },
+  {
+    "model": "Qwen-0.8B",
+    "variant": "top-1 + compete",
+    "span": 0.4848,
+    "value": 0.5656
+  },
+  {
+    "model": "Qwen-2B",
+    "variant": "top-1",
+    "span": 0.5035,
+    "value": 0.5959
+  },
+  {
+    "model": "Qwen-2B",
+    "variant": "top-1 + compete",
+    "span": 0.4951,
+    "value": 0.5753
+  },
+  {
+    "model": "Qwen-4B",
+    "variant": "top-1",
+    "span": 0.4792,
+    "value": 0.5572
+  },
+  {
+    "model": "Qwen-4B",
+    "variant": "top-1 + compete",
+    "span": 0.4731,
+    "value": 0.5416
+  },
+  {
+    "model": "Qwen-9B",
+    "variant": "top-1",
+    "span": 0.5315,
+    "value": 0.6409
+  },
+  {
+    "model": "Qwen-9B",
+    "variant": "top-1 + compete",
+    "span": 0.526,
+    "value": 0.6199
+  },
+  {
+    "model": "QA-bio",
+    "variant": "top-1",
+    "span": 0.3115,
+    "value": 0.3607
+  },
+  {
+    "model": "QA-bio",
+    "variant": "top-1 + compete",
+    "span": 0.3639,
+    "value": 0.419
+  },
+  {
+    "model": "QA",
+    "variant": "top-1",
+    "span": 0.2676,
+    "value": 0.29
+  },
+  {
+    "model": "QA",
+    "variant": "top-1 + compete",
+    "span": 0.3118,
+    "value": 0.3383
+  },
+  {
+    "model": "gliner-biomed (zs)",
+    "variant": "top-1",
+    "span": 0.2353,
+    "value": 0.2957
+  },
+  {
+    "model": "gliner-biomed (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.2339,
+    "value": 0.2881
+  },
+  {
+    "model": "gliner-biomed (ft)",
+    "variant": "top-1",
+    "span": 0.3432,
+    "value": 0.3367
+  },
+  {
+    "model": "gliner-biomed (ft)",
+    "variant": "top-1 + compete",
+    "span": 0.3531,
+    "value": 0.3507
+  },
+  {
+    "model": "gliner-biomed (ft, chunk)",
+    "variant": "top-1",
+    "span": 0.3864,
+    "value": 0.3673
+  },
+  {
+    "model": "gliner-biomed (ft, chunk)",
+    "variant": "top-1 + compete",
+    "span": 0.3971,
+    "value": 0.3818
+  },
+  {
+    "model": "v3b (zs)",
+    "variant": "top-1",
+    "span": 0.2027,
+    "value": 0.2521
+  },
+  {
+    "model": "v3b (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.1839,
+    "value": 0.2241
+  },
+  {
+    "model": "v3d (zs)",
+    "variant": "top-1",
+    "span": 0.1701,
+    "value": 0.2105
+  },
+  {
+    "model": "v3d (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.1745,
+    "value": 0.216
+  },
+  {
+    "model": "v3e (zs)",
+    "variant": "top-1",
+    "span": 0.1197,
+    "value": 0.1977
+  },
+  {
+    "model": "v3e (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.1169,
+    "value": 0.1832
+  },
+  {
+    "model": "v3f (zs)",
+    "variant": "top-1",
+    "span": 0.1536,
+    "value": 0.1924
+  },
+  {
+    "model": "v3f (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.1542,
+    "value": 0.1918
+  },
+  {
+    "model": "Qwen-9B (zs)",
+    "variant": "top-1",
+    "span": 0.3764,
+    "value": 0.4515
+  },
+  {
+    "model": "Qwen-9B (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.3647,
+    "value": 0.4306
+  },
+  {
+    "model": "Qwen-27B (zs)",
+    "variant": "top-1",
+    "span": 0.471,
+    "value": 0.5222
+  },
+  {
+    "model": "Qwen-27B (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.4579,
+    "value": 0.4997
+  },
+  {
+    "model": "Qwen-0.8B (zs)",
+    "variant": "top-1",
+    "span": 0.2106,
+    "value": 0.2779
+  },
+  {
+    "model": "Qwen-0.8B (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.2221,
+    "value": 0.2801
+  },
+  {
+    "model": "Qwen-2B (zs)",
+    "variant": "top-1",
+    "span": 0.289,
+    "value": 0.3964
+  },
+  {
+    "model": "Qwen-2B (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.2871,
+    "value": 0.3789
+  },
+  {
+    "model": "Qwen-4B (zs)",
+    "variant": "top-1",
+    "span": 0.3716,
+    "value": 0.4569
+  },
+  {
+    "model": "Qwen-4B (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.3599,
+    "value": 0.4388
+  },
+  {
+    "model": "v3e-large (zs)",
+    "variant": "top-1",
+    "span": 0.1843,
+    "value": 0.2583
+  },
+  {
+    "model": "v3e-large (zs)",
+    "variant": "top-1 + compete",
+    "span": 0.1873,
+    "value": 0.2585
+  },
+  {
+    "model": "v3b (ft)",
+    "variant": "top-1",
+    "span": 0.3845,
+    "value": 0.4149
+  },
+  {
+    "model": "v3b (ft)",
+    "variant": "top-1 + compete",
+    "span": 0.3959,
+    "value": 0.4276
+  },
+  {
+    "model": "v3d (ft)",
+    "variant": "top-1",
+    "span": 0.3857,
+    "value": 0.4161
+  },
+  {
+    "model": "v3d (ft)",
+    "variant": "top-1 + compete",
+    "span": 0.4035,
+    "value": 0.4291
+  },
+  {
+    "model": "v3e (ft)",
+    "variant": "top-1",
+    "span": 0.3807,
+    "value": 0.4159
+  },
+  {
+    "model": "v3e (ft)",
+    "variant": "top-1 + compete",
+    "span": 0.396,
+    "value": 0.428
+  },
+  {
+    "model": "v3e-large (ft)",
+    "variant": "top-1",
+    "span": 0.3867,
+    "value": 0.416
+  },
+  {
+    "model": "v3e-large (ft)",
+    "variant": "top-1 + compete",
+    "span": 0.3986,
+    "value": 0.4288
+  },
+  {
+    "model": "mw24-base",
+    "variant": "top-1",
+    "span": 0.2855,
+    "value": 0.2691
+  },
+  {
+    "model": "mw24-base",
+    "variant": "top-1 + compete",
+    "span": 0.2784,
+    "value": 0.2609
+  },
+  {
+    "model": "mw24-v3f",
+    "variant": "top-1",
+    "span": 0.214,
+    "value": 0.2107
+  },
+  {
+    "model": "mw24-v3f",
+    "variant": "top-1 + compete",
+    "span": 0.2084,
+    "value": 0.2056
+  },
+  {
+    "model": "mw24-v3fp",
+    "variant": "top-1",
+    "span": 0.2328,
+    "value": 0.2183
+  },
+  {
+    "model": "mw24-v3fp",
+    "variant": "top-1 + compete",
+    "span": 0.2183,
+    "value": 0.2046
+  },
+  {
+    "model": "mw24-large",
+    "variant": "top-1",
+    "span": 0.4055,
+    "value": 0.3776
+  },
+  {
+    "model": "mw24-large",
+    "variant": "top-1 + compete",
+    "span": 0.4074,
+    "value": 0.3766
+  },
+  {
+    "model": "ABL full",
+    "variant": "top-1",
+    "span": 0.0856,
+    "value": 0.1383
+  },
+  {
+    "model": "ABL full",
+    "variant": "top-1 + compete",
+    "span": 0.0749,
+    "value": 0.1165
+  },
+  {
+    "model": "ABL biomed-only",
+    "variant": "top-1",
+    "span": 0.0863,
+    "value": 0.1169
+  },
+  {
+    "model": "ABL biomed-only",
+    "variant": "top-1 + compete",
+    "span": 0.0835,
+    "value": 0.1125
+  },
+  {
+    "model": "ABL biomed-match",
+    "variant": "top-1",
+    "span": 0.0817,
+    "value": 0.1102
+  },
+  {
+    "model": "ABL biomed-match",
+    "variant": "top-1 + compete",
+    "span": 0.0727,
+    "value": 0.0982
+  },
+  {
+    "model": "QA de10",
+    "variant": "top-1",
+    "span": 0.0098,
+    "value": 0.0045
+  },
+  {
+    "model": "QA de10",
+    "variant": "top-1 + compete",
+    "span": 0.0021,
+    "value": 0.0009
+  },
+  {
+    "model": "QA de20",
+    "variant": "top-1",
+    "span": 0.0118,
+    "value": 0.0149
+  },
+  {
+    "model": "QA de20",
+    "variant": "top-1 + compete",
+    "span": 0.0065,
+    "value": 0.0081
+  },
+  {
+    "model": "QA de50",
+    "variant": "top-1",
+    "span": 0.0365,
+    "value": 0.0493
+  },
+  {
+    "model": "QA de50",
+    "variant": "top-1 + compete",
+    "span": 0.0537,
+    "value": 0.0683
+  },
+  {
+    "model": "QA de100",
+    "variant": "top-1",
+    "span": 0.0361,
+    "value": 0.0463
+  },
+  {
+    "model": "QA de100",
+    "variant": "top-1 + compete",
+    "span": 0.0358,
+    "value": 0.0431
+  },
+  {
+    "model": "QA de500",
+    "variant": "top-1",
+    "span": 0.3013,
+    "value": 0.3473
+  },
+  {
+    "model": "QA de500",
+    "variant": "top-1 + compete",
+    "span": 0.332,
+    "value": 0.3819
+  },
+  {
+    "model": "QA de1540",
+    "variant": "top-1",
+    "span": 0.3061,
+    "value": 0.3542
+  },
+  {
+    "model": "QA de1540",
+    "variant": "top-1 + compete",
+    "span": 0.3604,
+    "value": 0.4134
+  },
+  {
+    "model": "GLiNER de20",
+    "variant": "top-1",
+    "span": 0.1207,
+    "value": 0.1969
+  },
+  {
+    "model": "GLiNER de20",
+    "variant": "top-1 + compete",
+    "span": 0.1176,
+    "value": 0.1821
+  },
+  {
+    "model": "GLiNER de10 p8",
+    "variant": "top-1",
+    "span": 0.1681,
+    "value": 0.2754
+  },
+  {
+    "model": "GLiNER de10 p8",
+    "variant": "top-1 + compete",
+    "span": 0.1596,
+    "value": 0.2582
+  },
+  {
+    "model": "GLiNER de20 p8",
+    "variant": "top-1",
+    "span": 0.2716,
+    "value": 0.4014
+  },
+  {
+    "model": "GLiNER de20 p8",
+    "variant": "top-1 + compete",
+    "span": 0.3048,
+    "value": 0.438
+  },
+  {
+    "model": "LLM de10 v2",
+    "variant": "top-1",
+    "span": 0.5008,
+    "value": 0.5799
+  },
+  {
+    "model": "LLM de10 v2",
+    "variant": "top-1 + compete",
+    "span": 0.4988,
+    "value": 0.5658
+  },
+  {
+    "model": "LLM de20 v2",
+    "variant": "top-1",
+    "span": 0.5133,
+    "value": 0.597
+  },
+  {
+    "model": "LLM de20 v2",
+    "variant": "top-1 + compete",
+    "span": 0.5098,
+    "value": 0.5809
+  },
+  {
+    "model": "LLM de50 v2",
+    "variant": "top-1",
+    "span": 0.5136,
+    "value": 0.6157
+  },
+  {
+    "model": "LLM de50 v2",
+    "variant": "top-1 + compete",
+    "span": 0.5118,
+    "value": 0.6024
+  },
+  {
+    "model": "LLM de100 v2",
+    "variant": "top-1",
+    "span": 0.5487,
+    "value": 0.6428
+  },
+  {
+    "model": "LLM de100 v2",
+    "variant": "top-1 + compete",
+    "span": 0.5477,
+    "value": 0.6288
+  },
+  {
+    "model": "LLM de500 v2",
+    "variant": "top-1",
+    "span": 0.5494,
+    "value": 0.6561
+  },
+  {
+    "model": "LLM de500 v2",
+    "variant": "top-1 + compete",
+    "span": 0.5458,
+    "value": 0.6373
+  },
+  {
+    "model": "LLM de10",
+    "variant": "top-1",
+    "span": 0.376,
+    "value": 0.4499
+  },
+  {
+    "model": "LLM de10",
+    "variant": "top-1 + compete",
+    "span": 0.364,
+    "value": 0.4298
+  },
+  {
+    "model": "LLM de20",
+    "variant": "top-1",
+    "span": 0.3756,
+    "value": 0.4511
+  },
+  {
+    "model": "LLM de20",
+    "variant": "top-1 + compete",
+    "span": 0.3643,
+    "value": 0.4323
+  },
+  {
+    "model": "LLM de50",
+    "variant": "top-1",
+    "span": 0.3762,
+    "value": 0.4503
+  },
+  {
+    "model": "LLM de50",
+    "variant": "top-1 + compete",
+    "span": 0.3642,
+    "value": 0.4303
+  },
+  {
+    "model": "gliner-biomed (zs, chunk)",
+    "variant": "top-1",
+    "span": 0.2654,
+    "value": 0.3389
+  },
+  {
+    "model": "gliner-biomed (zs, chunk)",
+    "variant": "top-1 + compete",
+    "span": 0.2598,
+    "value": 0.3235
+  }
+]
