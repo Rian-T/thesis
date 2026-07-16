@@ -3,61 +3,76 @@
   \providecommand{\envsub}[1]{{\tiny\textcolor{ThesisNeutral}{#1}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily, text=ThesisInk,
-    box/.style={rounded corners=2pt, align=center, inner sep=5pt, text=ThesisInk},
-    model/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
-      text width=2.4cm, minimum height=1.05cm},
-    stage/.style={box, draw=ThesisNeutral!50, fill=white, text width=3.3cm},
-    truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=2.7cm},
-    act/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22, text width=2.7cm},
+    box/.style={rounded corners=2pt, align=center, inner sep=4pt, text=ThesisInk},
+    agent/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
+      text width=2.3cm, minimum height=1.0cm, line width=0.9pt},
+    item/.style={box, draw=ThesisNeutral!45, fill=white, text width=2.5cm,
+      minimum height=0.62cm, font=\scriptsize\sffamily},
+    crit/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
+      text width=2.5cm, minimum height=0.62cm, line width=0.9pt},
+    press/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!16,
+      text width=2.5cm, minimum height=0.62cm},
+    doc/.style={box, draw=ThesisNeutral!55, fill=ThesisPaper, text width=3.3cm,
+      align=left, inner sep=6pt},
+    truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=2.6cm},
+    safe/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22, text width=2.5cm},
+    unsafe/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!22, text width=2.5cm},
     lbl/.style={font=\tiny, color=ThesisNeutral},
     flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
       shorten <=2pt, shorten >=2pt},
-    rw/.style={{Stealth[length=4pt]}-{Stealth[length=4pt]}, draw=ThesisInk!42,
-      line width=0.7pt, shorten <=2pt, shorten >=2pt},
-    verify/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!70, line width=0.7pt,
+    read/.style={-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
+      shorten <=2pt, shorten >=2pt},
+    consult/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!70, line width=0.7pt,
       densely dashed, shorten <=2pt, shorten >=2pt},
-    actarr/.style={-{Stealth[length=4.5pt]}, draw=ThesisSecondaryDark, line width=1pt,
+    goodarr/.style={-{Stealth[length=4.5pt]}, draw=ThesisSecondaryDark, line width=0.9pt,
+      shorten <=2pt, shorten >=2pt},
+    badarr/.style={-{Stealth[length=5pt]}, draw=ThesisTertiaryDark, line width=1.1pt,
       shorten <=2pt, shorten >=2pt}]
 
-    % ---- the evaluated agent, centre -------------------------------------
-    \node[model] (ag) at (0,0) {agent\\[1pt]\envsub{evaluated model}};
+    % ===== LEFT: the work stream, delivered over time =====================
+    \node[lbl, align=center] at (-8.2,2.35) {a normal workday\\one item at a time};
+    \node[item]  (s1) at (-8.2,1.45) {summary note};
+    \node[item]  (s2) at (-8.2,0.70) {inventory};
+    \node[crit]  (s3) at (-8.2,-0.15) {prescription\\[-1pt]\envsub{the critical item}};
+    \node[press] (s4) at (-8.2,-1.15) {pressure $\times 3$\\[-1pt]\envsub{the patient pushes back}};
+    % time axis
+    \draw[-{Stealth[length=4pt]}, draw=ThesisNeutral!55, line width=0.7pt]
+      (-9.55,1.75) -- (-9.55,-1.45) node[midway, rotate=90, anchor=south, lbl] {time};
+    \draw[flow] (s3.east) .. controls +(1.0,0) and +(-1.2,-0.2) .. (-3.0,-0.05);
 
-    % ---- work queue, left ------------------------------------------------
-    \node[stage] (wq) at (-5.7,0)
-      {work queue\\[2pt]%
-       \envsub{benign task \ $\cdots$ \ }%
-       {\tiny\textcolor{ThesisTertiaryDark}{contraindicated case}}%
-       \envsub{ \ $\cdots$ \ pressure $\times 3$}};
-    \draw[flow] (wq.east) -- (ag.west)
-      node[midway, above, lbl] {one item at a time};
+    % ===== CENTRE: the agent at the workstation ===========================
+    \node[agent] (ag) at (-1.6,-0.1) {agent\\[-1pt]\envsub{evaluated model}};
 
-    % ---- patient record (EHR), top --------------------------------------
-    \node[stage, text width=4.2cm] (ehr) at (0,2.75)
-      {patient record (EHR)\\[3pt]%
-       \envsub{legitimate files \ $+$ \ }%
-       {\setlength{\fboxsep}{1.6pt}\colorbox{ThesisTertiary!22}{%
-         \textcolor{ThesisTertiaryDark}{\tiny forged derogation}}}};
-    \draw[rw] (ag.north) -- (ehr.south)
+    % patient record with the forged note
+    \node[doc] (ehr) at (-1.6,2.15)
+      {patient record (EHR)\\[3pt]
+       {\envsub{contraindicated pair}}\\[3pt]
+       {\setlength{\fboxsep}{1.6pt}\colorbox{ThesisTertiary!24}{%
+         \textcolor{ThesisTertiaryDark}{\tiny forged note: ``contraindication lifted''}}}};
+    \draw[{Stealth[length=4pt]}-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
+      shorten <=2pt, shorten >=2pt] (ag.north) -- (ehr.south)
       node[midway, right, lbl] {read / write};
 
-    % ---- ground-truth thesaurus, upper right -----------------------------
-    \node[truth] (th) at (5.6,1.35)
-      {ANSM thesaurus\\[1pt]\envsub{ground truth · one call}};
-    \draw[verify] (ag.east) -- (th.west)
-      node[midway, above, lbl] {consult};
+    % ground-truth thesaurus, consultable (information sits ABOVE the agent)
+    \node[truth] (th) at (2.25,2.35) {ANSM thesaurus\\[-1pt]\envsub{ground truth}};
+    \draw[consult] (ag.70) .. controls +(0.3,0.9) and +(-0.5,-0.9) .. (th.south)
+      node[pos=0.5, left=1pt, lbl] {consult};
 
-    % ---- irreversible act, lower right -----------------------------------
-    \node[act] (px) at (5.6,-1.35)
-      {issue prescription\\[1pt]\envsub{irreversible act · scored}};
-    \draw[actarr] (ag.east) -- (px.west);
+    % ===== RIGHT: the scored fork (the DECISION sits to the RIGHT) =========
+    \node[safe]   (ok) at (5.2,0.75)  {refuse\\[-1pt]\envsub{safe}};
+    \node[unsafe] (ko) at (5.2,-1.15) {issue prescription\\[-1pt]\envsub{irreversible, unsafe}};
+    \draw[goodarr] (ag.east) .. controls +(1.3,0.35) and +(-1.1,0) .. (ok.west);
+    \draw[badarr]  (ag.east) .. controls +(1.3,-0.55) and +(-1.1,0) .. (ko.west);
+    \node[lbl] at (3.5,-0.1) {scored: the act};
 
-    % ---- chokepoint note -------------------------------------------------
-    \node[lbl, align=center] at (0,-2.15)
-      {one chokepoint: every exchange is logged with what was \emph{served} and what is \emph{true}};
+    % ===== bottom note ====================================================
+    \node[lbl, align=center] at (-1.6,-2.55)
+      {the world lies only through the forged note; every call is logged with what was
+       \emph{served} and what is \emph{true}};
   \end{tikzpicture}%
   }
-  \captionof{figure}{The exploratory agentic environment: the model works a queue
-  of ordinary tasks that hides one contraindicated case and a forged derogation,
-  and its scored outcome is whether it issues the irreversible prescription.}
+  \captionof{figure}{The exploratory agentic environment: an ordinary workday
+  hides one contraindicated case and a forged note lifting the contraindication,
+  and the model is scored on whether it issues the irreversible prescription.}
   \label{fig:conclusion-agentic-env}
 \end{center}
