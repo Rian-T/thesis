@@ -4,43 +4,111 @@ incompletely digested.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 \chapter{What Holds Together}
 \label{sec:conclusion-holds-together}
 
-\begin{itemize}
-  \item \begin{reviewrewrite}TODO: hospital notes as target, not training data.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: one route: corpus, encoder, CLM, ontology text, extraction.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: relapsed-lymphoma cohort as convergence point.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: limit: not deployable yet; public text and generated data still go far.\end{reviewrewrite}
-\end{itemize}
+A hospital note runs through this thesis as a target, never as training
+material. No model built here was shown a real patient record. What the models
+learned, they learned from public text: scientific articles, drug leaflets,
+ontologies, and clinical cases that had already been published. From that public
+material a single route runs the length of the manuscript. Public text becomes a
+filtered corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}); the corpus
+pretrains an encoder (\Cref{chap:encoders,chap:objectives}); the encoder is
+enriched with knowledge drawn from ontologies (\Cref{chap:ontobook}); the
+enriched encoder becomes an extractor that can be asked for new fields at
+inference time (\Cref{chap:architectures}); and the extractor fills the
+structured clinical form of a study (\Cref{chap:evaluation}). Each part handed
+its output to the next.
+
+The same route can be read as a sequence of savings. The paragraph-level
+filtering of \Cref{chap:quality} matched the performance of the full corpus
+while training on one third of the tokens, and its clinical recipe reached the
+same point with 2.5 times fewer tokens. Adapting an encoder by continual
+pretraining, rather than training one from scratch, showed the same effect on
+carbon. CamemBERT-bio was adapted in 78 GPU-hours, for an estimated 0.80~kg of
+CO\textsubscript{2} at the French grid intensity of 34~g CO\textsubscript{2}eq
+per kWh over 2022 and 2023. A comparable model trained from scratch cost far
+more: DrBERT used 2{,}560 GPU-hours and 26.11~kg of CO\textsubscript{2}, and
+AliBERT 960 GPU-hours and 8.16~kg. The adapted encoder therefore emitted about
+32 times less carbon than a model trained from scratch, and lost no accuracy for
+the saving (\Cref{fig:conclusion-energy}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{plots/part_3/output/conclusion_energy.pdf}
+  \caption{Training carbon cost of DrBERT and AliBERT, trained from scratch,
+  against CamemBERT-bio, adapted by continual pretraining.}
+  \label{fig:conclusion-energy}
+\end{figure}
+
+The extractor at the end of the route shows the same pattern in what it costs to
+run. MC-bio-gliner has 150 million parameters, and on the synthetic clinical
+form its value $F_1$ of 0.640 comes within 0.018 of the 0.658 reached by
+Qwen3.5-4B, a generative model about twenty-seven times its size fine-tuned on
+the same data. The small encoder fits the hardware a clinical service already
+owns, where a multi-billion-parameter generator does not. Taken together, these
+results point to one idea. Several of the methods in this thesis, each on its
+own, lower the compute, the data, or the energy needed to reach a given clinical
+capability. That is what holds the chapters together, more than any single model
+does.
+
+The clearest case of this convergence is a corpus that paid off twice. The
+filtering of \Cref{chap:quality} let models train on one third of the tokens,
+and while doing so it found something else. Two million clinical cases were
+sitting inside scientific articles, described in passing and never labelled as
+clinical text. The filter surfaced them, and they were released as an open set
+of clinical cases. Later, in \Cref{chap:synthetic}, those same cases became the
+seed for generating the synthetic longitudinal records of a relapsed-lymphoma
+cohort, the very records used in \Cref{chap:evaluation} to measure the
+extractor. Data recovered while building the corpus became the ground on which
+the final task was scored. The lymphoma cohort is where the separate threads of
+the thesis meet.
+
+None of this is ready for a hospital ward. The evaluation ran on synthetic
+records, the fields were known in advance, and a real clinical study would bring
+messier text and stricter checks than any benchmark applied here. What the route
+does show is how far public text and generated data can carry a clinical task
+before a real record is ever needed, which is further than the privacy
+constraint would lead one to expect. That result invites a harder question,
+about how these models behave once they are actually used, and it is the
+question the next chapter takes up.
 
 \chapter{A New Problem}
 \label{sec:conclusion-evaluation}
 
-\begin{reviewrewrite}
-The next step is not only larger medical models. It is models used as agents,
-inside real clinical workflows, with access to context, tools, patient messages,
-and local hospital systems. At that point, the problem is no longer only whether
-the model knows the right medical fact. It is whether the model keeps safe
-behaviour when the fact is embedded in a prescription, a hospital note, a
-patient message, or a triage list. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and
-DrBenchmark mostly test factual medical knowledge through clean questions or
-biomedical understanding
-tasks~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
-HealthBench and CARES move closer to use by testing safety, refusal, harmful
-advice, and difficult clinical questions at larger scale~\citep{arora2025healthbench,chen2025cares}.
-For drug interactions, \citet{sicard2025ddi} report high sensitivity but limited
-specificity when commercial LLMs are tested on pharmacovigilance cases.
-They still leave a narrow but practical safety question. When the medical fact
-is unchanged, does the model keep the same behaviour?
-\end{reviewrewrite}
+The methods in this thesis were built to be efficient. We trained small encoder
+models rather than large generative ones, and we pretrained and continually
+pretrained them at a low compute and carbon cost (\Cref{chap:encoders,chap:objectives}).
+This is not the direction French clinical NLP appears to be taking. Hospitals are
+acquiring their own GPU infrastructure and deploying large general-purpose models
+locally, so that patient data never leaves the institution. One survey found that
+261 hospitals in mainland China reported a local deployment of DeepSeek-R1 on
+their own hardware within the first weeks of its release~\citep{yuan2025deepseek},
+and clinical informatics groups describe the same move toward on-premise models,
+chosen for privacy rather than for size~\citep{dennstadt2025implementing}. The
+efficient, small-model path this thesis took is defensible, but it is not where the
+field is going.
 
-\begin{reviewrewrite}
-That question also appears in regulation. The European AI Act covers medical
-decision support and triage among high-risk uses, and requires accuracy,
+The encoders this thesis favoured have one property that matters here. Once
+fine-tuned, they return the same answer to the same input. Large decoder models do
+not. Their output can change when the surface form of a question changes, when a
+fact is moved into a longer context, or when a user pushes back over several turns.
+This behavioural instability is largely invisible to the benchmarks the field uses
+to judge medical models. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and DrBenchmark
+mostly test factual medical knowledge through clean
+questions~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
+HealthBench and CARES move closer to real use by testing safety and refusal at
+larger scale~\citep{arora2025healthbench,chen2025cares}. None of them ask the
+narrow question that instability raises: when the medical fact is unchanged, does
+the model keep the same behaviour once that fact is embedded in a prescription, a
+long clinical note, a patient's insistence, or a triage list?
+
+The same question appears in regulation. The European AI Act places medical
+decision support and triage among its high-risk uses, and requires accuracy,
 robustness, and resilience to errors during interaction with
 people~\citep{aiact2024}. These requirements concern stored knowledge and the
-behaviour of the model during use: when a patient insists, when a drug is given
-by brand name, when a long note contains the relevant pair, or when several
-patients are compared at once.
-\end{reviewrewrite}
+behaviour of the model during use: when a patient insists, when a drug is given by
+brand name, when a long note contains the relevant pair, or when several patients
+are compared at once. If large decoder models are going to be deployed in hospitals
+regardless of the efficiency argument, then this behaviour has to be measured
+directly.
 
 \section{TABIB}
 \label{sec:conclusion-tabib}
@@ -447,9 +515,49 @@ Gemma4 E4B     & 78\% & 0.000 & 72\% & 0.000 \\
 \chapter{Where Medical AI Is Going}
 \label{sec:conclusion-field-direction}
 
-\begin{itemize}
-  \item \begin{reviewrewrite}TODO: scale, bitter lesson, general models absorbing specialist tasks.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: hospital GPUs, private inference, no external API.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: local scale still needs data, adaptation, evaluation, safety rules.\end{reviewrewrite}
-  \item \begin{reviewrewrite}TODO: public adaptation methods; public behavioural tests.\end{reviewrewrite}
-\end{itemize}
+The previous chapter tested one model at a time, answering one question under
+pressure. The systems now reaching hospitals are larger than that. They are
+agents: models given tools, access to a patient record, incoming messages, and
+local hospital software, acting over several steps to complete a task instead of
+answering a single prompt. A drug-interaction check stops being a question with a
+right answer and becomes one step inside a workflow, where the model reads a
+note, queries a database, drafts a reply, and passes the result to the next
+stage. The safety question grows with the system. The question is no longer
+whether the model holds the right medical fact. It is what the whole agent does
+with that fact across a chain of actions on real data.
+
+Testing such systems is harder than testing an answer. There is now evidence that
+models can tell when they are being examined. \citet{needham2025evalaware} show
+that frontier models classify transcripts as evaluation or deployment well above
+chance, with one model reaching an AUC of 0.83 on a benchmark of a thousand
+prompts drawn from public tests, real interactions, and agent trajectories. A
+model that recognises a test can behave one way for the test and another way in
+use. A clean score then measures how the model performs when it knows it is
+watched, which is not the number a hospital needs.
+
+This weakens the clean question-answering benchmark as the main tool for judging
+clinical models. The benchmarks in this thesis, and most benchmarks in medical
+NLP, present isolated questions with known answers. To see how an agent behaves in
+a hospital, the evaluation has to look more like a hospital: a simulated
+environment with a patient, a record, tools, and a task carried out over several
+turns, scored on the outcome. Early work in this direction exists. AgentClinic
+places a diagnostic agent in a simulated consultation where it must gather
+information through dialogue and tool use, and reports that accuracy falls sharply
+once the task becomes sequential instead of a single
+question~\citep{schmidgall2025agentclinic}. \citet{yao2024taubench} build
+tool-and-user environments in other domains and find that agents stay unreliable
+across repeated trials of the same task. The approach taken throughout this thesis
+was to build resources in the open and to test behaviour close to real use, and it
+extends to agents, where the environment itself becomes the thing to build and
+share.
+
+None of this infrastructure exists yet, at least not for French clinical care.
+There is no shared, realistic environment in which a hospital agent can be run,
+watched, and scored on tasks close to what it would actually do, with the safety
+behaviours from the previous chapter measured inside that setting instead of on
+isolated pairs. Building it runs into the constraint that shaped this whole
+thesis: the clinical setting cannot be exported, so the environment has to be
+rebuilt from public and synthetic material, and rebuilt well enough that a model
+cannot tell the reconstruction from the real thing. Until the clinic can be
+convincingly rebuilt in the open this way, we will keep grading medical models on
+the wrong test. Closing that gap is where this work points next.
