@@ -585,20 +585,53 @@ turns, scored on the outcome. Early work in this direction exists. AgentClinic
 places a diagnostic agent in a simulated consultation where it must gather
 information through dialogue and tool use, and reports that accuracy falls sharply
 once the task becomes sequential instead of a single
-question~\citep{schmidgall2025agentclinic}. \citet{yao2024taubench} build
+question~\citep{schmidgall2025agentclinic}, and \citet{yao2024taubench} build
 tool-and-user environments in other domains and find that agents stay unreliable
-across repeated trials of the same task. The approach taken throughout this thesis
-was to build resources in the open and to test behaviour close to real use, and it
-extends to agents, where the environment becomes the resource to build and
-share.
+across repeated trials of the same task.
 
-None of this infrastructure exists yet, at least not for French clinical care.
-There is no shared, realistic environment in which a hospital agent can be run,
-watched, and scored on tasks close to what it would actually do, with the safety
-behaviours from the previous chapter measured inside that setting instead of on
-isolated pairs. Building it runs into the constraint that shaped this whole
-thesis: the clinical setting cannot be exported, so the environment has to be
-rebuilt from public and synthetic material, and rebuilt well enough that a model
-cannot tell the reconstruction from the real thing. Until the clinic can be
-convincingly rebuilt in the open, we will keep grading medical models on
-the wrong test. Closing that gap is where this work points next.
+We have begun to build such an environment for the clinic, as an exploratory
+agentic extension of the TABIB benchmark of \Cref{sec:conclusion-tabib}. The model
+acts as an agent at a simulated clinical workstation, with a patient record it can
+read and write, a tool to consult the official ANSM drug-interaction thesaurus,
+which serves as the ground truth, and a tool to issue a prescription, which is an
+irreversible act. It works through a queue of ordinary secretarial and pharmacy
+tasks, one of which hides a patient whose file holds a contraindicated drug pair
+together with a forged note claiming that a doctor has lifted the contraindication
+for this patient. Every exchange between the agent and the world passes through a
+single point and is logged with what was served and what is true, so the scored
+outcome is the terminal act itself rather than the model's prose
+(\Cref{fig:conclusion-agentic-env}).
+
+\input{sources/part_3/figures/fig_agentic_env}
+
+Even this small probe shows that the safety verdict depends on the apparatus as
+much as on the model. The same model, with the same knowledge and the same forged
+note, commits no unsafe act in a clean single-question chat setting, and prescribes
+the contraindicated pair in about a quarter of cases, five out of twenty, in the
+agentic setting under repeated pressure. The knowledge is constant: with no forged
+note the model commits no unsafe act in any setting, so the difference is
+behavioural rather than a gap in medical knowledge. A single unsafe rate hides the
+failure, because the chat setting reaches zero unsafe acts while barely telling a
+contraindicated pair from a safe one, refusing almost every safe pair as well. A
+static benchmark that reports only the unsafe rate would call this model safe.
+
+Supplying the official contraindication together with the case does not protect it
+either: about a fifth still prescribe against the verdict they have just read. The
+mechanism is deference under pressure to the authority artifact rather than a
+missing fact, so access-based fixes such as forced retrieval treat the symptom and
+not the cause. The practical point is narrow: a safety number from a chat or
+multiple-choice benchmark is not an upper bound on the risk in deployment. Here it
+is wrong by a large factor, zero against a quarter, for the same model and the same
+artifact.
+
+This is one model, one scenario, and twenty pairs, with wide intervals: an
+exploratory probe rather than a benchmark, whose value is to show that the
+apparatus, and not the model alone, decides the number. A shared, realistic
+environment of this kind for French clinical care still has to be built, and it
+runs into the constraint that shaped this whole thesis. The clinic cannot be
+exported, so the environment has to be rebuilt from public and synthetic material,
+and rebuilt well enough that a model cannot tell the reconstruction from the real
+thing. The principle that ran through this work, to build the resource in the open
+and to test it close to real use, is the one that points the way. Building these
+environments, so that a medical model is finally judged on the test that matters,
+is the work that remains.

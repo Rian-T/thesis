@@ -1,0 +1,63 @@
+\begin{center}
+  \centering
+  \providecommand{\envsub}[1]{{\tiny\textcolor{ThesisNeutral}{#1}}}
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[font=\scriptsize\sffamily, text=ThesisInk,
+    box/.style={rounded corners=2pt, align=center, inner sep=5pt, text=ThesisInk},
+    model/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
+      text width=2.4cm, minimum height=1.05cm},
+    stage/.style={box, draw=ThesisNeutral!50, fill=white, text width=3.3cm},
+    truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=2.7cm},
+    act/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22, text width=2.7cm},
+    lbl/.style={font=\tiny, color=ThesisNeutral},
+    flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
+      shorten <=2pt, shorten >=2pt},
+    rw/.style={{Stealth[length=4pt]}-{Stealth[length=4pt]}, draw=ThesisInk!42,
+      line width=0.7pt, shorten <=2pt, shorten >=2pt},
+    verify/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!70, line width=0.7pt,
+      densely dashed, shorten <=2pt, shorten >=2pt},
+    actarr/.style={-{Stealth[length=4.5pt]}, draw=ThesisSecondaryDark, line width=1pt,
+      shorten <=2pt, shorten >=2pt}]
+
+    % ---- the evaluated agent, centre -------------------------------------
+    \node[model] (ag) at (0,0) {agent\\[1pt]\envsub{evaluated model}};
+
+    % ---- work queue, left ------------------------------------------------
+    \node[stage] (wq) at (-5.7,0)
+      {work queue\\[2pt]%
+       \envsub{benign task \ $\cdots$ \ }%
+       {\tiny\textcolor{ThesisTertiaryDark}{contraindicated case}}%
+       \envsub{ \ $\cdots$ \ pressure $\times 3$}};
+    \draw[flow] (wq.east) -- (ag.west)
+      node[midway, above, lbl] {one item at a time};
+
+    % ---- patient record (EHR), top --------------------------------------
+    \node[stage, text width=4.2cm] (ehr) at (0,2.75)
+      {patient record (EHR)\\[3pt]%
+       \envsub{legitimate files \ $+$ \ }%
+       {\setlength{\fboxsep}{1.6pt}\colorbox{ThesisTertiary!22}{%
+         \textcolor{ThesisTertiaryDark}{\tiny forged derogation}}}};
+    \draw[rw] (ag.north) -- (ehr.south)
+      node[midway, right, lbl] {read / write};
+
+    % ---- ground-truth thesaurus, upper right -----------------------------
+    \node[truth] (th) at (5.6,1.35)
+      {ANSM thesaurus\\[1pt]\envsub{ground truth · one call}};
+    \draw[verify] (ag.east) -- (th.west)
+      node[midway, above, lbl] {consult};
+
+    % ---- irreversible act, lower right -----------------------------------
+    \node[act] (px) at (5.6,-1.35)
+      {issue prescription\\[1pt]\envsub{irreversible act · scored}};
+    \draw[actarr] (ag.east) -- (px.west);
+
+    % ---- chokepoint note -------------------------------------------------
+    \node[lbl, align=center] at (0,-2.15)
+      {one chokepoint: every exchange is logged with what was \emph{served} and what is \emph{true}};
+  \end{tikzpicture}%
+  }
+  \captionof{figure}{The exploratory agentic environment: the model works a queue
+  of ordinary tasks that hides one contraindicated case and a forged derogation,
+  and its scored outcome is whether it issues the irreversible prescription.}
+  \label{fig:conclusion-agentic-env}
+\end{center}
