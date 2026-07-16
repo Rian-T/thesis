@@ -173,7 +173,9 @@ def _make_figure(panels: tuple[StylometryPanel, ...]):
             fontsize=8,
             color=tone,
         )
-        # Raw value at every node, above the marker.
+        # Raw value at every node, above the marker. A uniform dark tone (not the
+        # source tone) keeps every label equally legible, and a thin white bbox
+        # lifts the numbers clear of the crossing lines at the C2ST column.
         for panel, x_position, y_value in zip(panels, x_positions, ys):
             ax.annotate(
                 _decimal_label(panel.values[source_index], panel.precision),
@@ -183,7 +185,9 @@ def _make_figure(panels: tuple[StylometryPanel, ...]):
                 ha="center",
                 va="bottom",
                 fontsize=6.8,
-                color=tone,
+                color="#2D2A3C",
+                bbox=dict(boxstyle="round,pad=0.12", facecolor="white",
+                          edgecolor="none", alpha=0.85),
             )
 
     # Column headers: metric name + the direction convention.

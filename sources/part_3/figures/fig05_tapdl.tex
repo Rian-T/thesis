@@ -1,5 +1,6 @@
 \begin{center}
   \centering
+  \providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
     block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.2cm,
@@ -15,17 +16,17 @@
 
     \def\bx{4.15}
     \node[report]   (b1) at (0,0)      {\textbf{Routed report}\\[3pt]
-      \dots{}protocole \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}},
+      \dots{}protocole \hlspan{CHOEP-14},
       8 cycles\dots};
     \node[proposal] (b2) at (\bx,0)    {\textbf{LLM proposal}\\[3pt]
       \texttt{field}: first-line treatment\\
       \texttt{string}: CHOEP-14};
     \node[localize] (b3) at (2*\bx,0)  {\textbf{Deterministic\\localization}\\[4pt]
-      match the literal string, anchor its character offsets, resolve collisions};
+      match the literal string, anchor its character \mbox{offsets}, resolve collisions};
     \node[silver]   (b4) at (3*\bx,0)  {\textbf{Silver span}\\[3pt]
-      field: first-line treatment\\
-      offsets: \texttt{[128, 136]}\\
-      slice: ``CHOEP-14''};
+      \texttt{field}: first-line treatment\\
+      \texttt{offsets}: \texttt{[128, 136]}\\
+      \texttt{slice}: ``CHOEP-14''};
 
     \draw[flow] (b1)--(b2);
     \draw[flow] (b2)--(b3);

@@ -35,13 +35,14 @@
     % --- Answer (right) ---
     \node[ans] (ans) at (10.0,0.3) {CHOEP-14};
 
-    % --- Arrows: span (lavender) from above-left and description (neutral) from
-    %     below-left land on mirror-image points of the circle; answer (lime) exits right ---
-    \draw[pull, ThesisPrimaryDark] (cand.south east)
+    % --- Arrows: both inputs land on mirror-image points of the circle and the
+    %     answer exits right; all three are faded flow arrows, so the role colours
+    %     live on the nodes (lavender span, lime answer), not on the arrows ---
+    \draw[pull, ThesisNeutral!55] (cand.south east)
       to[out=-28,in=152] (sim.north west);
-    \draw[pull, ThesisNeutral!70] (desc.north east)
+    \draw[pull, ThesisNeutral!55] (desc.north east)
       to[out=28,in=-152] (sim.south west);
-    \draw[pull, ThesisSecondaryDark] (sim.east) -- (ans.west);
+    \draw[pull, ThesisNeutral!55] (sim.east) -- (ans.west);
 
   \end{tikzpicture}%
   }

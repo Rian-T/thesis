@@ -3,8 +3,8 @@ Risk--coverage figure (Part 3, chapter 7): selective risk vs coverage on the
 lymphoma eCRF, for MC-bio-gliner (encoder) against Qwen3.5-4B (generator).
 
 Message: the generator ranks its predictions by confidence more reliably. It
-keeps a lower area under the risk--coverage curve (AURC 0.175 against 0.239) and
-a higher precision at 50% coverage (0.862 against 0.770).
+keeps a lower area under the risk--coverage curve (AURC 0.207 against 0.239) and
+a higher precision at 50% coverage (0.828 against 0.770).
 
 Generates:
     plots/part_3/output/fig_risk_coverage.pdf   (vector, for the manuscript)
@@ -35,7 +35,7 @@ def main():
     enc = d["MC-bio-gliner"]
     gen = d["Qwen3.5-4B"]
 
-    enc_color = COLORS.get("encoder", COLORS["primary"])
+    enc_color = COLORS.get("encoder", COLORS["primary_dark"])
     gen_color = COLORS.get("neutral", COLORS["tertiary"])
 
     fig, ax = plt.subplots(figsize=(6.2, 4.2))

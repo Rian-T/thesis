@@ -40,7 +40,7 @@
       {\scriptsize\itshape\color{ThesisNeutral}span--type pairs}\\[5pt]
       \hlspan{rituximab} $\rightarrow$
         \textcolor{ThesisPrimaryDark}{\textbf{anticancer drug}}\\[3pt]
-      \hlspan{LDGCB} $\rightarrow$
+      \hlspan{lymphome diffus à grandes cellules B} $\rightarrow$
         \textcolor{ThesisPrimaryDark}{\textbf{lymphoma subtype}}};
     \draw[flow] (exa) -- (mapa);
     \draw[tie] (g3.south) -- (mapa.north);
@@ -67,14 +67,15 @@
     \draw[flow] (exb) -- (mapb);
     \draw[tie] (f3.south) -- (mapb.north);
 
-    % Adaptation from generalist to form-adapted encoder
+    % Adaptation from generalist to form-adapted encoder: routed on the far right,
+    % clear of the mapping blocks
     \draw[-{Stealth[length=5pt]}, draw=ThesisPrimaryDark!70, line width=0.8pt,
-      shorten <=4pt, shorten >=4pt] (ge) -- (fe)
-      node[midway, right=1pt, text=ThesisNeutral] {adaptation};
+      shorten <=4pt, shorten >=4pt] (ge.east) to[out=0, in=0, looseness=1.9] (fe.east)
+      node[midway, right=3pt, text=ThesisNeutral] {adaptation};
   \end{tikzpicture}%
   }
-  \caption{Two supervision routes. Each source excerpt is a document panel with its
-  spans highlighted in place; a separate block lists the span--type pairs for the
+  \caption{Two supervision routes: each source excerpt is a document panel with its
+  spans highlighted in place, and a separate block lists the span--type pairs for the
   generalist encoder and the silver form-field roles for the form-adapted encoder.}
   \label{fig:p3-supervision-routes}
 \end{figure}

@@ -24,7 +24,7 @@ from thesis_style import COLORS, apply_style
 # ── Data ──────────────────────────────────────────────────────────────────────
 # x = parameters in billions (log axis); y = value-F1 after field competition
 OURS     = (0.150, 0.640)   # MC-bio-gliner, published model
-BASELINE = (0.184, 0.367)   # GLiNER-BioMed, size-matched
+BASELINE = (0.184, 0.380)   # GLiNER-BioMed, size-matched (val-thresholded)
 LLM = [                            # Qwen3.5 generative family
     (0.8, 0.628),
     (2.0, 0.645),

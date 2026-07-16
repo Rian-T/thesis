@@ -1,6 +1,6 @@
 \begin{figure}[t]
   \centering
-  \resizebox{0.85\textwidth}{!}{%
+  \resizebox{0.8\textwidth}{!}{%
   \begin{tikzpicture}[font=\small\sffamily,
     anchorpt/.style={circle, fill=ThesisPrimaryDark, inner sep=2.8pt},
     pospt/.style={circle, fill=ThesisSecondaryDark, inner sep=2.6pt},
@@ -10,31 +10,40 @@
       shorten >=4pt, shorten <=4pt},
     push/.style={-{Stealth[length=2.6mm]}, ThesisTertiaryDark, line width=1.1pt,
       shorten >=4pt, shorten <=4pt},
+    axis/.style={densely dashed, draw=ThesisNeutral!50, line width=0.7pt,
+      shorten >=3pt, shorten <=3pt},
   ]
 
     % --- points ---
-    \coordinate (anchor) at (2.4,1.1);
-    \coordinate (pos)    at (5.0,2.5);
-    \coordinate (neg)    at (5.2,-0.5);
+    \coordinate (anchor) at (0,0);
+    \coordinate (pos)    at (2.4,1.35);
+    \coordinate (neg)    at (2.4,-1.35);
+
+    % description space: a light neutral region holding the embedded terms
+    \draw[draw=ThesisNeutral!35, fill=ThesisNeutral!7, rounded corners=14pt]
+      (-0.85,-1.95) rectangle (3.25,1.95);
+    \node[text=ThesisNeutral, font=\scriptsize\itshape, anchor=south west]
+      at (-0.72,-1.86) {description space};
 
     % contrastive forces: pull the synonym in, push the unrelated term out
+    \draw[axis] (anchor) -- (neg);
     \draw[pull] (pos) -- (anchor)
-      node[midway, above=2pt, font=\scriptsize, text=ThesisSecondaryDark] {pull together};
-    \draw[push] (neg) -- ($ (neg)!-1.1cm!(anchor) $)
-      node[midway, above=2pt, font=\scriptsize, text=ThesisTertiaryDark] {push apart};
+      node[midway, above=1.5pt, sloped, font=\scriptsize, text=ThesisSecondaryDark] {pull together};
+    \draw[push] (neg) -- ($ (anchor)!1.62!(neg) $)
+      node[pos=1.0, below=2pt, font=\scriptsize, text=ThesisTertiaryDark] {push apart};
 
     \node[anchorpt] at (anchor) {};
     \node[pospt]    at (pos)    {};
     \node[negpt]    at (neg)    {};
 
-    % --- labels (role tags as median italic sub-tags, no parentheses) ---
-    \node[lbl, anchor=east, align=right] at ([xshift=-6pt]anchor)
+    % --- labels: term coloured to match its dot, role tag neutral italic ---
+    \node[lbl, anchor=east, align=right, text=ThesisPrimaryDark] at ([xshift=-7pt]anchor)
       {lymphome diffus à\\grandes cellules B\\[1pt]
        {\scriptsize\itshape\color{ThesisNeutral}anchor}};
-    \node[lbl, anchor=west, text=ThesisSecondaryDark] at ([xshift=6pt]pos)
+    \node[lbl, anchor=west, text=ThesisSecondaryDark] at ([xshift=7pt]pos)
       {\textbf{LBDGC}~{\scriptsize\itshape\color{ThesisNeutral}$\cdot$ synonym}};
-    \node[lbl, anchor=west, text=ThesisTertiaryDark] at ([xshift=6pt]neg)
-      {adénocarcinome~{\scriptsize\itshape\color{ThesisNeutral}$\cdot$ unrelated}};
+    \node[lbl, anchor=west, text=ThesisTertiaryDark] at ([xshift=7pt]neg)
+      {ad\'enocarcinome~{\scriptsize\itshape\color{ThesisNeutral}$\cdot$ unrelated}};
 
   \end{tikzpicture}%
   }
