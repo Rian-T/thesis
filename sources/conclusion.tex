@@ -4,31 +4,54 @@ incompletely digested.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 \chapter{What Holds Together}
 \label{sec:conclusion-holds-together}
 
+\section{A Single Route Through Public Text}
+
 A hospital note runs through this thesis as a target, never as training
 material. No model built here was shown a real patient record. What the models
 learned, they learned from public text: scientific articles, drug leaflets,
-ontologies, and clinical cases that had already been published. From that public
-material a single route runs the length of the manuscript. Public text becomes a
+ontologies, and clinical cases that had already been published. From this
+material, a single route runs the length of the manuscript. Public text becomes a
 filtered corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}); the corpus
 pretrains an encoder (\Cref{chap:encoders,chap:objectives}); the encoder is
 enriched with knowledge drawn from ontologies (\Cref{chap:ontobook}); the
 enriched encoder becomes an extractor that can be asked for new fields at
 inference time (\Cref{chap:architectures}); and the extractor fills the
 structured clinical form of a study (\Cref{chap:evaluation}). Each part handed
-its output to the next.
+its output to the next, as \Cref{fig:conclusion-convergence} shows.
 
-The same route can be read as a sequence of savings. The paragraph-level
-filtering of \Cref{chap:quality} matched the performance of the full corpus
-while training on one third of the tokens, and its clinical recipe reached the
-same point with 2.5 times fewer tokens. Adapting an encoder by continual
-pretraining, rather than training one from scratch, showed the same effect on
-carbon. CamemBERT-bio was adapted in 78 GPU-hours, for an estimated 0.80~kg of
-CO\textsubscript{2} at the French grid intensity of 34~g CO\textsubscript{2}eq
-per kWh over 2022 and 2023. A comparable model trained from scratch cost far
-more: DrBERT used 2{,}560 GPU-hours and 26.11~kg of CO\textsubscript{2}, and
-AliBERT 960 GPU-hours and 8.16~kg. The adapted encoder therefore emitted about
-32 times less carbon than a model trained from scratch, and lost no accuracy for
-the saving (\Cref{fig:conclusion-energy}).
+\input{sources/part_3/figures/fig_convergence}
+
+\section{The Same Capability at Lower Cost}
+
+The same route can be read as a sequence of savings, one on each axis a model
+consumes. \Cref{tab:conclusion-savings} lists them.
+
+\begin{center}
+  \small
+  \captionof{table}{Where each contribution lowers the cost of the same clinical capability.}
+  \label{tab:conclusion-savings}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    \textbf{Axis} & \textbf{Contribution} & \textbf{Reduction} \\
+    \midrule
+    Training data & corpus filtering (\Cref{chap:quality}) & one third of the tokens \\
+    Training compute & continual pretraining (\Cref{chap:encoders}) & 32$\times$ less carbon \\
+    Inference & open-vocabulary extraction (\Cref{chap:architectures}) & 27$\times$ fewer parameters \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+The paragraph-level filtering of \Cref{chap:quality} matched the performance of
+the full corpus while training on one third of the tokens, and its clinical
+recipe reached the same point with 2.5 times fewer tokens. Adapting an encoder by
+continual pretraining, rather than training one from scratch, showed the same
+effect on carbon. CamemBERT-bio was adapted in 78 GPU-hours, for an estimated
+0.80~kg of CO\textsubscript{2} at the French grid intensity of 34~g
+CO\textsubscript{2}eq per kWh over 2022 and 2023. A comparable model trained from
+scratch cost far more: DrBERT used 2{,}560 GPU-hours and 26.11~kg of
+CO\textsubscript{2}, and AliBERT 960 GPU-hours and 8.16~kg. The adapted encoder
+therefore emitted about 32 times less carbon than a model trained from scratch,
+and lost no accuracy for the saving (\Cref{fig:conclusion-energy}).
 
 \begin{figure}[t]
   \centering
@@ -43,35 +66,36 @@ run. MC-bio-gliner has 150 million parameters, and on the synthetic clinical
 form its value $F_1$ of 0.640 comes within 0.018 of the 0.658 reached by
 Qwen3.5-4B, a generative model about twenty-seven times its size fine-tuned on
 the same data. The small encoder fits the hardware a clinical service already
-owns, where a multi-billion-parameter generator does not. Taken together, these
-results point to one idea. Several of the methods in this thesis, each on its
-own, lower the compute, the data, or the energy needed to reach a given clinical
-capability. That is what holds the chapters together, more than any single model
-does.
+owns, where a multi-billion-parameter generator does not. Several of the methods
+in this thesis, each on its own, lower the compute, the data, or the energy
+needed to reach a given clinical capability. That is what holds the chapters
+together, more than any single model does.
 
-The clearest case of this convergence is a corpus that paid off twice. The
-filtering of \Cref{chap:quality} let models train on one third of the tokens,
-and while doing so it found something else. Two million clinical cases were
-sitting inside scientific articles, described in passing and never labelled as
-clinical text. The filter surfaced them, and they were released as an open set
-of clinical cases. Later, in \Cref{chap:synthetic}, those same cases became the
-seed for generating the synthetic longitudinal records of a relapsed-lymphoma
-cohort, the very records used in \Cref{chap:evaluation} to measure the
-extractor. Data recovered while building the corpus became the ground on which
-the final task was scored. The lymphoma cohort is where the separate threads of
-the thesis meet.
+\section{A Corpus That Paid Off Twice}
+
+This convergence is clearest in one place. The filtering of \Cref{chap:quality}
+let models train on one third of the tokens, and while doing so it found
+something else. Two million clinical cases were sitting inside scientific
+articles, described in passing and never labelled as clinical text. The filter
+surfaced them, and they were released as an open set of clinical cases. Later, in
+\Cref{chap:synthetic}, those same cases became the seed for generating the
+synthetic longitudinal records of a relapsed-lymphoma cohort, the very records
+used in \Cref{chap:evaluation} to measure the extractor. Data recovered while
+building the corpus became the ground on which the final task was scored. The
+lymphoma cohort is where the separate threads of the thesis meet.
 
 None of this is ready for a hospital ward. The evaluation ran on synthetic
 records, the fields were known in advance, and a real clinical study would bring
 messier text and stricter checks than any benchmark applied here. What the route
 does show is how far public text and generated data can carry a clinical task
-before a real record is ever needed, which is further than the privacy
-constraint would lead one to expect. That result invites a harder question,
-about how these models behave once they are actually used, and it is the
-question the next chapter takes up.
+before a real record is ever needed, further than the privacy constraint
+suggests. That result invites a harder question: how these models behave once
+they are actually used. That is the question the next chapter takes up.
 
 \chapter{A New Problem}
 \label{sec:conclusion-evaluation}
+
+\section{When Efficiency Is Not the Direction}
 
 The methods in this thesis were built to be efficient. We trained small encoder
 models rather than large generative ones, and we pretrained and continually
@@ -79,12 +103,13 @@ pretrained them at a low compute and carbon cost (\Cref{chap:encoders,chap:objec
 This is not the direction French clinical NLP appears to be taking. Hospitals are
 acquiring their own GPU infrastructure and deploying large general-purpose models
 locally, so that patient data never leaves the institution. One survey found that
-261 hospitals in mainland China reported a local deployment of DeepSeek-R1 on
+261 hospitals in mainland China reported deploying DeepSeek-R1 on
 their own hardware within the first weeks of its release~\citep{yuan2025deepseek},
 and clinical informatics groups describe the same move toward on-premise models,
-chosen for privacy rather than for size~\citep{dennstadt2025implementing}. The
-efficient, small-model path this thesis took is defensible, but it is not where the
-field is going.
+chosen for privacy rather than for size~\citep{dennstadt2025implementing}. A single
+general model also covers many clinical tasks at once, where each of our encoders had
+to be fine-tuned for one. The efficient, small-model path this thesis took is
+defensible, but it is not where the field is going.
 
 The encoders this thesis favoured have one property that matters here. Once
 fine-tuned, they return the same answer to the same input. Large decoder models do
@@ -103,14 +128,12 @@ long clinical note, a patient's insistence, or a triage list?
 The same question appears in regulation. The European AI Act places medical
 decision support and triage among its high-risk uses, and requires accuracy,
 robustness, and resilience to errors during interaction with
-people~\citep{aiact2024}. These requirements concern stored knowledge and the
-behaviour of the model during use: when a patient insists, when a drug is given by
-brand name, when a long note contains the relevant pair, or when several patients
-are compared at once. If large decoder models are going to be deployed in hospitals
-regardless of the efficiency argument, then this behaviour has to be measured
-directly.
+people~\citep{aiact2024}. These requirements reach beyond stored knowledge to how
+the model behaves during use. If large decoder models are going to be deployed in
+hospitals regardless of the efficiency argument, then this behaviour has to be
+measured directly.
 
-\section{TABIB}
+\section{The TABIB Benchmark}
 \label{sec:conclusion-tabib}
 
 \begin{reviewrewrite}
@@ -369,7 +392,7 @@ Gemma4 E4B      & 0.55 & \textbf{2.36} & 3.10 & \textit{3.36} & 3.16 & 3.02 \\
 \end{tabular}
 \end{table}
 
-\section{Protocol Details and Sensitivity}
+\subsection{Protocol details and sensitivity}
 \label{sec:conclusion-tabib-details}
 
 \begin{reviewrewrite}
@@ -515,6 +538,8 @@ Gemma4 E4B     & 78\% & 0.000 & 72\% & 0.000 \\
 \chapter{Where Medical AI Is Going}
 \label{sec:conclusion-field-direction}
 
+\section{From Models to Agents}
+
 The previous chapter tested one model at a time, answering one question under
 pressure. The systems now reaching hospitals are larger than that. They are
 agents: models given tools, access to a patient record, incoming messages, and
@@ -522,9 +547,11 @@ local hospital software, acting over several steps to complete a task instead of
 answering a single prompt. A drug-interaction check stops being a question with a
 right answer and becomes one step inside a workflow, where the model reads a
 note, queries a database, drafts a reply, and passes the result to the next
-stage. The safety question grows with the system. The question is no longer
-whether the model holds the right medical fact. It is what the whole agent does
-with that fact across a chain of actions on real data.
+stage. The safety question grows with the system: it is no longer whether the
+model holds the right medical fact, but what the whole agent does with that fact
+across a chain of actions on real data.
+
+\section{Evaluation Under Observation}
 
 Testing such systems is harder than testing an answer. There is now evidence that
 models can tell when they are being examined. \citet{needham2025evalaware} show
@@ -534,6 +561,8 @@ prompts drawn from public tests, real interactions, and agent trajectories. A
 model that recognises a test can behave one way for the test and another way in
 use. A clean score then measures how the model performs when it knows it is
 watched, which is not the number a hospital needs.
+
+\section{Rebuilding the Clinic}
 
 This weakens the clean question-answering benchmark as the main tool for judging
 clinical models. The benchmarks in this thesis, and most benchmarks in medical
@@ -548,7 +577,7 @@ question~\citep{schmidgall2025agentclinic}. \citet{yao2024taubench} build
 tool-and-user environments in other domains and find that agents stay unreliable
 across repeated trials of the same task. The approach taken throughout this thesis
 was to build resources in the open and to test behaviour close to real use, and it
-extends to agents, where the environment itself becomes the thing to build and
+extends to agents, where the environment becomes the resource to build and
 share.
 
 None of this infrastructure exists yet, at least not for French clinical care.
@@ -559,5 +588,5 @@ isolated pairs. Building it runs into the constraint that shaped this whole
 thesis: the clinical setting cannot be exported, so the environment has to be
 rebuilt from public and synthetic material, and rebuilt well enough that a model
 cannot tell the reconstruction from the real thing. Until the clinic can be
-convincingly rebuilt in the open this way, we will keep grading medical models on
+convincingly rebuilt in the open, we will keep grading medical models on
 the wrong test. Closing that gap is where this work points next.
