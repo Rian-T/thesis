@@ -41,48 +41,47 @@ N = 20
 OUTPUT = os.path.join(os.path.dirname(__file__), "output", "conclusion_agentic_gradient")
 
 
-def series(counts):
-    y = [k / N for k in counts]
-    lo = [y[i] - wilson(k, N)[0] for i, k in enumerate(counts)]
-    hi = [wilson(k, N)[1] - y[i] for i, k in enumerate(counts)]
-    return y, [lo, hi]
+def cerr(counts):
+    """Wilson 95% interval expressed on the raw-count scale."""
+    lo, hi = [], []
+    for k in counts:
+        l, h = wilson(k, N)
+        lo.append(k - l * N)
+        hi.append(h * N - k)
+    return [lo, hi]
 
 
 def main():
     apply_style()
-    fig, ax = plt.subplots(figsize=(6.6, 3.7))
-    plt.rcParams.update({'xtick.labelsize':11,'ytick.labelsize':11,'axes.labelsize':13,'legend.fontsize':11})
+    plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11,
+                         "axes.labelsize": 12.5})
+    fig, ax = plt.subplots(figsize=(6.6, 3.6))
     x = list(range(len(X)))
 
-    yf, ef = series(FORGED)
-    ys, es = series(STALE)
-
-    ax.errorbar(x, ys, yerr=es, marker="s", ms=6, lw=1.6, capsize=3,
-                color=COLORS["neutral"], mec="white", mew=0.6, ls="--",
-                label="stale derogation (authentic)", zorder=2)
-    ax.errorbar(x, yf, yerr=ef, marker="o", ms=7, lw=1.8, capsize=3,
+    # the y-axis carries the count directly (of 20), so no floating value labels
+    ax.errorbar(x, STALE, yerr=cerr(STALE), marker="s", ms=6, lw=1.6, capsize=3,
+                color=COLORS["neutral"], mec="white", mew=0.6, ls="--", zorder=2)
+    ax.errorbar(x, FORGED, yerr=cerr(FORGED), marker="o", ms=7, lw=1.9, capsize=3,
                 color=COLORS["tertiary_dark"], mfc=COLORS["tertiary"],
-                mec="white", mew=0.6, label="forged derogation", zorder=3)
-
-    # truth-delivered point at the last apparatus
-    ax.scatter([3], [4 / N], s=52, facecolors="none",
+                mec="white", mew=0.6, zorder=3)
+    # truth-delivered point at the last apparatus (open marker)
+    ax.scatter([3], [4], s=54, facecolors="none",
                edgecolors=COLORS["tertiary_dark"], linewidths=1.3, zorder=4)
-    ax.annotate("+ truth delivered", (3, 4 / N), textcoords="offset points",
-                xytext=(-6, 11), fontsize=10, color=COLORS["tertiary_dark"],
-                ha="right")
 
-    # value labels on the forged series
-    for xi, (yi, k) in enumerate(zip(yf, FORGED)):
-        ax.text(xi, yi + 0.028, f"{k}/{N}", ha="center", va="bottom",
-                fontsize=10.5, fontweight="bold", color=COLORS["ink"])
+    # direct labels at the right, on each line -- no legend box, no in-plot text
+    ax.text(3.10, 5.2, "forged", color=COLORS["tertiary_dark"], va="center",
+            ha="left", fontsize=10.5)
+    ax.text(3.10, 3.9, "truth delivered", color=COLORS["tertiary_dark"],
+            va="center", ha="left", fontsize=9)
+    ax.text(3.10, 1.0, "stale, authentic", color=COLORS["neutral"], va="center",
+            ha="left", fontsize=10)
 
     ax.set_xticks(x)
     ax.set_xticklabels(X, fontsize=11)
-    ax.set_ylabel("sessions with an unsafe act")
-    ax.set_ylim(-0.02, 0.52)
-    ax.set_yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5])
-    ax.set_yticklabels(["0", "10\\%", "20\\%", "30\\%", "40\\%", "50\\%"])
-    ax.legend(loc="upper left", frameon=False, fontsize=10.5)
+    ax.set_xlim(-0.3, 4.35)
+    ax.set_ylabel("sessions with an unsafe act (of 20)")
+    ax.set_ylim(-0.4, 10.2)
+    ax.set_yticks([0, 2, 4, 6, 8, 10])
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
