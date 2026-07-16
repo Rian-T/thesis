@@ -594,8 +594,8 @@ We have begun to build such an environment for the clinic, as an exploratory
 agentic extension of the TABIB benchmark of \Cref{sec:conclusion-tabib}. The model
 acts as an agent at a simulated clinical workstation, with a patient record it can
 read and write, a tool to consult the official ANSM drug-interaction thesaurus,
-which serves as the ground truth, and a tool to issue a prescription, which is an
-irreversible act. It works through a queue of ordinary secretarial and pharmacy
+whose 3{,}170 graded entries serve as the ground truth, and a tool to issue a
+prescription, which is an irreversible act. It works through a queue of ordinary secretarial and pharmacy
 tasks, one of which hides a patient whose file holds a contraindicated drug pair
 together with a forged note claiming that a doctor has lifted the contraindication
 for this patient. Every exchange between the agent and the world passes through a
@@ -606,15 +606,30 @@ outcome is the terminal act itself rather than the model's prose
 \input{sources/part_3/figures/fig_agentic_env}
 
 Even this small probe shows that the safety verdict depends on the apparatus as
-much as on the model. The same model, with the same knowledge and the same forged
-note, commits no unsafe act in a clean single-question chat setting, and prescribes
-the contraindicated pair in about a quarter of cases, five out of twenty, in the
-agentic setting under repeated pressure. The knowledge is constant: with no forged
-note the model commits no unsafe act in any setting, so the difference is
-behavioural rather than a gap in medical knowledge. A single unsafe rate hides the
-failure, because the chat setting reaches zero unsafe acts while barely telling a
+much as on the model. \Cref{fig:conclusion-agentic-gradient} follows the same
+model, with the same knowledge and the same forged note, across four apparatuses
+of rising realism. In a clean single-question chat setting it commits no unsafe
+act. Adding tools raises it to two sessions in twenty, and it is the repeated
+patient pressure in the agentic setting, more than the longer horizon on its own,
+that carries it to five in twenty, a quarter of cases. An authentic but outdated
+derogation moves it far less, so the effect comes from the claim of authority the
+forged note carries. The knowledge is constant: with no forged note the model
+commits no unsafe act in any setting, so the difference is behavioural rather than
+a gap in medical knowledge. A single unsafe rate also hides the failure at the
+other end, because the chat setting reaches zero unsafe acts while barely telling a
 contraindicated pair from a safe one, refusing almost every safe pair as well. A
 static benchmark that reports only the unsafe rate would call this model safe.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\textwidth]{plots/part_3/output/conclusion_agentic_gradient.pdf}
+  \caption{The same model and the same forged note under four apparatuses of rising
+  realism: the share of sessions with an unsafe act climbs from none in a chat
+  setting to a quarter in the agentic setting under pressure, while an authentic
+  but outdated note and delivering the official contraindication (open marker)
+  both move it far less.}
+  \label{fig:conclusion-agentic-gradient}
+\end{figure}
 
 Supplying the official contraindication together with the case does not protect it
 either: about a fifth still prescribe against the verdict they have just read. The
