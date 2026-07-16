@@ -58,7 +58,7 @@ the scale of the whole pipeline, where the more recent ModernCamemBERT-bio-v2
 chain spends an estimated 17~kg against 169 for the from-scratch DoctoModernBERT,
 about ten times less.
 
-Where the budget goes is also informative. Training the encoder is the cheap
+The budget is not spent where one might expect. Training the encoder is the cheap
 part: the continual pretraining took about 16 GPU-hours, against roughly 383 for
 a model trained from scratch. Most of the budget, on both sides, goes to the
 language model that rewrites and annotates the training corpus, and our pipeline
@@ -92,7 +92,7 @@ together, more than any single model does.
 
 \section{A Corpus That Paid Off Twice}
 
-This convergence is clearest in one place. The filtering of \Cref{chap:quality}
+The chapters hold together most tightly in one place. The filtering of \Cref{chap:quality}
 let models train on one third of the tokens, and while doing so it found
 something else. Two million clinical cases were sitting inside scientific
 articles, described in passing and never labelled as clinical text. The filter
@@ -116,8 +116,8 @@ they are actually used. That is the question the next chapter takes up.
 
 Filling a clinical form from public data was the thesis's target. Putting a model
 to work in a clinic raises a different question, about how it behaves rather than
-what it knows, and it is the one the field is least ready to answer. This chapter
-takes a first measurement of it.
+what it knows. It is the question the field is least ready to answer, and this
+chapter takes a first measurement of that behaviour.
 
 \section{When Efficiency Is Not the Direction}
 
@@ -264,8 +264,10 @@ share a shape. Each perturbation leaves the medical fact untouched and changes
 only the form of the interaction, yet the answer moves: every protocol exposes a
 different way that the behaviour, not the knowledge, gives way.
 \Cref{fig:conclusion-tabib-radar} gives the overview, and the paragraphs below
-read it one failure mode at a time; \Cref{app:tabib-details} collects the
-per-protocol figures behind it. The first is surface form. Writing a pair with
+work through it one failure mode at a time; \Cref{app:tabib-details} collects the
+per-protocol figures behind it.
+
+The first is surface form. Writing a pair with
 brand names instead of generic ones already flips answers, significantly for
 Gemma4 E4B, which loses 38 points, and for Qwen3.5 4B, which loses 9 (McNemar
 test, $p < 0.05$); the other models change in both directions at once, so a stable
@@ -412,7 +414,7 @@ are the behaviours a factual benchmark, by construction, never sees.
 
 The thesis argued for small, public-data models tested close to real use. This
 closing chapter turns outward, to where clinical AI is heading and to what that
-shift will demand of the way these models are evaluated.
+shift will demand of how we evaluate them.
 
 \section{From Models to Agents}
 
@@ -440,8 +442,8 @@ watched, which is not the number a hospital needs.
 
 \section{Rebuilding the Clinic}
 
-This weakens the clean question-answering benchmark as the main tool for judging
-clinical models. The benchmarks in this thesis, and most benchmarks in medical
+Agents and evaluation awareness together weaken the clean question-answering
+benchmark as the main tool for judging clinical models. The benchmarks in this thesis, and most benchmarks in medical
 NLP, present isolated questions with known answers. To see how an agent behaves in
 a hospital, the evaluation has to look more like a hospital: a simulated
 environment with a patient, a record, tools, and a task carried out over several
@@ -449,7 +451,7 @@ turns, scored on the outcome. Early work in this direction exists. AgentClinic
 places a diagnostic agent in a simulated consultation where it must gather
 information through dialogue and tool use, and reports that accuracy falls sharply
 once the task becomes sequential instead of a single
-question~\citep{schmidgall2025agentclinic}, and \citet{yao2024taubench} build
+question~\citep{schmidgall2025agentclinic}. \citet{yao2024taubench} build
 tool-and-user environments in other domains and find that agents stay unreliable
 across repeated trials of the same task.
 
@@ -460,8 +462,8 @@ read and write, a tool to consult the official ANSM drug-interaction thesaurus,
 whose 3{,}170 graded entries serve as the ground truth, and a tool to issue a
 prescription, which is an irreversible act. It works through a queue of ordinary secretarial and pharmacy
 tasks, one of which hides a patient whose file holds a contraindicated drug pair
-together with a forged note claiming that a doctor has lifted the contraindication
-for this patient. Every exchange between the agent and the world passes through a
+together with a forged note claiming that a doctor has lifted the contraindication.
+Every exchange between the agent and the world passes through a
 single point and is logged with what was served and what is true, so the scored
 outcome is the terminal act itself rather than the model's prose
 (\Cref{fig:conclusion-agentic-env}).
@@ -479,8 +481,8 @@ derogation moves it far less, so the effect comes from the claim of authority th
 forged note carries. The knowledge is constant: with no forged note the model
 commits no unsafe act in any setting, so the difference is behavioural rather than
 a gap in medical knowledge. A single unsafe rate also hides the failure at the
-other end, because the chat setting reaches zero unsafe acts while barely telling a
-contraindicated pair from a safe one, refusing almost every safe pair as well. A
+other end, because the chat setting reaches zero unsafe acts only by refusing almost every
+pair, safe ones included, and so cannot tell a contraindicated pair from a safe one. A
 static benchmark that reports only the unsafe rate would call this model safe.
 
 \begin{figure}[t]

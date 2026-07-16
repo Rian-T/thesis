@@ -30,8 +30,8 @@ hospital label.
 MedEmbed builds the first part, the space in which descriptions and spans are
 compared. It starts from ModernCamemBERT-bio, the biomedical encoder developed in
 \Cref{chap:objectives}. Medical terms and relations derived from the resources
-of \Cref{chap:ontobook} provide contrastive pairs, and these pairs train the
-description space, as summarized in \Cref{fig:p3-medembed}.
+of \Cref{chap:ontobook} provide the contrastive pairs that train this description
+space, as summarized in \Cref{fig:p3-medembed}.
 
 \input{sources/part_3/figures/fig07_medembed}
 
@@ -75,7 +75,7 @@ span--description design \citep{zaratiana2025gliner2}, trained on the generalist
 annotations from \Cref{chap:synthetic} using equal proportions of descriptions
 produced by the annotator and their canonical forms, with no training label from
 a hospital record. The released checkpoint has 150 million parameters and is named
-\texttt{ModernCamemBERT-bio-gliner-base}. We write its full model name as
+ModernCamemBERT-bio-gliner-base. We write its full model name as
 ModernCamemBERT-bio-gliner and use the short form MC-bio-gliner in the rest of
 this part.
 
@@ -161,12 +161,12 @@ effect of that intervention, but they do not identify its linguistic cause.
 
 \section*{Conclusion}
 
-This chapter produced an open-vocabulary extractor that reads clinical text and
-returns the values of fields described in natural language at inference time,
-trained entirely on generalist annotations with no hospital label. Its
-description encoder, MedEmbed, improves terminology retrieval on OntoBench-FR and
-helps locate spans for benchmark-absent descriptions, so the extractor can be
-asked for new fields rather than only the ones fixed at training time. Two
+Trained only on generalist annotations, with no hospital label, the extractor
+still reads clinical text and returns the values of fields described in natural
+language at inference time. What makes its open queries useful is the description
+encoder. MedEmbed improves terminology retrieval on OntoBench-FR and helps locate
+spans for benchmark-absent descriptions, so the extractor can be asked for new
+fields rather than only the ones fixed at training time. Two
 questions stay open. Target-form performance and transfer to other descriptions
 must still be measured separately, and local span--description similarity does
 not determine the role of a repeated mention in a patient trajectory.

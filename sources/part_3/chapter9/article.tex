@@ -20,7 +20,7 @@ the form a clinician filled from them. No such data is available. No open
 dataset pairs a French hospital record with a clinician-filled form, and the
 records themselves cannot leave the hospital. The supervision for this task
 therefore has to be built rather than collected. We separate the evidence
-available to us, as summarized in \Cref{fig:p3-evidence}: synthetic records test
+we have, as summarized in \Cref{fig:p3-evidence}: synthetic records test
 the complete longitudinal task, while human-written corpora test narrower forms
 of transfer.
 
@@ -205,8 +205,8 @@ task rather than reproduce the surface of real clinical writing.
 Public resources support two complementary forms of supervision. Broad
 annotations teach an extractor to follow new type descriptions, while generated
 records provide a synthetic longitudinal task. Aligning these generated field
-assignments back to the record makes a task that has no real filled form
-evaluable, so the longitudinal eCRF becomes something a model can be scored on
-even though the reference remains silver rather than human. The next chapter asks
+assignments back to the record makes the longitudinal eCRF a task a model can be
+scored on, even though no real filled form exists and the reference remains silver
+rather than human. The next chapter asks
 whether an extractor conditioned on descriptions can use this supervision while
 remaining open to fields it was never trained on.
