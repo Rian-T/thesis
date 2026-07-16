@@ -165,7 +165,6 @@ are not distinguishable. The published MC-bio-gliner reaches 0.640, and scaling
 the encoder to 400 million parameters does not raise this score. The generators
 keep the advantage on span-$F_1$, up to 0.567 against 0.503 for MC-bio-gliner.
 
-\paragraph{Robustness to the decoding step.}
 The ranking does not depend on the decoding step. Field competition is the
 natural decoder for a local extractor, whereas a generator's guided JSON already
 gives one value per field, and the comparison before competition reaches the same
@@ -173,8 +172,9 @@ conclusion as the one after it.
 
 \section{Beyond the Aggregate Score}
 
-\paragraph{Errors and confidence.}
-The measures in this section are computed over every committed prediction,
+The aggregate value-$F_1$ hides two things: which kinds of error each system
+makes, and how well it ranks its own predictions by confidence. The measures in
+this section are computed over every committed prediction,
 without the confidence threshold used for the reported value-$F_1$, so they
 include the low-confidence tail that the operating point discards. Read this
 way, the two systems fail differently. Among its errors, MC-bio-gliner assigns a
@@ -200,8 +200,8 @@ bfloat16. The advantage is in memory alone. It does not carry to speed: paramete
 count does not imply lower end-to-end latency, and the encoder is not faster per
 record when all 89 descriptions are queried.
 
-\paragraph{The extractive QA baseline.}
-A SQuAD-style head returns one main span for each question, while a longitudinal
+The extractive question-answering baseline is weaker still, for a structural
+reason. A SQuAD-style head returns one main span for each question, while a longitudinal
 record may contain several mentions and surface forms of the same value. Our QA
 baseline is trained only on the first mention of each field, which discards this
 multiplicity. This mismatch helps explain why the biomedical QA encoder reaches
@@ -214,8 +214,9 @@ ordered by confidence.
 
 \section{Generalization and Transfer}
 
-\paragraph{Data efficiency.}
-For a separate data-efficiency series, we use a low-density variant of
+Two questions remain about the extractor: how much of its accuracy depends on the
+number of generated records, and whether it carries to human-written text. For
+the first, a separate series uses a low-density variant of
 MC-bio-gliner, trained on a corpus in which 22.5\% of documents have no retained
 mention. We adapt it with
 10, 50, 100, 500, and 1,540 synthetic records. This is not the joint-supervision
@@ -232,8 +233,8 @@ annotation.
   \label{fig:p3-data-efficiency}
 \end{figure}
 
-\paragraph{External transfer.}
-The synthetic eCRF measures the complete task but cannot establish transfer to
+The second question is external transfer. The synthetic eCRF measures the
+complete task but cannot establish transfer to
 human-written text. We therefore evaluate on PARHAF and FrACCO NER
 (\Cref{tab:p3-external}). PARHAF contains two biomarker types and only 31 test
 documents, so small differences are unstable. FrACCO contains three ICD-O types

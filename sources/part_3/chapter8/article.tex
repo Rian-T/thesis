@@ -27,8 +27,8 @@ to be trained to select spans from that space. We build the first part on top of
 biomedical encoder, and the second part on generalist annotations that carry no
 hospital label.
 
-\paragraph{Encoding medical descriptions.}
-MedEmbed starts from ModernCamemBERT-bio, the biomedical encoder developed in
+MedEmbed builds the first part, the space in which descriptions and spans are
+compared. It starts from ModernCamemBERT-bio, the biomedical encoder developed in
 \Cref{chap:objectives}. Medical terms and relations derived from the resources
 of \Cref{chap:ontobook} provide contrastive pairs, and these pairs train the
 description space, as summarized in \Cref{fig:p3-medembed}.
@@ -70,12 +70,11 @@ accuracy at rank one, compared with 50.84\% for the strongest baseline
   \end{threeparttable}
 \end{table}
 
-\paragraph{Training the extractor.}
-The extractor follows the GLiNER2 span--description design
-\citep{zaratiana2025gliner2}. It is trained on the generalist annotations from
-\Cref{chap:synthetic}, using equal proportions of descriptions produced by the
-annotator and their canonical forms, and no training label comes from a hospital
-record. The released checkpoint has 150 million parameters and is named
+The second part is the extractor that selects spans. It follows the GLiNER2
+span--description design \citep{zaratiana2025gliner2}, trained on the generalist
+annotations from \Cref{chap:synthetic} using equal proportions of descriptions
+produced by the annotator and their canonical forms, with no training label from
+a hospital record. The released checkpoint has 150 million parameters and is named
 \texttt{ModernCamemBERT-bio-gliner-base}. We write its full model name as
 ModernCamemBERT-bio-gliner and use the short form MC-bio-gliner in the rest of
 this part.
