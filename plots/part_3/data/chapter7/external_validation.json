@@ -1,0 +1,443 @@
+{
+  "benchmarks": {
+    "FrACCO": {
+      "documents": {
+        "test": 300,
+        "validation": 50
+      },
+      "models": {
+        "Density-corrected zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.41006319883325226,
+              "precision": 0.5184388444990781,
+              "recall": 0.33916365098512263
+            },
+            "value": {
+              "f1": 0.32036947010209044,
+              "precision": 0.40503995082974803,
+              "recall": 0.26497788500201047
+            }
+          },
+          "threshold": 0.01,
+          "validation_value_f1": 0.3268398268398268
+        },
+        "Low-density adapted": {
+          "test": {
+            "span": {
+              "f1": 0.6189715745768126,
+              "precision": 0.6578411405295316,
+              "recall": 0.5844390832328106
+            },
+            "value": {
+              "f1": 0.6145001596933886,
+              "precision": 0.6530889341479973,
+              "recall": 0.5802171290711701
+            }
+          },
+          "threshold": 0.17,
+          "validation_value_f1": 0.6357234314980793
+        },
+        "Low-density zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.38784401232600146,
+              "precision": 0.4113139508677034,
+              "recall": 0.366907921190189
+            },
+            "value": {
+              "f1": 0.2960365529699288,
+              "precision": 0.3139508677034032,
+              "recall": 0.2800562927221552
+            }
+          },
+          "threshold": 0.01,
+          "validation_value_f1": 0.3004754358161648
+        },
+        "MedGLiNER adapted": {
+          "test": {
+            "span": {
+              "f1": 0.6355140186915889,
+              "precision": 0.7115097159940209,
+              "recall": 0.5741857659831122
+            },
+            "value": {
+              "f1": 0.6247218513573654,
+              "precision": 0.6994270054808172,
+              "recall": 0.5644350623240852
+            }
+          },
+          "threshold": 0.24,
+          "validation_value_f1": 0.6464579901153213
+        },
+        "MedGLiNER zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.4694870834893298,
+              "precision": 0.4392294220665499,
+              "recall": 0.5042219541616405
+            },
+            "value": {
+              "f1": 0.36746536877573943,
+              "precision": 0.3437828371278459,
+              "recall": 0.3946521913952553
+            }
+          },
+          "threshold": 0.01,
+          "validation_value_f1": 0.38907657657657657
+        },
+        "gliner-biomed adapted": {
+          "test": {
+            "span": {
+              "f1": 0.8885039837680012,
+              "precision": 0.8750365532702993,
+              "recall": 0.9023924406915963
+            },
+            "value": {
+              "f1": 0.8672242292274955,
+              "precision": 0.8540793449653963,
+              "recall": 0.8807800562927222
+            }
+          },
+          "threshold": 0.26,
+          "validation_value_f1": 0.8708247117942653
+        },
+        "gliner-biomed zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.4154476806903991,
+              "precision": 0.3639525213578287,
+              "recall": 0.48391636509851227
+            },
+            "value": {
+              "f1": 0.3804962243797196,
+              "precision": 0.3333333333333333,
+              "recall": 0.4432046642541214
+            }
+          },
+          "threshold": 0.02,
+          "validation_value_f1": 0.41514429441355577
+        }
+      }
+    },
+    "PARHAF": {
+      "documents": {
+        "test": 31,
+        "validation": 21
+      },
+      "models": {
+        "Density-corrected adapted": {
+          "test": {
+            "span": {
+              "f1": 0.7145299145299145,
+              "precision": 0.7206896551724138,
+              "recall": 0.7084745762711865
+            },
+            "value": {
+              "f1": 0.6871794871794873,
+              "precision": 0.6931034482758621,
+              "recall": 0.6813559322033899
+            }
+          },
+          "threshold": 0.3,
+          "validation_value_f1": 0.7442922374429224
+        },
+        "Density-corrected zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.45152722443559096,
+              "precision": 0.37117903930131,
+              "recall": 0.576271186440678
+            },
+            "value": {
+              "f1": 0.4116865869853918,
+              "precision": 0.3384279475982533,
+              "recall": 0.5254237288135594
+            }
+          },
+          "threshold": 0.01,
+          "validation_value_f1": 0.47036328871892924
+        },
+        "Low-density adapted": {
+          "test": {
+            "span": {
+              "f1": 0.6569872958257714,
+              "precision": 0.70703125,
+              "recall": 0.6135593220338983
+            },
+            "value": {
+              "f1": 0.6533575317604355,
+              "precision": 0.703125,
+              "recall": 0.6101694915254238
+            }
+          },
+          "threshold": 0.29,
+          "validation_value_f1": 0.671264367816092
+        },
+        "Low-density zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.32418952618453867,
+              "precision": 0.2564102564102564,
+              "recall": 0.4406779661016949
+            },
+            "value": {
+              "f1": 0.29925187032418954,
+              "precision": 0.23668639053254437,
+              "recall": 0.4067796610169492
+            }
+          },
+          "threshold": 0.01,
+          "validation_value_f1": 0.3854166666666667
+        },
+        "MedGLiNER adapted": {
+          "test": {
+            "span": {
+              "f1": 0.7077464788732395,
+              "precision": 0.7362637362637363,
+              "recall": 0.6813559322033899
+            },
+            "value": {
+              "f1": 0.6830985915492958,
+              "precision": 0.7106227106227107,
+              "recall": 0.6576271186440678
+            }
+          },
+          "threshold": 0.23,
+          "validation_value_f1": 0.7139588100686498
+        },
+        "MedGLiNER zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.39055118110236214,
+              "precision": 0.36470588235294116,
+              "recall": 0.42033898305084744
+            },
+            "value": {
+              "f1": 0.36535433070866147,
+              "precision": 0.3411764705882353,
+              "recall": 0.39322033898305087
+            }
+          },
+          "threshold": 0.02,
+          "validation_value_f1": 0.4439655172413793
+        },
+        "Qwen3.5-2B adapted": {
+          "test": {
+            "span": {
+              "f1": 0.765151515151515,
+              "precision": 0.8669527896995708,
+              "recall": 0.6847457627118644
+            },
+            "value": {
+              "f1": 0.7424242424242425,
+              "precision": 0.8412017167381974,
+              "recall": 0.6644067796610169
+            }
+          },
+          "threshold": 0.7,
+          "validation_value_f1": 0.7740384615384616
+        },
+        "Qwen3.5-9B adapted": {
+          "test": {
+            "span": {
+              "f1": 0.7396226415094339,
+              "precision": 0.8340425531914893,
+              "recall": 0.6644067796610169
+            },
+            "value": {
+              "f1": 0.7245283018867925,
+              "precision": 0.8170212765957446,
+              "recall": 0.6508474576271186
+            }
+          },
+          "threshold": 0.7,
+          "validation_value_f1": 0.7677261613691932
+        },
+        "Qwen3.5-9B zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.7582205029013538,
+              "precision": 0.8828828828828829,
+              "recall": 0.6644067796610169
+            },
+            "value": {
+              "f1": 0.5918762088974855,
+              "precision": 0.6891891891891891,
+              "recall": 0.5186440677966102
+            }
+          },
+          "threshold": 0.72,
+          "validation_value_f1": 0.5843828715365239
+        },
+        "gliner-biomed adapted": {
+          "test": {
+            "span": {
+              "f1": 0.7666151468315301,
+              "precision": 0.7045454545454546,
+              "recall": 0.8406779661016949
+            },
+            "value": {
+              "f1": 0.6027820710973725,
+              "precision": 0.5539772727272727,
+              "recall": 0.6610169491525424
+            }
+          },
+          "threshold": 0.25,
+          "validation_value_f1": 0.6388308977035491
+        },
+        "gliner-biomed zero-shot": {
+          "test": {
+            "span": {
+              "f1": 0.5,
+              "precision": 0.3983903420523139,
+              "recall": 0.6711864406779661
+            },
+            "value": {
+              "f1": 0.43686868686868685,
+              "precision": 0.34808853118712274,
+              "recall": 0.5864406779661017
+            }
+          },
+          "threshold": 0.06,
+          "validation_value_f1": 0.46428571428571425
+        }
+      }
+    }
+  },
+  "input_sha256": {
+    "FrACCO:Density-corrected zero-shot": "8714046dabf3cd8e893ae8c3ad4427aee3c73c7a739add4fe751b7cfef18004b",
+    "FrACCO:Low-density adapted": "2b373aeb8f5f0747dcd11e0b04248b6dddc6eae2824e028fa505dae916945047",
+    "FrACCO:Low-density zero-shot": "82524f093c98b1fd3dfc878c0ac004ff7cc0b8edb6f782a5b1505598bf1718bb",
+    "FrACCO:MedGLiNER adapted": "b69ab0caba492499d8318784f9b11d9043b3aa4ecb99e0a68242f73306ec907a",
+    "FrACCO:MedGLiNER zero-shot": "88529d2280d1431d056672578642e79a07830f30a374ef96e79535ebee0120dd",
+    "FrACCO:gliner-biomed adapted": "3fc018b23a59da18f09fa07217d5de4b1a6b4edeea4174c63a0bebbb1447ce6e",
+    "FrACCO:gliner-biomed zero-shot": "b9cccbe47636aca012e70848e6923846d3c3e52b24f51ccc4392db29d45c7f54",
+    "FrACCO:gold": "35769cd7e04e7e0666d6b9123ccf7859c5154b70ca9fa9dc5712a2ebfdb1b5cc",
+    "FrACCO:test": "a0910025193b519f698c27099063bccb7b000741cce7111e81e555d681d2c8da",
+    "FrACCO:validation": "d1ea0791736368a757029520c815150356d8945790c1c23a2ccbb8ce020738f1",
+    "PARHAF:Density-corrected adapted": "6abb25167a4ccfc43260f74c0aa1a2e01d42817bcbdafea11b9197524a2afd2e",
+    "PARHAF:Density-corrected zero-shot": "ac6c316df5fad762b962bc4cf3824f27928c654341753fb013ce584357426953",
+    "PARHAF:Low-density adapted": "e022be72061419b65fcecb283bb454f98aaa134874fe43e2587ae6aac86cadb5",
+    "PARHAF:Low-density zero-shot": "41e1cbd7e6a84b8bcb82ca64ac6c7f96c290cccadf337bb763da7172fc9b730a",
+    "PARHAF:MedGLiNER adapted": "431e4b76303aece2f94695b4b7a14744e86319db6fda3ecb7005c4562b100487",
+    "PARHAF:MedGLiNER zero-shot": "8f80301d8026c1bb0c1edd0f521ef6b38c539b4e840ebd7e37b7a7c323eb3b2e",
+    "PARHAF:Qwen3.5-2B adapted": "a3c0658d877ae26a92636df69175e220b077e795974c2df17ebde8c171204289",
+    "PARHAF:Qwen3.5-9B adapted": "e39d4f04c50385a5b002fd51e62ffd87c7cac5f7f37f2878b28b16764290e4d8",
+    "PARHAF:Qwen3.5-9B zero-shot": "367656571002161c05652e851271fba59a5ad3d6a492effe4f1d857e179e8158",
+    "PARHAF:gliner-biomed adapted": "69bcfdcc519a4304d848f9705345e227373652f14df8f32a11e064ba11bbf097",
+    "PARHAF:gliner-biomed zero-shot": "74e4513a3db0a21569dc2ecc4e7f633bdcf326eeefe0382376da32ec9bb80b55",
+    "PARHAF:gold": "155e4f44bc5c648db4b1bdaeeef9260d8e5cbb9af3bad5319e98d4b243d99720",
+    "PARHAF:test": "1fb3ef906cce49e6f18f60783e20c6296fd1db7b5e9a97d09ce60b7ddfaa3349",
+    "PARHAF:validation": "2c85d4af47b01601def1a0c143d9f19a9fc29e67d6d9c4c322456405ac33133d",
+    "derivation": "6237a653ff93a6624be86df8236fc29a9226e9188b32d37e8d76f5e2b1f5e181"
+  },
+  "protocol": {
+    "reported_metrics_share_threshold": true,
+    "selection_metric": "validation value-F1",
+    "test_used_for_selection": false,
+    "threshold_grid": [
+      0.001,
+      0.01,
+      0.02,
+      0.03,
+      0.04,
+      0.05,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.1,
+      0.11,
+      0.12,
+      0.13,
+      0.14,
+      0.15,
+      0.16,
+      0.17,
+      0.18,
+      0.19,
+      0.2,
+      0.21,
+      0.22,
+      0.23,
+      0.24,
+      0.25,
+      0.26,
+      0.27,
+      0.28,
+      0.29,
+      0.3,
+      0.31,
+      0.32,
+      0.33,
+      0.34,
+      0.35,
+      0.36,
+      0.37,
+      0.38,
+      0.39,
+      0.4,
+      0.41,
+      0.42,
+      0.43,
+      0.44,
+      0.45,
+      0.46,
+      0.47,
+      0.48,
+      0.49,
+      0.5,
+      0.51,
+      0.52,
+      0.53,
+      0.54,
+      0.55,
+      0.56,
+      0.57,
+      0.58,
+      0.59,
+      0.6,
+      0.61,
+      0.62,
+      0.63,
+      0.64,
+      0.65,
+      0.66,
+      0.67,
+      0.68,
+      0.69,
+      0.7,
+      0.71,
+      0.72,
+      0.73,
+      0.74,
+      0.75,
+      0.76,
+      0.77,
+      0.78,
+      0.79,
+      0.8,
+      0.81,
+      0.82,
+      0.83,
+      0.84,
+      0.85,
+      0.86,
+      0.87,
+      0.88,
+      0.89,
+      0.9,
+      0.91,
+      0.92,
+      0.93,
+      0.94,
+      0.95,
+      0.96,
+      0.97,
+      0.98,
+      0.99
+    ]
+  },
+  "schema": 1
+}

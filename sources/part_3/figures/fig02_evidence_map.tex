@@ -1,29 +1,38 @@
 \begin{figure}[t]
   \centering
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    proxy/.style={align=center, text=ThesisInk, inner sep=3pt},
     target/.style={
-      draw=ThesisNeutral!75, dashed, rounded corners=3pt,
-      fill=ThesisPaper, text width=4.3cm, minimum height=1.35cm,
-      align=center, inner sep=6pt, text=ThesisInk
-    },
-    link/.style={->, draw=ThesisInk!38, line width=0.65pt,
-      shorten <=5pt, shorten >=5pt}
-  ]
-    \node[target] (target) at (0,0) {Clinician-annotated eCRFs\\from French hospital records};
+      draw=ThesisNeutral!70, densely dashed, rounded corners=3pt,
+      fill=ThesisNeutral!8, text width=4.6cm, minimum height=1.5cm,
+      align=center, inner sep=6pt, text=ThesisNeutral},
+    proxy/.style={
+      draw=ThesisNeutral!55, rounded corners=3pt,
+      fill=ThesisPaper, text width=3.5cm, minimum height=1.35cm,
+      align=center, inner sep=5pt, text=ThesisInk},
+    tests/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape},
+    link/.style={-{Stealth[length=4pt]}, draw=ThesisInk!30, line width=0.6pt,
+      densely dashed, shorten <=4pt, shorten >=4pt}]
 
-    \node[proxy] (ecrf) at (-4.5,1.65) {\textbf{Synthetic lymphoma eCRF}\\task structure};
-    \node[proxy] (parhaf) at (4.5,1.65) {\textbf{PARHAF}\\fictional clinical reports};
-    \node[proxy] (fracco) at (-4.5,-1.65) {\textbf{FrACCO}\\external oncology NER};
-    \node[proxy] (judge) at (4.5,-1.65) {\textbf{Evaluation without gold labels}\\new field types};
+    % Unavailable clinical target at the centre
+    \node[target] (target) at (0,0)
+      {Clinician-filled eCRF\\from French hospital records};
+    \node[anchor=south, text=ThesisNeutral!85, font=\scriptsize\bfseries]
+      at (target.north) {not available};
 
-    \draw[link] (ecrf) -- (target);
+    % Three present proxies, each labelled by what it tests
+    \node[proxy] (ecrf)   at (0,3.35)   {\textbf{Synthetic lymphoma eCRF}};
+    \node[proxy] (parhaf) at (-5.1,-2.5) {\textbf{PARHAF}};
+    \node[proxy] (fracco) at (5.1,-2.5)  {\textbf{FrACCO}};
+
+    \node[tests, above=1pt of ecrf]   {the complete form-filling task};
+    \node[tests, below=1pt of parhaf] {transfer to short\\human-written reports};
+    \node[tests, below=1pt of fracco] {dense entity recognition};
+
+    \draw[link] (ecrf)   -- (target);
     \draw[link] (parhaf) -- (target);
     \draw[link] (fracco) -- (target);
-    \draw[link] (judge) -- (target);
-
-    \node[anchor=south, text=ThesisNeutral] at (target.north) {not available};
   \end{tikzpicture}
-  \caption{Evaluation sources used around the unavailable clinical target.}
+  \caption{Three available proxies stand in for the unavailable clinical target,
+  each testing a different part of the task.}
   \label{fig:p3-evidence}
 \end{figure}

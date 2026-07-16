@@ -2,41 +2,47 @@
   \centering
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    excerpt/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
-      text width=3.85cm, minimum height=1.25cm, align=left, inner sep=6pt},
-    proposal/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!13,
-      rounded corners=2pt, text width=3.05cm, minimum height=1.25cm,
-      align=left, inner sep=6pt},
-    output/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
-      rounded corners=2pt, text width=2.75cm, minimum height=1.05cm,
-      align=left, inner sep=6pt},
-    operation/.style={align=center, text=ThesisSecondaryDark, inner sep=3pt},
-    flow/.style={->, ThesisInk!40, shorten >=4pt, shorten <=4pt}]
+    block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.1cm,
+      align=left, inner sep=7pt, text=ThesisInk},
+    report/.style ={block, draw=ThesisNeutral!55,       fill=ThesisPaper},
+    proposal/.style={block, draw=ThesisTertiaryDark,     fill=ThesisTertiary!13},
+    localize/.style={block, draw=ThesisSecondaryDark,    fill=ThesisSecondary!14},
+    silver/.style  ={block, draw=ThesisPrimaryDark,      fill=ThesisPrimary!16},
+    flow/.style={-{Stealth[length=5pt]}, draw=ThesisInk!40, line width=0.8pt,
+      shorten <=3pt, shorten >=3pt},
+    phase/.style={decorate, decoration={brace, amplitude=5pt},
+      draw=ThesisInk!40, line width=0.6pt}]
 
-    \node[excerpt] (report) at (-5.15,0) {\textbf{Routed report}\\[2pt]
-      ``début chimiothérapie par protocole
-      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}, 8 cycles''};
-    \node[proposal] (pair) at (-1.35,0) {\textbf{LLM proposal}\\[2pt]
+    \def\bx{4.15}
+    \node[report]   (b1) at (0,0)      {\textbf{Routed report}\\[3pt]
+      \dots{}protocole \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}},
+      8 cycles\dots};
+    \node[proposal] (b2) at (\bx,0)    {\textbf{LLM proposal}\\[3pt]
       \texttt{field}: first-line treatment\\
       \texttt{string}: CHOEP-14};
+    \node[localize] (b3) at (2*\bx,0)  {\textbf{Deterministic localization}\\[4pt]
+      literal match\\[1pt]
+      $\downarrow$\\[1pt]
+      character offsets\\[1pt]
+      $\downarrow$\\[1pt]
+      collision rule};
+    \node[silver]   (b4) at (3*\bx,0)  {\textbf{Silver span}\\[3pt]
+      field: first-line treatment\\
+      offsets: \texttt{[128, 136]}\\
+      slice: ``CHOEP-14''};
 
-    \node[operation] (match) at (1.25,0.58) {literal string\\match};
-    \node[operation] (offset) at (3.25,0.58) {document\\offsets};
-    \node[operation] (collision) at (5.25,0.58) {one field per\\identical offset pair};
-    \draw[ThesisSecondaryDark!55, line width=0.65pt] (0.25,0.0)--(6.1,0.0);
-    \fill[ThesisSecondaryDark] (1.25,0.0) circle (1.7pt);
-    \fill[ThesisSecondaryDark] (3.25,0.0) circle (1.7pt);
-    \fill[ThesisSecondaryDark] (5.25,0.0) circle (1.7pt);
+    \draw[flow] (b1)--(b2);
+    \draw[flow] (b2)--(b3);
+    \draw[flow] (b3)--(b4);
 
-    \node[output] (silver) at (3.25,-1.25) {\textbf{Silver span}\\field + offsets + text slice};
-
-    \draw[flow] (report)--(pair);
-    \draw[flow] (pair.east)--(0.25,0.0);
-    \draw[flow] (3.25,0.0)--(silver.north);
-    \node[above=3pt, text=ThesisTertiaryDark] at (-1.35,0.92) {semantic proposal};
-    \node[above=3pt, text=ThesisSecondaryDark] at (3.25,1.18) {deterministic localization};
+    % semantic vs deterministic phases
+    \draw[phase] ($(b1.north west)+(0,0.25)$) -- ($(b2.north east)+(0,0.25)$)
+      node[midway, above=6pt, text=ThesisTertiaryDark, font=\scriptsize\bfseries] {semantic};
+    \draw[phase] ($(b3.north west)+(0,0.25)$) -- ($(b4.north east)+(0,0.25)$)
+      node[midway, above=6pt, text=ThesisSecondaryDark, font=\scriptsize\bfseries] {deterministic};
   \end{tikzpicture}%
   }
-  \captionof{figure}{Semantic proposal and deterministic localization of each field value.}
+  \captionof{figure}{Each form value is proposed semantically by the language
+  model, then localized deterministically into an offset-anchored silver span.}
   \label{fig:p3-tapdl}
 \end{center}

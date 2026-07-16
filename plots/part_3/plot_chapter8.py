@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 from matplotlib.ticker import FuncFormatter
 
 from plots.part_3.common import (
@@ -15,11 +14,11 @@ from plots.part_3.common import (
     ProvisionalDataError,
     configure_style,
     load_visual_data,
-    mark_preliminary,
     result_value,
     save_figure,
     semantic_colors,
 )
+from plots.thesis_style import COLORS
 
 
 @dataclass(frozen=True)
@@ -60,14 +59,14 @@ class TradeoffData:
 
 
 _SECTION_LABELS = {
-    "first": "1re ligne\nde traitement",
-    "other": "autres lignes\nde traitement",
-    "news": "dernières nouvelles",
-    "second": "2e ligne\nde traitement",
-    "demography": "démographie",
-    "imaging": "imagerie",
-    "antecedents": "antécédents",
-    "history": "histoire de\nla maladie",
+    "first": "First treatment line",
+    "other": "Other treatment lines",
+    "news": "Latest status",
+    "second": "Second treatment line",
+    "demography": "Demographics",
+    "imaging": "Imaging",
+    "antecedents": "Medical history",
+    "history": "Disease history",
 }
 
 
@@ -134,8 +133,8 @@ def prepare_data(
     tradeoff = TradeoffData(
         points=(
             TradeoffPoint(
-                label="v3b généraliste",
-                kind="généraliste",
+                label="Generalist A",
+                kind="generalist",
                 ecrf=result_value(
                     "ecrf", "MC-bio-gliner (v3b)", "zero_shot", "value"
                 ),
@@ -144,24 +143,24 @@ def prepare_data(
                 ),
             ),
             TradeoffPoint(
-                label="FROMV3B spécialiste",
-                kind="spécialisé",
+                label="eCRF-only specialization",
+                kind="specialist",
                 ecrf=result_value(
                     "ecrf", "MC-bio-gliner (v3b)", "capstone", "value"
                 ),
                 parhaf=float(tradeoff_node["fromv3b_parhaf"]["value"]),
             ),
             TradeoffPoint(
-                label="v3e généraliste",
-                kind="généraliste",
+                label="Generalist B",
+                kind="generalist",
                 ecrf=float(tradeoff_node["v3e_ecrf"]["value"]),
                 parhaf=result_value(
                     "parhaf", "MC-bio-gliner (v3e)", "zero_shot", "value"
                 ),
             ),
             TradeoffPoint(
-                label="MIX6 spécialiste",
-                kind="spécialisé",
+                label="Mixed-supervision specialization",
+                kind="specialist",
                 ecrf=result_value(
                     "ecrf", "MC-bio-gliner (MIX)", "capstone", "value"
                 ),
@@ -173,7 +172,7 @@ def prepare_data(
 
 
 def _decimal(value: float, precision: int = 3) -> str:
-    return f"{value:.{precision}f}".replace(".", ",")
+    return f"{value:.{precision}f}"
 
 
 def _style_numeric_axis(ax) -> None:
@@ -185,133 +184,114 @@ def _style_numeric_axis(ax) -> None:
     )
 
 
-def _make_supervision_figure(data: SupervisionData):
+def _make_global_supervision_figure(data: SupervisionData):
     colors = semantic_colors()
-    fig, (global_ax, section_ax) = plt.subplots(
-        1,
-        2,
-        figsize=(5.5, 4.0),
-        layout="none",
-        gridspec_kw={"width_ratios": (0.78, 2.22), "wspace": 0.48},
+    fig, ax = plt.subplots(figsize=(5.5, 1.72))
+    global_labels = (
+        "Full corpus",
+        "Without clinical text",
+        "Biomedical control",
     )
-    fig.subplots_adjust(
-        left=0.20,
-        right=0.98,
-        bottom=0.19,
-        top=0.89,
-        wspace=0.62,
-    )
-
-    global_labels = ("complet", "sans clinique", "biomédical\napparié")
     global_colors = (colors["encoder"], colors["failure"], colors["neutral"])
     y_positions = (2, 1, 0)
-    global_ax.barh(
-        y_positions,
-        data.global_values,
-        height=0.48,
-        color=global_colors,
-        alpha=0.85,
-        edgecolor="white",
-        linewidth=0.6,
-    )
-    for value, y_position in zip(data.global_values, y_positions):
-        global_ax.annotate(
+    for value, y_position, color in zip(
+        data.global_values, y_positions, global_colors
+    ):
+        ax.plot((0, value), (y_position, y_position), color=color, linewidth=1.2)
+        ax.scatter(value, y_position, s=42, color=color, zorder=3)
+        ax.annotate(
             _decimal(value),
             (value, y_position),
-            xytext=(3, 0),
+            xytext=(6, 0),
             textcoords="offset points",
             ha="left",
             va="center",
-            fontsize=8,
+            fontsize=8.5,
+            color=color,
         )
-    global_ax.set_yticks(y_positions, labels=global_labels)
-    global_ax.set_xlim(0, 0.24)
-    global_ax.set_title(
-        f"Global · {data.n_documents} documents",
-        fontsize=9.5,
-        fontweight="bold",
-        pad=9,
-    )
-    global_ax.spines["left"].set_visible(False)
-    global_ax.tick_params(axis="y", length=0, labelsize=7.6)
-    _style_numeric_axis(global_ax)
+    ax.set_yticks(y_positions, labels=global_labels)
+    ax.set_xlim(0, 0.235)
+    ax.set_xticks((0.0, 0.1, 0.2))
+    ax.set_xlabel("value-micro-$F_1$", fontsize=9)
+    ax.spines["left"].set_visible(False)
+    _style_numeric_axis(ax)
+    ax.tick_params(axis="y", length=0, labelsize=8.5)
+    return fig
 
-    section_positions = list(range(len(data.sections) - 1, -1, -1))
-    for item, y_position in zip(data.sections, section_positions):
-        section_ax.plot(
-            (item.no_clinical, item.full),
-            (y_position, y_position),
-            color=colors["neutral"],
-            alpha=0.45,
-            linewidth=1.1,
+
+def _make_section_supervision_figure(data: SupervisionData):
+    """Fused dumbbell: a Global header row on top, then per-section dumbbells
+    sorted by the full/without-clinical gap (B3)."""
+
+    fig, ax = plt.subplots(figsize=(5.5, 4.0))
+
+    n_sections = len(data.sections)
+    gap_above_global = 1.4
+    global_y = n_sections - 1 + gap_above_global
+
+    def _dumbbell(low, high, y):
+        ax.plot(
+            (low, high),
+            (y, y),
+            color=COLORS["neutral"],
+            alpha=0.35,
+            linewidth=2.2,
+            solid_capstyle="round",
             zorder=1,
         )
-        section_ax.scatter(
-            item.full,
-            y_position,
-            s=31,
-            color=colors["encoder"],
-            edgecolor="white",
-            linewidth=0.6,
-            zorder=3,
-        )
-        section_ax.scatter(
-            item.no_clinical,
-            y_position,
-            s=31,
-            color=colors["failure"],
-            edgecolor="white",
-            linewidth=0.6,
-            zorder=3,
-        )
-        section_ax.annotate(
-            _decimal(item.full),
-            (item.full, y_position),
-            xytext=(4, 3),
-            textcoords="offset points",
-            ha="left",
-            va="bottom",
-            fontsize=7.3,
-            color=colors["encoder"],
-        )
-        section_ax.annotate(
-            _decimal(item.no_clinical),
-            (item.no_clinical, y_position),
-            xytext=(4, -3),
-            textcoords="offset points",
-            ha="left",
-            va="top",
-            fontsize=7.3,
-            color=colors["failure"],
-            fontweight="bold" if item.key in {"first", "other", "second"} else None,
-        )
 
-    section_ax.set_yticks(
-        section_positions,
-        labels=[
-            f"{item.label}\n$n={item.n_gold_cells}$" for item in data.sections
-        ],
+    # Global header row: full / without-clinical / biomedical control.
+    full, no_clinical, biomed = data.global_values
+    _dumbbell(min(full, no_clinical, biomed), max(full, no_clinical, biomed), global_y)
+    ax.scatter(biomed, global_y, s=44, color=COLORS["neutral"],
+               edgecolor="white", linewidth=0.6, zorder=3)
+    ax.scatter(no_clinical, global_y, s=44, color=COLORS["baseline"],
+               edgecolor="white", linewidth=0.6, zorder=3)
+    ax.scatter(full, global_y, s=44, color=COLORS["primary"],
+               edgecolor="white", linewidth=0.6, zorder=3)
+
+    # Per-section dumbbells, largest gap on top.
+    section_positions = list(range(n_sections - 1, -1, -1))
+    for item, y_position in zip(data.sections, section_positions):
+        _dumbbell(
+            min(item.no_clinical, item.full),
+            max(item.no_clinical, item.full),
+            y_position,
+        )
+        ax.scatter(item.no_clinical, y_position, s=40, color=COLORS["baseline"],
+                   edgecolor="white", linewidth=0.6, zorder=3)
+        ax.scatter(item.full, y_position, s=40, color=COLORS["primary"],
+                   edgecolor="white", linewidth=0.6, zorder=3)
+
+    y_ticks = section_positions + [global_y]
+    y_labels = [item.label for item in data.sections] + ["Global"]
+    ax.set_yticks(y_ticks, labels=y_labels)
+
+    ax.set_xlim(-0.012, 0.43)
+    ax.set_xticks((0.0, 0.1, 0.2, 0.3, 0.4))
+    ax.set_ylim(-0.65, global_y + 0.6)
+    ax.set_xlabel("value-micro-$F_1$", fontsize=9)
+    ax.spines["left"].set_visible(False)
+    ax.xaxis.set_major_formatter(
+        FuncFormatter(lambda value, _position: _decimal(value, 2))
     )
-    section_ax.set_xlim(-0.012, 0.43)
-    section_ax.set_xticks((0.0, 0.2))
-    section_ax.set_ylim(-0.65, len(data.sections) - 0.35)
-    section_ax.set_title(
-        "Sections · complet vs sans clinique",
-        fontsize=9.5,
-        fontweight="bold",
-        pad=9,
-    )
-    section_ax.spines["left"].set_visible(False)
-    section_ax.tick_params(axis="y", length=0, labelsize=7.2)
-    _style_numeric_axis(section_ax)
-    fig.supxlabel("value-micro-$F_1$", y=0.055, fontsize=8.5)
+    ax.grid(axis="x", color=COLORS["neutral"], alpha=0.2, linestyle=":", linewidth=0.6)
+    ax.tick_params(axis="x", labelsize=8, width=0.5, length=3)
+    ax.tick_params(axis="y", length=0, labelsize=8)
+
+    ax.scatter([], [], s=40, color=COLORS["primary"], label="Full corpus")
+    ax.scatter([], [], s=40, color=COLORS["baseline"], label="Without clinical text")
+    ax.scatter([], [], s=40, color=COLORS["neutral"], label="Biomedical control")
+    ax.legend(frameon=False, fontsize=8, loc="lower right")
     return fig
 
 
 def _make_novel_types_figure(data: NovelTypeData):
-    colors = semantic_colors()
-    fig, ax = plt.subplots(figsize=(5.5, 2.65))
-    regimes = ("types communs", "types nouveaux")
+    """Light dumbbell: MedEmbed vs the biomedical encoder on familiar and
+    benchmark-absent descriptions (B4)."""
+
+    fig, ax = plt.subplots(figsize=(4.8, 2.0))
+    regimes = ("Familiar descriptions", "Benchmark-absent descriptions")
     y_positions = (1, 0)
     for index, (regime, y_position) in enumerate(zip(regimes, y_positions)):
         medembed = data.medembed[index]
@@ -319,16 +299,17 @@ def _make_novel_types_figure(data: NovelTypeData):
         ax.plot(
             (mcbio, medembed),
             (y_position, y_position),
-            color=colors["neutral"],
-            alpha=0.5,
-            linewidth=1.3,
+            color=COLORS["neutral"],
+            alpha=0.35,
+            linewidth=2.0,
+            solid_capstyle="round",
             zorder=1,
         )
         ax.scatter(
             mcbio,
             y_position,
-            s=48,
-            color=colors["neutral"],
+            s=44,
+            color=COLORS["neutral"],
             edgecolor="white",
             linewidth=0.7,
             zorder=3,
@@ -336,73 +317,26 @@ def _make_novel_types_figure(data: NovelTypeData):
         ax.scatter(
             medembed,
             y_position,
-            s=48,
-            color=colors["encoder"],
+            s=64,
+            color=COLORS["primary"],
             edgecolor="white",
             linewidth=0.7,
-            zorder=3,
+            zorder=4,
         )
-        ax.annotate(
-            f"MC-bio  {_decimal(mcbio)}",
-            (mcbio, y_position),
-            xytext=(-5, -10),
-            textcoords="offset points",
-            ha="right",
-            va="top",
-            fontsize=8,
-            color=colors["neutral"],
-        )
-        ax.annotate(
-            f"MedEmbed  {_decimal(medembed)}",
-            (medembed, y_position),
-            xytext=(5, 9),
-            textcoords="offset points",
-            ha="left",
-            va="bottom",
-            fontsize=8,
-            color=colors["encoder"],
-            fontweight="bold",
-        )
-        ax.text(
-            (mcbio + medembed) / 2,
-            y_position + 0.14,
-            f"$\\Delta$ +{_decimal(medembed - mcbio)}",
-            ha="center",
-            va="bottom",
-            fontsize=7.5,
-            color=colors["neutral"],
-        )
-        ax.text(
-            0.292,
-            y_position,
-            f"{regime}\n{data.queries[index]} requêtes",
-            ha="left",
-            va="center",
-            fontsize=8.3,
-        )
-
-    ax.set_xlim(0.29, 0.55)
-    ax.set_ylim(-0.45, 1.43)
-    ax.set_yticks([])
+    ax.set_xlim(0.29, 0.56)
+    ax.set_ylim(-0.45, 1.45)
+    ax.set_yticks(y_positions, labels=regimes)
     ax.set_xlabel(data.metric, fontsize=9)
-    ax.set_title(
-        "Comparaison A/B du backbone contrastif",
-        fontsize=10.5,
-        fontweight="bold",
-        pad=9,
-    )
-    ax.text(
-        0.5,
-        -0.28,
-        "préférence du juge · pas une exactitude médicale humaine",
-        transform=ax.transAxes,
-        ha="center",
-        va="top",
-        fontsize=7.5,
-        color=colors["neutral"],
-    )
     ax.spines["left"].set_visible(False)
-    _style_numeric_axis(ax)
+    ax.xaxis.set_major_formatter(
+        FuncFormatter(lambda value, _position: _decimal(value, 2))
+    )
+    ax.grid(axis="x", color=COLORS["neutral"], alpha=0.2, linestyle=":", linewidth=0.6)
+    ax.tick_params(axis="x", labelsize=8, width=0.5, length=3)
+    ax.tick_params(axis="y", length=0, labelsize=8.5, pad=8)
+    ax.scatter([], [], s=64, color=COLORS["primary"], label="MedEmbed")
+    ax.scatter([], [], s=44, color=COLORS["neutral"], label="Biomedical encoder")
+    ax.legend(frameon=False, fontsize=8, loc="lower right")
     return fig
 
 
@@ -410,13 +344,13 @@ def _make_tradeoff_figure(data: TradeoffData):
     colors = semantic_colors()
     fig, ax = plt.subplots(figsize=(5.5, 3.45))
     label_offsets = {
-        "v3b généraliste": (7, 7),
-        "FROMV3B spécialiste": (-7, 8),
-        "v3e généraliste": (7, -11),
-        "MIX6 spécialiste": (-7, 8),
+        "Generalist A": (7, 7),
+        "eCRF-only specialization": (-7, 8),
+        "Generalist B": (7, -11),
+        "Mixed-supervision specialization": (-7, 8),
     }
     for point in data.points:
-        is_generalist = point.kind == "généraliste"
+        is_generalist = point.kind == "generalist"
         color = colors["encoder"] if is_generalist else colors["structure"]
         ax.scatter(
             point.ecrf,
@@ -429,7 +363,7 @@ def _make_tradeoff_figure(data: TradeoffData):
         )
         x_offset, y_offset = label_offsets[point.label]
         ax.annotate(
-            f"{point.label}\n({_decimal(point.ecrf)} ; {_decimal(point.parhaf)})",
+            point.label,
             (point.ecrf, point.parhaf),
             xytext=(x_offset, y_offset),
             textcoords="offset points",
@@ -441,52 +375,8 @@ def _make_tradeoff_figure(data: TradeoffData):
 
     ax.set_xlim(0.13, 0.70)
     ax.set_ylim(-0.005, 0.30)
-    ax.set_xlabel("eCRF value-micro-$F_1$  (spécialisation)", fontsize=9)
-    ax.set_ylabel("PARHAF NER value-micro-$F_1$  (ouverture)", fontsize=9)
-    ax.set_title(
-        "Spécialisation du formulaire vs transfert ouvert",
-        fontsize=10.5,
-        fontweight="bold",
-        pad=9,
-    )
-    legend_handles = (
-        Line2D(
-            [],
-            [],
-            marker="o",
-            linestyle="None",
-            markerfacecolor="white",
-            markeredgecolor=colors["encoder"],
-            markeredgewidth=1.5,
-            label="généraliste",
-        ),
-        Line2D(
-            [],
-            [],
-            marker="o",
-            linestyle="None",
-            markerfacecolor=colors["structure"],
-            markeredgecolor="white",
-            label="spécialisé",
-        ),
-    )
-    ax.legend(
-        handles=legend_handles,
-        loc="upper right",
-        frameon=False,
-        fontsize=7.5,
-        ncols=2,
-    )
-    ax.text(
-        0.5,
-        -0.22,
-        "points indépendants · ascendance des checkpoints non auditée",
-        transform=ax.transAxes,
-        ha="center",
-        va="top",
-        fontsize=7.2,
-        color=colors["neutral"],
-    )
+    ax.set_xlabel("eCRF value-micro-$F_1$", fontsize=9)
+    ax.set_ylabel("PARHAF NER value-micro-$F_1$", fontsize=9)
     ax.grid(color=colors["neutral"], alpha=0.14, linewidth=0.6)
     ax.tick_params(axis="both", labelsize=8, width=0.5, length=3)
     ax.xaxis.set_major_formatter(
@@ -499,12 +389,13 @@ def _make_tradeoff_figure(data: TradeoffData):
 
 
 def make_preview_figures():
-    """Create the three provisional figures without saving them."""
+    """Create the four provisional figures without saving them."""
 
     configure_style()
     supervision, novel_types, tradeoff = prepare_data()
     return (
-        _make_supervision_figure(supervision),
+        _make_global_supervision_figure(supervision),
+        _make_section_supervision_figure(supervision),
         _make_novel_types_figure(novel_types),
         _make_tradeoff_figure(tradeoff),
     )
@@ -513,7 +404,7 @@ def make_preview_figures():
 def build(
     output_dir: Path = DEFAULT_OUTPUT, allow_provisional: bool = False
 ) -> list[Path]:
-    """Build Figures 8–10, gating all provisional evidence atomically."""
+    """Build the Chapter 8 figures, gating provisional evidence atomically."""
 
     data = load_visual_data(allow_provisional=True)
     chapter = data["chapter8"]
@@ -526,8 +417,12 @@ def build(
     supervision, novel_types, tradeoff = prepare_data(data)
     figures = (
         (
-            _make_supervision_figure(supervision),
-            "fig08_supervision_signal",
+            _make_global_supervision_figure(supervision),
+            "fig08_global_supervision",
+        ),
+        (
+            _make_section_supervision_figure(supervision),
+            "fig08_section_supervision",
         ),
         (_make_novel_types_figure(novel_types), "fig09_novel_types"),
         (
@@ -538,8 +433,6 @@ def build(
     outputs = []
     try:
         for fig, stem in figures:
-            if _is_provisional(chapter):
-                mark_preliminary(fig)
             outputs.extend(save_figure(fig, stem, output_dir))
         return outputs
     except BaseException:

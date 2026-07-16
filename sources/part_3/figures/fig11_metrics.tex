@@ -1,17 +1,35 @@
 \begin{figure}[t]
   \centering
-  \resizebox{0.97\textwidth}{!}{%
-  \begin{tikzpicture}[font=\scriptsize\sffamily,
-    passage/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
-      text width=11.4cm, minimum height=0.9cm, align=left, inner sep=6pt},
-    example/.style={draw=ThesisNeutral!45, fill=ThesisPaper, rounded corners=2pt,
-      text width=5.35cm, minimum height=1.45cm, align=left, inner sep=6pt}]
-    \node[passage] at (0,2.0) {``Déc : début d'une chimiothérapie par protocole
-      \textbf{CHOEP-14}, \textbf{8 cycles}, J1 = \textbf{25 mai 2018}.''};
-    \node[example] at (-3.05,0.55) {\textbf{eCRF}\\one value for the requested field:\\CHOEP-14};
-    \node[example] at (3.05,0.55) {\textbf{Named entity recognition}\\all mentions:\\CHOEP-14 · 8 cycles · 25 mai 2018};
-    \node[example] at (-3.05,-1.2) {\textbf{Span $F_1$}\\reference: \underline{protocole CHOEP-14}\\prediction: \hspace{0.72cm}\underline{CHOEP-14}};
-    \node[example] at (3.05,-1.2) {\textbf{Value $F_1$}\\reference: \textbf{25 mai 2018}\\prediction: \textbf{mai 2018}\quad Jaccard $=2/3$};
+  \providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
+  \providecommand{\hlval}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisSecondary!32}{\textcolor{ThesisSecondaryDark}{\textbf{#1}}}}}
+  \resizebox{0.95\textwidth}{!}{%
+  \begin{tikzpicture}[font=\footnotesize\sffamily, text=ThesisInk,
+    passage/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=11.4cm, align=center, inner sep=9pt},
+    unit/.style={draw=ThesisNeutral!45, fill=ThesisPaper, rounded corners=3pt,
+      text width=5.35cm, minimum height=2.15cm, align=left, inner sep=9pt}]
+
+    % One clinical sentence, mentions highlighted (span = primary, value = secondary)
+    \node[passage] (sent) at (0,2.75) {``Déc : début d'une chimiothérapie par protocole
+      \hlspan{CHOEP-14}, \hlspan{8 cycles}, J1 = \hlval{25 mai 2018}.''};
+
+    % Row 1 — what counts as an extraction target
+    \node[unit] (ecrf) at (-3.0,0.7) {\textbf{eCRF}\\[2pt]
+      {\scriptsize\itshape\color{ThesisNeutral}one value for the requested field}\\[6pt]
+      \hlspan{CHOEP-14}};
+    \node[unit] (ner) at (3.0,0.7) {\textbf{Named entity recognition}\\[2pt]
+      {\scriptsize\itshape\color{ThesisNeutral}every mention in the text}\\[6pt]
+      \hlspan{CHOEP-14}\, \hlspan{8 cycles}\, \hlval{25 mai 2018}};
+
+    % Row 2 — how a single match is scored
+    \node[unit] (span) at (-3.0,-1.85) {\textbf{Span $F_1$}\\[2pt]
+      {\scriptsize\itshape\color{ThesisNeutral}token overlap of the span}\\[6pt]
+      reference:\ protocole \hlspan{CHOEP-14}\\[2pt]
+      prediction:\ \hlspan{CHOEP-14}};
+    \node[unit] (val) at (3.0,-1.85) {\textbf{Value $F_1$}\\[2pt]
+      {\scriptsize\itshape\color{ThesisNeutral}overlap of the normalised value}\\[6pt]
+      reference:\ \hlval{25 mai 2018}\\[2pt]
+      prediction:\ \hlval{mai 2018}\quad Jaccard $=2/3$};
   \end{tikzpicture}%
   }
   \caption{Four evaluation units illustrated on one clinical sentence.}

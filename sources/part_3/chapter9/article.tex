@@ -17,7 +17,8 @@ a new study form. Published patient cases describe clinical trajectories, but
 they are not sequences of reports written during care. We therefore construct
 two forms of supervision, shown in \Cref{fig:p3-supervision-routes}: broad
 open-vocabulary annotations for generalist training, and generated longitudinal
-records for adaptation to the eCRF.
+records for adaptation to the electronic case report form (eCRF), the structured
+form a clinical study fills for each patient.
 
 Both routes use Qwen3-235B with constrained JSON output. For public text, the
 model identifies mentions and describes their types, while for the target task it
@@ -26,8 +27,6 @@ fields. In both cases the resulting annotations are silver rather than human
 labels.
 
 \input{sources/part_3/figures/fig03_supervision_routes}
-
-\input{sources/part_3/figures/fig03_corpus_examples}
 
 
 \section{Generalist Annotation of Public Text}
@@ -96,11 +95,8 @@ that have already occurred.
 
 \input{sources/part_3/figures/fig04_wavefront}
 
-\Cref{fig:p3-case-to-record} shows the same transformation on a short fictional
-example. The generated reports retain the chronology but replace the compact
-case summary with documents written at distinct moments of care.
-
-\input{sources/part_3/figures/fig04_case_to_record}
+The generated reports keep the chronology of the source case but replace its
+compact summary with documents written at distinct moments of care.
 
 The resulting corpus contains 2,050 longitudinal records, each with a median of
 eight reports and 22,314 characters, and 31\% of them include a second treatment
@@ -161,7 +157,8 @@ that contains no hospital data, and we compare it with raw PMC-Patients cases,
 our generated records, and published E3C clinical
 cases~\citep{magnini_e3c_2021}.
 
-For each source, we sample 1,000 texts and represent them with MedEmbed. We then
+For each source, we sample 1,000 texts and represent them with MedEmbed, the
+biomedical description encoder introduced in \Cref{chap:architectures}. We then
 compare each distribution with PARHAF using MAUVE~\citep{pillutla_mauve_2021},
 Fr\'echet embedding distance (FED), adapted from the Fr\'echet distance used for
 generative images~\citep{heusel_fid_2017}, maximum mean discrepancy
@@ -189,7 +186,10 @@ therefore readily distinguishable from PARHAF in this representation space.
 Approximately 2.3\% of reports are abandoned during annotation. The train and
 test partitions were not checked for shared source articles in PMC-Patients.
 Because the same model generates the records and proposes their silver labels,
-the reference may favour conventions introduced during generation.
+the reference may favour conventions introduced during generation. The generated
+records also remain readily distinguishable from the human-written PARHAF
+reports in the representation space of \Cref{sec:stylometry}, so they imitate the
+task rather than reproduce the surface of real clinical writing.
 
 
 \section*{Conclusion}
@@ -197,8 +197,8 @@ the reference may favour conventions introduced during generation.
 Public resources support two complementary forms of supervision. Broad
 annotations teach an extractor to follow new type descriptions, while generated
 records provide a synthetic longitudinal task. Aligning these generated field
-assignments back to the record makes the task evaluable, although the reference
-remains non-human. The generated text also remains readily
-distinguishable from the human-written PARHAF reports. The next chapter asks
+assignments back to the record makes a task that has no real filled form
+evaluable, so the longitudinal eCRF becomes something a model can be scored on
+even though the reference remains silver rather than human. The next chapter asks
 whether an extractor conditioned on descriptions can use this supervision while
-remaining open to new fields.
+remaining open to fields it was never trained on.

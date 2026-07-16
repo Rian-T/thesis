@@ -95,21 +95,15 @@ Does public clinical text actually help this extractor? We answer with an
 ablation on the composition of the generalist corpus, keeping the evaluation set
 fixed to the 200 records shared by all runs. The complete corpus is compared with
 a corpus without public clinical paragraphs and with a second biomedical control
-corpus. \Cref{fig:p3-supervision-signal} reports the global result, and
-\Cref{fig:p3-section-supervision} separates the form sections. All scores in this
-section are micro-averaged value-$F_1$.
+corpus. \Cref{fig:p3-section-supervision} reports the global effect and breaks it
+down by form section. All scores in this section are micro-averaged value-$F_1$,
+the metric defined in \Cref{chap:evaluation}.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.82\textwidth]{plots/part_3/output/fig08_global_supervision.pdf}
-  \caption{Global value-$F_1$ by corpus composition.}
-  \label{fig:p3-supervision-signal}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.82\textwidth]{plots/part_3/output/fig08_section_supervision.pdf}
-  \caption{Value-$F_1$ by eCRF section and corpus composition.}
+  \includegraphics[width=0.86\textwidth]{plots/part_3/output/fig08_section_supervision.pdf}
+  \caption{Value-$F_1$ by corpus composition: the global effect, then broken down
+  by eCRF section.}
   \label{fig:p3-section-supervision}
 \end{figure}
 
@@ -171,9 +165,14 @@ effect of that intervention, but they do not identify its linguistic cause.
 
 \section*{Conclusion}
 
-Type descriptions let the extractor query fields that were not fixed during
-training. Target-form performance and transfer to other descriptions must still
-be measured separately. Local span--description similarity also does not
-determine the role of a repeated mention in a patient trajectory.
+This chapter produced an open-vocabulary extractor that reads clinical text and
+returns the values of fields described in natural language at inference time,
+trained entirely on generalist annotations with no hospital label. Its
+description encoder, MedEmbed, improves terminology retrieval on OntoBench-FR and
+helps locate spans for benchmark-absent descriptions, so the extractor can be
+asked for new fields rather than only the ones fixed at training time. Two
+questions stay open. Target-form performance and transfer to other descriptions
+must still be measured separately, and local span--description similarity does
+not determine the role of a repeated mention in a patient trajectory.
 \Cref{chap:evaluation} therefore moves from local extraction to complete
 longitudinal form filling.

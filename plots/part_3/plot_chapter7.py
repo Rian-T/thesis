@@ -6,13 +6,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullLocator
 
 from plots.part_3.common import (
     DEFAULT_OUTPUT,
     ProvisionalDataError,
     configure_style,
     load_visual_data,
-    mark_preliminary,
     save_figure,
 )
 from plots.thesis_style import COLORS
@@ -35,6 +35,12 @@ class CapstoneData:
     final_encoder_minus_qwen: float
     final_ci: tuple[float, float]
     provisional: bool
+
+
+@dataclass(frozen=True)
+class DataEfficiencyCurve:
+    training_records: tuple[int, ...]
+    value_f1: tuple[float, ...]
 
 
 def prepare_capstone(data: dict | None = None) -> CapstoneData:
@@ -81,71 +87,235 @@ def prepare_capstone(data: dict | None = None) -> CapstoneData:
     )
 
 
-def _draw_trajectory(ax, data: CapstoneData) -> None:
-    for system in (data.encoder, data.qwen):
+def prepare_data_efficiency(data: dict | None = None) -> DataEfficiencyCurve:
+    if data is None:
+        data = load_visual_data(allow_provisional=True)
+    observations = data["data_efficiency"]
+    training_records = (10, 50, 100, 500, 1540)
+    return DataEfficiencyCurve(
+        training_records=training_records,
+        value_f1=tuple(
+            float(observations[f"train_{size}"]["value"])
+            for size in training_records
+        ),
+    )
+
+
+def _label_point(
+    ax, x: float, y: float, value: float, color: str, y_offset: float = 8
+) -> None:
+    ax.annotate(
+        f"{value:.3f}",
+        (x, y),
+        xytext=(0, y_offset),
+        textcoords="offset points",
+        ha="center",
+        va="bottom" if y_offset >= 0 else "top",
+        fontsize=8.5,
+        color=color,
+    )
+
+
+# Field-competition slopegraph values (value-F1, before -> after).
+# Self-contained on purpose: these are the canonical train-on-test-free
+# numbers and must not be coupled to the shared capstone JSON node that
+# also feeds fig12_final_comparison.
+DECODING_SERIES = (
+    {
+        "label": "150M encoder",
+        "before": 0.634,
+        "after": 0.640,
+        "color": COLORS["primary_dark"],
+        "marker": "o",
+        # right label placed just below its endpoint (encoder sits lower)
+        "right_va": "top",
+        "right_dy": -3,
+    },
+    {
+        "label": "Qwen3.5-9B",
+        "before": 0.665,
+        "after": 0.650,
+        "color": COLORS["tertiary_dark"],
+        "marker": "D",
+        # right label placed just above its endpoint (Qwen sits higher)
+        "right_va": "bottom",
+        "right_dy": 3,
+    },
+)
+
+
+def _draw_trajectory(ax) -> None:
+    for series in DECODING_SERIES:
+        ys = (series["before"], series["after"])
         ax.plot(
-            (0, 1), system.value, color=system.color, linewidth=2.2,
-            marker=system.marker, markersize=6.5, markeredgecolor="white",
-            markeredgewidth=0.8, label=system.label, zorder=3,
+            (0, 1), ys, color=series["color"], linewidth=2.0,
+            marker=series["marker"], markersize=6.0,
+            markerfacecolor=series["color"], markeredgecolor="white",
+            markeredgewidth=0.8, zorder=3,
         )
-    ax.text(0.5, 0.687, r"raw Qwen -- encoder gap $\approx$ 0.032", ha="center", va="bottom", fontsize=8.2, color=COLORS["neutral"])
-    ax.text(0.07, 0.629, r"0.633 $\rightarrow$ 0.647  (+0.014)", color=data.encoder.color, fontsize=8.3, ha="left")
-    ax.text(0.07, 0.670, r"0.665 $\rightarrow$ 0.646  (-0.019)", color=data.qwen.color, fontsize=8.3, ha="left")
-    ax.set_xticks((0, 1), ("Top-1", "Top-1 + competition"))
-    ax.set_xlim(-0.15, 1.15)
-    ax.set_ylim(0.60, 0.695)
-    ax.set_ylabel("Value-F1")
-    ax.set_title("A  Before / after structural decoding", loc="left", fontsize=10.5, fontweight="bold")
-    ax.grid(axis="y", color=COLORS["neutral"], alpha=0.16, linewidth=0.6)
-    ax.legend(loc="lower left", frameon=False, fontsize=7.5, handlelength=1.4)
+        # left endpoint: value only
+        ax.annotate(
+            f"{series['before']:.3f}",
+            (0, series["before"]),
+            xytext=(-6, 0),
+            textcoords="offset points",
+            ha="right",
+            va="center",
+            fontsize=8.5,
+            color=series["color"],
+        )
+        # right endpoint: model name + value (direct labelling, no legend)
+        ax.annotate(
+            f"{series['label']}  {series['after']:.3f}",
+            (1, series["after"]),
+            xytext=(8, series["right_dy"]),
+            textcoords="offset points",
+            ha="left",
+            va=series["right_va"],
+            fontsize=8.5,
+            color=series["color"],
+        )
+
+    ax.set_xticks((0, 1), ("Before competition", "After competition"))
+    ax.set_xlim(-0.22, 1.55)
+    ax.set_ylim(0.62, 0.68)
+    ax.set_ylabel(r"Value $F_1$")
+    ax.grid(axis="y", color=COLORS["neutral"], alpha=0.2, linewidth=0.6,
+            linestyle=":")
+    ax.tick_params(axis="both", labelsize=8, width=0.5, length=3)
 
 
 def _draw_final(ax, data: CapstoneData) -> None:
-    metrics = (("Value-F1", data.encoder.value[1], data.qwen.value[1]), ("Span-F1", data.encoder.final_span, data.qwen.final_span))
-    for x, (_label, encoder, qwen) in enumerate(metrics):
-        ax.scatter(x - 0.07, encoder, s=48, marker=data.encoder.marker, color=data.encoder.color, edgecolor="white", linewidth=0.8, zorder=3)
-        ax.scatter(x + 0.07, qwen, s=44, marker=data.qwen.marker, color=data.qwen.color, edgecolor="white", linewidth=0.8, zorder=3)
-        ax.plot((x - 0.07, x + 0.07), (encoder, qwen), color=COLORS["neutral"], alpha=0.45, linewidth=0.8, zorder=1)
-    ax.text(0, 0.669, r"Value-F1: difference $\approx 0$", ha="center", fontsize=8.2, color=COLORS["neutral"])
-    ax.text(0, 0.630, "$\\Delta$ encoder -- Qwen = +0.0007\npaired 95 \\% CI [-0.0068, 0.0084]\n(provisional)", ha="center", va="top", fontsize=7.2, color=COLORS["neutral"])
-    ax.text(1, data.qwen.final_span + 0.012, "0.554", ha="center", fontsize=7.5, color=data.qwen.color)
-    ax.text(1, data.encoder.final_span - 0.018, "0.507", ha="center", fontsize=7.5, color=data.encoder.color)
-    ax.set_xticks((0, 1), ("Value-F1", "Span-F1"))
-    ax.set_xlim(-0.45, 1.45)
-    ax.set_ylim(0.48, 0.69)
-    ax.set_title("B  Final comparison", loc="left", fontsize=10.5, fontweight="bold")
-    ax.grid(axis="y", color=COLORS["neutral"], alpha=0.16, linewidth=0.6)
-    ax.tick_params(axis="y", labelleft=False, length=0)
+    metrics = (
+        (r"Value $F_1$", data.encoder.value[1], data.qwen.value[1]),
+        (r"Span $F_1$", data.encoder.final_span, data.qwen.final_span),
+    )
+    offsets = ((0.10, -0.10), (0.10, -0.10))
+    for y, ((label, encoder, qwen), (encoder_offset, qwen_offset)) in enumerate(
+        zip(metrics, offsets)
+    ):
+        y = 1 - y
+        ax.scatter(
+            encoder, y + encoder_offset, s=48, marker=data.encoder.marker,
+            color=data.encoder.color, edgecolor="white", linewidth=0.8,
+            label=data.encoder.label if y == 1 else None, zorder=3,
+        )
+        ax.scatter(
+            qwen, y + qwen_offset, s=44, marker=data.qwen.marker,
+            color=data.qwen.color, edgecolor="white", linewidth=0.8,
+            label=data.qwen.label if y == 1 else None, zorder=3,
+        )
+        ax.text(
+            encoder + 0.006, y + encoder_offset, f"{encoder:.3f}",
+            ha="left", va="center", fontsize=8.5, color=data.encoder.color,
+        )
+        ax.text(
+            qwen + 0.006, y + qwen_offset, f"{qwen:.3f}",
+            ha="left", va="center", fontsize=8.5, color=data.qwen.color,
+        )
+    ax.set_yticks((1, 0), labels=(metrics[0][0], metrics[1][0]))
+    ax.set_xlim(0.47, 0.69)
+    ax.set_ylim(-0.35, 1.35)
+    ax.set_xlabel(r"$F_1$")
+    ax.grid(axis="x", color=COLORS["neutral"], alpha=0.12, linewidth=0.6)
+    ax.tick_params(axis="y", length=0)
     ax.spines["left"].set_visible(False)
+    ax.legend(loc="lower right", frameon=False, fontsize=8)
 
 
-def _make_figure(data: CapstoneData):
-    fig, axes = plt.subplots(1, 2, figsize=(5.5, 3.05), gridspec_kw={"wspace": 0.28, "width_ratios": (1.12, 0.88)})
-    _draw_trajectory(axes[0], data)
-    _draw_final(axes[1], data)
+def _make_decoding_figure(data: CapstoneData | None = None):
+    fig, ax = plt.subplots(figsize=(5.5, 2.6))
+    _draw_trajectory(ax)
     return fig
 
 
-def make_preview_figure():
+def _make_final_figure(data: CapstoneData):
+    fig, ax = plt.subplots(figsize=(5.5, 2.45))
+    _draw_final(ax, data)
+    return fig
+
+
+def _make_data_efficiency_figure(data: DataEfficiencyCurve):
+    fig, ax = plt.subplots(figsize=(5.5, 2.55))
+    ax.plot(
+        data.training_records,
+        data.value_f1,
+        color=COLORS["primary_dark"],
+        linewidth=1.8,
+        marker="o",
+        markersize=6.2,
+        markerfacecolor=COLORS["primary"],
+        markeredgecolor="white",
+        markeredgewidth=0.8,
+        zorder=3,
+    )
+    for index, (records, score) in enumerate(
+        zip(data.training_records, data.value_f1)
+    ):
+        horizontal_offset = -4 if index == len(data.training_records) - 1 else 0
+        alignment = "right" if horizontal_offset else "center"
+        ax.annotate(
+            f"{score:.3f}",
+            (records, score),
+            xytext=(horizontal_offset, 8),
+            textcoords="offset points",
+            ha=alignment,
+            va="bottom",
+            fontsize=8.5,
+            color=COLORS["primary_dark"],
+        )
+
+    ax.set_xscale("log")
+    ax.set_xlim(8, 1900)
+    ax.set_xticks(data.training_records)
+    ax.set_xticklabels(("10", "50", "100", "500", "1,540"))
+    ax.xaxis.set_minor_locator(NullLocator())
+    ax.set_ylim(0, 0.72)
+    ax.set_yticks((0.0, 0.2, 0.4, 0.6))
+    ax.set_xlabel("Synthetic training records")
+    ax.set_ylabel(r"Value $F_1$")
+    ax.grid(axis="y", color=COLORS["neutral"], alpha=0.2, linewidth=0.6,
+            linestyle=":")
+    ax.tick_params(axis="both", labelsize=8, width=0.5, length=3)
+    return fig
+
+
+def make_preview_figures():
     configure_style()
-    return _make_figure(prepare_capstone())
+    data = load_visual_data(allow_provisional=True)
+    capstone = prepare_capstone(data)
+    efficiency = prepare_data_efficiency(data)
+    return (
+        _make_decoding_figure(capstone),
+        _make_final_figure(capstone),
+        _make_data_efficiency_figure(efficiency),
+    )
 
 
 def build(output_dir: Path = DEFAULT_OUTPUT, allow_provisional: bool = False) -> list[Path]:
-    data = prepare_capstone()
+    source = load_visual_data(allow_provisional=True)
+    data = prepare_capstone(source)
     if data.provisional and not allow_provisional:
         raise ProvisionalDataError("Figure 12 inputs remain provisional")
+    efficiency = prepare_data_efficiency(source)
     configure_style()
-    fig = None
-    try:
-        fig = _make_figure(data)
-        if data.provisional:
-            mark_preliminary(fig)
-        return save_figure(fig, "fig12_capstone", output_dir)
-    except BaseException:
-        if fig is not None:
-            plt.close(fig)
-        raise
+    outputs = []
+    outputs.extend(
+        save_figure(
+            _make_decoding_figure(data), "fig12_decoding_competition", output_dir
+        )
+    )
+    outputs.extend(
+        save_figure(_make_final_figure(data), "fig12_final_comparison", output_dir)
+    )
+    outputs.extend(
+        save_figure(
+            _make_data_efficiency_figure(efficiency),
+            "fig13_data_efficiency",
+            output_dir,
+        )
+    )
+    return outputs
 
 
 if __name__ == "__main__":

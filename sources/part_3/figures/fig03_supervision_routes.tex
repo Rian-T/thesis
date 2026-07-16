@@ -1,40 +1,63 @@
 \begin{figure}[t]
   \centering
-  \resizebox{0.98\textwidth}{!}{%
+  \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    routeitem/.style={align=center, text=ThesisInk, inner sep=3pt,
-      text width=2.45cm},
-    generated/.style={routeitem, text=ThesisTertiaryDark},
-    silver/.style={routeitem, text=ThesisSecondaryDark},
-    model/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
-      rounded corners=2pt, minimum width=2.35cm, minimum height=0.68cm,
-      align=center, inner sep=4pt},
-    flow/.style={->, draw=ThesisInk!38, line width=0.65pt,
-      shorten <=4pt, shorten >=4pt}]
+    stage/.style={draw=ThesisNeutral!45, fill=white, rounded corners=2pt,
+      minimum width=2.35cm, minimum height=0.7cm, align=center,
+      inner sep=3pt, text=ThesisInk},
+    enc/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!16, rounded corners=2pt,
+      minimum width=2.35cm, minimum height=0.7cm, align=center,
+      inner sep=3pt, text=ThesisInk},
+    rowlab/.style={anchor=east, align=right, text=ThesisNeutral, font=\scriptsize\bfseries},
+    ex/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=7.3cm, align=left, inner sep=8pt, text=ThesisInk},
+    flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!35, line width=0.6pt,
+      shorten <=3pt, shorten >=3pt}]
 
-    \node[anchor=east, text=ThesisNeutral] at (-6.65,1.15) {general supervision};
-    \node[routeitem] (public)  at (-4.75,1.15) {public biomedical text};
-    \node[generated] (annot)   at (-1.65,1.15) {LLM annotation};
-    \node[silver]    (pairs)   at (1.65,1.15) {grounded span--\\description pairs};
-    \node[model]     (general) at (5.0,1.15) {generalist encoder};
+    % ---- Row 1: general supervision --------------------------------------
+    \def\ya{5.0}
+    \node[rowlab] at (-6.9,\ya) {general\\supervision};
+    \node[stage] (g1) at (-5.0,\ya) {public\\biomedical text};
+    \node[stage] (g2) at (-2.0,\ya) {LLM annotation};
+    \node[stage] (g3) at (1.0,\ya)  {span--type pairs};
+    \node[enc]   (ge) at (4.2,\ya)  {generalist encoder};
+    \draw[flow] (g1)--(g2); \draw[flow] (g2)--(g3); \draw[flow] (g3)--(ge);
 
-    \node[anchor=east, text=ThesisNeutral] at (-6.65,-1.15) {form supervision};
-    \node[routeitem] (cases)   at (-4.75,-1.15) {published patient cases};
-    \node[generated] (records) at (-1.65,-1.15) {longitudinal generation};
-    \node[silver]    (labels)  at (1.65,-1.15) {reports and silver\\eCRF spans};
-    \node[model]     (form)    at (5.0,-1.15) {form-adapted encoder};
+    % general example box (spans/types in ThesisPrimary)
+    \node[ex] (exa) at (-1.55,3.35) {%
+      \dots{}traitement par \colorbox{ThesisPrimary!22}{rituximab} pour un
+      \colorbox{ThesisPrimary!22}{lymphome diffus \`a grandes cellules B}\dots\\[3pt]
+      {\footnotesize
+      \textcolor{ThesisPrimaryDark}{\textbf{rituximab}} $\rightarrow$ anticancer drug
+      \qquad
+      \textcolor{ThesisPrimaryDark}{\textbf{LDGCB}} $\rightarrow$ lymphoma subtype}};
 
-    \draw[flow] (public)--(annot);
-    \draw[flow] (annot)--(pairs);
-    \draw[flow] (pairs)--(general);
-    \draw[flow] (cases)--(records);
-    \draw[flow] (records)--(labels);
-    \draw[flow] (labels)--(form);
-    \draw[->, draw=ThesisPrimaryDark!70, line width=0.7pt,
-      shorten <=4pt, shorten >=4pt] (general)--(form)
-      node[midway, right, text=ThesisNeutral] {adaptation};
+    % ---- Row 2: form supervision -----------------------------------------
+    \def\yb{1.3}
+    \node[rowlab] at (-6.9,\yb) {form\\supervision};
+    \node[stage] (f1) at (-5.0,\yb) {published\\patient cases};
+    \node[stage] (f2) at (-2.0,\yb) {longitudinal\\generation};
+    \node[stage] (f3) at (1.0,\yb)  {silver eCRF spans};
+    \node[enc]   (fe) at (4.2,\yb)  {form-adapted encoder};
+    \draw[flow] (f1)--(f2); \draw[flow] (f2)--(f3); \draw[flow] (f3)--(fe);
+
+    % form example box (values/roles in ThesisSecondary)
+    \node[ex] (exb) at (-1.55,-0.35) {%
+      \dots{}protocole \colorbox{ThesisSecondary!30}{CHOEP-14}, 8 cycles,
+      J1 = 25 mai 2018\dots\\[3pt]
+      {\footnotesize
+      \textcolor{ThesisSecondaryDark}{\textbf{CHOEP-14}} $\rightarrow$ first-line treatment
+      \qquad
+      form fields: \textcolor{ThesisSecondaryDark}{first-line} / \textcolor{ThesisSecondaryDark}{second-line treatment}}};
+
+    % adaptation from generalist to form-adapted encoder (clear right margin)
+    \draw[-{Stealth[length=5pt]}, draw=ThesisPrimaryDark!70, line width=0.8pt,
+      shorten <=4pt, shorten >=4pt] (ge) -- (fe)
+      node[midway, right=1pt, text=ThesisNeutral] {adaptation};
   \end{tikzpicture}%
   }
-  \caption{General and form-specific supervision routes.}
+  \caption{Two supervision routes, each shown with a real annotated excerpt:
+  span--type pairs for the generalist encoder, form-field roles for the
+  form-adapted encoder.}
   \label{fig:p3-supervision-routes}
 \end{figure}

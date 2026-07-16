@@ -1,23 +1,56 @@
 \begin{figure}[t]
   \centering
-  \resizebox{0.86\textwidth}{!}{%
-  \begin{tikzpicture}[font=\scriptsize\sffamily,
-    model/.style={rounded corners=2pt, draw=ThesisPrimaryDark,
-      fill=ThesisPrimary!16, minimum width=2.25cm, minimum height=0.72cm,
-      align=center, inner sep=4pt},
-    signal/.style={rounded corners=2pt, draw=ThesisSecondaryDark,
-      fill=ThesisSecondary!20, minimum width=2.25cm, minimum height=0.72cm,
-      align=center, inner sep=4pt},
-    flow/.style={->, ThesisInk!38, shorten >=2pt, shorten <=2pt}]
+  \resizebox{0.72\textwidth}{!}{%
+  \begin{tikzpicture}[font=\small\sffamily,
+    anchorpt/.style={circle, fill=ThesisPrimaryDark, inner sep=2.4pt},
+    pospt/.style={circle, fill=ThesisSecondaryDark, inner sep=2.2pt},
+    negpt/.style={circle, fill=ThesisTertiaryDark, inner sep=2.2pt},
+    lbl/.style={font=\small\sffamily, text=ThesisInk},
+    pull/.style={-{Stealth[length=2.6mm]}, ThesisSecondaryDark, line width=1.1pt,
+      shorten >=2.5pt, shorten <=2.5pt},
+    push/.style={-{Stealth[length=2.6mm]}, ThesisTertiaryDark, line width=1.1pt,
+      shorten >=2.5pt, shorten <=2.5pt},
+    axis/.style={ThesisNeutral!45, line width=0.6pt, -{Stealth[length=1.8mm]}},
+  ]
 
-    \node[model] (biomed) at (-4.3,0.75) {ModernCamemBERT-bio};
-    \node[signal] (pairs) at (-4.3,-0.75) {OntoBook term pairs};
-    \node[model] (contrast) at (0,0) {contrastive training};
-    \node[model, fill=ThesisPrimary!28] (med) at (4.3,0) {MedEmbed};
+    % --- embedding space, discreet neutral backdrop ---
+    \begin{scope}[on background layer]
+      \fill[ThesisNeutral!8, rounded corners=4pt] (-0.6,-1.7) rectangle (7.4,3.5);
+    \end{scope}
+    \draw[axis] (-0.2,-1.3) -- (-0.2,3.2);
+    \draw[axis] (-0.2,-1.3) -- (6.9,-1.3);
+    \node[text=ThesisNeutral, font=\scriptsize\sffamily, anchor=south west]
+      at (-0.15,3.0) {embedding space};
 
-    \draw[flow] (biomed.east)--(contrast.west);
-    \draw[flow, draw=ThesisSecondaryDark] (pairs.east)--(contrast.west);
-    \draw[flow] (contrast)--(med);
+    % --- points ---
+    \coordinate (anchor) at (2.4,1.35);
+    \coordinate (pos)    at (4.4,2.35);
+    \coordinate (neg)    at (5.4,-0.55);
+
+    % contrastive forces: pull the synonym in, push the unrelated term out
+    \draw[pull] (pos)  -- (anchor)
+      node[midway, sloped, above=1pt, font=\scriptsize, text=ThesisSecondaryDark] {pull};
+    \draw[push] (neg) -- ($ (neg)!-0.9cm!(anchor) $)
+      node[midway, sloped, below=1pt, font=\scriptsize, text=ThesisTertiaryDark] {push};
+
+    \node[anchorpt] at (anchor) {};
+    \node[pospt]    at (pos)    {};
+    \node[negpt]    at (neg)    {};
+
+    % --- labels ---
+    \node[lbl, anchor=east, align=right] at ([xshift=-4pt]anchor)
+      {lymphome diffus à\\grandes cellules B\\[1pt]
+       {\scriptsize\itshape\color{ThesisNeutral}anchor}};
+    \node[lbl, anchor=west, text=ThesisSecondaryDark] at ([xshift=4pt]pos)
+      {\textbf{LDGCB}~{\scriptsize\itshape\mdseries(synonym)}};
+    \node[lbl, anchor=west, text=ThesisTertiaryDark] at ([xshift=4pt]neg)
+      {adénocarcinome~{\scriptsize\itshape\mdseries(unrelated)}};
+
+    % --- provenance legend, small and discreet ---
+    \node[text=ThesisNeutral, font=\scriptsize\sffamily, anchor=south west]
+      at (-0.2,-2.35)
+      {ModernCamemBERT-bio $+$ OntoBook term pairs $\rightarrow$ MedEmbed};
+
   \end{tikzpicture}%
   }
   \caption{Contrastive training of MedEmbed from a biomedical encoder and terminology pairs.}

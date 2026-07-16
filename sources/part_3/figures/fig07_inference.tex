@@ -1,29 +1,48 @@
 \begin{figure}[t]
   \centering
-  \resizebox{0.92\textwidth}{!}{%
-  \begin{tikzpicture}[font=\scriptsize\sffamily,
-    passage/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
-      text width=5.2cm, minimum height=1.35cm, align=left, inner sep=6pt},
-    query/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
-      rounded corners=2pt, text width=4.0cm, minimum height=0.85cm,
-      align=left, inner sep=6pt},
-    compare/.style={draw=ThesisNeutral!65, fill=ThesisPaper,
-      rounded corners=2pt, text width=2.5cm, minimum height=0.85cm,
-      align=center, inner sep=5pt},
-    answer/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18,
-      rounded corners=2pt, text width=3.0cm, minimum height=0.85cm,
-      align=center, inner sep=5pt},
-    flow/.style={->, ThesisInk!40, shorten >=3pt, shorten <=3pt}]
-    \node[passage] (sentence) at (-4.7,0.8) {\textbf{Clinical text}\\[2pt]
-      ``Déc : \underline{début chimiothérapie} par protocole
-      \underline{CHOEP-14}, \underline{8 cycles}.''};
-    \node[query] (description) at (-4.7,-0.9) {\textbf{Type description}\\
-      first-line treatment};
-    \node[compare] (similarity) at (0.2,0) {span--description\\similarity};
-    \node[answer] (span) at (4.0,0) {\textbf{CHOEP-14}};
-    \draw[flow] (sentence.east)--(similarity.west);
-    \draw[flow] (description.east)--(similarity.west);
-    \draw[flow] (similarity)--(span);
+  \resizebox{0.9\textwidth}{!}{%
+  \begin{tikzpicture}[font=\small\sffamily,
+    tok/.style={font=\small\sffamily, text=ThesisInk},
+    span/.style={rounded corners=2pt, draw=ThesisSecondaryDark, line width=0.9pt,
+      fill=ThesisSecondary!22, inner sep=3pt, font=\small\sffamily\bfseries,
+      text=ThesisInk},
+    query/.style={rounded corners=3pt, draw=ThesisPrimaryDark, line width=0.9pt,
+      fill=ThesisPrimary!16, inner sep=6pt, align=center, font=\small\sffamily,
+      text=ThesisInk},
+    sim/.style={circle, draw=ThesisInk!70, line width=0.9pt, fill=ThesisPaper,
+      inner sep=0pt, minimum size=2.15cm, align=center, font=\small\sffamily},
+    ans/.style={rounded corners=3pt, draw=ThesisSecondaryDark, line width=1pt,
+      fill=ThesisSecondary!30, inner sep=6pt, font=\small\sffamily\bfseries,
+      text=ThesisInk},
+    pull/.style={-{Stealth[length=2.4mm]}, line width=0.9pt,
+      shorten >=3pt, shorten <=3pt},
+  ]
+
+    % --- Clinical text (top), a line of tokens with one candidate span boxed ---
+    \node[tok] (t0) at (0,2.5) {\dots{} début chimiothérapie par protocole};
+    \node[span, right=3pt of t0] (cand) {CHOEP-14};
+    \node[tok, right=3pt of cand] (t1) {, 8 cycles \dots};
+    \node[text=ThesisNeutral, font=\scriptsize\sffamily, anchor=west]
+      at ([yshift=13pt]t0.west) {\textbf{Clinical text}};
+
+    % --- Type description (bottom), the open query ---
+    \node[query] (desc) at (1.05,-1.9) {\textbf{Type description}\\[2pt]
+      ``first-line treatment''};
+
+    % --- Similarity node (centre-right), spaced from both inputs ---
+    \node[sim] (sim) at (6.15,0.3) {span--\\description\\similarity};
+
+    % --- Answer (right) ---
+    \node[ans] (ans) at (10.0,0.3) {CHOEP-14};
+
+    % --- Arrows: span from above-left, description from below-left,
+    %     landing on distinct points of the circle so they never overlap ---
+    \draw[pull, ThesisSecondaryDark] (cand.south east)
+      to[out=-30,in=125] (sim.north west);
+    \draw[pull, ThesisPrimaryDark] (desc.east)
+      to[out=10,in=-135] (sim.south west);
+    \draw[pull, ThesisSecondaryDark] (sim.east) -- (ans.west);
+
   \end{tikzpicture}%
   }
   \caption{Span selection from a clinical text and a type description.}

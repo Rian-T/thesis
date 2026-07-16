@@ -2,17 +2,19 @@
 life''}{%
 Ludwig Wittgenstein, \textit{Philosophical Investigations}}
 
-This part asks how public biomedical resources can support clinical extraction
-without hospital records. We study a longitudinal lymphoma electronic case report
-form (eCRF), the structured data-collection form of a clinical study, here
-comprising 89 fields. The form is filled from a sequence of reports, where each
-mention must be assigned to its role in the patient trajectory. No real registry
-of this kind is available to us, so we build and evaluate a synthetic version of
-the task. The next three chapters construct task supervision from public and
-generated text, train an extractor that accepts new field descriptions, and
-compare a small biomedical encoder with larger generative models. The complete
-eCRF is evaluated on synthetic records, while PARHAF and FrACCO provide narrower
-tests on human-written text.
+The first two parts built a public biomedical corpus and pretrained encoders on
+it. This part asks whether those public foundations can support a real clinical
+task without any training on hospital data: reading a patient's free-text
+reports and filling the structured form that a clinical study keeps for each
+patient. The task is demanding because the same value plays different roles as
+the disease unfolds, and because no real filled form is available to learn from.
+The next three chapters build task supervision from public and generated text,
+design an extractor that can be asked for new fields at inference time, and
+compare a small biomedical encoder with much larger generative models. The
+result they build toward is that a 150-million-parameter encoder, trained only
+on public and generated text and never shown a real hospital record, nearly matches
+the accuracy of a generative model more than twenty-five times its size
+fine-tuned on the same data.
 
 \chapter{Synthetic Data for Task Adaptation}
 \label{chap:synthetic}

@@ -36,21 +36,21 @@ class StylometryPanel:
 
 
 _SOURCE_KEYS = ("pmc_patients", "synthetic_records", "e3c")
-_SOURCE_LABELS = ("PMC-Patients", "Dossiers synthétiques", "E3C")
+_SOURCE_LABELS = ("PMC-Patients", "Synthetic records", "E3C")
 _METRICS = (
     (
         "mauve",
         "MAUVE",
-        "plus haut = plus proche",
+        "higher = closer",
         3,
         (0.0, 0.050),
         (0.0, 0.02, 0.04),
     ),
-    ("fed", "FED", "plus bas = plus proche", 2, (0.0, 0.85), (0.0, 0.4, 0.8)),
+    ("fed", "FED", "lower = closer", 2, (0.0, 0.85), (0.0, 0.4, 0.8)),
     (
         "mmd2",
         r"MMD$^2$",
-        "plus bas = plus proche",
+        "lower = closer",
         4,
         (0.0, 0.00105),
         (0.0, 0.0005, 0.001),
@@ -58,7 +58,7 @@ _METRICS = (
     (
         "c2st",
         "C2ST",
-        "plus bas = plus proche",
+        "lower = closer",
         3,
         (0.48, 1.025),
         (0.5, 0.75, 1.0),
@@ -94,7 +94,7 @@ def prepare_stylometry(data: dict | None = None) -> tuple[StylometryPanel, ...]:
 
 
 def _decimal_label(value: float, precision: int) -> str:
-    return f"{value:.{precision}f}".replace(".", ",")
+    return f"{value:.{precision}f}"
 
 
 def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
@@ -163,10 +163,24 @@ def _draw_panel(ax, panel: StylometryPanel, show_sources: bool) -> None:
         ax.text(
             0.5,
             -0.42,
-            "indiscernables",
+            "chance = 0.5",
             ha="left",
             va="center",
             fontsize=7.5,
+            color=colors["neutral"],
+        )
+        # The three sources cluster in a razor-thin band far from chance: the
+        # per-point labels overlap visually, so spell the range out to make
+        # clear that every source is distinguishable from PARHAF.
+        ax.axvspan(0.985, 0.991, color=colors["neutral"], alpha=0.12, zorder=0)
+        ax.text(
+            0.52,
+            1.5,
+            r"all sources" + "\n" + r"$\in [0.985,\,0.991]$",
+            ha="left",
+            va="center",
+            fontsize=7.5,
+            linespacing=1.3,
             color=colors["neutral"],
         )
 
