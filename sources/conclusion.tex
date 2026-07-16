@@ -405,6 +405,27 @@ Gemma4 E4B      & 0.55 & \textbf{2.36} & 3.10 & \textit{3.36} & 3.16 & 3.02 \\
 \end{tabular}
 \end{table}
 
+Two threads run through these failures. The first concerns medical
+specialization. MedGemma, the only medically fine-tuned model in the panel, is
+not the safest of the seven: it reaches the best calibration score only by
+refusing almost every pair, and it is the least stable of all under the
+comparative triage. Fine-tuning a model for medicine can therefore hide its
+visible errors, through near-blanket refusal, without repairing the behaviour
+underneath, and at times while making it worse. The second thread is
+methodological. The demographic bias is invisible to an evaluation that scores one
+patient at a time, where profile differences stay below 0.03, and it becomes clear
+only when the model is asked to rank patients against one another. A benchmark that
+scores answers in isolation underreports the risk that surfaces the moment the
+model is used comparatively, as a triage list is.
+
+Each of these fragilities maps to a concrete clinical risk. The capitulation under
+patient pressure, up to 28 percent of pressure chains ending in unsafe advice,
+is the kind of failure that could wave a contraindicated combination through in
+self-medication; the missing prudence gradient blurs a critical contraindication
+into a minor precaution; and a triage order that shifts with a patient's name and
+postal code is exactly the behaviour a deployed triage tool must not have. These
+are the behaviours a factual benchmark, by construction, never sees.
+
 \subsection{Protocol details and sensitivity}
 \label{sec:conclusion-tabib-details}
 
@@ -622,7 +643,7 @@ static benchmark that reports only the unsafe rate would call this model safe.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.82\textwidth]{plots/part_3/output/conclusion_agentic_gradient.pdf}
+  \includegraphics[width=\textwidth]{plots/part_3/output/conclusion_agentic_gradient.pdf}
   \caption{The same model and the same forged note under four apparatuses of rising
   realism: the share of sessions with an unsafe act climbs from none in a chat
   setting to a quarter in the agentic setting under pressure, while an authentic

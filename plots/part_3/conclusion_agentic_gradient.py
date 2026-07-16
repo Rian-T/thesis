@@ -50,7 +50,8 @@ def series(counts):
 
 def main():
     apply_style()
-    fig, ax = plt.subplots(figsize=(5.7, 3.3))
+    fig, ax = plt.subplots(figsize=(6.6, 3.7))
+    plt.rcParams.update({'xtick.labelsize':11,'ytick.labelsize':11,'axes.labelsize':13,'legend.fontsize':11})
     x = list(range(len(X)))
 
     yf, ef = series(FORGED)
@@ -67,21 +68,21 @@ def main():
     ax.scatter([3], [4 / N], s=52, facecolors="none",
                edgecolors=COLORS["tertiary_dark"], linewidths=1.3, zorder=4)
     ax.annotate("+ truth delivered", (3, 4 / N), textcoords="offset points",
-                xytext=(-6, 10), fontsize=8, color=COLORS["tertiary_dark"],
+                xytext=(-6, 11), fontsize=10, color=COLORS["tertiary_dark"],
                 ha="right")
 
     # value labels on the forged series
     for xi, (yi, k) in enumerate(zip(yf, FORGED)):
         ax.text(xi, yi + 0.028, f"{k}/{N}", ha="center", va="bottom",
-                fontsize=8.5, fontweight="bold", color=COLORS["ink"])
+                fontsize=10.5, fontweight="bold", color=COLORS["ink"])
 
     ax.set_xticks(x)
-    ax.set_xticklabels(X, fontsize=9)
+    ax.set_xticklabels(X, fontsize=11)
     ax.set_ylabel("sessions with an unsafe act")
     ax.set_ylim(-0.02, 0.52)
     ax.set_yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5])
     ax.set_yticklabels(["0", "10\\%", "20\\%", "30\\%", "40\\%", "50\\%"])
-    ax.legend(loc="upper left", frameon=False, fontsize=8.5)
+    ax.legend(loc="upper left", frameon=False, fontsize=10.5)
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
