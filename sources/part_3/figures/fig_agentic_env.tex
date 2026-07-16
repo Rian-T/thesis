@@ -1,71 +1,81 @@
 \begin{center}
   \centering
-  \providecommand{\envsub}[1]{{\tiny\textcolor{ThesisNeutral}{#1}}}
+  \providecommand{\envsub}[1]{{\scriptsize\itshape\textcolor{ThesisNeutral}{#1}}}
   \resizebox{\textwidth}{!}{%
-  \begin{tikzpicture}[font=\scriptsize\sffamily, text=ThesisInk,
-    box/.style={rounded corners=2pt, align=center, inner sep=4pt, text=ThesisInk},
+  \begin{tikzpicture}[font=\footnotesize\sffamily, text=ThesisInk,
+    box/.style={rounded corners=2.5pt, align=center, inner sep=5pt, text=ThesisInk},
+    % the evaluated model
     agent/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
-      text width=2.3cm, minimum height=1.0cm, line width=0.9pt},
-    item/.style={box, draw=ThesisNeutral!45, fill=white, text width=2.6cm,
-      minimum height=0.6cm},
-    crit/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!10,
-      text width=2.6cm, minimum height=0.6cm, line width=0.9pt},
-    press/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!16,
-      text width=2.6cm, minimum height=0.6cm},
-    doc/.style={box, draw=ThesisNeutral!55, fill=ThesisPaper, text width=3.5cm,
-      align=left, inner sep=6pt},
-    truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=2.5cm},
-    safe/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22, text width=2.6cm},
-    unsafe/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!22, text width=2.6cm},
-    lbl/.style={font=\tiny, color=ThesisNeutral, inner sep=1.5pt},
-    flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
+      text width=2.7cm, minimum height=1.25cm, line width=1pt},
+    % ordinary queue tasks
+    item/.style={box, draw=ThesisNeutral!45, fill=white, text width=3.0cm,
+      minimum height=0.72cm},
+    % the queue task that hides the trap
+    trap/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!10, line width=0.9pt,
+      text width=3.0cm, minimum height=0.72cm},
+    % a document the agent reads: paper panel, serif
+    doc/.style={box, draw=ThesisNeutral!55, fill=ThesisPaper, text width=4.0cm,
+      align=left, inner sep=8pt},
+    % ground-truth tool
+    truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=4.6cm,
+      align=left, inner sep=8pt},
+    % the scored fork
+    safe/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22,
+      text width=3.2cm, minimum height=0.95cm, line width=0.9pt},
+    unsafe/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!24,
+      text width=3.2cm, minimum height=0.95cm, line width=1pt},
+    lbl/.style={font=\scriptsize, color=ThesisNeutral, inner sep=2pt},
+    % arrows
+    flow/.style={-{Stealth[length=5pt]}, draw=ThesisInk!42, line width=0.8pt,
       shorten <=2pt, shorten >=2pt},
-    consult/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!70, line width=0.7pt,
+    rw/.style={{Stealth[length=5pt]}-{Stealth[length=5pt]}, draw=ThesisInk!42, line width=0.8pt,
+      shorten <=2pt, shorten >=2pt},
+    consult/.style={-{Stealth[length=5pt]}, draw=ThesisNeutral!70, line width=0.8pt,
       densely dashed, shorten <=2pt, shorten >=2pt},
-    goodarr/.style={-{Stealth[length=4.5pt]}, draw=ThesisSecondaryDark, line width=0.9pt,
+    goodarr/.style={-{Stealth[length=6pt]}, draw=ThesisSecondaryDark, line width=1.1pt,
       shorten <=2pt, shorten >=2pt},
-    badarr/.style={-{Stealth[length=5pt]}, draw=ThesisTertiaryDark, line width=1.1pt,
+    badarr/.style={-{Stealth[length=6pt]}, draw=ThesisTertiaryDark, line width=1.4pt,
       shorten <=2pt, shorten >=2pt}]
 
-    % ===== LEFT: the work stream, delivered over time =====================
-    \node[lbl, align=center] (hdr) at (-7.0,3.05) {a workday, one item at a time};
-    \node[item]  (s1) at (-7.0,2.05) {summary note};
-    \node[item]  (s2) at (-7.0,1.15) {inventory};
-    \node[crit]  (s3) at (-7.0,0.15) {prescription \envsub{critical}};
-    \node[press] (s4) at (-7.0,-1.0) {pressure $\times 3$};
-    \draw[-{Stealth[length=4pt]}, draw=ThesisNeutral!55, line width=0.7pt]
-      (-8.6,2.25) -- (-8.6,-0.9) node[midway, rotate=90, anchor=south, lbl] {time};
-    \draw[flow] (s3.east) -- (-2.85,0.05);
-    \node[lbl] (itlbl) at (-4.2,0.62) {one item at a time};
+    % ===== LEFT: the workday, one task at a time =========================
+    \node[lbl, align=center] (qhdr) at (-8.1,3.35) {a workday,\\one task at a time};
+    \node[item] (s1) at (-8.1,2.35) {summary note};
+    \node[item] (s2) at (-8.1,1.45) {stock inventory};
+    \node[trap] (s3) at (-8.1,0.30) {patient case\\[1pt]{\scriptsize\itshape\textcolor{ThesisTertiaryDark}{hides the trap}}};
+    \draw[-{Stealth[length=4pt]}, draw=ThesisNeutral!55, line width=0.8pt]
+      (-9.85,2.6) -- (-9.85,0.05) node[midway, rotate=90, anchor=south, lbl] {time};
+    \draw[flow] (s3.east) -- (-5.35,0.05);
 
     % ===== CENTRE: the agent =============================================
-    \node[agent] (ag) at (-1.5,0.0) {agent\\[-1pt]\envsub{evaluated model}};
+    \node[agent] (ag) at (-4.0,-0.15) {agent\\[1pt]\envsub{the evaluated model}};
 
-    % information ABOVE the agent, well separated
-    \node[doc] (ehr) at (-1.5,2.75)
-      {patient record (EHR)\\[3pt]
-       {\envsub{contraindicated pair}}\\[3pt]
-       {\setlength{\fboxsep}{1.6pt}\colorbox{ThesisTertiary!24}{%
-         \textcolor{ThesisTertiaryDark}{\tiny forged note: ``contraindication lifted''}}}};
-    \draw[{Stealth[length=4pt]}-{Stealth[length=4pt]}, draw=ThesisInk!42, line width=0.7pt,
-      shorten <=2pt, shorten >=2pt] (ag.north) -- (ehr.south);
-    \node[lbl, anchor=east] (rwlbl) at (-1.75,1.6) {reads};
+    % ===== the single logged boundary between agent and world ============
+    \draw[densely dashed, draw=ThesisNeutral!60, line width=0.7pt] (-6.1,1.75) -- (1.9,1.75);
+    \node[lbl, fill=white, inner sep=2.5pt, align=center] at (-5.05,1.75)
+      {every exchange logged\\served vs.\ true};
 
-    \node[truth] (th) at (2.7,2.85) {ANSM thesaurus\\[-1pt]\envsub{ground truth}};
-    \draw[consult] (ag.north east) -- (th.south);
-    \node[lbl, anchor=west] (cslbl) at (2.0,1.75) {consult};
+    % ===== ABOVE the boundary: the world the agent acts on ===============
+    \node[doc] (ehr) at (-2.3,3.55)
+      {\textbf{\normalfont Patient record (EHR)}\\[3pt]
+       \itshape contraindicated\\ drug pair\\[4pt]
+       \upshape{\setlength{\fboxsep}{2.5pt}\colorbox{ThesisTertiary!26}{%
+         \textcolor{ThesisTertiaryDark}{\footnotesize forged note:}}}\\[2pt]
+       \itshape\textcolor{ThesisTertiaryDark}{``a doctor lifted the contraindication''}};
+    \node[truth] (th) at (2.7,3.45)
+      {\textbf{ANSM interaction thesaurus}\\[3pt]
+       \envsub{3{,}170 graded entries · ground truth}\\[4pt]
+       verdict: \textbf{contraindicated}};
 
-    % ===== RIGHT: the scored fork ========================================
-    \node[safe]   (ok) at (5.4,1.0)  {refuse \envsub{safe}};
-    \node[unsafe] (ko) at (5.4,-1.15) {issue prescription \envsub{irreversible, unsafe}};
-    \draw[goodarr] (ag.east) .. controls +(1.4,0.4) and +(-1.2,0) .. (ok.west);
-    \draw[badarr]  (ag.east) .. controls +(1.4,-0.5) and +(-1.2,0) .. (ko.west);
-    \node[lbl] (sclbl) at (3.3,-0.05) {scored};
+    \draw[rw] (ag.north) -- ([xshift=-6pt]ehr.south) node[pos=0.32, right=2pt, lbl] {read / write};
+    \draw[consult] (ag.north east) -- ([xshift=-16pt]th.south) node[pos=0.72, right=2pt, lbl] {consult};
 
-    % ===== bottom note ===================================================
-    \node[lbl, align=center] (note) at (-1.5,-2.55)
-      {the world lies only through the forged note; every call is logged with what was
-       \emph{served} and what is \emph{true}};
+    % ===== RIGHT: the scored terminal act ================================
+    \node[safe]   (ok) at (7.0,1.15)  {\textbf{refuse}\\[1pt]\envsub{safe}};
+    \node[unsafe] (ko) at (7.0,-1.55) {\textbf{issue prescription}\\[1pt]\envsub{irreversible · unsafe}};
+    \draw[goodarr] (ag.east) .. controls +(1.8,0.6) and +(-1.6,0) .. (ok.west);
+    \draw[badarr]  (ag.east) .. controls +(1.8,-0.7) and +(-1.6,0) .. (ko.west);
+    \node[lbl, align=center] at (4.55,-0.28) {scored:\\terminal act};
+
   \end{tikzpicture}%
   }
   \captionof{figure}{The exploratory agentic environment: an ordinary workday
