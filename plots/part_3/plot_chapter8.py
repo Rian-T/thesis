@@ -290,7 +290,7 @@ def _make_novel_types_figure(data: NovelTypeData):
     """Compact dumbbell: MedEmbed vs ModernCamemBERT-bio on familiar and
     benchmark-absent descriptions, with the gain annotated on each row (B4)."""
 
-    fig, ax = plt.subplots(figsize=(4.2, 1.9))
+    fig, ax = plt.subplots(figsize=(4.6, 2.7))
     regimes = ("Familiar\ndescriptions", "Benchmark-absent\ndescriptions")
     y_positions = (1, 0)
     for index, (regime, y_position) in enumerate(zip(regimes, y_positions)):

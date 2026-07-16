@@ -117,131 +117,66 @@ def _closeness_order(panel: StylometryPanel) -> tuple[int, ...]:
 
 
 def _make_figure(panels: tuple[StylometryPanel, ...]):
-    """A compact slopegraph: every source on every metric at once.
+    """Small multiples: one panel per metric, actual values as horizontal bars.
 
-    Each metric ranks the three public sources by how close they sit to
-    PARHAF (top = closest). The three distributional metrics agree; only the
-    C2ST classifier reverses the order, and that disagreement reads directly
-    as the crossing of the lines on the right.
+    Each panel shows the three sources' distance to PARHAF on one metric, with
+    the value printed at each bar. This reads as values, not ranks. The three
+    distributional metrics agree that PMC-Patients sits closest; the C2ST panel
+    reverses that order by a razor-thin margin, and its chance line at 0.5 makes
+    the real conclusion visible: all three sources sit far from PARHAF.
     """
 
     colors = semantic_colors()
     sources = panels[0].sources
-    x_positions = list(range(len(panels)))
-    y_levels = (1.0, 0.5, 0.0)  # closest, middle, furthest
+    tones = _SOURCE_TONES
 
-    # source_y[source_index] -> list of y over the four metrics.
-    source_y: list[list[float]] = [[] for _ in sources]
-    for panel in panels:
-        order = _closeness_order(panel)
-        for rank, source_index in enumerate(order):
-            source_y[source_index].append(y_levels[rank])
+    fig, axes = plt.subplots(2, 2, figsize=(6.3, 3.7))
+    axes = axes.ravel()
 
-    fig, ax = plt.subplots(figsize=(5.3, 2.85))
-
-    for source_index in range(len(sources)):
-        tone = _SOURCE_TONES[source_index]
-        marker = _SOURCE_MARKERS[source_index]
-        ys = source_y[source_index]
-        ax.plot(
-            x_positions,
-            ys,
-            color=tone,
-            linewidth=1.4,
-            alpha=0.9,
-            zorder=2,
-            solid_capstyle="round",
-        )
-        ax.scatter(
-            x_positions,
-            ys,
-            s=30,
-            color=tone,
-            marker=marker,
-            edgecolor="white",
-            linewidth=0.6,
-            zorder=3,
-        )
-        # Direct label at the left end — no legend needed.
-        ax.annotate(
-            sources[source_index],
-            (x_positions[0], ys[0]),
-            xytext=(-8, 0),
-            textcoords="offset points",
-            ha="right",
-            va="center",
-            fontsize=8,
-            color=tone,
-        )
-        # Raw value at every node, above the marker. A uniform dark tone (not the
-        # source tone) keeps every label equally legible, and a thin white bbox
-        # lifts the numbers clear of the crossing lines at the C2ST column.
-        for panel, x_position, y_value in zip(panels, x_positions, ys):
+    for col, (ax, panel) in enumerate(zip(axes, panels)):
+        y_of = {i: len(sources) - 1 - i for i in range(len(sources))}
+        for i, (value, tone) in enumerate(zip(panel.values, tones)):
+            ax.barh(
+                y_of[i], value, height=0.62, color=tone,
+                edgecolor="white", linewidth=0.6, zorder=3,
+            )
             ax.annotate(
-                _decimal_label(panel.values[source_index], panel.precision),
-                (x_position, y_value),
-                xytext=(0, 6),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                fontsize=6.8,
-                color="#2D2A3C",
-                bbox=dict(boxstyle="round,pad=0.12", facecolor="white",
-                          edgecolor="none", alpha=0.85),
+                _decimal_label(value, panel.precision),
+                (value, y_of[i]),
+                xytext=(4, 0), textcoords="offset points",
+                va="center", ha="left", fontsize=7.5, color="#2D2A3C",
             )
 
-    # Column headers: metric name + the direction convention.
-    for panel, x_position in zip(panels, x_positions):
-        ax.text(
-            x_position,
-            1.29,
-            panel.title,
-            ha="center",
-            va="bottom",
-            fontsize=10,
-            fontweight="bold",
-            color=colors["neutral"],
+        ax.set_xlim(*panel.limits)
+        ax.set_xticks(panel.ticks)
+        ax.set_ylim(-0.6, len(sources) - 0.4)
+        ax.set_yticks([y_of[i] for i in range(len(sources))])
+        # source labels only on the left column, to avoid repetition
+        if col % 2 == 0:
+            ax.set_yticklabels(sources, fontsize=8)
+        else:
+            ax.set_yticklabels([])
+        ax.tick_params(axis="x", labelsize=7)
+        ax.tick_params(axis="y", length=0)
+        ax.set_title(
+            f"{panel.title}   {panel.direction}",
+            fontsize=8.5, color=colors["neutral"], pad=4,
         )
-        ax.text(
-            x_position,
-            1.20,
-            panel.direction,
-            ha="center",
-            va="bottom",
-            fontsize=7,
-            color=colors["neutral"],
-        )
+        for spine in ("top", "right"):
+            ax.spines[spine].set_visible(False)
+        ax.grid(axis="x", color=colors["neutral"], alpha=0.12, linewidth=0.5)
 
-    # Vertical guide rails, one per metric.
-    for x_position in x_positions:
-        ax.axvline(
-            x_position,
-            color=colors["neutral"],
-            alpha=0.15,
-            linewidth=0.6,
-            linestyle=":",
-            zorder=0,
-        )
+        # C2ST: mark the 0.5 chance line so the reader sees all bars sit far above it
+        if panel.key == "c2st":
+            ax.axvline(0.5, color=colors["neutral"], linestyle="--",
+                       linewidth=0.9, alpha=0.8, zorder=2)
+            ax.annotate(
+                "chance", (0.5, len(sources) - 0.5),
+                xytext=(2, 0), textcoords="offset points",
+                fontsize=6.8, color=colors["neutral"], ha="left", va="center",
+            )
 
-    ax.set_xlim(-0.95, len(panels) - 1 + 0.35)
-    ax.set_ylim(-0.28, 1.18)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-
-    # The one non-obvious fact the ranking hides: every C2ST score sits in a
-    # razor-thin band far above chance, so all three sources are trivially
-    # separable from PARHAF.
-    ax.text(
-        (len(panels) - 1) / 2,
-        -0.26,
-        r"C2ST scores all in $[0.985,\,0.991]$, far above the $0.5$ chance line",
-        ha="center",
-        va="bottom",
-        fontsize=7.5,
-        color=colors["neutral"],
-    )
+    fig.tight_layout()
     return fig
 
 

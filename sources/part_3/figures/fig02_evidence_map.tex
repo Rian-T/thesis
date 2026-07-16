@@ -1,48 +1,39 @@
 \begin{figure}[t]
   \centering
-  \begin{tikzpicture}[font=\scriptsize\sffamily,
-    anchorbox/.style={
-      draw=ThesisPrimaryDark, line width=1pt, rounded corners=3pt,
-      fill=ThesisPrimary!20, text width=5cm, minimum height=1.5cm,
-      align=center, inner sep=8pt, text=ThesisInk},
-    subbox/.style={
-      draw=ThesisNeutral!55, rounded corners=3pt,
-      fill=ThesisPaper, text width=3.1cm, minimum height=1.05cm,
-      align=center, inner sep=5pt, text=ThesisInk},
-    note/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape,
-      text width=5.6cm},
-    subtitle/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape},
-    standin/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!60, line width=0.6pt,
-      densely dashed, shorten <=3pt, shorten >=4pt},
-    check/.style={-{Stealth[length=4pt]}, draw=ThesisPrimaryDark!55, line width=0.7pt,
-      shorten <=4pt, shorten >=4pt}]
+  \begin{tikzpicture}[font=\scriptsize\sffamily, text=ThesisInk,
+    target/.style={draw=ThesisNeutral!55, densely dashed, rounded corners=3pt,
+      fill=ThesisNeutral!8, text width=6.4cm, align=center, inner sep=8pt,
+      minimum height=1.1cm},
+    proxy/.style={draw=ThesisNeutral!55, rounded corners=3pt, fill=ThesisPaper,
+      text width=3.35cm, align=left, inner sep=7pt, minimum height=2.05cm},
+    ours/.style={proxy, draw=ThesisPrimaryDark, fill=ThesisPrimary!12, line width=1pt},
+    up/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!60, line width=0.6pt,
+      densely dashed, shorten <=4pt, shorten >=4pt}]
 
-    % Discreet note: the real clinical target cannot be shared
-    \node[note] (real) at (0,2.65)
-      {Real target: a clinician-filled eCRF from French hospital records,
-       not shareable};
+    % the real, unavailable target
+    \node[target] (real) at (0,3.15)
+      {\textbf{Evaluation on French hospital records}\\[1pt]
+       {\itshape\color{ThesisNeutral}the real target, not available}};
 
-    % Anchor: the synthetic task under study (the contribution)
-    \node[anchorbox] (ecrf) at (0,0.55)
-      {\textbf{Synthetic lymphoma eCRF}\\[2pt]
-       {\normalfont\scriptsize the complete form-filling task}};
+    % three imperfect evaluation sets, each a partial proxy
+    \node[ours]  (ecrf)   at (-4.7,0) {\textbf{Synthetic eCRF}\\[3pt]
+       gives the complete longitudinal task\\[3pt]
+       {\itshape\color{ThesisNeutral}but synthetic}};
+    \node[proxy] (parhaf) at (0,0)     {\textbf{PARHAF}\\[3pt]
+       gives human-written clinical reports\\[3pt]
+       {\itshape\color{ThesisNeutral}but short, two entity types}};
+    \node[proxy] (fracco) at (4.7,0)   {\textbf{FrACCO}\\[3pt]
+       gives dense real oncology entities\\[3pt]
+       {\itshape\color{ThesisNeutral}but flat, not longitudinal}};
 
-    \draw[standin] (real) -- (ecrf)
-      node[midway, right=2pt, text=ThesisNeutral, font=\scriptsize] {stands in for};
-
-    % Subordinate partial checks
-    \node[subbox] (parhaf) at (-3.7,-2.35) {\textbf{PARHAF}};
-    \node[subbox] (fracco) at (3.7,-2.35)  {\textbf{FrACCO}};
-    \node[subtitle, below=2pt of parhaf] {transfer to short\\human-written reports};
-    \node[subtitle, below=2pt of fracco] {dense entity\\recognition};
-
-    \node[text=ThesisNeutral, font=\scriptsize\itshape] (checklbl) at (0,-1.25)
-      {partial external checks};
-
-    \draw[check] (ecrf.south) -- (parhaf.north);
-    \draw[check] (ecrf.south) -- (fracco.north);
+    \draw[up] (ecrf.north)   -- (real.south west);
+    \draw[up] (parhaf.north) -- (real.south);
+    \draw[up] (fracco.north) -- (real.south east);
+    \node[text=ThesisNeutral, font=\scriptsize\itshape] at (2.35,1.55)
+      {each an incomplete proxy};
   \end{tikzpicture}
-  \caption{Our synthetic lymphoma eCRF is the task under study, with two human
-  corpora giving partial external checks in place of the unshareable clinical target.}
+  \caption{No hospital evaluation is available, so three imperfect sets each supply
+  a different partial signal toward it: the synthetic eCRF gives the complete task,
+  PARHAF gives human-written text, and FrACCO gives dense real entities.}
   \label{fig:p3-evidence}
 \end{figure}

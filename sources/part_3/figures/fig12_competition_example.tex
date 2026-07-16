@@ -1,36 +1,34 @@
 \begin{center}
   \centering
-  \resizebox{0.9\textwidth}{!}{%
+  \resizebox{0.82\textwidth}{!}{%
   \begin{tikzpicture}[
     font=\small, text=ThesisInk, >={Stealth[length=2mm]},
     span/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!22, rounded corners=3pt,
-                 minimum height=0.72cm, inner xsep=9pt, font=\bfseries},
-    cand/.style={draw=ThesisNeutral!60, fill=ThesisPaper, rounded corners=3pt,
-                 text width=5.0cm, minimum height=0.95cm, inner sep=9pt},
-    win/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!24, line width=1.0pt},
-    result/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!30, rounded corners=3pt,
-                   text width=3.0cm, minimum height=1.05cm, align=center, inner sep=9pt},
-    arr/.style={->, draw=ThesisNeutral, line width=0.8pt}]
+                 minimum height=0.85cm, inner xsep=10pt, font=\bfseries},
+    field/.style={rounded corners=3pt, text width=7.0cm, minimum height=0.95cm,
+                  inner sep=8pt, align=left, font=\small},
+    kept/.style={field, draw=ThesisSecondaryDark, fill=ThesisSecondary!24, line width=1.1pt},
+    dropped/.style={field, draw=ThesisTertiaryDark, fill=ThesisTertiary!16},
+    arr/.style={->, draw=ThesisNeutral!70, line width=0.9pt, shorten >=3pt, shorten <=3pt}]
 
-    % predicted span, claimed by two candidate fields
-    \node[span] (s) at (-4.7,0) {BCL2 positive};
+    % one predicted value, claimed by two fields
+    \node[span] (s) at (0,0) {BCL2 positive};
 
-    % competing field assignments with confidence scores
-    \node[cand, win] (a) at (0.5,1.05)
-      {BCL2 FISH \hfill {\bfseries\large\color{ThesisSecondaryDark}0.792}};
-    \node[cand] (b) at (0.5,-1.05)
-      {BCL2 immunohistochemistry \hfill {\bfseries\color{ThesisNeutral}0.415}};
+    % the two competing field assignments, with confidence and outcome
+    \node[kept] (a) at (7.4,1.2)
+      {BCL2 FISH \hfill \textbf{0.79} \;\;
+       {\footnotesize\textbf{\color{ThesisSecondaryDark}kept}}};
+    \node[dropped] (b) at (7.4,-1.2)
+      {BCL2 immunohistochemistry \hfill 0.42 \;\;
+       {\footnotesize\color{ThesisTertiaryDark}dropped}};
 
-    % retained assignment = most confident field
-    \node[result] (out) at (5.9,0) {retained assignment\\[3pt]\textbf{BCL2 FISH}};
+    \draw[arr] (s.east) to[out=30,in=180] (a.west);
+    \draw[arr] (s.east) to[out=-30,in=180] (b.west);
 
-    \draw[arr] (s.east) -- (a.west);
-    \draw[arr] (s.east) -- (b.west);
-    \draw[arr, draw=ThesisSecondaryDark, line width=1.0pt] (a.east) -- (out.west);
-
-    % strike out the losing (less confident) assignment
-    \draw[ThesisNeutral, line width=1.0pt] (b.west) -- (b.east);
+    \node[font=\footnotesize\itshape, text=ThesisNeutral, align=center] at (3.5,0)
+      {the more confident\\assignment wins};
   \end{tikzpicture}}
-  \captionof{figure}{Field competition between two assignments of the same predicted span.}
+  \captionof{figure}{Field competition: one predicted value claims two fields, and
+  the more confident assignment is kept while the other is dropped.}
   \label{fig:p3-field-competition-example}
 \end{center}
