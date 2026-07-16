@@ -48,14 +48,14 @@ def main():
     ax.fill_between(ex, ey, alpha=0.12, color=enc_color, zorder=1)
 
     ax.plot(gx, gy, "-", color=gen_color, linewidth=1.8, zorder=3,
-            label=r"Qwen3.5-4B (AURC 0.175)")
+            label="Qwen3.5-4B")
     ax.plot(ex, ey, "-", color=enc_color, linewidth=1.8, zorder=4,
-            label=r"MC-bio-gliner (AURC 0.239)")
+            label="MC-bio-gliner")
 
-    # ── AURC labels near each curve ───────────────────────────────────────────
-    ax.text(0.80, 0.45, r"AURC 0.239", color=COLORS["primary_dark"],
+    # ── AURC labels near each curve (read from JSON, never stale) ─────────────
+    ax.text(0.80, 0.45, f"AURC {enc['aurc']:.3f}", color=COLORS["primary_dark"],
             fontsize=9, ha="left", va="center", rotation=32)
-    ax.text(0.82, 0.245, r"AURC 0.175", color=gen_color,
+    ax.text(0.82, 0.245, f"AURC {gen['aurc']:.3f}", color=gen_color,
             fontsize=9, ha="left", va="center", rotation=14)
 
     # ── 50% coverage marker + precision annotations ───────────────────────────
@@ -70,10 +70,10 @@ def main():
     ax.plot(0.5, gen_risk50, "o", markersize=6, markerfacecolor=gen_color,
             markeredgecolor="white", markeredgewidth=0.8, zorder=6)
 
-    ax.annotate(r"prec@50\% = 0.770", (0.5, enc_risk50),
+    ax.annotate(rf"prec@50\% = {enc['prec_at_50']:.3f}", (0.5, enc_risk50),
                 xytext=(0.475, enc_risk50 + 0.055), ha="right", va="bottom",
                 fontsize=8.5, color=COLORS["primary_dark"])
-    ax.annotate(r"prec@50\% = 0.862", (0.5, gen_risk50),
+    ax.annotate(rf"prec@50\% = {gen['prec_at_50']:.3f}", (0.5, gen_risk50),
                 xytext=(0.475, gen_risk50 - 0.055), ha="right", va="top",
                 fontsize=8.5, color=gen_color)
 

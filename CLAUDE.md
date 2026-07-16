@@ -1,5 +1,35 @@
 # CLAUDE.md
 
+> 🚨 **EN COURS — PARTIE 3 : boucle de POLISH profonde (figures + narratif), multi-vagues fable/opus.**
+> Docs de travail À LIRE : `research/lymphome/DASHBOARD_NUIT.md` (chiffres), `FIGURE_GRAMMAR.md` (grammaire
+> visuelle), `canonical_scores.json` (source programmatique des chiffres). Scorers LOCAUX (parquets dans
+> `research/lymphome/data/`) : `score_valthr.py` (seuil-val), `score_calib.py` (§18.4.1), `verify_tables.py`
+> (parse le `.tex` et recalcule chaque nombre depuis les parquets = anti-hallucination).
+>
+> **CHIFFRES — train-on-test-free, VÉRIFIÉS depuis les parquets (`results.json` PÉRIMÉ, ne pas l'utiliser).**
+> Capstone eCRF (après field competition) : MC-bio-gliner publié **0.640/0.503**, variante task-mixed **0.657**
+> ≈ **Qwen3.5-4B 0.658** (parquets `-de1540v2` = Qwen *fine-tuné sur les mêmes 1540 records*, le comparateur juste ;
+> PAS les `-lp410`). QA baselines propres **ModernCamemBERT 0.336 / ModernCamemBERT-bio 0.417** (seuil plat).
+> GLiNER-BioMed **0.367** (= crossfit, en cours de certif GPU propre : sbatch **1909861** sur JZ). §18.4.1 (Qwen
+> de1540v2) : AURC 0.239 vs **0.207**, prec@50 0.770 vs **0.828**, wrong-field 48.9% vs **38.8%**. PARITÉ = HONNÊTE :
+> publié = quasi-parité (« within 0.018 »), SEULE la variante task-adapted atteint la parité. 27× (pas 25×).
+>
+> **NAMING (appliqué) :** `MC-bio-gliner` (court) / `ModernCamemBERT-bio-gliner` (long, défini 1×) ; `GLiNER-BioMed` ;
+> `Qwen3.5-…` ; retrieval terminologique = `ICD-O` (ex-« FrACCO », collision avec FrACCO-NER résolue). ZÉRO
+> parenthèse de rôle (aveu de faiblesse), ZÉRO codename (v3b/mix/de1540v2 jamais dans le manuscrit), noms de
+> modèles en **serif droit** jamais `\texttt`. eCRF défini à sa 1re occurrence.
+>
+> **GRAMMAIRE VISUELLE (`FIGURE_GRAMMAR.md`, à respecter partout) :** un bloc = UNE chose (jamais mélanger
+> texte-source + annotation + rôle) ; empan/mention = LAVANDE, valeur/prédiction produite = LIME, négatif = PÊCHE,
+> inactif/méta = NEUTRE ; panneau-Document = `ThesisPaper` serif italique, 1 texte cité ; flèches à sens unique
+> (flux `->` faded ; proxy pointillé ; pull/push contrastif coloré). Réfs canon : `fig02_evidence_map` (flèches),
+> `fig11_metrics` (couleurs). VÉRIFIER CHAQUE figure AU RENDU (pdftoppm), jamais à la source.
+>
+> **NEXT :** (1) intégrer les 2 nouvelles figures `fig_parhaf_doc` + `fig_report_to_ecrf` (\input part-intro + ch18) ;
+> (2) placement des flottants (fig 17.4/18.6/16.1/16.3 dérivent → forcer non-float `\begin{center}\captionof`,
+> vérifier au rendu) ; (3) poller GLiNER (1909861) → recalculer la valeur propre + remplacer 0.367 ;
+> (4) compile + render-check global + commit. Puis éventuellement une vague fable/opus de plus.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
