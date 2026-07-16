@@ -36,7 +36,7 @@ class StylometryPanel:
 
 
 _SOURCE_KEYS = ("pmc_patients", "synthetic_records", "e3c")
-_SOURCE_LABELS = ("PMC-Patients", "Synthetic records", "E3C")
+_SOURCE_LABELS = ("Clinical cases", "Synthetic records", "E3C")
 _METRICS = (
     (
         "mauve",
@@ -121,7 +121,7 @@ def _make_figure(panels: tuple[StylometryPanel, ...]):
 
     Each panel shows the three sources' distance to PARHAF on one metric, with
     the value printed at each bar. This reads as values, not ranks. The three
-    distributional metrics agree that PMC-Patients sits closest; the C2ST panel
+    distributional metrics agree that the clinical cases sit closest; the C2ST panel
     reverses that order by a razor-thin margin, and its chance line at 0.5 makes
     the real conclusion visible: all three sources sit far from PARHAF.
     """

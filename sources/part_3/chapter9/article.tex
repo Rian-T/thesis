@@ -80,7 +80,7 @@ The source families are listed in \Cref{tab:p3-corpus}.
     \midrule
     \rowcolor{ThesisTableSep}
     \multicolumn{2}{c}{\rule{0pt}{10pt}\textbf{Longitudinal generation}} \\[1pt]
-    PMC-Patients & 167,034 cases \\
+    Open clinical cases & 456,481 cases \\
     Generated records & 2,050 records \\
     \bottomrule
   \end{tabular}
@@ -95,12 +95,13 @@ table describe sampled material, not disjoint parts of the final corpus.
 \label{sec:lymphoma-dossiers}
 
 Published cases summarize a patient trajectory in a single narrative, whereas
-the target form is filled from a sequence of dated reports. We start from
-PMC-Patients~\citep{zhao_pmcpatients_2023}, a collection of 167,034 English
-patient cases, and favour cases
-that mention a relapse or a second treatment line. Each selected case is
-assigned a reproducible fictitious French identity, hospital, city, and anchor
-year.
+the target form is filled from a sequence of dated reports. We start from the
+openly released clinical cases that \Cref{chap:quality} recovered from PubMed
+Central as a public substitute for hospital records, and annotate them with
+Qwen3-Next-80B-A3B to keep the cases that describe a lymphoma. Among these we
+favour cases that mention a relapse or a second treatment line. Each selected
+case is assigned a reproducible fictitious French identity, hospital, city, and
+anchor year.
 
 Generation follows the clinical chronology. We first convert the source case into
 a structured French timeline and harmonize its dates, ages, and bounded values.
@@ -150,7 +151,7 @@ guarantee that the field assignment is medically correct.
 The generated records can be internally consistent while remaining different
 from human-written clinical reports. As a proxy for real reports we use
 PARHAF~\citep{tannier_parhaf_2026}, a set of fictitious but human-written reports
-that contains no hospital data, and we compare it with raw PMC-Patients cases,
+that contains no hospital data, and we compare it with the raw clinical cases,
 our generated records, and published E3C clinical
 cases~\citep{magnini_e3c_2021}.
 
@@ -180,7 +181,7 @@ accuracy of a classifier trying to tell the two sources apart, so 0.5 means
 chance-level, indistinguishable distributions, and a higher value means more
 separable ones.
 
-The distance measures place raw PMC-Patients closest to PARHAF, followed by the
+The distance measures place the raw clinical cases closest to PARHAF, followed by the
 generated records and E3C, while C2ST gives the reverse order. This disagreement
 does not support a single ranking of the sources. More importantly, every C2ST
 score lies between
@@ -191,7 +192,7 @@ therefore readily distinguishable from PARHAF in this representation space.
 \section{Limitations}
 
 Approximately 2.3\% of reports are abandoned during annotation. The train and
-test partitions were not checked for shared source articles in PMC-Patients.
+test partitions were not checked for shared source articles among the clinical cases.
 Because the same model generates the records and proposes their silver labels,
 the reference may favour conventions introduced during generation. The generated
 records also remain readily distinguishable from the human-written PARHAF
