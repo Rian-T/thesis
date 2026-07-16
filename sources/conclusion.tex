@@ -44,30 +44,31 @@ consumes. \Cref{tab:conclusion-savings} lists them.
 The paragraph-level filtering of \Cref{chap:quality} matched the performance of
 the full corpus while training on one third of the tokens, and its clinical
 recipe reached the same point with 2.5 times fewer tokens. The same restraint
-carries into pretraining, and the accounting is clearest across the whole
-pipeline. Training the encoder is the cheap part: ModernCamemBERT-bio was adapted
-by continual pretraining in about 16 GPU-hours, against roughly 383 for a
-comparable model trained from scratch, some twenty-four times less. The dominant
-cost lies elsewhere. On both sides, most of the budget goes to the language model
-that rewrites and annotates the training corpus (\Cref{fig:conclusion-carbon}).
-Counted end to end, the ModernCamemBERT-bio-v2 pipeline spends about 582
-GPU-hours and an estimated 17~kg of CO\textsubscript{2}, against 5{,}920
-GPU-hours and 169~kg for the from-scratch DoctoModernBERT, about ten times less.
-It stays lighter because it curates a small, targeted biomedical corpus rather
+carries into pretraining. Across models and generations, adapting a public base
+by continual pretraining emits far less carbon than training a biomedical encoder
+from scratch (\Cref{fig:conclusion-carbon}). CamemBERT-bio was adapted for an
+estimated 0.80~kg of CO\textsubscript{2}, against 26.11 for the from-scratch
+DrBERT and 8.16 for AliBERT (\Cref{chap:encoders}), and the same pattern holds at
+the scale of the whole pipeline, where the more recent ModernCamemBERT-bio-v2
+chain spends an estimated 17~kg against 169 for the from-scratch DoctoModernBERT,
+about ten times less.
+
+Where the budget goes is itself informative. Training the encoder is the cheap
+part: the continual pretraining took about 16 GPU-hours, against roughly 383 for
+a model trained from scratch. Most of the budget, on both sides, goes to the
+language model that rewrites and annotates the training corpus, and our pipeline
+stays lighter there because it curates a small, targeted biomedical corpus rather
 than rephrasing a web-scale one. These figures count reserved GPU-hours at the
 French grid intensity of 34~g CO\textsubscript{2}eq per kWh, a convention that
 understates the gap, since our curation ran the accelerators well below their
-rated power. The same lesson first appeared at encoder scale, where CamemBERT-bio
-emitted 0.80~kg of CO\textsubscript{2} against 26.11 for DrBERT
-(\Cref{chap:encoders}).
+rated power.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.85\textwidth]{plots/part_3/output/conclusion_carbon.pdf}
-  \caption{Training carbon of the full pipeline: the language model that curates
-  the corpus dominates both budgets, and targeting a small biomedical corpus
-  keeps the continually pretrained pipeline about ten times lighter than one
-  trained from scratch.}
+  \includegraphics[width=0.82\textwidth]{plots/part_3/output/conclusion_carbon_all.pdf}
+  \caption{Training carbon of the biomedical encoders, on a log scale: continual
+  pretraining from a public base stays well below training from scratch in each
+  generation.}
   \label{fig:conclusion-carbon}
 \end{figure}
 
