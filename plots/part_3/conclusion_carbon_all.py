@@ -40,34 +40,38 @@ OUTPUT = os.path.join(os.path.dirname(__file__), "output", "conclusion_carbon_al
 
 def main():
     apply_style()
-    fig, ax = plt.subplots(figsize=(5.9, 3.0))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.2, 3.0), sharey=True)
 
     y = list(range(len(MODELS)))[::-1]  # first entry on top
     train = [m[1] for m in MODELS]
     prep = [m[2] for m in MODELS]
 
-    ax.barh(y, train, height=0.6, color=COLORS["primary"],
-            edgecolor=COLORS["primary_dark"], linewidth=0.7, label="training")
-    ax.barh(y, prep, height=0.6, left=train, color=COLORS["tertiary"],
-            edgecolor=COLORS["tertiary_dark"], linewidth=0.7,
-            label="data preparation")
+    # (a) model training
+    ax1.barh(y, train, height=0.6, color=COLORS["primary"],
+             edgecolor=COLORS["primary_dark"], linewidth=0.7)
+    for yi, v in zip(y, train):
+        ax1.text(v + 0.6, yi, f"{round(v, 2):g}", va="center", ha="left",
+                 fontsize=8.5, color=COLORS["ink"])
+    ax1.set_yticks(y); ax1.set_yticklabels([m[0] for m in MODELS], fontsize=9)
+    ax1.set_xlim(0, 31); ax1.set_xlabel("kg CO$_2$eq")
+    ax1.set_title("(a) Model training", fontsize=10.5)
+    ax1.tick_params(axis="y", length=0)
 
-    for yi, m in zip(y, MODELS):
-        total = m[1] + m[2]
-        ax.text(total + 2.5, yi, f"{round(total, 1):g} kg", va="center",
-                ha="left", fontsize=8.5, color=COLORS["ink"])
+    # (b) data preparation (LLM curation of the corpus)
+    ax2.barh(y, prep, height=0.6, color=COLORS["tertiary"],
+             edgecolor=COLORS["tertiary_dark"], linewidth=0.7)
+    for yi, v in zip(y, prep):
+        lab = f"{round(v, 2):g}" if v > 0 else "\\textemdash"
+        ax2.text(v + 3.5 if v > 0 else 3.5, yi, lab, va="center", ha="left",
+                 fontsize=8.5, color=COLORS["ink"])
+    ax2.set_xlim(0, 185); ax2.set_xlabel("kg CO$_2$eq")
+    ax2.set_title("(b) Data preparation", fontsize=10.5)
+    ax2.tick_params(axis="y", length=0)
 
-    ax.set_yticks(y)
-    ax.set_yticklabels([m[0] for m in MODELS], fontsize=9)
-    ax.set_xlabel("Training emissions (kg CO$_2$eq)")
-    ax.set_xlim(0, 190)
-    ax.tick_params(axis="y", length=0)
-    ax.margins(y=0.08)
+    for ax in (ax1, ax2):
+        ax.margins(y=0.08)
 
-    ax.legend(loc="lower right", frameon=False, fontsize=8.5, handlelength=1.1,
-              borderaxespad=0.4)
-
-    fig.tight_layout()
+    fig.tight_layout(w_pad=1.6)
     for ext in ("pdf", "png"):
         fig.savefig(f"{OUTPUT}.{ext}", bbox_inches="tight")
         print(f"{OUTPUT}.{ext}")
