@@ -17,8 +17,8 @@ import numpy as np
 from thesis_style import COLORS, apply_style
 
 OUT = os.path.join(os.path.dirname(__file__), "output")
-MODELS = ["Nemotron 4B", "Qwen3.5 4B", "Gemma4 E2B", "MedGemma 4B",
-          "Ministral 8B", "Qwen3.5 9B", "Gemma4 E4B"]
+MODELS = ["Nemotron-3-Nano", "Qwen3.5 4B", "Gemma4 E2B", "MedGemma 1.5",
+          "Ministral-3 8B", "Qwen3.5 9B", "Gemma4 E4B"]
 
 BAD = COLORS["tertiary_dark"]      # peach   — worse / unsafe / unstable
 BADF = COLORS["tertiary"]          # peach light
@@ -84,16 +84,16 @@ def fig1():
 
 
 def fig2():
-    cap_models = ["Ministral 8B", "Nemotron 4B", "Qwen3.5 9B", "Qwen3.5 4B",
-                  "Gemma4 E4B", "Gemma4 E2B", "MedGemma 4B"]
+    cap_models = ["Ministral-3 8B", "Nemotron-3-Nano", "Qwen3.5 9B", "Qwen3.5 4B",
+                  "Gemma4 E4B", "Gemma4 E2B", "MedGemma 1.5"]
     _raw = [(42, 29, 19, 3), (47, 11, 20, 16), (43, 20, 15, 21), (30, 30, 25, 14),
             (50, 25, 22, 3), (43, 12, 37, 7), (19, 17, 61, 2)]
     _norm = [tuple(round(100 * x / sum(r)) for x in r) for r in _raw]
     cap_m = [r[0] for r in _norm]; cap_h = [r[1] for r in _norm]
     cap_d = [r[2] for r in _norm]; cap_c = [r[3] for r in _norm]
 
-    ece_models = ["Nemotron 4B", "Gemma4 E4B", "Qwen3.5 9B", "Gemma4 E2B",
-                  "Ministral 8B", "Qwen3.5 4B", "MedGemma 4B"]
+    ece_models = ["Nemotron-3-Nano", "Gemma4 E4B", "Qwen3.5 9B", "Gemma4 E2B",
+                  "Ministral-3 8B", "Qwen3.5 4B", "MedGemma 1.5"]
     ece_vals = [0.693, 0.533, 0.500, 0.499, 0.238, 0.177, 0.132]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.4, 3.3))
@@ -135,8 +135,8 @@ def fig2():
 
 def fig3():
     kappa = [0.041, 0.360, 0.004, 0.000, 0.586, 0.418, 0.000]
-    tau_models = ["MedGemma 4B", "Nemotron 4B", "Qwen3.5 9B", "Gemma4 E2B",
-                  "Ministral 8B", "Qwen3.5 4B", "Gemma4 E4B"]
+    tau_models = ["MedGemma 1.5", "Nemotron-3-Nano", "Qwen3.5 9B", "Gemma4 E2B",
+                  "Ministral-3 8B", "Qwen3.5 4B", "Gemma4 E4B"]
     tau = [0.069, 0.167, 0.416, 0.458, 0.463, 0.479, 0.554]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.4, 3.4))
@@ -170,13 +170,13 @@ def fig4():
     import matplotlib.colors as mcolors
     # 7x7 normalised behavioural profile (1 = best), rows sorted by mean desc.
     rows = [
-        ("Ministral 8B", 0.59, [0.50, 1.00, 0.72, 0.59, 0.76, 0.10, 0.46]),
+        ("Ministral-3 8B", 0.59, [0.50, 1.00, 0.72, 0.59, 0.76, 0.10, 0.46]),
         ("Qwen3.5 4B",   0.51, [0.17, 0.81, 0.84, 0.36, 0.82, 0.10, 0.48]),
         ("Qwen3.5 9B",   0.49, [0.78, 0.44, 0.79, 0.42, 0.50, 0.10, 0.42]),
-        ("MedGemma 4B",  0.44, [0.64, 0.37, 1.00, 0.00, 0.87, 0.10, 0.07]),
+        ("MedGemma 1.5",  0.44, [0.64, 0.37, 1.00, 0.00, 0.87, 0.10, 0.07]),
         ("Gemma4 E4B",   0.38, [0.00, 0.74, 0.88, 0.00, 0.47, 0.05, 0.55]),
         ("Gemma4 E2B",   0.35, [0.19, 0.26, 1.00, 0.00, 0.50, 0.05, 0.46]),
-        ("Nemotron 4B",  0.21, [0.00, 0.09, 0.78, 0.04, 0.31, 0.10, 0.17]),
+        ("Nemotron-3-Nano",  0.21, [0.00, 0.09, 0.78, 0.04, 0.31, 0.10, 0.17]),
     ]
     cols = ["B1\nSurface", "B2\nDistract.", "B3\nCapitul.", "B4\nCross-ling.",
             "B5\nCalibr.", "B6\nPrudence", "B7\nBias"]
@@ -224,13 +224,13 @@ def fig_capitulation():
     import matplotlib.colors as mcolors
     # rows sorted by unsafe rate desc (worst clinical outcome at top)
     rows = [
-        ("Ministral 8B", [42, 29, 19, 3, 28]),
-        ("Nemotron 4B",  [47, 11, 20, 16, 22]),
+        ("Ministral-3 8B", [42, 29, 19, 3, 28]),
+        ("Nemotron-3-Nano",  [47, 11, 20, 16, 22]),
         ("Qwen3.5 9B",   [43, 20, 15, 21, 21]),
         ("Qwen3.5 4B",   [30, 30, 25, 14, 16]),
         ("Gemma4 E4B",   [50, 25, 22, 3, 12]),
         ("Gemma4 E2B",   [43, 12, 37, 7, 0]),
-        ("MedGemma 4B",  [19, 17, 61, 2, 0]),
+        ("MedGemma 1.5",  [19, 17, 61, 2, 0]),
     ]
     cols = ["maintain", "hedge", "deflect", "capitulate", "unsafe"]
     # column polarity: +1 = higher is safer (maintain), -1 = higher is worse

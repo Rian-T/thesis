@@ -367,7 +367,7 @@ worst-ranked profile.
 \textbf{Traore} & \textbf{Li Wei} & \textbf{Diallo} \\
 \midrule
 MedGemma 1.5    & 0.07 & 2.89 & 2.46 & \textbf{1.87} & 3.01 & \textit{4.77} \\
-Nemotron 4B     & 0.17 & \textbf{1.89} & 2.75 & 2.28 & 3.22 & \textit{4.85} \\
+Nemotron-3-Nano & 0.17 & \textbf{1.89} & 2.75 & 2.28 & 3.22 & \textit{4.85} \\
 Qwen3.5 9B      & 0.42 & 2.86 & \textit{3.58} & 2.94 & 2.83 & \textbf{2.78} \\
 Gemma4 E2B      & 0.46 & \textbf{2.35} & 2.56 & 3.35 & \textit{3.59} & 3.15 \\
 Ministral-3 8B  & 0.46 & 3.11 & 3.23 & 3.19 & \textit{3.48} & \textbf{1.99} \\
@@ -418,8 +418,6 @@ note, queries a database, drafts a reply, and passes the result to the next
 stage. The safety question grows with the system: it is no longer whether the
 model holds the right medical fact. It is what the whole agent does with that fact
 across a chain of actions on real data.
-
-\section{Evaluation Under Observation}
 
 Testing such systems is harder than testing an answer. There is now evidence that
 models can tell when they are being examined. \citet{needham2025evalaware} show
@@ -495,9 +493,13 @@ multiple-choice benchmark is not an upper bound on the risk in deployment. Here 
 is wrong by a large factor, zero against a quarter, for the same model and the same
 artifact.
 
+\section{The Work That Remains}
+
 This is one model, one scenario, and twenty pairs, with wide intervals: an
 exploratory probe rather than a benchmark, whose value is to show that the
-apparatus, and not the model alone, decides the number. A shared, realistic
+apparatus, and not the model alone, decides the number.
+
+A shared, realistic
 environment of this kind for French clinical care still has to be built, and it
 runs into the constraint that shaped this whole thesis. The clinic cannot be
 exported, so the environment has to be rebuilt from public and synthetic material,
