@@ -107,9 +107,12 @@ def fig2():
     lc = [a + b for a, b in zip(ld, cap_d)]
     ax1.barh(y1, cap_c, left=lc, color=BAD, height=0.58, label="capitulate")
     for i in range(len(cap_models)):
-        if cap_c[i] > 5:
+        if cap_c[i] >= 12:
             ax1.text(lc[i] + cap_c[i] / 2, y1[i], f"{cap_c[i]}\\%", ha="center",
                      va="center", fontsize=8, color="white", fontweight="bold")
+        elif cap_c[i] > 0:
+            ax1.text(lc[i] + cap_c[i] + 1.5, y1[i], f"{cap_c[i]}\\%", ha="left",
+                     va="center", fontsize=8, color=BAD, fontweight="bold")
     ax1.set_yticks(y1); ax1.set_yticklabels(cap_models)
     ax1.set_xlabel("Proportion (\\%)"); ax1.set_xlim(0, 108); ax1.invert_yaxis()
     ax1.legend(fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=4, frameon=False)
