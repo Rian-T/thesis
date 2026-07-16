@@ -1,246 +1,204 @@
 \section{Introduction}
 
-\begin{reviewrewrite}
-Clinical text is scarce, but structured medical knowledge is not. France maintains medical ontologies that span tens of thousands of codes (CIM-10 for diagnoses, CCAM for procedures, ATC for medications), and PubMed Central contains millions of clinical case descriptions embedded in scientific articles. Both are publicly available, both are richly structured, and neither can be used directly to train a language model. The question is whether we can convert them into synthetic training data that is closer to what clinical applications actually need.
-\end{reviewrewrite}
+The ideal training signal for this task would be a French hospital record paired
+with a form completed by clinicians, but no open dataset provides that
+combination, and the clinical part of the thesis rests on this absence. We
+therefore separate the evidence available to us, as summarized in
+\Cref{fig:p3-evidence}: synthetic records test the complete longitudinal task,
+while human-written corpora test narrower forms of transfer.
 
-\begin{reviewrewrite}
-We already saw one form of generated data in \Cref{chap:ontobook}, where medical ontologies became synthetic textbooks for pretraining. This chapter generates data for the extraction task, in two ways, and neither touches a real patient record. The first annotates public biomedical text with a large language model, producing the labelled examples that train the extraction model of \Cref{chap:architectures}. The second rewrites public case descriptions into the style of hospital notes, to approximate a register that no public corpus offers. Both take a public source, hand it to a language model under a strict prompt, and get back training material that real clinical data could not supply.
-\end{reviewrewrite}
+\input{sources/part_3/figures/fig02_evidence_map}
+
+\section{Two Routes to Supervision}
+
+The available public resources provide two incomplete views of the task.
+Biomedical articles contain medical entities, but they do not use the fields of
+a new study form. Published patient cases describe clinical trajectories, but
+they are not sequences of reports written during care. We therefore construct
+two forms of supervision, shown in \Cref{fig:p3-supervision-routes}: broad
+open-vocabulary annotations for generalist training, and generated longitudinal
+records for adaptation to the eCRF.
+
+Both routes use Qwen3-235B with constrained JSON output. For public text, the
+model identifies mentions and describes their types, while for the target task it
+first generates the reports and only later assigns strings from them to form
+fields. In both cases the resulting annotations are silver rather than human
+labels.
+
+\input{sources/part_3/figures/fig03_supervision_routes}
+
+\input{sources/part_3/figures/fig03_corpus_examples}
 
 
-\section{Annotating Biomedical Text for Extraction}
+\section{Generalist Annotation of Public Text}
 \label{sec:gliner-data}
 
-\begin{figure}[t]
-\centering
-\providecommand{\ftitle}[1]{{\footnotesize\bfseries\sffamily\color{ThesisInk}#1}}
-\providecommand{\etype}[1]{{\color{ThesisPrimaryDark}#1}}
-\begin{tikzpicture}[
-  font=\footnotesize\sffamily,
-  outbox/.style={draw, rounded corners=4pt, line width=0.7pt,
-                 text width=6.9cm, inner sep=7pt, align=left, anchor=west},
-  fan/.style={-{Latex[length=2.2mm]}, line width=0.9pt, ThesisInk!50},
-]
-% Input text block (left), vertically centred against the output stack
-\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=4pt, line width=0.7pt,
-      text width=2.7cm, inner sep=7pt, align=justify, text=ThesisInk,
-      font=\footnotesize\itshape] (input) at (0,0)
-  {Mrs Diallo, 64, diffuse large B-cell lymphoma diagnosed 12/03/2019.
-   R-CHOP started 02/04/2019, 6 cycles. Relapse 15/01/2021. Death 03/02/2021.
-   LDH 480 IU/L at diagnosis.};
+The generalist corpus teaches the extractor to associate spans with descriptions
+of medical types. For each passage, Qwen3-235B proposes entity mentions together
+with a natural-language description of each type. We then search for every
+proposed mention in the source passage and remove the ones we cannot locate, so
+that each retained span is guaranteed to appear in the text. Documents left with
+no remaining mention are kept as negative examples.
 
-% LLM step
-\node[draw=ThesisInk!55, fill=ThesisInk!6, rounded corners=3pt, line width=0.7pt,
-      minimum width=1.0cm, minimum height=0.8cm, text=ThesisInk,
-      font=\footnotesize\bfseries\sffamily] (llm) at (3.2,0) {LLM};
-
-% Three output blocks (right), equal width, evenly stacked
-\node[outbox, draw=ThesisPrimaryDark, fill=ThesisPrimary!10] (ent) at (4.3,2.7)
-  {\ftitle{Entities}\par\vspace{3pt}
-   {\footnotesize\ttfamily\etype{Disease}\,$\rightarrow$\,diffuse large B-cell lymphoma\par
-    \etype{Drug}\,$\rightarrow$\,R-CHOP\qquad
-    \etype{Examination}\,$\rightarrow$\,LDH\par
-    \etype{date}\,$\rightarrow$\,03/02/2021\qquad
-    \etype{measure}\,$\rightarrow$\,480 IU/L}};
-
-\node[outbox, draw=ThesisSecondaryDark, fill=ThesisSecondary!12] (rel) at (4.3,0)
-  {\ftitle{Relations}\par\vspace{3pt}
-   {\footnotesize\ttfamily treats:\, R-CHOP\,$\rightarrow$\,lymphoma}};
-
-\node[outbox, draw=ThesisTertiaryDark, fill=ThesisTertiary!14] (str) at (4.3,-2.7)
-  {\ftitle{Structure and classification}\par\vspace{3pt}
-   {\footnotesize\ttfamily timeline \{diagnosis date, treatment start, relapse, death\}\par
-    ICD-10 chapter: tumours\par
-    document type: follow-up note}};
-
-% Input -> LLM -> fan-out to the three blocks
-\draw[fan, line width=1pt] (input.east) -- (llm.west);
-\draw[fan] (llm.east) to[out=40,in=180]  (ent.west);
-\draw[fan] (llm.east) --                  (rel.west);
-\draw[fan] (llm.east) to[out=-40,in=180] (str.west);
-\end{tikzpicture}
-\caption{A large language model turns one passage into typed entities, relations
-between them, and a document structure with its classifications. The full
-annotation prompts are given in \Cref{app:gliner-prompts}.}
-\label{fig:annotation-example}
-\end{figure}
-
-\begin{reviewrewrite}
-Training an extractor by fine-tuning needs labelled examples, and as this part's introduction noted, those are out of reach for French clinical text. We take a different route. Instead of paying clinicians to annotate real notes, we annotate public biomedical text automatically with a large language model, and use the result to train a smaller extraction model. This is a form of distillation: a large general model that is too heavy to run at scale produces the labels, and a small model learns to reproduce them. Everything we annotate is public text, so none of the resulting data carries the restrictions of a patient record.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-The annotator is \texttt{Qwen3-235B-A22B-Instruct}, a 235-billion-parameter instruction-tuned model~\citep{yang2025qwen3}, run with FP8 quantisation on four NVIDIA H100 GPUs through vLLM~\citep{kwon2023vllm}. For each document, the model returns a single JSON object whose fields are fixed in advance by a schema, so every annotation has the same shape and parses without error. We turn off the model's step-by-step reasoning mode and sample at a low temperature of $0.6$, which keeps the output close to the schema. The same model later serves as the judge that scores our extractors (\Cref{chap:evaluation}), so we check there that it does not simply favour its own annotations.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-The schema asks for more than a list of entities. For each document the model first lists candidate spans, meaning every noun phrase that could be a medical entity, and then builds four kinds of annotation on top of them. It marks \emph{entities} with open-vocabulary types at four levels of granularity, from a single reusable word such as \textit{Maladie} (disease) up to a full compositional phrase, and the same span may be typed at several levels at once. It assigns two or three \emph{classifications} to the document, such as its specialty or its document type. It fills zero to two \emph{structures}, small field-value schemas such as a dosage or a patient profile. And it records \emph{relations} between entities, such as a drug that treats a disease. The model also returns a short list of \emph{hard negatives}: plausible types that are absent from the text, which teach the extractor what not to find. \Cref{fig:annotation-example} shows one annotated example.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-We then ground every annotation against the source text. A mention is kept only when it is an exact substring of the document, which removes spans the model paraphrased or invented. We also drop a type when it is merely a lexical variant of its own mention, measured by edit distance, so the model cannot take the shortcut of repeating a word as its own type. The head and tail of every relation must likewise be exact substrings. Documents where no annotation survives are not discarded: a document with text but no entity is kept as a negative example, which is what teaches the extractor to stay silent on non-medical text.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-The text we annotate is drawn from three kinds of public source, listed in \Cref{tab:gliner-sources}. Most of it is French biomedical literature from the corpus of \Cref{chap:mcbio}, kept above a quality threshold. A large share is case-centred: articles that contain patient cases, and French translations of PubMed Central case reports. A smaller part comes from passages generated from the CIM-10, CCAM, and ATC nomenclatures, which bring in coding terminology. Finally, non-medical and low-quality documents are added on purpose as negatives. The final dataset holds about $94{,}000$ annotated documents, with $662{,}000$ entities, $1.98$~million mentions, and $592{,}000$ relations; roughly a quarter of the documents are negatives.
-\end{reviewrewrite}
+The source families are listed in \Cref{tab:p3-corpus}.
 
 \begin{table}[t]
   \centering
-  \caption{Public sources sampled for annotation by the language model to train
-  the extraction model of \Cref{chap:architectures}. Of the $118{,}000$ sampled
-  documents, about $94{,}000$ yield a valid annotation after grounding and
-  filtering.}
-  \label{tab:gliner-sources}
+  \caption{Public sources used to construct the two supervision corpora.}
+  \label{tab:p3-corpus}
   \small
-  \setlength{\tabcolsep}{6pt}
-  \renewcommand{\arraystretch}{1.2}
-  % Left-aligned group band (the global \tablegroup centres; here the data rows
-  % are left-aligned, so a centred band reads as zigzag).
-  \newcommand{\tablegroupl}[1]{%
-    \rowcolor{ThesisTableSep}%
-    \multicolumn{3}{@{}l@{}}{\rule{0pt}{9pt}\textbf{#1}} \\[1pt]%
-  }%
-  \begin{tabular}{@{}l l S[table-format=6.0, group-separator={,}, group-minimum-digits=4]@{}}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}l r@{}}
     \toprule
-    Source & What it provides & {Sampled} \\
+    \textbf{Source} & \textbf{Selected input} \\
     \midrule
-    \tablegroupl{Biomedical literature (\Cref{chap:mcbio})}
-    HAL                       & French biomedical articles              & 26000 \\
-    ISTEX                     & French biomedical articles              & 26000 \\
-    \tablegroupl{Patient cases}
-    Articles with cases       & passages describing real patient cases  & 18000 \\
-    PMC-Patients-FR           & translated PubMed Central case reports   & 14000 \\
-    \tablegroupl{Ontology terminology}
-    CIM-10 / CCAM / ATC       & passages from the coding nomenclatures   & 9000 \\
-    \tablegroupl{Negatives}
-    Non-medical / low quality & documents with no entity to find         & 25000 \\
+    \rowcolor{ThesisTableSep}
+    \multicolumn{2}{c}{\rule{0pt}{10pt}\textbf{Generalist extraction}} \\[1pt]
+    HAL & 50,000 documents \\
+    ISTEX & 50,000 documents \\
+    Patient-centred text & 40,000 passages \\
+    Translated clinical cases & 30,000 cases \\
+    Biomedical encyclopedia & 20,000 passages \\
+    CCAM, CIM-10, and ATC & Terminology \\
+    \addlinespace
+    Annotated corpus & 118,687 documents \\
     \midrule
-    Documents sampled         &                                          & 118000 \\
-    Valid annotations         & after grounding and filtering            & 94000 \\
+    \rowcolor{ThesisTableSep}
+    \multicolumn{2}{c}{\rule{0pt}{10pt}\textbf{Longitudinal generation}} \\[1pt]
+    PMC-Patients & 167,034 cases \\
+    Generated records & 2,050 records \\
     \bottomrule
   \end{tabular}
 \end{table}
 
+After annotation and deduplication, the generalist corpus contains 118,687
+documents with 14.7 mentions per document on average. The input volumes in the
+table describe sampled material, not disjoint parts of the final corpus.
 
 
-\section{Synthetic Clinical Reports}
-\label{sec:synthetic-reports}
-
-\begin{reviewrewrite}
-Public case descriptions still read like published cases. They do not read like the terse notes a hospital produces. The second use of generation closes part of that gap. We rewrite a public case into the register of a hospital note, and a deterministic degradation step adds the abbreviations, missing accents, and dictation slips that make real notes hard to read, so the extractor meets that register during training as well as on real notes.
-\end{reviewrewrite}
-
-
-\section{Synthesizing Longitudinal Patient Dossiers}
+\section{Longitudinal Record Generation}
 \label{sec:lymphoma-dossiers}
 
-\begin{reviewrewrite}
-A single note captures one moment. A patient's record covers years and many documents, and the clinical questions we care about depend on the whole record, not on any one note. This thesis is part of OncoLab, a project that annotates the dossiers of lymphoma patients, all of them relapsed, against a form of about a hundred variables covering demographics, disease history, treatment lines, imaging, and outcome. Real dossiers cannot be used to develop and test that annotation, for the privacy reasons that run through this thesis, so the project needs a synthetic but realistic set of French dossiers to build the form and train automatic extraction before any real record is touched.
-\end{reviewrewrite}
+Published cases summarize a patient trajectory in a single narrative, whereas
+the target form is filled from a sequence of dated reports. We start from
+PMC-Patients~\citep{zhao_pmcpatients_2023}, a collection of 167,034 English
+patient cases, and favour cases
+that mention a relapse or a second treatment line. Each selected case is
+assigned a reproducible fictitious French identity, hospital, city, and anchor
+year.
 
-\begin{reviewrewrite}
-A first attempt seeded each synthetic dossier from a single short case description, and it did not work. The seed text was about a thousand characters and described one moment, while a dossier covers years and about a dozen documents. Asked to cover that distance, the model had to invent almost everything, and it did so by imitation, producing dossiers that looked plausible but did not hold together. Clinicians who reviewed the output found the gaps. There were almost no follow-up reports and almost no relapse consultations, although every patient in the target cohort has relapsed. Cases with both a first and a second treatment line were missing, so adverse events beyond the first cycle could not be annotated. And the multidisciplinary-meeting reports had the wrong shape.
-\end{reviewrewrite}
+Generation follows the clinical chronology. We first convert the source case into
+a structured French timeline and harmonize its dates, ages, and bounded values.
+Reports are then generated one at a time, and after each one we extract the
+timeline again from the result as a consistency check. As shown in
+\Cref{fig:p3-wavefront}, a report at time $t$ receives only the relevant events
+that have already occurred.
 
-\begin{reviewrewrite}
-We did not fix this by adding a rule for each defect. Patching the prompt with one constraint per problem makes the model produce clone-like patients and loses the variety that made it useful. We asked instead what lets the model do well on its own, and the answer was a better source and a decomposed task.
-\end{reviewrewrite}
+\input{sources/part_3/figures/fig04_wavefront}
 
-\subsection*{A richer source}
+\Cref{fig:p3-case-to-record} shows the same transformation on a short fictional
+example. The generated reports retain the chronology but replace the compact
+case summary with documents written at distinct moments of care.
 
-\begin{reviewrewrite}
-We seed instead from PMC-Patients, a public set of $167{,}034$ patient case narratives extracted from PubMed Central, where each case follows one patient across diagnosis, treatment, response, and sometimes relapse and death. These narratives average about $3{,}000$ characters, roughly three times the short snippets the first attempt used, and they carry structured age and gender fields that let us keep adults only. A set of regular expressions tags each case by lymphoma subtype and scores it for longitudinal richness. The richness score is weighted to favour exactly what the clinicians found missing: a mention of relapse adds $2.0$ and a mention of second-line therapy adds $2.5$, the two highest weights, ahead of a chemotherapy regimen ($1.0$), a response assessment ($1.0$), and death ($1.0$). Keeping any lymphoma subtype, with age at least $18$, source length at least $1{,}500$ characters, and a richness score of at least $2.0$, and sorting by richness so the longest trajectories are used first, leaves $2{,}774$ adult cases. Each case is paired with a synthetic French identity drawn reproducibly from its index: a first and last name, a sex consistent with the source, a university hospital or cancer centre, an anchor year between $2015$ and $2024$, and a target document count between five and ten. The identity supplies the French institutional context the English case lacks; no real patient detail is added.
-\end{reviewrewrite}
+\input{sources/part_3/figures/fig04_case_to_record}
 
-\subsection*{A decomposed task}
+The resulting corpus contains 2,050 longitudinal records, each with a median of
+eight reports and 22,314 characters, and 31\% of them include a second treatment
+line. We use 410 records for testing and 100 of the remaining 1,640 records for
+validation, which leaves up to 1,540 records for training.
 
-\begin{reviewrewrite}
-The generation then splits into four stages and respects time, as \Cref{fig:dossier-pipeline} shows on a short example. The model first writes a coherent patient timeline as structured data, with dated events and a plan of the documents to produce. A short reflexive pass then audits that timeline for inconsistencies, such as an age that does not match the diagnosis date, a relapse before any response, or a death date earlier than the last event, and repairs them rather than rejecting the case. Only then does the model write the documents, one at a time and in chronological order. Each document sees the earlier ones and the events dated up to its own date, but never anything later, so the dossier accumulates the way a real record does and no document can quote a result from its own future. A document also sees only the event categories that belong to it, so an imaging report cannot read off the histology panel. A final stage reads the assembled dossier back and extracts the structured fields. Because a field such as a response assessment takes several values over a dossier, each field is stored as a list of entries, and each entry records the value, the verbatim span it came from, and the heading of the source document. Only the two fields that cannot change, date of birth and sex, stay single-valued. This keeps the longitudinal structure and lets every value be traced back to the document that stated it.
-\end{reviewrewrite}
+
+\subsection{The Silver Reference}
+\label{sec:tapdl}
+
+The generated reports are not yet an extraction reference. Each value must be
+linked to one of the 89 form fields and located in the complete record, and this
+link also depends on time, since the same treatment may fill a first-line field
+in one report and a second-line field after relapse. We therefore label each
+report together with its date, document type, and corresponding events.
+
+For each report, the language model returns a field name together with a string
+meant to reproduce text from that report, but it predicts neither character
+offsets nor a normalized value. We recover the position ourselves: we search for
+the returned string, fall back to approximate matching when the literal search
+fails, and remap the match onto the complete record. When two fields claim
+exactly the same offsets, a final rule keeps a single assignment; partial
+overlaps are left in place.
+
+\input{sources/part_3/figures/fig05_tapdl}
+
+One language-model pass over 16,375 reports yields 237,194 span assignments
+across the 89 fields (\Cref{tab:p3-tapdl}).
+
+\begin{table}[t]
+  \centering
+  \caption{Silver-reference annotation counts.}
+  \label{tab:p3-tapdl}
+  \small
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{@{}l S[table-format=6.0,group-separator={,},group-minimum-digits=4]@{}}
+    \toprule
+    \textbf{Corpus quantity} & {\textbf{Count}} \\
+    \midrule
+    Reports processed & 16375 \\
+    Final spans & 237194 \\
+    Form fields & 89 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each stored value is the text found at its final offsets, but this does not
+guarantee that the field assignment is medically correct.
+
+
+\section{Distributional Comparison with Human Text}
+\label{sec:stylometry}
+
+The generated records can be internally consistent while remaining different
+from human-written clinical reports. As a proxy for real reports we use
+PARHAF~\citep{tannier_parhaf_2026}, a set of fictitious but human-written reports
+that contains no hospital data, and we compare it with raw PMC-Patients cases,
+our generated records, and published E3C clinical
+cases~\citep{magnini_e3c_2021}.
+
+For each source, we sample 1,000 texts and represent them with MedEmbed. We then
+compare each distribution with PARHAF using MAUVE~\citep{pillutla_mauve_2021},
+Fr\'echet embedding distance (FED), adapted from the Fr\'echet distance used for
+generative images~\citep{heusel_fid_2017}, maximum mean discrepancy
+(MMD)~\citep{gretton_kernel_2012}, and a classifier two-sample test
+(C2ST)~\citep{lopezpaz_c2st_2017}.
+The results are reported in \Cref{fig:p3-stylometry}.
 
 \begin{figure}[t]
-\centering
-% ---- a single document = page icon with a folded top-right corner ----
-\newcommand{\docnode}[3]{% #1 name  #2 x  #3 label
-  \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!22, line width=0.6pt,
-        minimum width=0.52cm, minimum height=0.64cm, inner sep=0pt] (#1) at (#2,-1.35) {};
-  \fill[ThesisTertiaryDark!38] ($(#1.north east)+(-0.16,0)$) -- (#1.north east)
-        -- ($(#1.north east)+(0,-0.16)$) -- cycle;
-  \draw[ThesisTertiaryDark, line width=0.4pt] ($(#1.north east)+(-0.16,0)$)
-        -- ($(#1.north east)+(0,-0.16)$);
-  \node[font=\scriptsize, color=ThesisInk, anchor=north] at (#2,-1.78) {#3};
-  \draw[ThesisNeutral!50, line width=0.5pt, dotted] (#2,-0.10) -- (#2,-1.01);
-}
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[font=\footnotesize\sffamily,
-    >={Latex[length=2.2mm]},
-    evdot/.style={fill=ThesisSecondaryDark, draw=ThesisSecondaryDark},
-    field/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!12, rounded corners=2pt,
-                  line width=0.6pt, font=\scriptsize, text=ThesisInk, inner sep=3pt}]
-
-% --- public-case seed feeding the timeline ---
-\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=2pt, line width=0.7pt,
-      minimum width=0.52cm, minimum height=0.66cm, inner sep=0pt] (seed) at (-1.8,0) {};
-\node[font=\scriptsize, color=ThesisNeutral, anchor=north] at (-1.8,-0.40) {public case};
-\draw[-{Latex[length=2.2mm]}, ThesisNeutral, line width=0.9pt]
-      (seed.east) -- ++(0.85,0);
-
-% --- time axis ---
-\draw[-{Latex[length=2.6mm]}, ThesisInk, line width=1.1pt] (-0.55,0) -- (10.7,0);
-\node[font=\scriptsize\itshape, color=ThesisNeutral, anchor=south west] at (10.25,0.07) {time};
-
-% year ticks under the axis (label nudged off the document connector line)
-\foreach \x/\yr in {0/2019, 6.4/2021}{
-  \draw[ThesisInk, line width=0.9pt] (\x,0.10) -- (\x,-0.10);
-  \node[font=\scriptsize, color=ThesisNeutral, anchor=north east] at (\x-0.1,-0.14) {\yr};
-}
-
-% --- event dots + staggered labels (two heights, no overlap) ---
-\foreach \x/\y/\lab in {0/1.18/diagnosis, 1.5/0.62/R-CHOP, 3.2/1.18/response,
-                        6.4/0.62/relapse, 7.9/1.18/R-DHAP, 9.7/0.62/death}{
-  \draw[ThesisNeutral!55, line width=0.5pt] (\x,0.09) -- (\x,\y-0.06);
-  \node[evdot] at (\x,0) [circle, inner sep=0pt, minimum size=4.4pt] {};
-  \node[font=\scriptsize, color=ThesisInk, anchor=south] at (\x,\y) {\lab};
-}
-
-% --- documents (page icons below the axis, dropped from their date) ---
-\docnode{danap}{0}{anapath}
-\docnode{dpet}{3.2}{PET-CT}
-\docnode{drcp}{6.4}{relapse RCP}
-\docnode{ddis}{9.7}{discharge}
-
-% --- extracted fields, aligned under their source document for straight arrows ---
-\node[field] (f1) at (0,-3.05)   {1st line: R-CHOP};
-\node[field] (f2) at (6.4,-3.05) {relapse: 2021-01};
-\node[field] (f3) at (9.7,-3.05) {2nd line: R-DHAP};
-
-\foreach \f/\d in {f1/danap, f2/drcp, f3/ddis}{
-  \draw[-{Latex[length=1.8mm]}, dashed, dash pattern=on 2pt off 1.6pt,
-        ThesisPrimaryDark!75, line width=0.6pt] (\f.north) -- (\d.south);
-}
-\end{tikzpicture}%
-}
-\caption{The four stages on a short example: a public case becomes a dated
-timeline, the timeline is written out as documents in chronological order so
-that each document sees only the past, and the structured fields are then
-extracted back, each value tied to the document it came from.}
-\label{fig:dossier-pipeline}
+  \centering
+  \includegraphics[width=\textwidth]{plots/part_3/output/fig06_stylometry.pdf}
+  \caption{Distributional comparison of three text sources with PARHAF.}
+  \label{fig:p3-stylometry}
 \end{figure}
 
-\begin{reviewrewrite}
-The production run for the broadened cohort generated $2{,}050$ of its $2{,}774$ planned cases before reaching its compute time limit, each with about eight documents and around nineteen timeline events. A timeline was valid in every case, and the structured extraction succeeded for $99.8\%$ of them. Second-line treatment now appears in $31\%$ of the dossiers, against the $20\%$ the clinicians had flagged as too low, and a relapse or progression document is present in $36\%$. The extraction records $1.21$ values per filled field on average, and $13\%$ of filled fields hold more than one value, so the longitudinal dimension is captured rather than collapsed. The automatic quality check that accompanies each dossier compares re-extracted values against the timeline and reports a low match rate near $0.29$; this number reflects format differences, such as \texttt{M} against \textit{homme}, far more than clinical error, so it should not be read as a correctness score. The work is still in progress, both in completing the remaining cases and in clinical review of the output. A held-out part of this set becomes the hardest evaluation in the thesis, the one we use in \Cref{chap:evaluation}.
-\end{reviewrewrite}
+The distance measures place raw PMC-Patients closest to PARHAF, followed by the
+generated records and E3C, while C2ST gives the reverse order. This disagreement
+does not support a single ranking of the sources. More importantly, every C2ST
+score lies between
+0.985 and 0.991, where 0.5 denotes chance classification. All three sources are
+therefore readily distinguishable from PARHAF in this representation space.
+
+
+\section{Limitations}
+
+Approximately 2.3\% of reports are abandoned during annotation. The train and
+test partitions were not checked for shared source articles in PMC-Patients.
+Because the same model generates the records and proposes their silver labels,
+the reference may favour conventions introduced during generation.
 
 
 \section*{Conclusion}
 
-\begin{reviewrewrite}
-Across these uses the recipe is the same: take a public source, constrain a language model with a strict prompt, and keep only what holds together. The data this produces is real and large, but it settles nothing on its own. It only matters if a model can turn it into clinical extraction under a label set that is open and keeps changing, the setting that defeats a fixed classifier.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-\vspace{2em}
-The data now exists. Whether a model can use it well is the question of the next chapter, \Cref{chap:architectures}, which builds the extractor trained on the material generated here.
-\end{reviewrewrite}
+Public resources support two complementary forms of supervision. Broad
+annotations teach an extractor to follow new type descriptions, while generated
+records provide a synthetic longitudinal task. Aligning these generated field
+assignments back to the record makes the task evaluable, although the reference
+remains non-human. The generated text also remains readily
+distinguishable from the human-written PARHAF reports. The next chapter asks
+whether an extractor conditioned on descriptions can use this supervision while
+remaining open to new fields.

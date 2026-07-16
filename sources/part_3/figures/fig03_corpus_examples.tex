@@ -1,0 +1,31 @@
+\begin{center}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small, text=ThesisInk,
+    panel/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+                  text width=6.35cm, minimum height=3.25cm, inner sep=10pt,
+                  align=left},
+    tag/.style={rounded corners=2pt, inner xsep=3pt, inner ysep=1pt,
+                fill=ThesisPrimary!22, text=ThesisPrimaryDark, font=\scriptsize\sffamily},
+    field/.style={rounded corners=2pt, inner xsep=3pt, inner ysep=1pt,
+                  fill=ThesisSecondary!28, text=ThesisSecondaryDark, font=\scriptsize\sffamily}]
+    \node[panel] (general) at (-3.65,0) {\textbf{Public biomedical passage}\\[5pt]
+      Le patient reçoit un traitement par \textbf{rituximab} pour un
+      \textbf{lymphome diffus à grandes cellules B}.\\[8pt]
+      \textcolor{ThesisPrimaryDark}{rituximab · anticancer drug}\\
+      \textcolor{ThesisPrimaryDark}{lymphome diffus... · lymphoma subtype}};
+    \node[panel] (form) at (3.65,0) {\textbf{Longitudinal record}\\[5pt]
+      \textcolor{ThesisNeutral}{18 May 2018 · tumour board}\\
+      Première ligne par \textbf{CHOEP-14}.\\[3pt]
+      \textcolor{ThesisNeutral}{25 April 2032 · relapse visit}\\
+      Reprise de \textbf{CHOEP-14}.\\[7pt]
+      \textcolor{ThesisSecondaryDark}{first-line treatment · second-line treatment}};
+    \node[above=4pt, font=\scriptsize\sffamily, text=ThesisNeutral] at (general.north)
+      {span and type description};
+    \node[above=4pt, font=\scriptsize\sffamily, text=ThesisNeutral] at (form.north)
+      {value and role in the trajectory};
+  \end{tikzpicture}}
+  \captionof{figure}{Examples of the two supervision corpora. All clinical content is fictional.}
+  \label{fig:p3-corpus-examples}
+\end{center}

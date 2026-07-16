@@ -1,82 +1,42 @@
-\begin{figure}[t]
+\begin{center}
   \centering
-  \begin{tikzpicture}[scale=0.98, transform shape,
-    box/.style={
-      rectangle, rounded corners=3pt, line width=0.7pt,
-      text width=2.75cm, minimum height=1.65cm, align=left,
-      inner sep=5pt, font=\scriptsize
-    },
-    report/.style={box, draw=ThesisNeutral!70, fill=ThesisPaper},
-    llm/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!18},
-    deterministic/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!16},
-    final/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16},
-    flow/.style={-{Stealth[length=1.8mm]}, line width=0.82pt,
-      draw=ThesisNeutral, shorten <=3pt, shorten >=3pt},
-    every node/.style={text=ThesisInk}
-  ]
-    \node[report] (cr) at (-5.55,1.55) {%
-      \textbf{Compte rendu}\\[2pt]
-      \og début d'une chimiothérapie par protocole \textbf{CHOEP-14}, 8 cycles\fg{}
-    };
-    \node[llm] (pair) at (-2.15,1.55) {%
-      \textbf{Sortie LLM (schéma)}\\[2pt]
-      \texttt{field}: ligne 1\\
-      \texttt{span}: \og chimiothérapie par protocole CHOEP-14\fg{}
-    };
-    \node[deterministic] (literal) at (1.25,1.55) {%
-      \textbf{Recherche littérale}\\[2pt]
-      \texttt{find(span)} dans le seul compte rendu routé
-    };
-    \node[deterministic, densely dashed] (fuzzy) at (5.45,1.55) {%
-      \textbf{Repli approximatif}\\[2pt]
-      seulement si la chaîne proposée n'est pas retrouvée exactement
-    };
-    \node[deterministic] (global) at (5.45,-1.70) {%
-      \textbf{Offsets globaux}\\[2pt]
-      offset du CR $+$ offset local\\
-      exemple: $[8637,8674)$
-    };
-    \node[deterministic] (collision) at (1.25,-1.70) {%
-      \textbf{Résolution des collisions}\\[2pt]
-      priorité de champ puis déduplication
-    };
-    \node[final] (silver) at (-3.10,-1.70) {%
-      \textbf{Silver final}\\[2pt]
-      champ, offsets et tranche de texte; 89 champs couverts\\
-      \textbf{237\,194 empans}
-    };
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[font=\scriptsize\sffamily,
+    excerpt/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
+      text width=3.85cm, minimum height=1.25cm, align=left, inner sep=6pt},
+    proposal/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!13,
+      rounded corners=2pt, text width=3.05cm, minimum height=1.25cm,
+      align=left, inner sep=6pt},
+    output/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
+      rounded corners=2pt, text width=2.75cm, minimum height=1.05cm,
+      align=left, inner sep=6pt},
+    operation/.style={align=center, text=ThesisSecondaryDark, inner sep=3pt},
+    flow/.style={->, ThesisInk!40, shorten >=4pt, shorten <=4pt}]
 
-    \draw[flow] (cr) -- (pair);
-    \draw[flow] (pair) -- (literal);
-    \draw[flow, dashed] (literal) -- (fuzzy);
-    \coordinate (craw) at ($(pair.east)!0.5!(literal.west)$);
-    \node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=south]
-      (nraw) at ([yshift=1.10cm]craw) {275\,544 propositions};
-    \draw[line width=0.45pt, draw=ThesisNeutral!60] (nraw.south) -- (craw);
-    \coordinate (cmiss) at ($(literal.east)!0.5!(fuzzy.west)$);
-    \node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=south]
-      (nmiss) at ([yshift=1.10cm]cmiss) {15\,868 sans match};
-    \draw[line width=0.45pt, draw=ThesisNeutral!60] (nmiss.south) -- (cmiss);
-    \draw[flow, draw=ThesisSecondaryDark]
-      (literal.south) --
-      node[midway, above, sloped, fill=white, inner sep=1pt,
-        font=\scriptsize\sffamily, text=ThesisSecondaryDark]
-      {match exact} (global.north west);
-    \draw[flow, dashed] (fuzzy) --
-      node[right, font=\scriptsize\sffamily, text=ThesisNeutral,
-        align=left] {7\,441\\récupérées} (global);
-    \draw[flow] (global) -- (collision);
-    \coordinate (ccoll) at ($(global.west)!0.5!(collision.east)$);
-    \node[font=\scriptsize\sffamily, text=ThesisNeutral, anchor=north]
-      (ncoll) at ([yshift=-1.05cm]ccoll) {27\,491 collisions brutes};
-    \draw[line width=0.45pt, draw=ThesisNeutral!60] (ncoll.north) -- (ccoll);
-    \draw[flow, draw=ThesisPrimaryDark] (collision) -- (silver);
-  \end{tikzpicture}
-  \caption{\textbf{TAPDL sépare proposition sémantique et localisation.}
-  Le LLM émet une paire champ--chaîne; la recherche, le remappage des offsets
-  et l'exclusivité sont déterministes. Le repli approximatif ne concerne que
-  7\,441 récupérations, soit 3,1\,\% du silver final. L'extrait de compte
-  rendu et les offsets viennent de \texttt{lym\_76}; la paire illustre le
-  format de sortie.}
+    \node[excerpt] (report) at (-5.15,0) {\textbf{Routed report}\\[2pt]
+      ``début chimiothérapie par protocole
+      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}, 8 cycles''};
+    \node[proposal] (pair) at (-1.35,0) {\textbf{LLM proposal}\\[2pt]
+      \texttt{field}: first-line treatment\\
+      \texttt{string}: CHOEP-14};
+
+    \node[operation] (match) at (1.25,0.58) {literal string\\match};
+    \node[operation] (offset) at (3.25,0.58) {document\\offsets};
+    \node[operation] (collision) at (5.25,0.58) {one field per\\identical offset pair};
+    \draw[ThesisSecondaryDark!55, line width=0.65pt] (0.25,0.0)--(6.1,0.0);
+    \fill[ThesisSecondaryDark] (1.25,0.0) circle (1.7pt);
+    \fill[ThesisSecondaryDark] (3.25,0.0) circle (1.7pt);
+    \fill[ThesisSecondaryDark] (5.25,0.0) circle (1.7pt);
+
+    \node[output] (silver) at (3.25,-1.25) {\textbf{Silver span}\\field + offsets + text slice};
+
+    \draw[flow] (report)--(pair);
+    \draw[flow] (pair.east)--(0.25,0.0);
+    \draw[flow] (3.25,0.0)--(silver.north);
+    \node[above=3pt, text=ThesisTertiaryDark] at (-1.35,0.92) {semantic proposal};
+    \node[above=3pt, text=ThesisSecondaryDark] at (3.25,1.18) {deterministic localization};
+  \end{tikzpicture}%
+  }
+  \captionof{figure}{Semantic proposal and deterministic localization of each field value.}
   \label{fig:p3-tapdl}
-\end{figure}
+\end{center}

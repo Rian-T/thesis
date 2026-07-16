@@ -1,0 +1,24 @@
+\begin{center}
+  \centering
+  \resizebox{0.88\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small, text=ThesisInk, >={Stealth[length=2mm]},
+    span/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!22, rounded corners=3pt,
+                 minimum width=1.0cm, minimum height=0.65cm, font=\bfseries},
+    candidate/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+                      text width=4.2cm, minimum height=0.85cm, inner sep=7pt},
+    keep/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!25},
+    arr/.style={->, draw=ThesisNeutral, line width=0.7pt}]
+    \node[anchor=east] at (-4.7,0) {``SUVmax 3,\,\textbf{2}''};
+    \node[span] (s) at (-4.1,0) {2};
+    \node[candidate, keep] (a) at (0,0.72) {BCL2 FISH\hfill \textbf{0.792}};
+    \node[candidate] (b) at (0,-0.72) {BCL2 immunohistochemistry\hfill 0.415};
+    \node[candidate, keep] (out) at (5.0,0) {retained assignment\\BCL2 FISH};
+    \draw[arr] (s) -- (a.west);
+    \draw[arr] (s) -- (b.west);
+    \draw[arr] (a.east) -- (out.west);
+    \draw[ThesisNeutral, line width=0.6pt] ($(b.west)+(0.2,-0.25)$) -- ($(b.east)+(-0.2,0.25)$);
+  \end{tikzpicture}}
+  \captionof{figure}{Field competition between two assignments of the same predicted span.}
+  \label{fig:p3-field-competition-example}
+\end{center}

@@ -1,0 +1,31 @@
+\begin{figure}[t]
+  \centering
+  \resizebox{0.92\textwidth}{!}{%
+  \begin{tikzpicture}[font=\scriptsize\sffamily,
+    passage/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
+      text width=5.2cm, minimum height=1.35cm, align=left, inner sep=6pt},
+    query/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
+      rounded corners=2pt, text width=4.0cm, minimum height=0.85cm,
+      align=left, inner sep=6pt},
+    compare/.style={draw=ThesisNeutral!65, fill=ThesisPaper,
+      rounded corners=2pt, text width=2.5cm, minimum height=0.85cm,
+      align=center, inner sep=5pt},
+    answer/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18,
+      rounded corners=2pt, text width=3.0cm, minimum height=0.85cm,
+      align=center, inner sep=5pt},
+    flow/.style={->, ThesisInk!40, shorten >=3pt, shorten <=3pt}]
+    \node[passage] (sentence) at (-4.7,0.8) {\textbf{Clinical text}\\[2pt]
+      ``Déc : \underline{début chimiothérapie} par protocole
+      \underline{CHOEP-14}, \underline{8 cycles}.''};
+    \node[query] (description) at (-4.7,-0.9) {\textbf{Type description}\\
+      first-line treatment};
+    \node[compare] (similarity) at (0.2,0) {span--description\\similarity};
+    \node[answer] (span) at (4.0,0) {\textbf{CHOEP-14}};
+    \draw[flow] (sentence.east)--(similarity.west);
+    \draw[flow] (description.east)--(similarity.west);
+    \draw[flow] (similarity)--(span);
+  \end{tikzpicture}%
+  }
+  \caption{Span selection from a clinical text and a type description.}
+  \label{fig:p3-open-query}
+\end{figure}

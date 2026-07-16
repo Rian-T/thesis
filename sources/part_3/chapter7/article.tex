@@ -1,246 +1,280 @@
-\section{Introduction}
+\section{The Lymphoma eCRF}
 
-\begin{reviewrewrite}
-The extractor of the previous chapter can be asked for a type it never saw. That is the point of it, and it is also what makes it hard to score. The usual way to measure extraction compares a model's output against a fixed set of human annotations. But those annotations cover only the types the annotators were told to mark, under one set of conventions about where a span begins and ends and what counts as an entity. A model rewarded for matching those conventions is not necessarily better at finding what a new study cares about; it may have learned the house style of one annotation effort. To see whether our model generalises, we need an evaluation that does not assume a fixed answer key.
-\end{reviewrewrite}
+We cannot evaluate on a real hospital study, so we build a synthetic one that
+imitates it as closely as we can. The task fills a lymphoma electronic case
+report form (eCRF) of 89 fields from a longitudinal record. The fields cover ten
+sections, including disease history, two treatment lines, imaging, and patient
+status. Filling the form requires both locating a value and assigning its role
+in the trajectory. In \Cref{fig:p3-task}, the same treatment name fills different
+fields before and after relapse.
 
-\section{A Reference-Free Evaluation with a Language-Model Judge}
+\input{sources/part_3/figures/fig01_longitudinal_to_ecrf}
 
-\begin{reviewrewrite}
-We evaluate without a gold standard. We take 400 clinical case documents the models were never trained on, and a bank of twenty types: ten common clinical types, such as disease, drug, and symptom, and ten novel types that no benchmark uses, built to be compositional or cross-domain, such as an adverse effect, an implantable device, or an environmental risk factor. Each model runs twice, once for the common types and once for the novel ones, so the two can be measured apart. We pool the spans every model proposes, add candidates of the judge's own, remove duplicates, and hide which system produced which span. A large language model then judges each span against its type description and labels it correct, wrong type, wrong boundary, or not an entity. We score with mean average precision, which does not depend on a decision threshold, and we summarise generalisation by the gap between a model's score on common types and its score on novel ones. \Cref{fig:judge-schema} sets out the whole procedure.
-\end{reviewrewrite}
+The full form is larger than this two-field example. \Cref{fig:p3-form-preview}
+shows a small extract from three of its sections.
 
-\begin{reviewrewrite}
-To keep the judge honest we seed the pool with controls: real clinical entities that should be accepted, and function words mislabelled as diseases that should be rejected. We keep only the runs where the judge handles these correctly.
-\end{reviewrewrite}
+\input{sources/part_3/figures/fig01_form_preview}
 
-\begin{figure}[t]
-\centering
-% displaCy-style: candidate span highlighted in its sentence + its candidate type
-\providecommand{\sptag}[2]{\tikz[baseline=(x.base)]{\node[fill=ThesisPrimary!20,
-  draw=ThesisPrimaryDark!55, rounded corners=2pt, inner xsep=3pt, inner ysep=1.5pt,
-  text=ThesisInk] (x) {{\ttfamily\small #1}\,\raisebox{0.15ex}{\scriptsize\textsc{\textcolor{ThesisPrimaryDark}{#2}}}};}}
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-  font=\sffamily, text=ThesisInk, >={Stealth[length=2mm]},
-  ctx/.style={draw=none, fill=none, inner sep=3pt, anchor=west, text=ThesisNeutral, font=\small},
-  vbox/.style={draw=none, fill=none, inner sep=4pt, font=\small, anchor=west, text=ThesisInk},
-  judge/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!28, rounded corners=4pt,
-                line width=1.3pt, align=center, font=\sffamily\bfseries},
-  thru/.style={->, ThesisNeutral!75, line width=0.7pt, shorten >=1.5pt, shorten <=1.5pt},
-  tiny/.style={font=\sffamily\scriptsize\itshape, text=ThesisNeutral},
-]
-  \def\ya{2.7} \def\yb{1.5} \def\yc{0.3} \def\yd{-0.9}
-  \coordinate (mid) at (0,0.9);
-  % each candidate is a span shown in its sentence (gray), so the verdict is legible
-  \node[ctx] (c1) at (0,\ya) {started \sptag{R-CHOP}{drug}, six cycles};
-  \node[ctx] (c2) at (0,\yb) {diffuse large \sptag{B-cell}{disease} lymphoma};
-  \node[ctx] (c3) at (0,\yc) {the \sptag{hépatique}{anatomy} function};
-  \node[ctx] (c4) at (0,\yd) {examination \sptag{sans particularité}{value}};
-  % the single accent: the judge, placed 0.9cm right of the widest candidate (c2)
-  \node[judge, anchor=west, minimum width=2.2cm, minimum height=4.6cm]
-     (J) at ([xshift=0.9cm]c2.east |- mid) {language-model\\[1pt]judge};
-  % the four possible verdicts, one per lane (left edges aligned on v1)
-  \node[vbox] (v1) at ([xshift=0.9cm]J.east |- c1) {correct};
-  \node[vbox] (v2) at (v1.west |- c2) {wrong boundary};
-  \node[vbox] (v3) at (v1.west |- c3) {wrong type};
-  \node[vbox] (v4) at (v1.west |- c4) {not an entity};
-  \node[tiny, anchor=west] at (c1.north west |- 0,3.6) {pooled $\cdot$ blind candidates};
-  \node[tiny] at ([yshift=6pt]J.north) {one verdict each};
-  \foreach \c/\v in {c1/v1, c2/v2, c3/v3, c4/v4}{
-    \draw[thru] (\c.east) -- (J.west |- \c.east);
-    \draw[thru] (J.east |- \v.west) -- (\v.west);
-  }
-\end{tikzpicture}}
-\caption{The reference-free judge. Each pooled, de-identified candidate, a span shown here
-in its sentence with a candidate type, is labelled by a blind language-model judge as one of
-correct, wrong type, wrong boundary, or not an entity, without a gold standard. These
-verdicts are then aggregated into a mean average precision, and the gap between the common
-and novel types (\Cref{tab:judge-map}) measures overfitting.}
-\label{fig:judge-schema}
-\end{figure}
+The synthetic corpus is split into 1,540 training records, 100 validation
+records, and 410 test records. No record is a hospital document. Extractive
+systems score local span--description pairs, while generative systems produce
+all requested fields jointly.
 
-\section{Benchmark Winners Do Not Generalise}
+\section{Evaluation Protocol}
 
-\begin{reviewrewrite}
-On the common types the models are close. The novel types separate them, as \Cref{tab:judge-map} shows. Our entity-tuned configuration reaches a mean average precision of $0.476$ on novel types, the best of any model we test. The baselines collapse: a strong single-encoder model tuned to a standard benchmark scores well on common types but never makes a confident prediction on a novel one, and a published biomedical extractor falls to $0.121$ on novel types. The gap between common and novel performance, which measures how far a model has overfit to familiar types, is small for our models and large for the baselines. The entity-tuned model is ahead of the convention-tuned baseline on novel types by $+0.095$ in mean average precision, with a $95\%$ bootstrap confidence interval of $[+0.063, +0.131]$.
-\end{reviewrewrite}
+The eCRF keeps one value per record and field: the prediction with the highest
+confidence. A wrong value contributes one false positive and one false negative.
+PARHAF and the FrACCO NER dataset remain multi-mention tasks, where all predictions are
+matched greedily by decreasing confidence. The two regimes are summarized in
+\Cref{fig:p3-metrics,tab:p3-metrics}.
+
+We report two eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
+reference, making it permissive about boundaries. Value-$F_1$ requires a Jaccard
+similarity of at least 0.5 between normalized token sets. It measures surface
+agreement and does not measure clinical equivalence. Main model comparisons use paired
+confidence intervals across test records. Each extractive model emits a confidence
+with every span. We select its decision threshold on the 100 validation records
+and apply it once to the test set, so no reported score uses the test set to tune
+the threshold. Generative models return values directly and need no threshold.
+
+\input{sources/part_3/figures/fig11_metrics}
 
 \begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{10pt}
-\sisetup{detect-weight=true, table-format=1.3}
-\begin{tabular}{l S S S[table-format=+1.3]}
-\toprule
-\textbf{Model} & {\textbf{MAP common}} & {\textbf{MAP novel}} & {$\boldsymbol{\Delta}$\textbf{overfit}} \\
-\midrule
-\tablegroup{4}{Our models}
-Entity-tuned & 0.583 & \bfseries 0.476 & +0.107 \\
-Multi-task & 0.534 & 0.302 & +0.232 \\
-\midrule
-\tablegroup{4}{Baselines}
-Convention-tuned baseline & 0.569 & 0.381 & +0.188 \\
-GLiNER2-large             & 0.496 & 0.285 & +0.211 \\
-GLiNER-biomed             & 0.390 & 0.121 & +0.269 \\
-\bottomrule
-\end{tabular}
-\caption{Reference-free judge scores on common and novel types: the entity-tuned model has the best novel-type mean average precision and the smallest common-to-novel gap, while the baselines drop sharply on novel types.}
-\label{tab:judge-map}
+  \centering
+  \small
+  \caption{Matching rules used in each evaluation.}
+  \label{tab:p3-metrics}
+  \begin{tabular}{p{0.25\textwidth} p{0.27\textwidth} p{0.34\textwidth}}
+    \toprule
+    \textbf{Evaluation} & \textbf{Prediction} & \textbf{Match} \\
+    \midrule
+    eCRF value-$F_1$ & One value per field & Token Jaccard $\geq 0.5$ \\
+    eCRF span-$F_1$ & One span per field & Any overlap \\
+    PARHAF and FrACCO & All mentions & Greedy span matching \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
-\begin{reviewrewrite}
-Ranked on a standard benchmark, the same models come out in almost the opposite order (\Cref{fig:benchmark-vs-judge}): the convention-tuned baseline first, our multi-task configuration last. A model can top the benchmark and still be the weakest at finding new types, because the benchmark measures agreement with one annotation convention rather than the ability to generalise. A lower benchmark score is what we should expect from a model that has not overfit to a single convention, and it is the entity-tuned configuration, weaker on the benchmark, that generalises best.
-\end{reviewrewrite}
+\section{Raw Model Outputs}
+
+We compare six extractive systems with four sizes from the same generative model
+family. Their training objectives and output formats differ, so this is not a
+controlled scaling experiment. Before competition between fields, the strongest
+generator is the 4-billion-parameter model at 0.672 value-$F_1$; scaling it
+further does not help, as the 9-billion-parameter model reaches only 0.665. The
+150-million-parameter MC-bio-gliner reaches 0.634, and its best variant reaches
+0.650. The raw gap to the strongest generator is therefore 0.038 for the
+published model and 0.022 for the best variant, at 27 times fewer parameters.
+The raw gap is modest relative to the difference in model size.
+
+\section{Adding the Form Structure}
+
+An extractive model scores each span--field pair locally, so the same passage can
+be assigned to several fields. Field competition resolves these conflicts before
+the form is filled. Strongly overlapping candidates compete, the most confident
+assignment is retained, and each field keeps one final value. This rule can
+resolve competing assignments, but it cannot repair a clinically wrong span.
+
+Field competition improves all six extractive systems. For the published
+MC-bio-gliner, value-$F_1$ rises from 0.634 to 0.640. Applying the same rule to
+generators is less natural because
+their guided JSON already represents a joint answer. It reduces the
+9-billion-parameter model from 0.665 to 0.650, a paired change of $-0.0153$ (95\%
+CI $[-0.0176, -0.0129]$), as shown in \Cref{fig:p3-decoding-competition}.
+
+\Cref{fig:p3-field-competition-example} illustrates the operation on one
+candidate span. Competition chooses between field assignments; it does not
+determine whether the selected span is clinically meaningful.
+
+\input{sources/part_3/figures/fig12_competition_example}
+
+After competition, the published MC-bio-gliner reaches 0.640, trailing the
+strongest generator, Qwen3.5-4B at 0.658, by 0.018 (95\% CI $[-0.0243, -0.0108]$).
+Adapting the training mixture to the task closes this gap: a variant trained on a
+mixture of generalist examples and generated form records reaches 0.657, level
+with Qwen3.5-4B, with a paired difference of $-0.0005$ (95\% CI $[-0.0075,
+0.0072]$) that does not distinguish the two. The raw comparison remains the
+cleaner comparison for the generator, while competition measures the benefit of
+form structure for local extractors. \Cref{tab:p3-capstone} reports the systems
+after competition.
 
 \begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{plots/chapter18/benchmark_vs_judge.pdf}
-\caption{The same models ranked two ways. On the standard benchmark (left, strict
-macro-$F_1$) the convention-tuned baseline ranks first and the multi-task
-configuration last. On generalisation to novel types (right, reference-free judge
-MAP) the order is almost reversed, and the entity-tuned configuration, weaker on
-the benchmark, generalises best. Each model keeps its colour across the panels.}
-\label{fig:benchmark-vs-judge}
+  \centering
+  \includegraphics[width=0.82\textwidth]{plots/part_3/output/fig12_decoding_competition.pdf}
+  \caption{Value-$F_1$ before and after field competition.}
+  \label{fig:p3-decoding-competition}
 \end{figure}
 
-\section{Is the Judge Trustworthy?}
-
-\begin{reviewrewrite}
-Using a language model to grade extractions invites two worries: that the judge is unreliable, and that it favours models like itself. We check both. Against human annotations on clinical types where the gold is unambiguous, the judge agrees at a Cohen's kappa of $0.532$, rising to $0.797$ on the cleanest set (\Cref{tab:judge-validity}). Two judges from different model families agree with each other at $0.728$, so the result does not rest on a single judge.
-\end{reviewrewrite}
-
 \begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{10pt}
-\begin{tabular}{l S[table-format=1.3]}
-\toprule
-\textbf{Annotated set} & {\textbf{Cohen's }$\boldsymbol{\kappa}$} \\
-\midrule
-CAS1    & 0.257 \\
-CAS2    & 0.544 \\
-E3C     & 0.797 \\
-EMEA    & 0.560 \\
-MEDLINE & 0.502 \\
-\midrule
-Global (judge vs human gold) & 0.532 \\
-Inter-judge (Qwen vs MedGemma) & 0.728 \\
-\bottomrule
-\end{tabular}
-\caption{The judge agrees with human gold at a Cohen's kappa of $0.532$ overall and $0.797$ on the cleanest set, and the two judges agree with each other at $0.728$.}
-\label{tab:judge-validity}
-\end{table} Re-scoring everything with a second, independent medical model leaves the rankings in place and slightly sharper, which rules out self-preference. Where the judge and the human gold disagree, $85\%$ of the disagreements are cases where the human annotation followed a convention the judge reasonably declined to follow, not cases where the judge was wrong.
-
-\begin{reviewrewrite}
-What a convention looks like is easiest to see in the disagreements (\Cref{fig:judge-disagreements}). The word \textit{hépatique} (hepatic) is marked as an anatomical entity because the guideline projects a relational adjective onto the organ it modifies. The participle \textit{traités} (treated) is marked as a procedure because the guideline extends the type to inflected forms of a treatment. The phrase \textit{sans particularité} (unremarkable) is marked as an examination value. Given a plain description of each type, the judge rejects all three, since the word is not an organ, an act, or a measurement. In every case the judge is right about what the type means, and the gold is following a labeling convention.
-\end{reviewrewrite}
-
-\begin{figure}[t]
-\centering
-% displaCy-style: whole passage, gold spans in lavender with type tag above;
-% solid border = judge agrees, dashed peach + verdict below = judge refuses the type.
-\providecommand{\gtafull}[1]{\raisebox{0.15ex}{\scriptsize\textsc{\textcolor{ThesisPrimaryDark}{#1}}}}
-\providecommand{\jtafull}[1]{\scriptsize\textsc{\textcolor{ThesisTertiaryDark}{#1}}}
-\begin{tikzpicture}[font=\normalsize\sffamily, text=ThesisInk,
-  ok/.style ={fill=ThesisPrimary!28, draw=ThesisPrimaryDark, rounded corners=3pt,
-              line width=0.6pt, inner xsep=4pt, inner ysep=2.5pt},
-  bad/.style={fill=ThesisPrimary!28, draw=ThesisTertiaryDark, dashed, rounded corners=3pt,
-              line width=0.8pt, inner xsep=4pt, inner ysep=2.5pt},
-  gtag/.style={anchor=base, font=\scriptsize\sffamily},
-  jtag/.style={fill=ThesisTertiary!22, draw=ThesisTertiaryDark, rounded corners=2.5pt,
-               line width=0.5pt, inner xsep=3.5pt, inner ysep=2pt, font=\scriptsize\sffamily},
-  drop/.style={-{Stealth[length=1.7mm]}, ThesisTertiaryDark!70, line width=0.6pt,
-               shorten >=1pt, shorten <=1pt}]
-  \def\rh{2.35}
-  % row 1
-  \node[anchor=base west] (a) at (0,0) {Patient suivi pour un };
-  \node[ok, anchor=base west] (lymphome) at (a.base east) {lymphome};
-  \node[anchor=base west] (b) at (lymphome.base east) {, };
-  \node[bad, anchor=base west] (traite) at (b.base east) {traité};
-  \node[anchor=base west] (c) at (traite.base east) { par };
-  \node[ok, anchor=base west] (rchop) at (c.base east) {R-CHOP};
-  \node[anchor=base west] (d) at (rchop.base east) {.};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]lymphome.north) {\gtafull{disease}};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]rchop.north)   {\gtafull{drug}};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]traite.north)  {\gtafull{procedure}};
-  \node[jtag, anchor=north] (jt1) at ([yshift=-5.5mm]traite.south) {\jtafull{wrong type}};
-  \draw[drop] (traite.south) -- (jt1.north);
-  % row 2
-  \node[anchor=base west] (e) at (0,-\rh) {La fonction };
-  \node[bad, anchor=base west] (hepa) at (e.base east) {hépatique};
-  \node[anchor=base west] (f) at (hepa.base east) { est normale et l'};
-  \node[ok, anchor=base west] (exam) at (f.base east) {examen clinique};
-  \node[anchor=base west] (g) at (exam.base east) { est };
-  \node[bad, anchor=base west] (sp) at (g.base east) {sans particularité};
-  \node[anchor=base west] (h) at (sp.base east) {.};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]hepa.north) {\gtafull{anatomy}};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]exam.north) {\gtafull{exam}};
-  \node[gtag, anchor=base] at ([yshift=4.5mm]sp.north)   {\gtafull{value}};
-  \node[jtag, anchor=north] (jt2) at ([yshift=-5.5mm]hepa.south) {\jtafull{wrong type}};
-  \draw[drop] (hepa.south) -- (jt2.north);
-  \node[jtag, anchor=north] (jt3) at ([yshift=-5.5mm]sp.south) {\jtafull{not an entity}};
-  \draw[drop] (sp.south) -- (jt3.north);
-  % legend
-  \coordinate (lx) at (0,-2*\rh-0.2);
-  \node[ok, anchor=west, minimum width=5mm, minimum height=3.5mm] (lg1) at (lx) {};
-  \node[anchor=west, font=\scriptsize] at (lg1.east) {gold span, judge agrees};
-  \node[bad, anchor=west, minimum width=5mm, minimum height=3.5mm] (lg2) at ([xshift=5.2cm]lx) {};
-  \node[anchor=west, font=\scriptsize] at (lg2.east) {gold span, judge refuses the type};
-\end{tikzpicture}
-\caption{The same clinical passage under two annotation layers: most gold spans
-match the judge, and the three it refuses (a participle, a relational adjective,
-a qualitative negation) diverge on labeling convention rather than fact.}
-\label{fig:judge-disagreements}
-\end{figure}
-
-\begin{reviewrewrite}
-The papers behind these gold sets already grant that their labels are conventional. The authors of QUAERO state that there is no consensus on what counts as an entity and that their scheme is a deliberate choice~\citep{neveol14quaero}. The DEFT~2020 campaign supplies the clinical-entity labels we use over the case reports of CAS~\citep{grabar_cas_2018}. Its two human annotators agreed at only $0.67$ in strict scoring, and at $0.80$ once boundaries were allowed to differ slightly~\citep{cardon_presentation_2020}. They report diseases and signs as the hardest categories to annotate consistently, down to spans where one annotator wrote a word and another a synonym and the two counted as a disagreement. The E3C corpus goes one step further and separates a fully manual gold layer from a mostly automatic silver one~\citep{magnini_e3c_2021}. Each of these grants that the gold is conventional, yet none measures how much of a model's apparent error is convention rather than mistake. The reference-free judge supplies that measurement, and most of the error is convention.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-This low ceiling on human agreement is the reason a benchmark cannot do the work in its place. When two trained annotators agree only $0.67$ of the time in strict scoring, exact match against either of them is bounded well below a model's real ability, and a model can be right about the medicine and still be scored as wrong. It also explains why the judge agrees with the gold most where the gold is cleanest: a kappa of $0.797$ on the carefully annotated E3C set against $0.257$ on the noisiest one. Agreement rises with the quality of the gold.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-The judge is conservative: it under-credits correct spans, so the absolute scores understate real performance while the rankings between models stay stable. One limit remains. The human check covers only the common types, so the headline claim about novel types has no direct human anchor yet, and a small human study of novel-type judgements is the most useful next step.
-\end{reviewrewrite}
-
-\section{The OncoLab Lymphoma Cohort}
-
-\begin{reviewrewrite}
-The last test applies the whole thesis to a real clinical problem. The OncoLab cohort asks for $89$ fields of a lymphoma annotation form, and we evaluate on the held-out synthetic dossiers built in \Cref{chap:synthetic}, scoring each field by how well the model locates its value in the text. Every earlier part of the thesis meets here: the public corpora that supplied the seeds (\Cref{chap:collecting,chap:quality,chap:mcbio}), the modern French biomedical encoder (\Cref{chap:objectives,chap:ontobook}), the open-vocabulary architecture (\Cref{chap:architectures}), and the synthetic dossiers themselves (\Cref{chap:synthetic}).
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-Off the shelf, no model does well. The best zero-shot result is a micro-averaged F-score of $0.174$, and most models sit between $0.10$ and $0.15$. The convention-tuned baseline is precise but barely fires, finding only a small fraction of the fields. The task is long and spread across several documents, and reading it cold is beyond every model we try.
-\end{reviewrewrite}
-
-\begin{reviewrewrite}
-After fine-tuning on the synthetic dossiers, the picture changes (\Cref{tab:lymphoma-capstone}). Every model rises to about $0.31$ to $0.33$, and the differences between them nearly vanish. The synthetic data closes most of the distance, and it closes it for all of them: the benchmark champion and the generalist extractor reach the same ceiling. The scores are still low in absolute terms, which measures how hard the task is rather than showing it solved. The result we set out to reach holds here: built only from public and synthetic data, a small open model reaches the same level on a real oncology task as a model tuned on a standard benchmark, without ever seeing a real clinical note.
-\end{reviewrewrite}
-
-\begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{12pt}
-\sisetup{detect-weight=true, table-format=1.3}
-\begin{tabular}{l S S}
-\toprule
-\textbf{Model} & {\textbf{Zero-shot}} & {\textbf{After fine-tuning}} \\
-\midrule
-GLiNER-biomed             & \bfseries 0.174 & \bfseries 0.329 \\
-Entity-tuned              & 0.150 & 0.318 \\
-Convention-tuned baseline & 0.138 & 0.324 \\
-Multi-task                & 0.106 & 0.319 \\
-\bottomrule
-\end{tabular}
-\caption{Micro-F1 on the OncoLab lymphoma cohort: zero-shot the models are low and spread out, but after fine-tuning on the synthetic dossiers they all converge to about $0.32$.}
-\label{tab:lymphoma-capstone}
+  \centering
+  \small
+  \caption{\textbf{Lymphoma eCRF results} after field competition. Value-$F_1$
+  and span-$F_1$ on the 410 test records; extractive thresholds are selected on
+  the validation split. Bold: best per column; underline: second best.}
+  \label{tab:p3-capstone}
+  \begin{threeparttable}[b]
+  \sisetup{detect-weight=true, table-format=1.3}
+  \begin{tabular}{@{}p{0.49\textwidth} r S S@{}}
+    \toprule
+    \textbf{Model} & \textbf{Parameters} & {\textbf{Value-$F_1$}} & {\textbf{Span-$F_1$}} \\
+    \midrule
+    \rowcolor{ThesisTableSep}
+    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Question answering}} \\[1pt]
+    Extractive QA & 150 M & 0.338 & 0.312 \\
+    Biomedical QA & 150 M & 0.419 & 0.364 \\
+    \midrule
+    \rowcolor{ThesisTableSep}
+    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Open-vocabulary extraction}} \\[1pt]
+    GLiNER-BioMed & 184 M & 0.367 & 0.365 \\
+    MC-bio-gliner & 150 M & 0.640 & 0.503 \\
+    \midrule
+    \rowcolor{ThesisTableSep}
+    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Generation}} \\[1pt]
+    Qwen3.5-0.8B & 0.8 B & 0.628 & 0.543 \\
+    Qwen3.5-2B & 2 B & 0.645 & 0.559 \\
+    Qwen3.5-4B & 4 B & \bfseries 0.658 & \bfseries 0.567 \\
+    Qwen3.5-9B & 9 B & \underline{0.650} & \underline{0.558} \\
+    \bottomrule
+  \end{tabular}
+  \end{threeparttable}
 \end{table}
+
+After competition, the strongest generator, Qwen3.5-4B, holds the highest
+value-$F_1$ at 0.658, with the task-adapted mixture just behind at 0.657; the two
+are not distinguishable. The published MC-bio-gliner reaches 0.640, and scaling
+the encoder to 400 million parameters does not raise this score. The generators
+keep the advantage on span-$F_1$, up to 0.567 against 0.507 for MC-bio-gliner.
+These post-competition scores should be read together with the raw scores
+reported above.
+
+\section{What the Final Score Hides}
+
+The measures in this section are computed over every committed prediction,
+without the confidence threshold used for the reported value-$F_1$, so they
+include the low-confidence tail that the operating point discards. Read this
+way, the two systems fail differently. Among its errors, MC-bio-gliner assigns a
+correct value to the wrong field 48.9\% of the time, against 37.9\% for the
+strongest generator, Qwen3.5-4B; more of the encoder's mistakes are role
+confusions, the right string placed in the wrong slot. The generator also ranks
+its predictions by confidence more reliably: it reaches a lower risk--coverage
+area, 0.175 against 0.239, and a higher precision at 50\% coverage, 0.862 against
+0.770. The encoder commits to more fields per record and abstains less, which
+raises its coverage but leaves more of its confidence budget on wrong slots.
+
+MC-bio-gliner's practical advantage is its weight memory. Its 150 million parameters
+require less than one gigabyte at common precisions, compared with about 18 GB
+for 9 billion parameters in bfloat16. Parameter count does not imply lower
+end-to-end latency: the encoder is not faster per record when all 89 descriptions
+are queried.
+
+\section{Limits of the Extractive QA Baseline}
+
+A SQuAD-style head returns one main span for each question, while a longitudinal
+record may contain several mentions and surface forms of the same value. Our QA
+baseline is trained only on the first mention of each field, which discards this
+multiplicity. This mismatch helps explain why the biomedical QA encoder reaches
+0.419 value-$F_1$, below the description-conditioned encoders.
+
+The QA scores are also poorly suited to selective prediction. On PARHAF, 72.4\%
+of its predictions receive the same confidence. Value-$F_1$ remains defined,
+but a risk--coverage analysis is not informative when most examples cannot be
+ordered by confidence.
+
+\section{Data Efficiency on Synthetic Records}
+
+For a separate data-efficiency series, we use a MC-bio-gliner (low-density) trained on a
+corpus in which 22.5\% of documents have no retained mention. We adapt it with
+10, 50, 100, 500, and 1,540 synthetic records. This is not the joint-supervision
+model reported in the main table. Value-$F_1$ rises from 0.182
+with 10 records to 0.485 with 50 and 0.659 with the full training set
+(\Cref{fig:p3-data-efficiency}). This curve measures the use of generated
+supervision; it does not estimate the cost or value of equivalent human
+annotation.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{plots/part_3/output/fig13_data_efficiency.pdf}
+  \caption{Lymphoma eCRF value-$F_1$ by number of synthetic training records.}
+  \label{fig:p3-data-efficiency}
+\end{figure}
+
+\section{External Transfer}
+
+The synthetic eCRF measures the complete task but cannot establish transfer to
+human-written text. We therefore evaluate on PARHAF and FrACCO NER
+(\Cref{tab:p3-external}). PARHAF contains two biomarker types and only 31 test
+documents, so small differences are unstable. FrACCO contains three ICD-O types
+and about 34 mentions per document, making it a substantially denser NER task.
+The MC-bio-gliner corpus contains 0.2\% documents with no retained mention. The
+MC-bio-gliner (density-balanced) is a separate training variant designed to rebalance
+this annotation density.
+
+The two datasets also differ in what an annotated passage looks like.
+\Cref{fig:p3-external-examples} contrasts their annotation density before the
+numerical comparison.
+
+\input{sources/part_3/figures/fig14_external_examples}
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Results on PARHAF and FrACCO NER. Value-$F_1$; the confidence
+  threshold is selected on the validation split and the test set is evaluated
+  once. Best per column in bold.}
+  \label{tab:p3-external}
+  \sisetup{detect-weight=true, table-format=1.3}
+  \begin{tabular}{p{0.58\textwidth} S S}
+    \toprule
+    \textbf{Model} & {\textbf{Zero-shot $F_1$}} & {\textbf{100-document $F_1$}} \\
+    \midrule
+    \rowcolor{ThesisTableSep}
+    \multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{PARHAF}} \\[1pt]
+    Qwen3.5-2B & {--} & \bfseries 0.741 \\
+    Qwen3.5-9B & \bfseries 0.595 & 0.726 \\
+    GLiNER-BioMed (base) & 0.098 & 0.562 \\
+    MC-bio-gliner & 0.244 & 0.681 \\
+    MC-bio-gliner (density-balanced) & {--} & 0.687 \\
+    MC-bio-gliner (low-density) & {--} & 0.655 \\
+    \midrule
+    \rowcolor{ThesisTableSep}
+    \multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{FrACCO}} \\[1pt]
+    GLiNER-BioMed (base) & \bfseries 0.341 & \bfseries 0.762 \\
+    MC-bio-gliner & 0.203 & 0.626 \\
+    MC-bio-gliner (low-density) & {--} & 0.620 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+On PARHAF, adaptation with 100 documents raises MC-bio-gliner from 0.244 to 0.681,
+above the size-matched GLiNER-BioMed (base) at 0.562. Qwen3.5-2B and Qwen3.5-9B
+reach 0.741 and 0.726, respectively. Because the test set contains 31 documents,
+these small differences should not be read as a stable ranking.
+
+FrACCO gives a different result. After adaptation, the size-matched
+GLiNER-BioMed (base) reaches 0.762, compared with 0.626 for MC-bio-gliner. On this
+dense, flat NER task the biomedical NER baseline keeps the advantage, and
+MC-bio-gliner is not the strongest model here. This result narrows the scope of the
+synthetic eCRF comparison to the longitudinal form-filling task it was built for.
+
+\section{Limits}
+
+The main limitation is the silver reference. The same model family generates the
+records and produces their annotation, so the reference can reward the conventions
+of the generator rather than clinical ground truth. The synthetic split has also
+not been checked for PMC source articles shared between training and test. No part
+of this evaluation uses real hospital records or human annotation, which remains
+the necessary step before any clinical use.
 
 \section*{Conclusion}
 
-\begin{reviewrewrite}
-The parts of the thesis come together on one cohort. A public biomedical corpus, an encoder trained on it, a training objective with a dose of structured knowledge, an open-vocabulary architecture, and data that is generated rather than collected all meet on one relapsed-lymphoma cohort and let a model that never saw a real clinical note reach a usable level of extraction. The conclusion of the thesis steps back from these numbers to ask what they say about building clinical models from public data, and where the approach still falls short.
-\end{reviewrewrite}
+Before form-level decoding, the 150-million-parameter MC-bio-gliner reaches 0.634
+value-$F_1$, within 0.038 of the strongest generator, Qwen-4B, at 27 times fewer
+parameters; its best variant matches Qwen-4B after field competition. Scaling the
+generator to nine billion parameters does not help. The generator keeps an
+advantage on span-$F_1$, on wrong-field errors, and on risk--coverage, while
+MC-bio-gliner needs far less memory. The three evaluations delimit where the result
+holds: MC-bio-gliner owns the longitudinal form it was built for; on the narrower
+PARHAF biomarkers it beats the size-matched baseline but not the generator; and
+on the dense FrACCO NER the biomedical baseline keeps the lead. These results
+concern a synthetic longitudinal form with a silver reference and do not
+establish clinical accuracy on French hospital records.

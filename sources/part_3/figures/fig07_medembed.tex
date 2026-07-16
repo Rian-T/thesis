@@ -1,100 +1,25 @@
 \begin{figure}[t]
   \centering
-  \begin{tikzpicture}[
-    panel/.style={
-      rectangle, rounded corners=4pt, draw=ThesisNeutral!55,
-      fill=ThesisPaper, line width=0.65pt, minimum width=6.75cm,
-      minimum height=6.25cm, inner sep=5pt
-    },
-    encoder/.style={
-      rectangle, rounded corners=3pt, draw=ThesisPrimaryDark,
-      fill=ThesisPrimary!16, line width=0.7pt, text width=2.30cm,
-      minimum height=0.90cm, align=center, inner sep=4pt,
-      font=\scriptsize
-    },
-    supervision/.style={
-      rectangle, rounded corners=3pt, draw=ThesisSecondaryDark,
-      fill=ThesisSecondary!17, line width=0.7pt, text width=2.25cm,
-      minimum height=0.90cm, align=center, inner sep=4pt,
-      font=\scriptsize
-    },
-    example/.style={
-      rectangle, rounded corners=3pt, draw=ThesisNeutral!65,
-      fill=white, line width=0.6pt, text width=5.85cm,
-      align=left, inner sep=5pt, font=\scriptsize
-    },
-    flow/.style={-{Stealth[length=1.8mm]}, line width=0.78pt,
-      draw=ThesisNeutral, shorten <=2.5pt, shorten >=2.5pt},
-    every node/.style={text=ThesisInk}
-  ]
-    \node[panel] (lineage) at (-3.55,0) {};
-    \node[panel] (inference) at (3.55,0) {};
+  \resizebox{0.86\textwidth}{!}{%
+  \begin{tikzpicture}[font=\scriptsize\sffamily,
+    model/.style={rounded corners=2pt, draw=ThesisPrimaryDark,
+      fill=ThesisPrimary!16, minimum width=2.25cm, minimum height=0.72cm,
+      align=center, inner sep=4pt},
+    signal/.style={rounded corners=2pt, draw=ThesisSecondaryDark,
+      fill=ThesisSecondary!20, minimum width=2.25cm, minimum height=0.72cm,
+      align=center, inner sep=4pt},
+    flow/.style={->, ThesisInk!38, shorten >=2pt, shorten <=2pt}]
 
-    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
-      anchor=north] at ([yshift=-5pt]lineage.north)
-      {A · CONSTRUIRE L'ESPACE};
-    \node[font=\scriptsize\sffamily\bfseries, text=ThesisNeutral,
-      anchor=north] at ([yshift=-5pt]inference.north)
-      {B · DEMANDER UN TYPE À L'INFÉRENCE};
+    \node[model] (biomed) at (-4.3,0.75) {ModernCamemBERT-bio};
+    \node[signal] (pairs) at (-4.3,-0.75) {OntoBook term pairs};
+    \node[model] (contrast) at (0,0) {contrastive training};
+    \node[model, fill=ThesisPrimary!28] (med) at (4.3,0) {MedEmbed};
 
-    \node[encoder] (mcb) at (-4.95,1.68)
-      {\textbf{ModernCamemBERT}};
-    \node[encoder] (detour) at (-2.15,1.68)
-      {\textbf{Détour CLM}\\ puis retour MLM};
-    \node[encoder] (bio) at (-2.15,0.25)
-      {\textbf{ModernCamemBERT-bio}};
-    \node[supervision] (pairs) at (-4.95,-1.17)
-      {\textbf{Paires terminologiques}\\ dérivées d'OntoBook};
-    \node[encoder] (contrast) at (-2.15,-1.17)
-      {\textbf{Apprentissage contrastif}\\ descriptions et termes};
-    \node[encoder, fill=ThesisPrimary!27, line width=0.95pt]
-      (medembed) at (-3.55,-2.43) {\textbf{MedEmbed}};
-
-    \draw[flow] (mcb) -- (detour);
-    \draw[flow] (detour) -- (bio);
-    \draw[flow] (bio) -- (contrast);
-    \draw[flow, draw=ThesisSecondaryDark] (pairs) -- (contrast);
-    \draw[flow, draw=ThesisPrimaryDark] (contrast) -- (medembed);
-
-    \node[example, anchor=north] (description)
-      at ([yshift=-0.64cm]inference.north) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{CHAMP DEMANDÉ · IDENTITÉ VÉRIFIÉE}}\\[2pt]
-      \texttt{first\_line\_treatment}\\
-      \textcolor{ThesisNeutral}{glose canonique (schéma): traitement de première ligne}
-    };
-    \node[example, anchor=north] (candidates)
-      at ([yshift=-0.20cm]description.south) {%
-      \textcolor{ThesisNeutral}{\textbf{EMPANS CANDIDATS · \texttt{lym\_76}}}\\[2pt]
-      \textcolor{ThesisNeutral}{\texttt{stade IV}}\\
-      \textcolor{ThesisSecondaryDark}{\textbf{chimiothérapie par protocole CHOEP-14}}\\
-      \textcolor{ThesisNeutral}{\texttt{réponse complète}}
-    };
-    \node[example, anchor=north] (scores)
-      at ([yshift=-0.20cm]candidates.south) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{EMBEDDINGS ET SIMILARITÉS (SCHÉMA)}}\\[2pt]
-      $s($description, stade IV$)=0{,}12$\\
-      \textcolor{ThesisSecondaryDark}{%
-        $s($description, CHOEP-14$)=0{,}91$
-        \quad\textbf{$\leftarrow$ retenu}}\\
-      $s($description, réponse complète$)=0{,}18$
-    };
-
-    \draw[flow, draw=ThesisPrimaryDark] (description) -- (candidates);
-    \draw[flow, draw=ThesisPrimaryDark] (candidates) -- (scores);
-    \draw[flow, draw=ThesisPrimaryDark, dashed]
-      (medembed.east) --
-      node[midway, below, font=\scriptsize\sffamily,
-        text=ThesisPrimaryDark, fill=white, inner sep=1pt]
-      {même encodeur}
-      ([xshift=-2pt]scores.west |- medembed.east) --
-      ([xshift=-2pt]scores.west);
-  \end{tikzpicture}
-  \caption{\textbf{MedEmbed relie une lignée d'encodeur à une requête ouverte.}
-  Le détour CLM produit ModernCamemBERT-bio, tandis que les paires dérivées
-  d'OntoBook apportent un signal contrastif indépendant: OntoBook n'est pas un
-  checkpoint supplémentaire. À l'inférence, le comportement à vocabulaire
-  ouvert vient de la géométrie description--empan, et non d'un classifieur à
-  sorties fixes. Les empans proviennent de \texttt{lym\_76}; les similarités
-  numériques illustrent le mécanisme.}
+    \draw[flow] (biomed.east)--(contrast.west);
+    \draw[flow, draw=ThesisSecondaryDark] (pairs.east)--(contrast.west);
+    \draw[flow] (contrast)--(med);
+  \end{tikzpicture}%
+  }
+  \caption{Contrastive training of MedEmbed from a biomedical encoder and terminology pairs.}
   \label{fig:p3-medembed}
 \end{figure}

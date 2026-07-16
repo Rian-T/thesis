@@ -2,9 +2,17 @@
 life''}{%
 Ludwig Wittgenstein, \textit{Philosophical Investigations}}
 
-\begin{reviewrewrite}
-A pretrained model still has to be taught a task, and the usual way is to fine-tune it on labelled examples. For clinical information extraction in French, that direct route does not work well. There are almost no labelled clinical examples to learn from, because real notes are private and cannot be shared. There are also too many possible labels for a fixed output layer, and the labels change from one study to the next. Public training text creates another gap because it does not read like a hospital note. This part takes two routes around these limits. We generate training data from public sources instead of collecting it from the clinic, and we build a model that matches text against a description of the wanted type rather than against a fixed list of labels. We then test the whole approach on a real oncology cohort, the case at the centre of the OncoLab project, where the earlier parts of this thesis are brought to bear at once.
-\end{reviewrewrite}
+This part asks how public biomedical resources can support clinical extraction
+without hospital records. We study a longitudinal lymphoma electronic case report
+form (eCRF), the structured data-collection form of a clinical study, here
+comprising 89 fields. The form is filled from a sequence of reports, where each
+mention must be assigned to its role in the patient trajectory. No real registry
+of this kind is available to us, so we build and evaluate a synthetic version of
+the task. The next three chapters construct task supervision from public and
+generated text, train an extractor that accepts new field descriptions, and
+compare a small biomedical encoder with larger generative models. The complete
+eCRF is evaluated on synthetic records, while PARHAF and FrACCO provide narrower
+tests on human-written text.
 
 \chapter{Synthetic Data for Task Adaptation}
 \label{chap:synthetic}

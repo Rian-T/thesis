@@ -1,0 +1,27 @@
+\begin{center}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small, text=ThesisInk, >={Stealth[length=2mm]},
+    box/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+                text width=4.0cm, minimum height=3.3cm, inner sep=9pt, align=left},
+    arr/.style={->, draw=ThesisNeutral, line width=0.7pt, shorten >=5pt, shorten <=5pt}]
+    \node[box] (case) at (-5.0,0) {\textbf{Published case summary}\\[5pt]
+      A patient was diagnosed with diffuse large B-cell lymphoma, received
+      CHOEP-14, achieved remission, and relapsed fourteen years later.};
+    \node[box] (timeline) at (0,0) {\textbf{Structured chronology}\\[6pt]
+      \textcolor{ThesisPrimaryDark}{2018} · diagnosis\\
+      \textcolor{ThesisPrimaryDark}{2018} · CHOEP-14\\
+      \textcolor{ThesisPrimaryDark}{2019} · remission\\
+      \textcolor{ThesisPrimaryDark}{2032} · relapse};
+    \node[box] (reports) at (5.0,0) {\textbf{Generated French reports}\\[5pt]
+      \textcolor{ThesisPrimaryDark}{18 May 2018} · pathology\\
+      \textcolor{ThesisPrimaryDark}{22 May 2018} · tumour board\\
+      \textcolor{ThesisPrimaryDark}{14 January 2019} · imaging\\
+      \textcolor{ThesisPrimaryDark}{25 April 2032} · relapse visit};
+    \draw[arr] (case) -- (timeline);
+    \draw[arr] (timeline) -- (reports);
+  \end{tikzpicture}}
+  \captionof{figure}{Transformation of a fictional case summary into a dated longitudinal record.}
+  \label{fig:p3-case-to-record}
+\end{center}

@@ -1,0 +1,24 @@
+\begin{center}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small, text=ThesisInk,
+    panel/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
+                  text width=6.3cm, minimum height=3.15cm, inner sep=10pt, align=left},
+    bio/.style={rounded corners=2pt, fill=ThesisPrimary!23, text=ThesisPrimaryDark,
+                inner xsep=2pt, inner ysep=1pt},
+    res/.style={rounded corners=2pt, fill=ThesisSecondary!28, text=ThesisSecondaryDark,
+                inner xsep=2pt, inner ysep=1pt}]
+    \node[panel] (parhaf) at (-3.65,0) {\textbf{PARHAF · sparse biomarker NER}\\[6pt]
+      Recherche de \textcolor{ThesisPrimaryDark}{\textbf{BCL2}} positive dans
+      \textcolor{ThesisSecondaryDark}{\textbf{80\%}} des cellules tumorales.\\[9pt]
+      \textcolor{ThesisNeutral}{2 entity types · about 9 mentions per document}};
+    \node[panel] (fracco) at (3.65,0) {\textbf{FrACCO · dense oncology NER}\\[6pt]
+      Adénocarcinome du \textcolor{ThesisPrimaryDark}{\textbf{côlon sigmoïde}},
+      \textcolor{ThesisSecondaryDark}{\textbf{métastatique}}, de morphologie
+      \textcolor{ThesisPrimaryDark}{\textbf{tubulaire}}.\\[9pt]
+      \textcolor{ThesisNeutral}{3 entity types · about 34 mentions per document}};
+  \end{tikzpicture}}
+  \captionof{figure}{Fictional passages illustrating the annotation density of PARHAF and FrACCO.}
+  \label{fig:p3-external-examples}
+\end{center}

@@ -1,61 +1,19 @@
 \begin{figure}[t]
   \centering
-  \begin{tikzpicture}[
-    shared/.style={
-      rectangle, rounded corners=3pt, draw=ThesisNeutral!65,
-      fill=ThesisPaper, line width=0.65pt, text width=12.95cm,
-      minimum height=1.10cm, align=left, inner sep=6pt,
-      font=\scriptsize
-    },
-    panel/.style={
-      rectangle, rounded corners=4pt, draw=ThesisNeutral!55,
-      fill=white, line width=0.65pt, text width=5.95cm,
-      minimum height=2.42cm, align=left, inner sep=7pt,
-      font=\scriptsize
-    },
-    every node/.style={text=ThesisInk}
-  ]
-    \node[shared] (sentence) at (0,2.55) {%
-      \textcolor{ThesisNeutral}{\textbf{PHRASE COMMUNE · \texttt{lym\_76}}}\\[3pt]
-      \og Décision : début d'une chimiothérapie par protocole
-      \textbf{CHOEP-14}, 8 cycles, J1 = \textbf{25 mai 2018}.\fg{}
-    };
-
-    \node[panel] (ecrf) at (-3.43,0.65) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{1 · eCRF · UNE VALEUR PAR CHAMP}}\\[4pt]
-      champ: traitement de première ligne\\
-      valeur retenue: \textcolor{ThesisSecondaryDark}{%
-        \textbf{chimiothérapie par protocole CHOEP-14}}\\[3pt]
-      \textcolor{ThesisNeutral}{Un couple dossier--champ produit au plus une valeur.}
-    };
-    \node[panel] (ner) at (3.43,0.65) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{2 · NER · TOUTES LES MENTIONS}}\\[4pt]
-      traitement: \textcolor{ThesisSecondaryDark}{%
-        \textbf{chimiothérapie par protocole CHOEP-14}}\\
-      nombre de cycles: \textcolor{ThesisSecondaryDark}{\textbf{8 cycles}}\\
-      date: \textcolor{ThesisSecondaryDark}{\textbf{25 mai 2018}}\\[3pt]
-      \textcolor{ThesisNeutral}{Chaque mention appariée est une unité.}
-    };
-    \node[panel] (span) at (-3.43,-2.15) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{3 · span-$F_1$ · CHEVAUCHEMENT}}\\[4pt]
-      référence: \underline{chimiothérapie par protocole CHOEP-14}\\
-      prédiction: \hspace{2.35cm}\underline{protocole CHOEP-14}\\[4pt]
-      \textcolor{ThesisSecondaryDark}{\textbf{intersection non vide $\Rightarrow$ apparié}}\\
-      \textcolor{ThesisNeutral}{Une frontière incomplète peut donc compter juste.}
-    };
-    \node[panel] (value) at (3.43,-2.15) {%
-      \textcolor{ThesisPrimaryDark}{\textbf{4 · value-$F_1$ · TOKENS}}\\[4pt]
-      référence: \textbf{25 mai 2018}\\
-      prédiction: \textbf{25/05/18}\\[4pt]
-      Jaccard $=1/5=0{,}20 < 0{,}5$\\
-      \textcolor{ThesisNeutral}{Même date clinique, mais le score de surface peut échouer.}
-    };
-  \end{tikzpicture}
-  \caption{\textbf{Une phrase, quatre unités qui ne sont pas interchangeables.}
-  Le formulaire retient une valeur par champ, le NER compte toutes les
-  mentions, le span-$F_1$ accepte tout chevauchement non vide et le value-$F_1$
-  compare des ensembles de tokens. Ce dernier mesure une ressemblance de
-  surface: deux formats d'une même date clinique ne sont pas nécessairement
-  appariés.}
+  \resizebox{0.97\textwidth}{!}{%
+  \begin{tikzpicture}[font=\scriptsize\sffamily,
+    passage/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
+      text width=11.4cm, minimum height=0.9cm, align=left, inner sep=6pt},
+    example/.style={draw=ThesisNeutral!45, fill=ThesisPaper, rounded corners=2pt,
+      text width=5.35cm, minimum height=1.45cm, align=left, inner sep=6pt}]
+    \node[passage] at (0,2.0) {``Déc : début d'une chimiothérapie par protocole
+      \textbf{CHOEP-14}, \textbf{8 cycles}, J1 = \textbf{25 mai 2018}.''};
+    \node[example] at (-3.05,0.55) {\textbf{eCRF}\\one value for the requested field:\\CHOEP-14};
+    \node[example] at (3.05,0.55) {\textbf{Named entity recognition}\\all mentions:\\CHOEP-14 · 8 cycles · 25 mai 2018};
+    \node[example] at (-3.05,-1.2) {\textbf{Span $F_1$}\\reference: \underline{protocole CHOEP-14}\\prediction: \hspace{0.72cm}\underline{CHOEP-14}};
+    \node[example] at (3.05,-1.2) {\textbf{Value $F_1$}\\reference: \textbf{25 mai 2018}\\prediction: \textbf{mai 2018}\quad Jaccard $=2/3$};
+  \end{tikzpicture}%
+  }
+  \caption{Four evaluation units illustrated on one clinical sentence.}
   \label{fig:p3-metrics}
 \end{figure}
