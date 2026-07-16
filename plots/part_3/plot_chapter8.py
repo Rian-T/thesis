@@ -245,7 +245,7 @@ def _make_section_supervision_figure(data: SupervisionData):
     _dumbbell(min(full, no_clinical, biomed), max(full, no_clinical, biomed), global_y)
     ax.scatter(biomed, global_y, s=44, color=COLORS["neutral"],
                edgecolor="white", linewidth=0.6, zorder=3)
-    ax.scatter(no_clinical, global_y, s=44, color=COLORS["baseline"],
+    ax.scatter(no_clinical, global_y, s=44, color=COLORS["tertiary_dark"],
                edgecolor="white", linewidth=0.6, zorder=3)
     ax.scatter(full, global_y, s=44, color=COLORS["primary"],
                edgecolor="white", linewidth=0.6, zorder=3)
@@ -258,7 +258,7 @@ def _make_section_supervision_figure(data: SupervisionData):
             max(item.no_clinical, item.full),
             y_position,
         )
-        ax.scatter(item.no_clinical, y_position, s=40, color=COLORS["baseline"],
+        ax.scatter(item.no_clinical, y_position, s=40, color=COLORS["tertiary_dark"],
                    edgecolor="white", linewidth=0.6, zorder=3)
         ax.scatter(item.full, y_position, s=40, color=COLORS["primary"],
                    edgecolor="white", linewidth=0.6, zorder=3)
@@ -280,7 +280,7 @@ def _make_section_supervision_figure(data: SupervisionData):
     ax.tick_params(axis="y", length=0, labelsize=8)
 
     ax.scatter([], [], s=40, color=COLORS["primary"], label="Full corpus")
-    ax.scatter([], [], s=40, color=COLORS["baseline"], label="Without clinical text")
+    ax.scatter([], [], s=40, color=COLORS["tertiary_dark"], label="Without clinical text")
     ax.scatter([], [], s=40, color=COLORS["neutral"], label="Biomedical control")
     ax.legend(frameon=False, fontsize=8, loc="lower right")
     return fig

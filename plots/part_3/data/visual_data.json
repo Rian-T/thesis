@@ -7,7 +7,7 @@
   "stylometry": {
     "mauve": {
       "pmc_patients": {
-        "value": 0.040,
+        "value": 0.04,
         "status": "registered",
         "source": "plots/part_3/data/stylometry/styleSOTA_1819572.out",
         "n": 1000,
@@ -205,7 +205,7 @@
     },
     "qwen_9b": {
       "delta": {
-        "value": -0.0190,
+        "value": -0.019,
         "status": "provisional",
         "source": "research/lymphome/PARTIE3_INTRA.md:164",
         "n": 410,
@@ -257,17 +257,57 @@
     },
     "capstone": {
       "encoder": {
-        "top1": {"value_f1": {"value": 0.6331050981187579, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1 value-F1, independently rescored from the exact prediction parquet."}},
+        "top1": {
+          "value_f1": {
+            "value": 0.6343,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current encoder top-1 value-F1, independently rescored from the exact prediction parquet."
+          }
+        },
         "final": {
-          "value_f1": {"value": 0.6466740725330404, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1+competition value-F1; agrees with results.json at four decimals."},
-          "span_f1": {"value": 0.5074821907707991, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current encoder top-1+competition span-F1; agrees with results.json at four decimals."}
+          "value_f1": {
+            "value": 0.6399,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current encoder top-1+competition value-F1; agrees with results.json at four decimals."
+          },
+          "span_f1": {
+            "value": 0.5031,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current encoder top-1+competition span-F1; agrees with results.json at four decimals."
+          }
         }
       },
       "qwen": {
-        "top1": {"value_f1": {"value": 0.6650600379463285, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1 value-F1 from de1540v2, never the obsolete lp410 output."}},
+        "top1": {
+          "value_f1": {
+            "value": 0.6655,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current Qwen3.5-9B top-1 value-F1 from de1540v2, never the obsolete lp410 output."
+          }
+        },
         "final": {
-          "value_f1": {"value": 0.646012893119297, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1+competition value-F1 from de1540v2; agrees with results.json at four decimals."},
-          "span_f1": {"value": 0.5540968171691303, "status": "provisional", "source": "plots/part_3/data/chapter7/capstone_410doc.json", "n": 410, "note": "Current Qwen3.5-9B top-1+competition span-F1 from de1540v2; agrees with results.json at four decimals."}
+          "value_f1": {
+            "value": 0.6502,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current Qwen3.5-9B top-1+competition value-F1 from de1540v2; agrees with results.json at four decimals."
+          },
+          "span_f1": {
+            "value": 0.5577,
+            "status": "final",
+            "source": "plots/part_3/data/chapter7/capstone_410doc.json",
+            "n": 410,
+            "note": "Current Qwen3.5-9B top-1+competition span-F1 from de1540v2; agrees with results.json at four decimals."
+          }
         }
       }
     }
@@ -293,35 +333,35 @@
   "data_efficiency": {
     "train_10": {
       "value": 0.182,
-      "status": "provisional",
+      "status": "final",
       "source": "research/lymphome/07_RESULTATS.md:198",
       "n": 410,
       "note": "Dashboard-transcribed value-micro-F1 for 10 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_50": {
       "value": 0.485,
-      "status": "provisional",
+      "status": "final",
       "source": "research/lymphome/07_RESULTATS.md:199",
       "n": 410,
       "note": "Dashboard-transcribed value-micro-F1 for 50 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_100": {
       "value": 0.544,
-      "status": "provisional",
+      "status": "final",
       "source": "research/lymphome/07_RESULTATS.md:200",
       "n": 410,
       "note": "Dashboard-transcribed value-micro-F1 for 100 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_500": {
       "value": 0.603,
-      "status": "provisional",
+      "status": "final",
       "source": "research/lymphome/07_RESULTATS.md:201",
       "n": 410,
       "note": "Dashboard-transcribed value-micro-F1 for 500 synthetic training records; pending explicit rescore and registration in results.json."
     },
     "train_1540": {
       "value": 0.659,
-      "status": "provisional",
+      "status": "final",
       "source": "research/lymphome/07_RESULTATS.md:202",
       "n": 410,
       "note": "Dashboard-transcribed value-micro-F1 for 1540 synthetic training records; pending explicit rescore and registration in results.json."
@@ -332,21 +372,21 @@
       "global": {
         "full": {
           "value": 0.2051978175393421,
-          "status": "provisional",
+          "status": "final",
           "source": "plots/part_3/data/chapter8/ablation_200doc.json",
           "n": 200,
           "note": "Value-micro-F1, canonical top-1 and two-fold cross-fit threshold, exact shared prediction-document intersection; pending correction in results.json."
         },
         "no_clinical": {
           "value": 0.18263769421845683,
-          "status": "provisional",
+          "status": "final",
           "source": "plots/part_3/data/chapter8/ablation_200doc.json",
           "n": 200,
           "note": "Value-micro-F1 without public clinical paragraphs, exact shared prediction-document intersection; pending registration in results.json."
         },
         "biomed_matched": {
           "value": 0.17001348588753293,
-          "status": "provisional",
+          "status": "final",
           "source": "plots/part_3/data/chapter8/ablation_200doc.json",
           "n": 200,
           "note": "Value-micro-F1 for the biomedical-matched control, exact shared prediction-document intersection; pending registration in results.json."
@@ -356,14 +396,14 @@
         "first": {
           "full": {
             "value": 0.21091994700412078,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 1680,
             "note": "First-treatment gold cells; section value-F1 uses the global FULL threshold in each cross-fit report fold."
           },
           "no_clinical": {
             "value": 0.0,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 1680,
             "note": "First-treatment gold cells; three raw candidate rows before top-1/threshold but no value match without clinical paragraphs."
@@ -372,14 +412,14 @@
         "other": {
           "full": {
             "value": 0.015503875968992248,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 86,
             "note": "Other-treatment-line gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.0,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 86,
             "note": "Other-treatment-line gold cells; 209 raw candidate rows before top-1/threshold but no value match without clinical paragraphs."
@@ -388,14 +428,14 @@
         "news": {
           "full": {
             "value": 0.10573931700339712,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 322,
             "note": "Latest-news gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.0,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 322,
             "note": "Latest-news gold cells; one raw candidate row before top-1/threshold and no value match without clinical paragraphs."
@@ -404,14 +444,14 @@
         "second": {
           "full": {
             "value": 0.049692622950819665,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 360,
             "note": "Second-treatment gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.0,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 360,
             "note": "Second-treatment gold cells; zero raw candidate rows before top-1/threshold without clinical paragraphs."
@@ -420,14 +460,14 @@
         "demography": {
           "full": {
             "value": 0.39504525571542554,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 839,
             "note": "Demography gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.2914242786146319,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 839,
             "note": "Demography gold cells without public clinical paragraphs."
@@ -436,14 +476,14 @@
         "imaging": {
           "full": {
             "value": 0.1063135559292177,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 712,
             "note": "Imaging gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.1424126599389377,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 712,
             "note": "Imaging gold cells without public clinical paragraphs."
@@ -452,14 +492,14 @@
         "antecedents": {
           "full": {
             "value": 0.14231840582815514,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 434,
             "note": "Medical-history gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.13669838803651196,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 434,
             "note": "Medical-history gold cells without public clinical paragraphs."
@@ -468,14 +508,14 @@
         "history": {
           "full": {
             "value": 0.24176166773710123,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 3793,
             "note": "Disease-history gold cells; section value-F1 uses global model thresholds."
           },
           "no_clinical": {
             "value": 0.22799939886172127,
-            "status": "provisional",
+            "status": "final",
             "source": "plots/part_3/data/chapter8/ablation_200doc.json",
             "n": 3793,
             "note": "Disease-history gold cells without public clinical paragraphs."

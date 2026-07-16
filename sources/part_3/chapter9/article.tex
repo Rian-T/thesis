@@ -1,15 +1,28 @@
-\section{Supervision Without a Reference}
+The first two parts of this thesis built biomedical encoders by pretraining
+them on public text. This part puts those encoders to work on a real clinical
+task. A clinical study follows each of its patients over time and records what
+it learns in a structured form called an electronic case report form, or eCRF:
+one line per patient, with a fixed set of fields such as the treatment given or
+the date it started. The information needed to fill that form is written in the
+patient's own reports, the consultation notes, discharge summaries, and
+pathology results produced during care. These reports are longitudinal: they are
+written at successive moments as the disease unfolds rather than gathered in a
+single note, so a value can appear in one report and be revised in a later one.
+The task of this part is to read those reports and fill the matching line of the
+form, as \Cref{fig:p3-report-to-ecrf} shows on a single report.
 
 \input{sources/part_3/figures/fig_report_to_ecrf}
 
-The task is to read a patient's longitudinal reports and fill the corresponding
-line of a structured study form, as \Cref{fig:p3-report-to-ecrf} shows on one
-report. Since no open dataset pairs a French hospital record with a
-clinician-filled form, the supervision for this task has to be built rather than
-collected. We
-therefore separate the evidence available to us, as summarized in
-\Cref{fig:p3-evidence}: synthetic records test the complete longitudinal task,
-while human-written corpora test narrower forms of transfer.
+\section{Supervision Without a Reference}
+
+Learning this task in the usual way would need examples of reports paired with
+the form a clinician filled from them. No such data is available. No open
+dataset pairs a French hospital record with a clinician-filled form, and the
+records themselves cannot leave the hospital. The supervision for this task
+therefore has to be built rather than collected. We separate the evidence
+available to us, as summarized in \Cref{fig:p3-evidence}: synthetic records test
+the complete longitudinal task, while human-written corpora test narrower forms
+of transfer.
 
 \input{sources/part_3/figures/fig02_evidence_map}
 
@@ -21,8 +34,7 @@ a new study form. Published patient cases describe clinical trajectories, but
 they are not sequences of reports written during care. We therefore construct
 two forms of supervision, shown in \Cref{fig:p3-supervision-routes}: broad
 open-vocabulary annotations for generalist training, and generated longitudinal
-records for adaptation to the electronic case report form (eCRF), the structured
-form a clinical study fills for each patient.
+records for adaptation to the eCRF.
 
 Both routes use Qwen3-235B with constrained JSON output. For public text, the
 model identifies mentions and describes their types, while for the target task it

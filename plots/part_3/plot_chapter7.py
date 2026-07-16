@@ -60,7 +60,7 @@ def prepare_capstone(data: dict | None = None) -> CapstoneData:
         observation("qwen", "final", "span_f1"),
     ]
     encoder = SystemScores(
-        "150M encoder",
+        "MC-bio-gliner",
         (float(selected[0]["value"]), float(selected[1]["value"])),
         float(selected[2]["value"]),
         COLORS["primary_dark"],
@@ -70,7 +70,7 @@ def prepare_capstone(data: dict | None = None) -> CapstoneData:
         "Qwen3.5-9B",
         (float(selected[3]["value"]), float(selected[4]["value"])),
         float(selected[5]["value"]),
-        COLORS["tertiary_dark"],
+        COLORS["neutral"],
         "D",
     )
     interval = data["decoding"]["post_decoding_encoder_minus_qwen"]
@@ -122,7 +122,7 @@ def _label_point(
 # also feeds fig12_final_comparison.
 DECODING_SERIES = (
     {
-        "label": "150M encoder",
+        "label": "MC-bio-gliner",
         "before": 0.634,
         "after": 0.640,
         "color": COLORS["primary_dark"],
@@ -135,7 +135,7 @@ DECODING_SERIES = (
         "label": "Qwen3.5-9B",
         "before": 0.665,
         "after": 0.650,
-        "color": COLORS["tertiary_dark"],
+        "color": COLORS["neutral"],
         "marker": "D",
         # right label placed just above its endpoint (Qwen sits higher)
         "right_va": "bottom",
