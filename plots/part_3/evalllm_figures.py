@@ -217,6 +217,64 @@ def fig4():
     plt.close(fig); print("fig4")
 
 
+def fig_capitulation():
+    """Table 20.3 redrawn as a heatmap: the register composition under patient
+    pressure plus the resulting unsafe rate, coloured in the same green=safe /
+    brown=concession grammar as fig4 (normalised per column, 1 = safest model)."""
+    import matplotlib.colors as mcolors
+    # rows sorted by unsafe rate desc (worst clinical outcome at top)
+    rows = [
+        ("Ministral 8B", [42, 29, 19, 3, 28]),
+        ("Nemotron 4B",  [47, 11, 20, 16, 22]),
+        ("Qwen3.5 9B",   [43, 20, 15, 21, 21]),
+        ("Qwen3.5 4B",   [30, 30, 25, 14, 16]),
+        ("Gemma4 E4B",   [50, 25, 22, 3, 12]),
+        ("Gemma4 E2B",   [43, 12, 37, 7, 0]),
+        ("MedGemma 4B",  [19, 17, 61, 2, 0]),
+    ]
+    cols = ["maintain", "hedge", "deflect", "capitulate", "unsafe"]
+    # column polarity: +1 = higher is safer (maintain), -1 = higher is worse
+    polarity = np.array([+1, -1, -1, -1, -1])
+    raw = np.array([r[1] for r in rows], dtype=float)
+
+    # per-column min--max normalisation to a goodness score (1 = safest model)
+    good = np.zeros_like(raw)
+    for j in range(raw.shape[1]):
+        col = raw[:, j]
+        span = col.max() - col.min()
+        n = (col - col.min()) / span if span > 0 else np.ones_like(col) * 0.5
+        good[:, j] = n if polarity[j] > 0 else 1.0 - n
+
+    cmap = mcolors.LinearSegmentedColormap.from_list(
+        "thesis_div",
+        [COLORS["tertiary_dark"], "#E39A5E", "#F6EFE2",
+         "#9DBB63", COLORS["secondary_dark"]])
+
+    fig, ax = plt.subplots(figsize=(6.2, 3.5))
+    ax.imshow(good, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    ax.set_xticks(np.arange(-0.5, len(cols), 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, len(rows), 1), minor=True)
+    ax.grid(which="minor", color="white", linewidth=1.4)
+    for i in range(raw.shape[0]):
+        for j in range(raw.shape[1]):
+            g = good[i, j]
+            tc = "white" if (g < 0.22 or g > 0.80) else COLORS["ink"]
+            ax.text(j, i, f"{raw[i, j]:.0f}\\%", ha="center", va="center",
+                    fontsize=9.5, color=tc)
+    ax.set_xticks(range(len(cols))); ax.set_xticklabels(cols, fontsize=9.5)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([r[0] for r in rows], fontsize=10)
+    ax.tick_params(length=0)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    ax.set_title("greener = safer register, per column", fontsize=8.5,
+                 color=COLORS["neutral"], pad=8)
+    fig.tight_layout()
+    fig.savefig(f"{OUT}/evalllm_capitulation.pdf", bbox_inches="tight")
+    fig.savefig(f"{OUT}/evalllm_capitulation.png", bbox_inches="tight", dpi=150)
+    plt.close(fig); print("fig_capitulation")
+
+
 if __name__ == "__main__":
     apply_style()
-    fig1(); fig2(); fig3(); fig4()
+    fig1(); fig2(); fig3(); fig4(); fig_capitulation()

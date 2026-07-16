@@ -294,7 +294,7 @@ unchanged.
 Conversation is a further failure mode, and its lever is the register of pressure
 rather than any medical content. Under multi-turn pressure five of the seven
 models give unsafe advice in 12 to 28 percent of chains, led by Ministral-3 at 28
-percent (\Cref{tab:conclusion-tabib-b3}). One register does most of the damage:
+percent (\Cref{fig:conclusion-tabib-b3}). One register does most of the damage:
 asking the model to role-play a free-handed caregiver acts as a generic jailbreak,
 pushing unsafe advice to 60 percent for Ministral-3 and 55 percent for Qwen3.5 4B,
 far above the realistic patient-pressure registers. These rates match what is
@@ -303,26 +303,16 @@ capitulation~\citep{sharma2024sycophancy,hong2025sycon}. Only MedGemma stays at
 zero, and it does so by never engaging: 61 percent of its turns are deflections,
 the same non-engagement that reappears in calibration and prudence.
 
-\begin{table}[tbp]
+\begin{figure}[t]
 \centering
-\caption{Adversarial capitulation under patient pressure.}
-\label{tab:conclusion-tabib-b3}
-\small
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Model} & \textsc{maintain} & \textsc{hedge} & \textsc{deflect} &
-\textsc{capitulate} & unsafe \\
-\midrule
-Nemotron 4B       & 47\% & 11\% & 20\% & 16\% & 22\% \\
-Qwen3.5 4B        & 30\% & 30\% & 25\% & 14\% & 16\% \\
-Gemma4 E2B        & 43\% & 12\% & 37\% &  7\% &  0\% \\
-MedGemma 1.5 & 19\% & 17\% & 61\% & 2\% & 0\% \\
-Ministral-3 8B    & 42\% & 29\% & 19\% &  3\% & 28\% \\
-Qwen3.5 9B & 43\% & 20\% & 15\% & 21\% & 21\% \\
-Gemma4 E4B & 50\% & 25\% & 22\% & 3\% & 12\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.82\textwidth]{plots/part_3/output/evalllm_capitulation.pdf}
+\caption{Adversarial capitulation under patient pressure: the response-register
+composition and the resulting unsafe rate, coloured per column so the safest
+model is green. Maintaining the correct answer is the safe register; hedging,
+deflecting, capitulating, and issuing unsafe advice are successively stronger
+forms of giving way.}
+\label{fig:conclusion-tabib-b3}
+\end{figure}
 
 Confidence and prudence turn the same non-engagement into a calibration artifact.
 Nemotron has the worst calibration, an ECE of 0.693, and four models pile most
