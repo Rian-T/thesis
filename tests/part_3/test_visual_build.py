@@ -267,7 +267,7 @@ def test_chapter9_prepares_registered_raw_stylometry_in_fixed_order():
         "c2st",
     ]
     assert all(
-        panel.sources == ("PMC-Patients", "Dossiers synthétiques", "E3C")
+        panel.sources == ("PMC-Patients", "Synthetic records", "E3C")
         for panel in panels
     )
     assert [panel.values for panel in panels] == [
@@ -297,7 +297,7 @@ def test_chapter9_render_is_native_width_with_labels_on_both_left_panels():
                 label.get_text()
                 for label in fig.axes[index].get_yticklabels()
                 if label.get_visible()
-            ] == ["PMC-Patients", "Dossiers synthétiques", "E3C"]
+            ] == ["PMC-Patients", "Synthetic records", "E3C"]
         for index in (1, 3):
             assert all(
                 not label.get_visible()
@@ -364,14 +364,16 @@ def test_chapter9_final_build_accepts_registered_stylometry(
     assert preliminary_calls == []
 
 
-def test_chapter8_preview_builds_exact_six_outputs(tmp_path):
+def test_chapter8_preview_builds_exact_eight_outputs(tmp_path):
     from plots.part_3 import plot_chapter8
 
     outputs = plot_chapter8.build(tmp_path, allow_provisional=True)
 
     assert [path.name for path in outputs] == [
-        "fig08_supervision_signal.pdf",
-        "fig08_supervision_signal.png",
+        "fig08_global_supervision.pdf",
+        "fig08_global_supervision.png",
+        "fig08_section_supervision.pdf",
+        "fig08_section_supervision.png",
         "fig09_novel_types.pdf",
         "fig09_novel_types.png",
         "fig10_specialization_tradeoff.pdf",
@@ -389,21 +391,20 @@ def test_chapter8_final_gate_fails_before_leaving_partial_outputs(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
-def test_chapter8_preview_marks_every_provisional_figure(
-    tmp_path, monkeypatch
+def test_chapter8_preview_keeps_provisional_status_outside_plot_surface(
+    tmp_path,
 ):
     from plots.part_3 import plot_chapter8
 
-    marked = []
-    monkeypatch.setattr(
-        plot_chapter8,
-        "mark_preliminary",
-        lambda fig: marked.append(fig),
-    )
-
-    plot_chapter8.build(tmp_path, allow_provisional=True)
-
-    assert len(marked) == 3
+    figures = plot_chapter8.make_preview_figures()
+    try:
+        assert all(
+            "PRELIMINARY" not in {text.get_text() for text in fig.texts}
+            for fig in figures
+        )
+    finally:
+        for fig in figures:
+            plt.close(fig)
 
 
 def test_chapter8_figures_are_native_width_with_legible_text():
@@ -411,9 +412,10 @@ def test_chapter8_figures_are_native_width_with_legible_text():
 
     figures = plot_chapter8.make_preview_figures()
     try:
-        assert len(figures) == 3
-        for fig in figures:
-            assert fig.get_size_inches()[0] == pytest.approx(5.5)
+        assert len(figures) == 4
+        expected_widths = (5.5, 5.5, 4.8, 5.5)
+        for fig, expected_width in zip(figures, expected_widths):
+            assert fig.get_size_inches()[0] == pytest.approx(expected_width)
             visible_text = [
                 text
                 for ax in fig.axes
@@ -448,13 +450,13 @@ def test_chapter8_prepared_values_preserve_metric_identity():
         point.label: (point.ecrf, point.parhaf, point.kind)
         for point in tradeoff.points
     }
-    assert points["v3b généraliste"][:2] == pytest.approx((0.2241, 0.2577))
-    assert points["FROMV3B spécialiste"][:2] == pytest.approx((0.6467, 0.0179))
-    assert points["v3e généraliste"][:2] == pytest.approx((0.1832, 0.1598))
-    assert points["MIX6 spécialiste"][:2] == pytest.approx((0.6574, 0.1531))
+    assert points["Generalist A"][:2] == pytest.approx((0.2241, 0.2577))
+    assert points["eCRF-only specialization"][:2] == pytest.approx((0.6467, 0.0179))
+    assert points["Generalist B"][:2] == pytest.approx((0.1832, 0.1598))
+    assert points["Mixed-supervision specialization"][:2] == pytest.approx((0.6574, 0.1531))
     assert {value[2] for value in points.values()} == {
-        "généraliste",
-        "spécialisé",
+        "generalist",
+        "specialist",
     }
 
 
@@ -488,16 +490,20 @@ def test_chapter7_prepared_values_preserve_current_prediction_identity():
     assert data.provisional
 
 
-def test_chapter7_preview_builds_exact_outputs_and_marks_preliminary(tmp_path, monkeypatch):
+def test_chapter7_preview_builds_three_clean_figures(tmp_path):
     from plots.part_3 import plot_chapter7
 
-    marked = []
-    monkeypatch.setattr(plot_chapter7, "mark_preliminary", lambda fig: marked.append(fig))
     outputs = plot_chapter7.build(tmp_path, allow_provisional=True)
 
-    assert outputs == [tmp_path / "fig12_capstone.pdf", tmp_path / "fig12_capstone.png"]
+    assert outputs == [
+        tmp_path / "fig12_decoding_competition.pdf",
+        tmp_path / "fig12_decoding_competition.png",
+        tmp_path / "fig12_final_comparison.pdf",
+        tmp_path / "fig12_final_comparison.png",
+        tmp_path / "fig13_data_efficiency.pdf",
+        tmp_path / "fig13_data_efficiency.png",
+    ]
     assert all(path.is_file() and path.stat().st_size > 0 for path in outputs)
-    assert len(marked) == 1
 
 
 def test_chapter7_final_gate_fails_before_leaving_partial_outputs(tmp_path):
@@ -509,18 +515,33 @@ def test_chapter7_final_gate_fails_before_leaving_partial_outputs(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
-def test_chapter7_figure_is_native_width_with_legible_text():
+def test_chapter7_figures_are_native_width_with_legible_text():
     from plots.part_3 import plot_chapter7
 
-    fig = plot_chapter7.make_preview_figure()
-    try:
-        assert fig.get_size_inches()[0] == pytest.approx(5.5)
-        visible_text = [
-            text for ax in fig.axes
-            for text in ([ax.title] + list(ax.texts) + list(ax.get_xticklabels()) + list(ax.get_yticklabels()))
-            if text.get_visible() and text.get_text()
-        ]
-        assert visible_text
-        assert min(text.get_fontsize() for text in visible_text) >= 7
-    finally:
-        plt.close(fig)
+    figures = plot_chapter7.make_preview_figures()
+    for fig in figures:
+        try:
+            assert fig.get_size_inches()[0] == pytest.approx(5.5)
+            visible_text = [
+                text for ax in fig.axes
+                for text in ([ax.title] + list(ax.texts) + list(ax.get_xticklabels()) + list(ax.get_yticklabels()))
+                if text.get_visible() and text.get_text()
+            ]
+            assert visible_text
+            assert min(text.get_fontsize() for text in visible_text) >= 7
+            assert all(
+                forbidden not in text.get_text().lower()
+                for text in visible_text
+                for forbidden in ("provisional", "preliminary", "95% ci", "n =")
+            )
+        finally:
+            plt.close(fig)
+
+
+def test_chapter7_data_efficiency_preserves_registered_points():
+    from plots.part_3 import plot_chapter7
+
+    data = plot_chapter7.prepare_data_efficiency()
+
+    assert data.training_records == (10, 50, 100, 500, 1540)
+    assert data.value_f1 == pytest.approx((0.182, 0.485, 0.544, 0.603, 0.659))

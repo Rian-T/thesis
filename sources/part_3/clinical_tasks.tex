@@ -12,9 +12,9 @@ Deployment sharpens the stakes. A hospital can neither send its records to a
 cloud API, which medical confidentiality and the GDPR forbid, nor host a
 nine-billion-parameter model on the modest hardware of a clinical service.
 Matching the accuracy of a large generator is therefore not the only
-requirement: a small encoder that runs on site is the only model a clinical
-service can actually deploy, which is the same privacy constraint that motivated
-the public corpus and encoders of the first two parts. The next three chapters
+requirement: a small encoder that runs on site is the only kind of model whose
+footprint fits the hardware of a clinical service, which is the same privacy
+constraint that motivated the public corpus and encoders of the first two parts. The next three chapters
 build task supervision from public and generated text, design an extractor that
 can be asked for new fields at inference time, and compare a small biomedical
 encoder with much larger generative models. The result they build toward is that

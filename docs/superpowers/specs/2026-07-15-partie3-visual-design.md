@@ -1,5 +1,30 @@
 # Partie 3 — Visual design specification
 
+## Readability revision after the first manuscript render
+
+- One question per figure; split a figure when its panels support different
+  argumentative steps.
+- Figure 17.2 becomes two figures: a minimal three-condition global corpus
+  ablation, followed by a section-level comparison revealing the localized
+  treatment effect.
+- Remove workflow metadata from manuscript graphics and tables: no status
+  column, run identifier, registry state, provenance path, or repeated sample
+  count inside body rows.
+- Move sample sizes and provisional caveats to surrounding bullets, concise
+  notes, or the reproducibility appendix.
+- TikZ schemas follow the Parts I--II aesthetic: thin borders, pale fills,
+  quiet text, faded straight arrows, generous spacing, and no decorative panel.
+- Internal run names never appear in the manuscript; use audited approach names
+  or neutral descriptive labels.
+- OntoBench-FR final v9 contains four terminology-retrieval tasks: CIM-10, ATC,
+  CCAM, and FrACCO. This FrACCO acc@1 result is distinct from external FrACCO
+  dense NER.
+- Show MedEmbed per-task v9 evidence where available, including FrACCO retrieval
+  at 53.46 and the v9 grand score at 60.35; do not rely on one unexplained
+  aggregate.
+- Prose remains blocked until the complete telegraphic outline has been audited
+  for repetition, missing context, ordering, transitions, and evidence strength.
+
 Date: 2026-07-15  
 Status: approved direction; implementation not started
 

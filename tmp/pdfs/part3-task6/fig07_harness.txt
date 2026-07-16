@@ -1,0 +1,31 @@
+             A · CONSTRUIRE L’ESPACE                          B · DEMANDER UN TYPE À L’INFÉRENCE
+
+                                                            DESCRIPTION DEMANDÉE
+                                Détour CLM                  first_line_treatment · traitement de première ligne
+       ModernCamemBERT         puis retour MLM
+
+                                                            EMPANS CANDIDATS · lym_76
+                                                            stade IV
+                             ModernCamemBERT-               chimiothérapie par protocole CHOEP-14
+                                    bio                     réponse complète
+
+
+                                 Apprentissage              EMBEDDINGS ET SIMILARITÉS (SCHÉMA)
+           Paires termi-
+            nologiques              contrastif              s(description, stade IV) = 0,12
+       dérivées d’OntoBook    descriptions et termes        s(description, CHOEP-14) = 0,91 ← retenu
+                                                            s(description, réponse complète) = 0,18
+
+
+                        MedEmbed
+                                            même encodeur
+
+
+
+
+Figure 1 – MedEmbed relie une lignée d’encodeur à une requête ouverte. Le détour CLM produit
+ModernCamemBERT-bio, tandis que les paires dérivées d’OntoBook apportent un signal contrastif in-
+dépendant : OntoBook n’est pas un checkpoint supplémentaire. À l’inférence, le comportement à voca-
+bulaire ouvert vient de la géométrie description–empan, et non d’un classifieur à sorties fixes. Les empans
+proviennent de lym_76 ; les similarités numériques illustrent le mécanisme.
+

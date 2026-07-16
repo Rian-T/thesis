@@ -1,0 +1,32 @@
+   PHRASE COMMUNE · lym_76
+   « Décision : début d’une chimiothérapie par protocole CHOEP-14, 8 cycles, J1 = 25 mai 2018. »
+
+
+
+                                                                      2 · NER · TOUTES LES MENTIONS
+    1 · eCRF · UNE VALEUR PAR CHAMP
+                                                                      traitement : chimiothérapie, CHOEP-14
+    champ : traitement de première ligne
+                                                                      nombre de cycles : 8 cycles
+    valeur retenue : chimiothérapie par protocole CHOEP-14
+                                                                      date : 25 mai 2018
+    Un couple dossier–champ produit au plus une valeur.
+                                                                      Chaque mention appariée est une unité.
+
+
+
+
+    3 · span-F1 · CHEVAUCHEMENT                                       4 · value-F1 · TOKENS
+    référence : chimiothérapie par protocole CHOEP-14                 référence : 25 mai 2018
+    prédiction :                         protocole CHOEP-14           prédiction : 25/05/18
+    intersection non vide ⇒ apparié                                   Jaccard = 1/5 = 0,20 < 0,5
+    Une frontière incomplète peut donc compter juste.                 Même date clinique, mais le score de surface peut échouer.
+
+
+
+
+Figure 1 – Une phrase, quatre unités qui ne sont pas interchangeables. Le formulaire retient une
+valeur par champ, le NER compte toutes les mentions, le span-F1 accepte tout chevauchement non vide
+et le value-F1 compare des ensembles de tokens. Ce dernier mesure une ressemblance de surface : deux
+formats d’une même date clinique ne sont pas nécessairement appariés.
+

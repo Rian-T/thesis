@@ -1,0 +1,134 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Front-matter statement on the use of AI (unnumbered, two pages).
+% Page 1: Brainstorming out loud.  Page 2: Iterative writing.
+% Each page carries a hand-built TikZ dialogue-bubble schema.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usetikzlibrary{shapes.callouts}
+
+% ---- shared bubble / avatar styles -------------------------------------
+\tikzset{
+  mebub/.style={rectangle callout, rounded corners=3pt, callout pointer width=0.16cm,
+    fill=ThesisPaper, draw=ThesisNeutral!55, line width=0.5pt,
+    inner sep=8pt, align=left, font=\small, text=ThesisInk},
+  aibub/.style={rectangle callout, rounded corners=3pt, callout pointer width=0.16cm,
+    fill=ThesisPrimary!12, draw=ThesisPrimary!70, line width=0.6pt,
+    inner sep=8pt, align=left, font=\small, text=ThesisInk},
+  av/.style={circle, minimum size=8.5mm, inner sep=0pt, text=white, font=\small},
+  role/.style={font=\footnotesize\itshape, text=ThesisNeutral},
+  flow/.style={-{Stealth[length=2.4mm]}, ThesisNeutral!65, line width=0.7pt},
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% PAGE 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\thispagestyle{empty}
+\addcontentsline{toc}{chapter}{Note on the Use of AI}
+
+\begin{center}
+  \textsc{Note on the Use of AI}
+\end{center}
+\bigskip
+
+\noindent\textbf{Brainstorming out loud.}\quad I think by talking: walking the
+room, saying the argument as it comes. Speech transcription turns that stream
+into a first draft, which the assistant then structures.
+
+\bigskip
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+  % --- human: avatar + spoken bubble ---
+  \node[av, fill=ThesisTertiary] (m) at (0,0) {\faMicrophone};
+  \node[mebub, text width=8.6cm, anchor=north west,
+        callout absolute pointer={(m.east)}] (mb) at (1.05,0.55)
+    {Bon\dots\ la partie sur les t\^aches cliniques. Faut montrer que le
+     fine-tuning direct, \c{c}a suffit pas --- trop peu de labels, le vocabulaire
+     qui bouge tout le temps. Du coup deux r\'eponses : g\'en\'erer des donn\'ees,
+     et\dots\ ouais, changer d'architecture aussi. Et \`a la fin le cas du
+     lymphome qui rassemble tout, c'est \c{c}a le climax.};
+  \node[role, anchor=south west] at ([yshift=1pt]mb.north west)
+    {Me, thinking out loud (French)};
+
+  % --- assistant: avatar + structured bubble ---
+  \node[av, fill=ThesisPrimaryDark] (a) at (11.7,-3.85) {\faRobot};
+  \node[aibub, text width=8.6cm, anchor=north east,
+        callout absolute pointer={(a.west)}] (ab) at (10.65,-3.25)
+    {\textbf{Part on clinical tasks.} Open on why direct fine-tuning fails:
+     scarce labels, a label set that keeps shifting. Two answers follow ---
+     synthetic data, then a low-resource architecture. Close on the lymphoma
+     case, the capstone that ties the thesis together.};
+  \node[role, anchor=south east] at ([yshift=1pt]ab.north east)
+    {Assistant --- drafts \& structures};
+
+  % --- flow ---
+  \draw[flow] (mb.south) .. controls +(0,-0.55) and +(0,0.6) .. (ab.north);
+\end{tikzpicture}}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% PAGE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+  \textsc{Note on the Use of AI}
+\end{center}
+\bigskip
+
+\noindent\textbf{Iterative writing.}\quad I draft in French, fast and informal.
+The assistant returns an English version; I correct, it revises, until the
+sentence says exactly what I mean.
+
+\bigskip
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+  % column centres: me on the left, assistant on the right
+  % --- b1: me, French draft ---
+  \node[av, fill=ThesisTertiary] (m1) at (0,-0.35) {\faPenFancy};
+  \node[mebub, text width=6.4cm, anchor=north west,
+        callout absolute pointer={(m1.east)}] (b1) at (0.95,0)
+    {\textsf{\footnotesize drbert $-$20 pts cest un artefact d'\'eval, pas un
+     vrai \'ecart de qualit\'e. faut le dire clairement + renvoyer au tableau}};
+  \node[role, anchor=south west] at ([yshift=1pt]b1.north west) {French draft};
+
+  % --- b2: assistant, English v1 ---
+  \node[av, fill=ThesisPrimaryDark] (a2) at (12.7,-2.45) {\faRobot};
+  \node[aibub, text width=6.4cm, anchor=north east,
+        callout absolute pointer={(a2.west)}] (b2) at (11.75,-2.05)
+    {The 20-point gap for DrBERT is \emph{purely} an evaluation artefact, not a
+     \emph{real} difference in model quality.};
+  \node[role, anchor=south east] at ([yshift=1pt]b2.north east) {English, first pass};
+
+  % --- b3: me, correction ---
+  \node[av, fill=ThesisTertiary] (m3) at (0,-4.55) {\faPenFancy};
+  \node[mebub, text width=6.4cm, anchor=north west,
+        callout absolute pointer={(m3.east)}] (b3) at (0.95,-4.2)
+    {\textsf{\footnotesize ``purely'' trop fort. mets ``largely'', enl\`eve
+     ``real''. + cite le tableau}};
+  \node[role, anchor=south west] at ([yshift=1pt]b3.north west) {Correction};
+
+  % --- b4: assistant, English v2 ---
+  \node[av, fill=ThesisPrimaryDark] (a4) at (12.7,-6.65) {\faRobot};
+  \node[aibub, text width=6.4cm, anchor=north east,
+        callout absolute pointer={(a4.west)}] (b4) at (11.75,-6.25)
+    {This 20-point gap is \emph{largely} an evaluation artefact
+     (\Cref{tab:compare}), not a difference in pretraining quality.};
+  \node[role, anchor=south east] at ([yshift=1pt]b4.north east) {English, revised};
+
+  % --- flow arrows ---
+  \draw[flow] (b1.south) .. controls +(0,-0.5) and +(-0.7,0.4) .. (b2.west);
+  \draw[flow] (b2.south) .. controls +(0,-0.5) and +(0.7,0.4)  .. (b3.east);
+  \draw[flow] (b3.south) .. controls +(0,-0.5) and +(-0.7,0.4) .. (b4.west);
+
+  % --- iteration loop glyph (in the open right-centre pocket) ---
+  \node[av, fill=ThesisSecondaryDark, minimum size=7mm] (loop) at (9.7,-4.35) {\faRedo};
+  \node[role, below=1pt of loop, align=center, text width=2.8cm]
+    {repeat until\\it holds};
+\end{tikzpicture}}
+\end{center}
+
+\vfill
+\noindent{\footnotesize\color{ThesisNeutral}The ideas, the claims, and the
+numbers are mine; the assistant helped me turn them into clear prose. I am
+accountable for everything in these pages.}
+\clearpage

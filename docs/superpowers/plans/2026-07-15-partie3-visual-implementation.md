@@ -1,5 +1,23 @@
 # Part 3 Visual Redesign Implementation Plan
 
+## Revision pass: readability before prose
+
+- [ ] Inspect every Part 3 PNG and rendered TikZ at manuscript scale; record the
+      single question answered and a keep/simplify/split decision.
+- [ ] Split the public-clinical-text ablation into a global plot and a
+      section-level plot, each referenced before its float.
+- [ ] Remove status columns, repeated row-level sample sizes, internal run names,
+      and provenance metadata from body tables and figures.
+- [ ] Restyle TikZ schemas against the Parts I--II templates and render them in
+      the complete manuscript.
+- [ ] Replace aggregate-only MedEmbed evidence with OntoBench-FR v9 per-task
+      retrieval results and distinguish FrACCO retrieval from FrACCO NER.
+- [ ] Compile and inspect all Part 3 pages for overlap, tiny text, whitespace,
+      and float order.
+- [ ] Audit every telegraphic bullet for repetition, missing context, wrong
+      order, unsupported transitions, and evidence-level mismatch.
+- [ ] Present the narrative audit before converting any bullet block to prose.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build, verify, and integrate the fourteen approved Part 3 figures and nine result-bearing tables while preserving the exact visual language of Parts 1 and 2.
