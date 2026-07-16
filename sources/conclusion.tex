@@ -333,14 +333,14 @@ MedGemma uniformly direct, so neither helps a clinician tell a critical
 contraindication from a minor precaution.
 
 \begin{reviewrewrite}
-Cross-lingual consistency is weak even when the substances are medically the
-same. Nemotron detects interactions in English but only 7\% of French pairs,
-with $\kappa = 0.041$. Gemma4 E2B detects interactions in both languages but
-often assigns different severity levels, with $\kappa = 0.004$. MedGemma and
-Gemma4 E4B have high raw agreement but $\kappa = 0$ because they mostly repeat
-the same answer in French. Ministral-3 8B is the only model above $\kappa = 0.5$,
-with $\kappa = 0.586$. Larger factual knowledge does not guarantee stable
-answers across languages~\citep{qi2023crosslingual}.
+Agreement between French and English predictions is low, and it breaks down in a
+few distinct ways. Nemotron detects most interactions in English but flags only
+7\% of the same French pairs, with $\kappa = 0.041$; Gemma4 E2B detects them in
+both languages yet assigns different severity levels, with $\kappa = 0.004$. For
+MedGemma and Gemma4 E4B, high raw agreement collapses to $\kappa = 0$ because they
+mostly repeat one answer in French, an artifact of repetition rather than genuine
+consistency. Only Ministral-3 8B stays consistent, at $\kappa = 0.586$; larger
+factual knowledge does not buy that consistency~\citep{qi2023crosslingual}.
 \end{reviewrewrite}
 
 \begin{reviewrewrite}
