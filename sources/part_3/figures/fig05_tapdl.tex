@@ -2,12 +2,12 @@
   \centering
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.1cm,
-      align=left, inner sep=7pt, text=ThesisInk},
+    block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.2cm,
+      align=left, inner sep=7pt, text=ThesisInk, anchor=north},
     report/.style ={block, draw=ThesisNeutral!55,       fill=ThesisPaper},
-    proposal/.style={block, draw=ThesisTertiaryDark,     fill=ThesisTertiary!13},
-    localize/.style={block, draw=ThesisSecondaryDark,    fill=ThesisSecondary!14},
-    silver/.style  ={block, draw=ThesisPrimaryDark,      fill=ThesisPrimary!16},
+    proposal/.style={block, draw=ThesisSecondaryDark,    fill=ThesisSecondary!14},
+    localize/.style={block, draw=ThesisNeutral!55,       fill=white},
+    silver/.style  ={block, draw=ThesisSecondaryDark,    fill=ThesisSecondary!22},
     flow/.style={-{Stealth[length=5pt]}, draw=ThesisInk!40, line width=0.8pt,
       shorten <=3pt, shorten >=3pt},
     phase/.style={decorate, decoration={brace, amplitude=5pt},
@@ -20,12 +20,8 @@
     \node[proposal] (b2) at (\bx,0)    {\textbf{LLM proposal}\\[3pt]
       \texttt{field}: first-line treatment\\
       \texttt{string}: CHOEP-14};
-    \node[localize] (b3) at (2*\bx,0)  {\textbf{Deterministic localization}\\[4pt]
-      literal match\\[1pt]
-      $\downarrow$\\[1pt]
-      character offsets\\[1pt]
-      $\downarrow$\\[1pt]
-      collision rule};
+    \node[localize] (b3) at (2*\bx,0)  {\textbf{Deterministic\\localization}\\[4pt]
+      match the literal string, anchor its character offsets, resolve collisions};
     \node[silver]   (b4) at (3*\bx,0)  {\textbf{Silver span}\\[3pt]
       field: first-line treatment\\
       offsets: \texttt{[128, 136]}\\
@@ -37,9 +33,9 @@
 
     % semantic vs deterministic phases
     \draw[phase] ($(b1.north west)+(0,0.25)$) -- ($(b2.north east)+(0,0.25)$)
-      node[midway, above=6pt, text=ThesisTertiaryDark, font=\scriptsize\bfseries] {semantic};
+      node[midway, above=6pt, text=ThesisNeutral, font=\scriptsize\bfseries] {semantic};
     \draw[phase] ($(b3.north west)+(0,0.25)$) -- ($(b4.north east)+(0,0.25)$)
-      node[midway, above=6pt, text=ThesisSecondaryDark, font=\scriptsize\bfseries] {deterministic};
+      node[midway, above=6pt, text=ThesisNeutral, font=\scriptsize\bfseries] {deterministic};
   \end{tikzpicture}%
   }
   \captionof{figure}{Each form value is proposed semantically by the language

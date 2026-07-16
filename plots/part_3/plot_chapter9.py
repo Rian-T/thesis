@@ -232,7 +232,7 @@ def _make_figure(panels: tuple[StylometryPanel, ...]):
     ax.text(
         (len(panels) - 1) / 2,
         -0.26,
-        r"C2ST scores all in $[0.985,\,0.991]$ — far above the $0.5$ chance line",
+        r"C2ST scores all in $[0.985,\,0.991]$, far above the $0.5$ chance line",
         ha="center",
         va="bottom",
         fontsize=7.5,

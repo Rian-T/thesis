@@ -1,21 +1,29 @@
 \begin{figure}[t]
   \centering
+  \providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!22}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
     stage/.style={draw=ThesisNeutral!45, fill=white, rounded corners=2pt,
-      minimum width=2.35cm, minimum height=0.7cm, align=center,
+      minimum width=2.35cm, minimum height=0.72cm, align=center,
       inner sep=3pt, text=ThesisInk},
     enc/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!16, rounded corners=2pt,
-      minimum width=2.35cm, minimum height=0.7cm, align=center,
+      minimum width=2.35cm, minimum height=0.72cm, align=center,
       inner sep=3pt, text=ThesisInk},
     rowlab/.style={anchor=east, align=right, text=ThesisNeutral, font=\scriptsize\bfseries},
-    ex/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
-      text width=7.3cm, align=left, inner sep=8pt, text=ThesisInk},
+    % Document panel: cited source text only, serif italic, spans highlighted in situ
+    doc/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=5.0cm, align=left, inner sep=8pt, text=ThesisInk,
+      font=\footnotesize\rmfamily\itshape},
+    % Mapping panel: span -> type/role pairs, distinct from the document
+    map/.style={draw=ThesisNeutral!45, fill=white, rounded corners=3pt,
+      text width=5.1cm, align=left, inner sep=8pt, text=ThesisInk},
     flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!35, line width=0.6pt,
-      shorten <=3pt, shorten >=3pt}]
+      shorten <=3pt, shorten >=3pt},
+    tie/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!55, line width=0.6pt,
+      densely dashed, shorten <=3pt, shorten >=3pt}]
 
-    % ---- Row 1: general supervision --------------------------------------
-    \def\ya{5.0}
+    % ==== Row 1: general supervision =====================================
+    \def\ya{5.2}
     \node[rowlab] at (-6.9,\ya) {general\\supervision};
     \node[stage] (g1) at (-5.0,\ya) {public\\biomedical text};
     \node[stage] (g2) at (-2.0,\ya) {LLM annotation};
@@ -23,17 +31,22 @@
     \node[enc]   (ge) at (4.2,\ya)  {generalist encoder};
     \draw[flow] (g1)--(g2); \draw[flow] (g2)--(g3); \draw[flow] (g3)--(ge);
 
-    % general example box (spans/types in ThesisPrimary)
-    \node[ex] (exa) at (-1.55,3.35) {%
-      \dots{}traitement par \colorbox{ThesisPrimary!22}{rituximab} pour un
-      \colorbox{ThesisPrimary!22}{lymphome diffus \`a grandes cellules B}\dots\\[3pt]
-      {\footnotesize
-      \textcolor{ThesisPrimaryDark}{\textbf{rituximab}} $\rightarrow$ anticancer drug
-      \qquad
-      \textcolor{ThesisPrimaryDark}{\textbf{LDGCB}} $\rightarrow$ lymphoma subtype}};
+    % Document (source text only, lavender spans in situ)
+    \node[doc] (exa) at (-3.2,3.15) {\dots{}traitement par
+      \hlspan{rituximab} pour un
+      \hlspan{lymphome diffus à grandes cellules B}\dots};
+    % Distinct mapping block (span -> type)
+    \node[map] (mapa) at (2.9,3.15) {%
+      {\scriptsize\itshape\color{ThesisNeutral}span--type pairs}\\[5pt]
+      \hlspan{rituximab} $\rightarrow$
+        \textcolor{ThesisPrimaryDark}{\textbf{anticancer drug}}\\[3pt]
+      \hlspan{LDGCB} $\rightarrow$
+        \textcolor{ThesisPrimaryDark}{\textbf{lymphoma subtype}}};
+    \draw[flow] (exa) -- (mapa);
+    \draw[tie] (g3.south) -- (mapa.north);
 
-    % ---- Row 2: form supervision -----------------------------------------
-    \def\yb{1.3}
+    % ==== Row 2: form supervision ========================================
+    \def\yb{0.9}
     \node[rowlab] at (-6.9,\yb) {form\\supervision};
     \node[stage] (f1) at (-5.0,\yb) {published\\patient cases};
     \node[stage] (f2) at (-2.0,\yb) {longitudinal\\generation};
@@ -41,23 +54,27 @@
     \node[enc]   (fe) at (4.2,\yb)  {form-adapted encoder};
     \draw[flow] (f1)--(f2); \draw[flow] (f2)--(f3); \draw[flow] (f3)--(fe);
 
-    % form example box (values/roles in ThesisSecondary)
-    \node[ex] (exb) at (-1.55,-0.35) {%
-      \dots{}protocole \colorbox{ThesisSecondary!30}{CHOEP-14}, 8 cycles,
-      J1 = 25 mai 2018\dots\\[3pt]
-      {\footnotesize
-      \textcolor{ThesisSecondaryDark}{\textbf{CHOEP-14}} $\rightarrow$ first-line treatment
-      \qquad
-      form fields: \textcolor{ThesisSecondaryDark}{first-line} / \textcolor{ThesisSecondaryDark}{second-line treatment}}};
+    % Document (source text only, lavender spans in situ)
+    \node[doc] (exb) at (-3.2,-1.15) {\dots{}protocole
+      \hlspan{CHOEP-14}, 8 cycles, J1 = \hlspan{25 mai 2018}\dots};
+    % Distinct mapping block (span -> form-field role, value-side in lime)
+    \node[map] (mapb) at (2.9,-1.15) {%
+      {\scriptsize\itshape\color{ThesisNeutral}silver eCRF spans}\\[5pt]
+      \hlspan{CHOEP-14} $\rightarrow$
+        \textcolor{ThesisSecondaryDark}{\textbf{first-line treatment}}\\[3pt]
+      \hlspan{25 mai 2018} $\rightarrow$
+        \textcolor{ThesisSecondaryDark}{\textbf{first-line start}}};
+    \draw[flow] (exb) -- (mapb);
+    \draw[tie] (f3.south) -- (mapb.north);
 
-    % adaptation from generalist to form-adapted encoder (clear right margin)
+    % Adaptation from generalist to form-adapted encoder
     \draw[-{Stealth[length=5pt]}, draw=ThesisPrimaryDark!70, line width=0.8pt,
       shorten <=4pt, shorten >=4pt] (ge) -- (fe)
       node[midway, right=1pt, text=ThesisNeutral] {adaptation};
   \end{tikzpicture}%
   }
-  \caption{Two supervision routes, each shown with an annotated excerpt:
-  span--type pairs for the generalist encoder, form-field roles for the
-  form-adapted encoder.}
+  \caption{Two supervision routes. Each source excerpt is a document panel with its
+  spans highlighted in place; a separate block lists the span--type pairs for the
+  generalist encoder and the silver form-field roles for the form-adapted encoder.}
   \label{fig:p3-supervision-routes}
 \end{figure}

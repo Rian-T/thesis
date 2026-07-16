@@ -1,6 +1,9 @@
 \begin{center}
   \centering
   \providecommand{\hlent}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
+  \providecommand{\hltopo}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
+  \providecommand{\hlmorph}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisSecondary!30}{\textcolor{ThesisSecondaryDark}{\textbf{#1}}}}}
+  \providecommand{\hlstage}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisTertiary!30}{\textcolor{ThesisTertiaryDark}{\textbf{#1}}}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[
     font=\small, text=ThesisInk,
@@ -10,16 +13,18 @@
     % PARHAF — sparse: a handful of biomarker mentions in one sentence
     \node[panel] (parhaf) at (-3.75,0) {%
       \textbf{PARHAF · sparse biomarker NER}\\[8pt]
-      « Les cellules tumorales expriment l'\hlent{AE1AE3}, la \hlent{chromogranine},
-      la \hlent{synaptophysine} et le \hlent{CD56}. »\\[10pt]
+      {\itshape « Les cellules tumorales expriment l'\hlent{AE1AE3}, la \hlent{chromogranine},
+      la \hlent{synaptophysine} et le \hlent{CD56}. »}\\[10pt]
       {\scriptsize\itshape\color{ThesisNeutral}2 entity types · about 9 mentions per document}};
 
-    % FrACCO — dense: layered ICD-O topography and morphology
+    % FrACCO — dense: three layered ICD-O types, one tint each
     \node[panel] (fracco) at (3.75,0) {%
       \textbf{FrACCO · dense oncology NER}\\[8pt]
-      « … \hlent{adénocarcinome} de \hlent{stade IV} du \hlent{moyen rectum},
-      RAS natif … FOLFOX 6-Cetuximab … »\\[10pt]
-      {\scriptsize\itshape\color{ThesisNeutral}3 ICD-O types · about 34 mentions per document}};
+      {\itshape « … \hlmorph{adénocarcinome} de \hlstage{stade IV} du \hltopo{moyen rectum},
+      RAS natif … FOLFOX 6-Cetuximab … »}\\[10pt]
+      {\scriptsize\itshape\color{ThesisNeutral}\textcolor{ThesisPrimaryDark}{topography} ·
+      \textcolor{ThesisSecondaryDark}{morphology} · \textcolor{ThesisTertiaryDark}{stage}
+      $\cdot$ about 34 mentions per document}};
   \end{tikzpicture}}
   \captionof{figure}{Fictional passages contrasting the annotation density of PARHAF and FrACCO.}
   \label{fig:p3-external-examples}

@@ -4,22 +4,24 @@
   \begin{tikzpicture}[font=\scriptsize\sffamily,
     event/.style={circle, draw=ThesisPrimaryDark, fill=ThesisPrimary!30,
       minimum size=4.5mm, inner sep=0pt},
-    future/.style={circle, draw=ThesisNeutral!55, densely dashed,
-      fill=ThesisNeutral!12, minimum size=4.5mm, inner sep=0pt},
+    future/.style={circle, draw=ThesisNeutral!55, densely dotted,
+      fill=ThesisNeutral!10, minimum size=4.5mm, inner sep=0pt},
     caseb/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
-      text width=2.5cm, align=center, inner sep=6pt, text=ThesisInk},
+      text width=2.6cm, align=center, inner sep=6pt, text=ThesisInk},
     cutoff/.style={draw=ThesisTertiaryDark!80, densely dashed, line width=0.7pt},
-    brace/.style={decorate, decoration={brace, amplitude=5pt, mirror},
-      draw=ThesisInk!40, line width=0.6pt}]
+    % tinted observation window under the timeline (pale lavender)
+    band/.style={draw=ThesisPrimaryDark!35, fill=ThesisPrimary!14, rounded corners=3pt},
+    bandlab/.style={anchor=east, align=right, text=ThesisInk, font=\scriptsize\bfseries}]
 
-    \def\xD{-5.2}\def\xF{-1.9}\def\xR{1.4}\def\xL{4.7}
-    \def\yl{1.4}
-    \def\tone{0.05}\def\ttwo{2.95}
+    \def\xD{-5.0}\def\xF{-2.0}\def\xR{1.0}\def\xL{4.0}
+    \def\yl{2.0}
+    \def\tone{-0.5}\def\ttwo{2.5}
 
     % Published case entry, structured into the timeline
-    \node[caseb] (case) at (-9.3,\yl) {Published case\\(PMC-Patients)};
+    \node[caseb] (case) at (-9.2,\yl) {Published case\\[1pt]
+      {\scriptsize\itshape\color{ThesisNeutral}PMC-Patients}};
     \draw[-{Stealth[length=4pt]}, draw=ThesisInk!40, line width=0.7pt,
-      shorten <=3pt, shorten >=3pt] (case.east) -- (\xD-0.35,\yl)
+      shorten <=3pt, shorten >=3pt] (case.east) -- (\xD-0.4,\yl)
       node[midway, above=3pt, text=ThesisNeutral] {dated timeline};
 
     % Timeline axis and events
@@ -31,25 +33,36 @@
     \node[above=5pt of d] {diagnosis};
     \node[above=5pt of f, align=center] {first-line\\treatment};
     \node[above=5pt of r] {response};
-    \node[above=5pt of l, text=ThesisNeutral, align=center] {future relapse\\{\itshape (never observed)}};
+    \node[above=5pt of l, text=ThesisNeutral, align=center]
+      {future relapse\\[1pt]{\scriptsize\itshape never observed}};
 
-    % Two report cutoffs
-    \draw[cutoff] (\tone,\yl+1.15)--(\tone,-1.9);
-    \draw[cutoff] (\ttwo,\yl+1.15)--(\ttwo,-2.9);
-    \node[above, text=ThesisTertiaryDark] at (\tone,\yl+1.15) {$t_1$};
-    \node[above, text=ThesisTertiaryDark] at (\ttwo,\yl+1.15) {$t_2$};
+    % Two report cutoffs, dashed through the observation bands
+    \draw[cutoff] (\tone,\yl+0.35)--(\tone,-0.85);
+    \draw[cutoff] (\ttwo,\yl+0.35)--(\ttwo,-1.55);
+    \node[above, text=ThesisTertiaryDark] at (\tone,\yl+0.35) {$t_1$};
+    \node[above, text=ThesisTertiaryDark] at (\ttwo,\yl+0.35) {$t_2$};
 
-    % Reach brackets: each report at t sees only the past events
-    \draw[brace] (\xD,0.55)--(\tone,0.55)
-      node[midway, below=6pt, text=ThesisInk, align=center]
-      {report at $t_1$: past events only\\(diagnosis, first-line treatment)};
-    \draw[brace] (\xD,-1.55)--(\ttwo,-1.55)
-      node[midway, below=6pt, text=ThesisInk, align=center]
-      {report at $t_2$: adds response};
+    % Growing observation window: two tinted bands, wider at t2 than at t1
+    \def\xbL{-5.5}
+    \filldraw[band] (\xbL,0.55) rectangle (\tone,1.15);
+    \node[bandlab] at (\xbL-0.15,0.85) {report at $t_1$};
+    \node[text=ThesisNeutral, font=\scriptsize\itshape] at ($(\xbL,0.85)!0.5!(\tone,0.85)$)
+      {diagnosis, first-line treatment};
+
+    \filldraw[band] (\xbL,-0.9) rectangle (\ttwo,-0.3);
+    \node[bandlab] at (\xbL-0.15,-0.6) {report at $t_2$};
+    \node[text=ThesisNeutral, font=\scriptsize\itshape] at ($(\xbL,-0.6)!0.5!(\ttwo,-0.6)$)
+      {diagnosis, first-line treatment, response};
+
+    % window growth cue
+    \draw[-{Stealth[length=3pt]}, ThesisPrimaryDark!55, line width=0.6pt]
+      (\tone,0.5) -- (\tone,-0.25)
+      node[midway, right=2pt, text=ThesisNeutral, font=\scriptsize\itshape] {window grows};
   \end{tikzpicture}%
   }
   \caption{A published case becomes a dated timeline, and each generated report
-  at time $t$ receives only the events that have already occurred.}
+  at time $t$ sees only the events that have already occurred; the observation
+  window widens from $t_1$ to $t_2$.}
   \label{fig:p3-wavefront}
   \label{fig:dossier-pipeline}
 \end{figure}

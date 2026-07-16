@@ -27,8 +27,7 @@ to be trained to select spans from that space. We build the first part on top of
 biomedical encoder, and the second part on generalist annotations that carry no
 hospital label.
 
-\subsection{Encoding Medical Descriptions}
-
+\paragraph{Encoding medical descriptions.}
 MedEmbed starts from ModernCamemBERT-bio, the biomedical encoder developed in
 \Cref{chap:objectives}. Medical terms and relations derived from the resources
 of \Cref{chap:ontobook} provide contrastive pairs, and these pairs train the
@@ -36,9 +35,10 @@ description space, as summarized in \Cref{fig:p3-medembed}.
 
 \input{sources/part_3/figures/fig07_medembed}
 
-We first test this space through terminology retrieval. On OntoBench-FR,
-MedEmbed reaches 60.35\% mean accuracy at rank one across CIM-10, ATC, CCAM, and
-ICD-O, compared with 50.84\% for the strongest baseline
+We first test this space through terminology retrieval. OntoBench-FR asks a
+model to match a French clinical term to its correct entry across four
+terminologies, CIM-10, ATC, CCAM, and ICD-O. MedEmbed reaches 60.35\% mean
+accuracy at rank one, compared with 50.84\% for the strongest baseline
 (\Cref{tab:p3-medembed}).
 
 \begin{table}[t]
@@ -70,8 +70,7 @@ ICD-O, compared with 50.84\% for the strongest baseline
   \end{threeparttable}
 \end{table}
 
-\subsection{Training the Extractor}
-
+\paragraph{Training the extractor.}
 The extractor follows the GLiNER2 span--description design
 \citep{zaratiana2025gliner2}. It is trained on the generalist annotations from
 \Cref{chap:synthetic}, using equal proportions of descriptions produced by the
@@ -138,12 +137,11 @@ comparison changes only the description encoder, replacing ModernCamemBERT-bio
 with MedEmbed while the extractor remains fixed. \Cref{fig:p3-novel-types} reports
 both conditions.
 
-\begin{figure}[t]
-  \centering
+\begin{center}
   \includegraphics[width=0.78\textwidth]{plots/part_3/output/fig09_novel_types.pdf}
-  \caption{LLM-judge MAP for familiar and benchmark-absent type descriptions.}
+  \captionof{figure}{LLM-judge MAP for familiar and benchmark-absent type descriptions.}
   \label{fig:p3-novel-types}
-\end{figure}
+\end{center}
 
 For familiar descriptions, LLM-judge MAP increases from 0.478 with
 ModernCamemBERT-bio to 0.517 with MedEmbed, a gain of 0.039. For benchmark-absent

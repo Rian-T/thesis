@@ -3,11 +3,11 @@
   \resizebox{0.9\textwidth}{!}{%
   \begin{tikzpicture}[font=\small\sffamily,
     tok/.style={font=\small\sffamily, text=ThesisInk},
-    span/.style={rounded corners=2pt, draw=ThesisSecondaryDark, line width=0.9pt,
-      fill=ThesisSecondary!22, inner sep=3pt, font=\small\sffamily\bfseries,
+    span/.style={rounded corners=2pt, draw=ThesisPrimaryDark, line width=0.9pt,
+      fill=ThesisPrimary!24, inner sep=3pt, font=\small\sffamily\bfseries,
       text=ThesisInk},
-    query/.style={rounded corners=3pt, draw=ThesisPrimaryDark, line width=0.9pt,
-      fill=ThesisPrimary!16, inner sep=6pt, align=center, font=\small\sffamily,
+    query/.style={rounded corners=3pt, draw=ThesisNeutral!55, line width=0.9pt,
+      fill=ThesisNeutral!12, inner sep=6pt, align=center, font=\small\sffamily,
       text=ThesisInk},
     sim/.style={circle, draw=ThesisInk!70, line width=0.9pt, fill=ThesisPaper,
       inner sep=0pt, minimum size=2.15cm, align=center, font=\small\sffamily},
@@ -35,12 +35,12 @@
     % --- Answer (right) ---
     \node[ans] (ans) at (10.0,0.3) {CHOEP-14};
 
-    % --- Arrows: span from above-left, description from below-left,
-    %     landing on distinct points of the circle so they never overlap ---
-    \draw[pull, ThesisSecondaryDark] (cand.south east)
-      to[out=-30,in=125] (sim.north west);
-    \draw[pull, ThesisPrimaryDark] (desc.east)
-      to[out=10,in=-135] (sim.south west);
+    % --- Arrows: span (lavender) from above-left and description (neutral) from
+    %     below-left land on mirror-image points of the circle; answer (lime) exits right ---
+    \draw[pull, ThesisPrimaryDark] (cand.south east)
+      to[out=-28,in=152] (sim.north west);
+    \draw[pull, ThesisNeutral!70] (desc.north east)
+      to[out=28,in=-152] (sim.south west);
     \draw[pull, ThesisSecondaryDark] (sim.east) -- (ans.west);
 
   \end{tikzpicture}%

@@ -1,20 +1,22 @@
 \begin{figure}[t]
   \centering
+  \providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    excerpt/.style={draw=ThesisNeutral!55, fill=white, rounded corners=2pt,
-      text width=5.25cm, minimum height=1.42cm, align=left, inner sep=6pt},
-    field/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
+    excerpt/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=5.25cm, minimum height=1.42cm, align=left, inner sep=6pt,
+      font=\scriptsize\rmfamily\itshape, text=ThesisInk},
+    field/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18,
       rounded corners=2pt, text width=4.4cm, minimum height=0.78cm,
-      align=left, inner sep=5pt},
+      align=left, inner sep=5pt, text=ThesisInk},
     flow/.style={->, ThesisInk!40, shorten >=3pt, shorten <=3pt}]
 
-    \node[excerpt] (first) at (-3.6,1.45) {\textbf{22 May 2018 · tumour board}\\[2pt]
-      ``Déc : début chimiothérapie par protocole
-      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}, 8 cycles.''};
-    \node[excerpt] (second) at (3.6,1.45) {\textbf{25 April 2032 · first relapse}\\[2pt]
-      ``Déc : réintro 6 cycles
-      \textcolor{ThesisPrimaryDark}{\textbf{CHOEP-14}}.''};
+    \node[excerpt] (first) at (-3.6,1.45) {{\upshape\bfseries\color{ThesisNeutral}22 May 2018 · tumour board}\\[2pt]
+      « Déc : début chimiothérapie par protocole
+      \hlspan{CHOEP-14}, 8 cycles. »};
+    \node[excerpt] (second) at (3.6,1.45) {{\upshape\bfseries\color{ThesisNeutral}25 April 2032 · first relapse}\\[2pt]
+      « Déc : réintro 6 cycles
+      \hlspan{CHOEP-14}. »};
 
     \draw[ThesisNeutral!60] (-6.2,0)--(6.2,0);
     \fill[ThesisPrimaryDark] (-3.6,0) circle (2pt);

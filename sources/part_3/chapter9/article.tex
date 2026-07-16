@@ -1,8 +1,12 @@
-\section{Introduction}
+\section{Supervision Without a Reference}
 
-The ideal training signal for this task would be a French hospital record paired
-with a form completed by clinicians, but no open dataset provides that
-combination, and the clinical part of the thesis rests on this absence. We
+\input{sources/part_3/figures/fig_report_to_ecrf}
+
+The task is to read a patient's longitudinal reports and fill the corresponding
+line of a structured study form, as \Cref{fig:p3-report-to-ecrf} shows on one
+report. Since no open dataset pairs a French hospital record with a
+clinician-filled form, the supervision for this task has to be built rather than
+collected. We
 therefore separate the evidence available to us, as summarized in
 \Cref{fig:p3-evidence}: synthetic records test the complete longitudinal task,
 while human-written corpora test narrower forms of transfer.
@@ -29,7 +33,7 @@ labels.
 \input{sources/part_3/figures/fig03_supervision_routes}
 
 
-\section{Generalist Annotation of Public Text}
+\subsection{Generalist Annotation of Public Text}
 \label{sec:gliner-data}
 
 The generalist corpus teaches the extractor to associate spans with descriptions
@@ -75,7 +79,7 @@ documents with 14.7 mentions per document on average. The input volumes in the
 table describe sampled material, not disjoint parts of the final corpus.
 
 
-\section{Longitudinal Record Generation}
+\subsection{Longitudinal Record Generation}
 \label{sec:lymphoma-dossiers}
 
 Published cases summarize a patient trajectory in a single narrative, whereas
@@ -104,7 +108,7 @@ line. We use 410 records for testing and 100 of the remaining 1,640 records for
 validation, which leaves up to 1,540 records for training.
 
 
-\subsection{The Silver Reference}
+\subsubsection{The Silver Reference}
 \label{sec:tapdl}
 
 The generated reports are not yet an extraction reference. Each value must be
@@ -139,7 +143,8 @@ our generated records, and published E3C clinical
 cases~\citep{magnini_e3c_2021}.
 
 For each source, we sample 1,000 texts and represent them with MedEmbed, the
-biomedical description encoder introduced in \Cref{chap:architectures}. We then
+biomedical encoder introduced in \Cref{chap:architectures}, which maps each text
+to a single vector in its description space. We then
 compare each distribution with PARHAF using MAUVE~\citep{pillutla_mauve_2021},
 Fr\'echet embedding distance (FED), adapted from the Fr\'echet distance used for
 generative images~\citep{heusel_fid_2017}, maximum mean discrepancy
@@ -150,9 +155,18 @@ The results are reported in \Cref{fig:p3-stylometry}.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{plots/part_3/output/fig06_stylometry.pdf}
-  \caption{Distributional comparison of three text sources with PARHAF.}
+  \caption{Distributional comparison of three text sources with PARHAF: the
+  three sources stay clearly distinguishable from PARHAF, with C2ST near 0.99
+  against 0.5 at chance.}
   \label{fig:p3-stylometry}
 \end{figure}
+
+These measures point in different directions. For MAUVE a higher value means the
+two distributions are closer, while for FED and MMD a value of zero means
+identical distributions and a smaller value means closer. C2ST reports the
+accuracy of a classifier trying to tell the two sources apart, so 0.5 means
+chance-level, indistinguishable distributions, and a higher value means more
+separable ones.
 
 The distance measures place raw PMC-Patients closest to PARHAF, followed by the
 generated records and E3C, while C2ST gives the reverse order. This disagreement

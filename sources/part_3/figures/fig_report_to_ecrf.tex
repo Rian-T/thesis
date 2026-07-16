@@ -1,0 +1,45 @@
+\begin{center}
+\centering
+\providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
+\providecommand{\hlval}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisSecondary!32}{\textcolor{ThesisSecondaryDark}{\textbf{#1}}}}}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize\sffamily, text=ThesisInk,
+    doc/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=7.2cm, align=left, inner sep=10pt, text=ThesisInk},
+    card/.style={draw=ThesisNeutral!55, fill=ThesisPaper, rounded corners=3pt,
+      text width=6.0cm, align=left, inner sep=10pt, text=ThesisInk},
+    flow/.style={-{Stealth[length=5pt]}, draw=ThesisInk!40, line width=0.7pt,
+      shorten <=5pt, shorten >=5pt}]
+
+  % ---- LEFT: the source document (serif italic) ------------------------
+  \node[doc] (src) at (0,0) {%
+    {\scriptsize\sffamily\color{ThesisNeutral} Consultation d'h\'ematologie
+     $\cdot$ 12 mai 2018 $\cdot$ fictif}\\[4pt]
+    {\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[5pt]
+    \itshape\color{ThesisInk}%
+    Le patient \^ag\'e de 54 ans est vu pour des douleurs chroniques du dos droit.
+    D\'ecision : d\'ebut d'une chimioth\'erapie par protocole \hlspan{CHOEP-14},
+    8 cycles, J1 = 25 mai 2018.};
+
+  % ---- RIGHT: the produced eCRF row (target) ---------------------------
+  \node[card] (ecrf) at (11.0,0) {%
+    {\scriptsize\sffamily\color{ThesisNeutral} eCRF --- electronic case report form}\\[4pt]
+    {\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[5pt]
+    \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.5}%
+    \begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
+      \texttt{first\_line\_treatment} & \hlval{CHOEP-14}\\
+      \texttt{first\_line\_start}     & \hlval{25/05/2018}\\
+      \texttt{cycles}                 & \hlval{8}\\
+      \texttt{response}               & {\itshape\color{ThesisNeutral} not reported}\\
+    \end{tabular}};
+
+  % ---- ARROW: document -> prediction -----------------------------------
+  \draw[flow] (src.east) -- (ecrf.west)
+    node[midway, above=1pt, text=ThesisInk, font=\footnotesize\rmfamily] {MC-bio-gliner};
+\end{tikzpicture}%
+}
+
+\captionof{figure}{D'un compte-rendu longitudinal, le mod\`ele produit la ligne
+d'eCRF correspondante ; ici le protocole CHOEP-14 remplit le champ de premi\`ere ligne.}
+\label{fig:p3-report-to-ecrf}
+\end{center}
