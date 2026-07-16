@@ -66,11 +66,12 @@ rated power.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{plots/part_3/output/conclusion_carbon_all.pdf}
-  \caption{Training carbon in two parts. (a) The model training itself is cheap
-  under continual pretraining and costly from scratch (DrBERT, AliBERT). (b) The
-  language model that prepares the corpus, which the older encoders did not use
-  (\textemdash), dominates the recent from-scratch DoctoModernBERT, while the
-  ontology step from ModernCamemBERT-bio v1 to v2 adds only a marginal amount.}
+  \caption{Training carbon in two parts. The model training itself, on the left,
+  is cheap under continual pretraining and costly from scratch, as DrBERT and
+  AliBERT show. The language model that prepares the corpus, on the right, was not
+  used by the older encoders and dominates the recent from-scratch
+  DoctoModernBERT, while the ontology step from ModernCamemBERT-bio to its v2 adds
+  only a marginal amount.}
   \label{fig:conclusion-carbon}
 \end{figure}
 

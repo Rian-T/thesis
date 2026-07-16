@@ -25,15 +25,14 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from thesis_style import COLORS, apply_style
 
-# (label, training kg, data-prep kg) -- top to bottom.
-# v1 and v2 kept adjacent so the marginal cost of v2 reads at a glance.
+# (label, training kg, data-prep kg) -- ordered by training carbon, descending.
 MODELS = [
-    ("DoctoModernBERT",                  10.9, 158.1),
     ("DrBERT",                           26.1,   0.0),
-    ("ModernCamemBERT-bio (v1)",          0.46, 14.7),
-    ("ModernCamemBERT-bio-v2 (marginal)", 0.06,  1.37),
+    ("DoctoModernBERT",                  10.9, 158.1),
     ("AliBERT",                           8.2,   0.0),
     ("CamemBERT-bio",                     0.8,   0.0),
+    ("ModernCamemBERT-bio",              0.46, 14.7),
+    ("ModernCamemBERT-bio-v2",           0.06,  1.37),
 ]
 OUTPUT = os.path.join(os.path.dirname(__file__), "output", "conclusion_carbon_all")
 
@@ -54,7 +53,7 @@ def main():
                  fontsize=8.5, color=COLORS["ink"])
     ax1.set_yticks(y); ax1.set_yticklabels([m[0] for m in MODELS], fontsize=9)
     ax1.set_xlim(0, 31); ax1.set_xlabel("kg CO$_2$eq")
-    ax1.set_title("(a) Model training", fontsize=10.5)
+    ax1.set_title("Model training", fontsize=10.5)
     ax1.tick_params(axis="y", length=0)
 
     # (b) data preparation (LLM curation of the corpus)
@@ -65,7 +64,7 @@ def main():
         ax2.text(v + 3.5 if v > 0 else 3.5, yi, lab, va="center", ha="left",
                  fontsize=8.5, color=COLORS["ink"])
     ax2.set_xlim(0, 185); ax2.set_xlabel("kg CO$_2$eq")
-    ax2.set_title("(b) Data preparation", fontsize=10.5)
+    ax2.set_title("Data preparation", fontsize=10.5)
     ax2.tick_params(axis="y", length=0)
 
     for ax in (ax1, ax2):
