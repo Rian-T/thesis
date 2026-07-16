@@ -76,17 +76,16 @@ further does not help, as the 9-billion-parameter model reaches only 0.665. The
 150-million-parameter MC-bio-gliner reaches 0.634, and its best variant reaches
 0.650. The raw gap to the strongest generator is therefore 0.038 for the
 published model and 0.022 for the best variant, at 27 times fewer parameters.
-The raw gap is modest relative to the difference in model size
-(\Cref{fig:p3-money}).
+The raw gap is modest relative to the difference in model size.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.82\textwidth]{plots/part_3/output/money_params_vs_f1.pdf}
-  \caption{Value-$F_1$ on the lymphoma eCRF against parameter count. The
-  150-million-parameter MC-bio-gliner comes within 0.018 value-$F_1$ of the
-  strongest generator Qwen3.5-4B at 27 times fewer parameters, while the
-  size-matched GLiNER-BioMed baseline, fine-tuned on the same records, lags far
-  behind.}
+  \caption{Value-$F_1$ on the lymphoma eCRF against parameter count, after field
+  competition. The 150-million-parameter MC-bio-gliner comes within 0.018
+  value-$F_1$ of the strongest generator Qwen3.5-4B at 27 times fewer parameters,
+  while the size-matched GLiNER-BioMed baseline, fine-tuned on the same records,
+  lags far behind.}
   \label{fig:p3-money}
 \end{figure}
 
@@ -112,13 +111,13 @@ CI $[-0.0176, -0.0129]$), as shown in \Cref{fig:p3-decoding-competition}.
 \end{center}
 
 \Cref{fig:p3-field-competition-example} illustrates the operation on one
-candidate span. Competition chooses between field assignments; it does not
-determine whether the selected span is clinically meaningful.
+candidate span.
 
 \input{sources/part_3/figures/fig12_competition_example}
 
 After competition, the published MC-bio-gliner reaches 0.640, trailing the
-strongest generator, Qwen3.5-4B at 0.658, by 0.018 (95\% CI $[-0.0243, -0.0108]$).
+strongest generator, Qwen3.5-4B at 0.658, by 0.018 (95\% CI $[-0.0243, -0.0108]$);
+\Cref{fig:p3-money} places every system on the parameter axis.
 Adapting the training mixture to the task closes this gap: a variant trained on a
 mixture of generalist examples and generated form records reaches 0.657, level
 with Qwen3.5-4B, with a paired difference of $-0.0005$ (95\% CI $[-0.0075,
@@ -169,9 +168,8 @@ keep the advantage on span-$F_1$, up to 0.567 against 0.503 for MC-bio-gliner.
 \paragraph{Robustness to the decoding step.}
 The ranking does not depend on the decoding step. Field competition is the
 natural decoder for a local extractor, whereas a generator's guided JSON already
-gives one value per field; before competition the published MC-bio-gliner sits
-within 0.038 of the strongest generator and its best variant within 0.022, the
-same conclusion the post-competition comparison reaches.
+gives one value per field, and the comparison before competition reaches the same
+conclusion as the one after it.
 
 \section{Beyond the Aggregate Score}
 
@@ -198,9 +196,9 @@ raises its coverage but leaves more of its confidence budget on wrong slots.
 MC-bio-gliner's practical advantage is its weight memory. Its 150 million parameters
 require less than one gigabyte at common precisions, against roughly 8 GB for the
 four-billion-parameter generator it matches, and about 18 GB for nine billion, in
-bfloat16. This advantage is memory, not speed: parameter count does not imply
-lower end-to-end latency, and the encoder is not faster per record when all 89
-descriptions are queried.
+bfloat16. The advantage is in memory alone. It does not carry to speed: parameter
+count does not imply lower end-to-end latency, and the encoder is not faster per
+record when all 89 descriptions are queried.
 
 \paragraph{The extractive QA baseline.}
 A SQuAD-style head returns one main span for each question, while a longitudinal
@@ -242,9 +240,7 @@ documents, so small differences are unstable. FrACCO contains three ICD-O types
 and about 34 mentions per document, making it a substantially denser NER task.
 The MC-bio-gliner corpus contains only 0.2\% of documents with no retained
 mention; retraining it to match the sparser annotation density of these datasets
-raises PARHAF transfer marginally, to 0.687.
-
-\input{sources/part_3/figures/fig_parhaf_doc}
+raises PARHAF transfer only marginally.
 
 The two datasets also differ in what an annotated passage looks like.
 \Cref{fig:p3-external-examples} contrasts their annotation density before the
@@ -304,36 +300,33 @@ the necessary step before any clinical use.
 
 \section*{Conclusion}
 
-This part set out to fill a real clinical form from public foundations alone, and
-its central result is that this is possible. A 150-million-parameter biomedical
-encoder, trained only on public and generated text and never shown a real
-hospital record, comes within a small margin of a generative model trained on
-exactly the same data at 27 times fewer parameters, and a task-adapted variant
-closes that margin. Before form-level decoding the
-published MC-bio-gliner reaches 0.634 value-$F_1$, within 0.038 of the strongest
-generator, Qwen3.5-4B; its best variant reaches 0.657, level with Qwen3.5-4B at
-0.658 after field competition, a difference the paired interval cannot
-distinguish. Scaling the generator to nine billion parameters does not help.
+This part set out to fill a clinical study form from public foundations alone,
+with no hospital data, and its central result is that a small encoder comes close
+on a synthetic version of that task. A 150-million-parameter biomedical encoder,
+trained only on public and generated text and never shown a real hospital record,
+comes within a small margin of a generative model trained on exactly the same
+data at 27 times fewer parameters, and a task-adapted variant closes that margin.
+Before form-level decoding the published MC-bio-gliner reaches 0.634 value-$F_1$,
+within 0.038 of the strongest generator, Qwen3.5-4B; its best variant reaches
+0.657, level with Qwen3.5-4B at 0.658 after field competition, a difference the
+paired interval cannot distinguish. Scaling the generator to nine billion
+parameters does not help.
 
-The size gap is also a deployment gap. A hospital cannot send its records to a
-cloud API, which medical confidentiality and the GDPR forbid, and running a
-generator on the modest hardware of a clinical service is costly: the
-four-billion-parameter model it matches needs roughly 8 GB in bfloat16, and the
-nine-billion one about 18 GB. The encoder fits in less than one gigabyte at
-common precisions, so it can run on site, inside the hospital, where the data
-stays; comparable accuracy then comes with the only model whose footprint is
-compatible with on-site deployment. The generator keeps an advantage on
-span-$F_1$, on wrong-field errors, and on risk--coverage, and the encoder trades
-this ranking quality for its far smaller footprint.
+The size gap is also a deployment gap. Confidentiality and the GDPR keep a
+hospital's records off any external API, and the only on-site alternative, a
+multi-billion-parameter generator, does not fit the modest hardware of a clinical
+service. The encoder does: it runs where the data stays, so comparable accuracy
+comes with the only compared model a clinical service could host on site. The
+generator keeps an advantage on span-$F_1$, on wrong-field errors, and on
+risk--coverage, and the encoder trades this ranking quality for its far smaller
+footprint.
 
 The three evaluations delimit where the result holds. MC-bio-gliner wins the
 longitudinal form it was built for; on the narrower PARHAF biomarkers it beats
 the size-matched baseline but not the generator; and on the dense FrACCO NER the
 biomedical baseline keeps the lead. Every part of this evidence is synthetic or
-silver: a generated longitudinal corpus, a silver reference produced by the same
-model family, and no real hospital record or human annotation anywhere in the
-task. Matching, on this synthetic task, a fine-tuned generative model at 27 times fewer
-parameters and without any real clinical data is the finding of this part;
-whether it carries to human-written records is not yet established, and
-confirming it on French hospital records remains the necessary next step before
-any clinical use.
+silver, with no real hospital record or human annotation in the task. Matching a
+fine-tuned generative model at 27 times fewer parameters, with no clinical data,
+is the result of this part. Whether it carries to human-written records is the
+next thing to establish, and confirming it on French hospital records is the
+necessary step before any clinical use.

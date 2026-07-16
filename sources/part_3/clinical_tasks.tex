@@ -8,19 +8,19 @@ task without any training on hospital data: reading a patient's free-text
 reports and filling the structured form that a clinical study keeps for each
 patient. The task is demanding because the same value plays different roles as
 the disease unfolds, and because no real filled form is available to learn from.
-Deployment sharpens the stakes. A hospital can neither send its records to a
-cloud API, which medical confidentiality and the GDPR forbid, nor host a
-nine-billion-parameter model on the modest hardware of a clinical service.
-Matching the accuracy of a large generator is therefore not the only
-requirement: a small encoder that runs on site is the only kind of model whose
-footprint fits the hardware of a clinical service, which is the same privacy
-constraint that motivated the public corpus and encoders of the first two parts. The next three chapters
+Deployment sharpens the stakes. A hospital cannot move its records to a cloud
+API, which confidentiality law forbids, and it cannot fit a multi-billion-parameter
+generator on the hardware a clinical service runs. Accuracy alone is therefore not
+enough: the model must also run on site, and only a small encoder has a footprint
+that fits. This is the same privacy constraint that motivated the public corpus
+and encoders of the first two parts. The next three chapters
 build task supervision from public and generated text, design an extractor that
 can be asked for new fields at inference time, and compare a small biomedical
 encoder with much larger generative models. The result they build toward is that
 a 150-million-parameter encoder, trained only on public and generated text and
-never shown a real hospital record, nearly matches the accuracy of a generative
-model about twenty-seven times its size fine-tuned on the same data.
+never shown a real hospital record, nearly matches, on a synthetic version of the
+task, the accuracy of a generative model about twenty-seven times its size
+fine-tuned on the same data.
 
 \chapter{Synthetic Data for Task Adaptation}
 \label{chap:synthetic}
