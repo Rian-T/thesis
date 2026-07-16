@@ -66,9 +66,10 @@ rated power.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.82\textwidth]{plots/part_3/output/conclusion_carbon_all.pdf}
-  \caption{Training carbon of the biomedical encoders, on a log scale: continual
-  pretraining from a public base stays well below training from scratch in each
-  generation.}
+  \caption{Training carbon split into model training and the language model that
+  prepares the corpus: for the recent models the data preparation dominates, and
+  the ontology step that turns ModernCamemBERT-bio v1 into v2 adds only a marginal
+  amount.}
   \label{fig:conclusion-carbon}
 \end{figure}
 
