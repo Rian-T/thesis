@@ -15,7 +15,7 @@ A hospital note runs through this thesis as a target, never as training
 material. No model built here was shown a real patient record. What the models
 learned, they learned from public text: scientific articles, drug leaflets,
 ontologies, and clinical cases that had already been published. From this
-material, a single route runs the length of the manuscript. Public text becomes a
+material, one route runs the length of the manuscript. Public text becomes a
 filtered corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}); the corpus
 pretrains an encoder (\Cref{chap:encoders,chap:objectives}); the encoder is
 enriched with knowledge drawn from ontologies (\Cref{chap:ontobook}); the
@@ -58,7 +58,7 @@ the scale of the whole pipeline, where the more recent ModernCamemBERT-bio-v2
 chain spends an estimated 17~kg against 169 for the from-scratch DoctoModernBERT,
 about ten times less.
 
-Where the budget goes is itself informative. Training the encoder is the cheap
+Where the budget goes is also informative. Training the encoder is the cheap
 part: the continual pretraining took about 16 GPU-hours, against roughly 383 for
 a model trained from scratch. Most of the budget, on both sides, goes to the
 language model that rewrites and annotates the training corpus, and our pipeline
@@ -424,7 +424,7 @@ answering a single prompt. A drug-interaction check stops being a question with 
 right answer and becomes one step inside a workflow, where the model reads a
 note, queries a database, drafts a reply, and passes the result to the next
 stage. The safety question grows with the system: it is no longer whether the
-model holds the right medical fact, but what the whole agent does with that fact
+model holds the right medical fact. It is what the whole agent does with that fact
 across a chain of actions on real data.
 
 \section{Evaluation Under Observation}
