@@ -124,26 +124,7 @@ overlaps are left in place.
 \input{sources/part_3/figures/fig05_tapdl}
 
 One language-model pass over 16,375 reports yields 237,194 span assignments
-across the 89 fields (\Cref{tab:p3-tapdl}).
-
-\begin{table}[t]
-  \centering
-  \caption{Silver-reference annotation counts.}
-  \label{tab:p3-tapdl}
-  \small
-  \setlength{\tabcolsep}{7pt}
-  \begin{tabular}{@{}l S[table-format=6.0,group-separator={,},group-minimum-digits=4]@{}}
-    \toprule
-    \textbf{Corpus quantity} & {\textbf{Count}} \\
-    \midrule
-    Reports processed & 16375 \\
-    Final spans & 237194 \\
-    Form fields & 89 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Each stored value is the text found at its final offsets, but this does not
+across the 89 fields. Each stored value is the text found at its final offsets, but this does not
 guarantee that the field assignment is medically correct.
 
 

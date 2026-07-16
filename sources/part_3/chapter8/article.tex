@@ -38,9 +38,8 @@ description space, as summarized in \Cref{fig:p3-medembed}.
 
 We first test this space through terminology retrieval. On OntoBench-FR,
 MedEmbed reaches 60.35\% mean accuracy at rank one across CIM-10, ATC, CCAM, and
-FrACCO, compared with 50.84\% for the strongest baseline
-(\Cref{tab:p3-medembed}). FrACCO denotes ICD-O retrieval in this table, and is
-distinct from the FrACCO NER evaluation used later.
+ICD-O, compared with 50.84\% for the strongest baseline
+(\Cref{tab:p3-medembed}).
 
 \begin{table}[t]
   \centering
@@ -51,7 +50,7 @@ distinct from the FrACCO NER evaluation used later.
     \sisetup{detect-weight=true}
     \begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
       \toprule
-      \textbf{Model} & {\textbf{CIM-10}} & {\textbf{ATC}} & {\textbf{CCAM}} & {\textbf{FrACCO}} & {\textbf{Mean}} \\
+      \textbf{Model} & {\textbf{CIM-10}} & {\textbf{ATC}} & {\textbf{CCAM}} & {\textbf{ICD-O}} & {\textbf{Mean}} \\
       \midrule
       \rowcolor{ThesisTableSep}
       \multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]

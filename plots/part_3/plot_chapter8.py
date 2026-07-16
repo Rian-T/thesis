@@ -287,11 +287,11 @@ def _make_section_supervision_figure(data: SupervisionData):
 
 
 def _make_novel_types_figure(data: NovelTypeData):
-    """Light dumbbell: MedEmbed vs the biomedical encoder on familiar and
-    benchmark-absent descriptions (B4)."""
+    """Compact dumbbell: MedEmbed vs ModernCamemBERT-bio on familiar and
+    benchmark-absent descriptions, with the gain annotated on each row (B4)."""
 
-    fig, ax = plt.subplots(figsize=(4.8, 2.0))
-    regimes = ("Familiar descriptions", "Benchmark-absent descriptions")
+    fig, ax = plt.subplots(figsize=(4.2, 1.9))
+    regimes = ("Familiar\ndescriptions", "Benchmark-absent\ndescriptions")
     y_positions = (1, 0)
     for index, (regime, y_position) in enumerate(zip(regimes, y_positions)):
         medembed = data.medembed[index]
@@ -300,15 +300,15 @@ def _make_novel_types_figure(data: NovelTypeData):
             (mcbio, medembed),
             (y_position, y_position),
             color=COLORS["neutral"],
-            alpha=0.35,
-            linewidth=2.0,
+            alpha=0.4,
+            linewidth=2.4,
             solid_capstyle="round",
             zorder=1,
         )
         ax.scatter(
             mcbio,
             y_position,
-            s=44,
+            s=46,
             color=COLORS["neutral"],
             edgecolor="white",
             linewidth=0.7,
@@ -317,15 +317,50 @@ def _make_novel_types_figure(data: NovelTypeData):
         ax.scatter(
             medembed,
             y_position,
-            s=64,
+            s=82,
             color=COLORS["primary"],
             edgecolor="white",
             linewidth=0.7,
             zorder=4,
         )
-    ax.set_xlim(0.29, 0.56)
-    ax.set_ylim(-0.45, 1.45)
+        # Endpoint values, kept small and below the markers.
+        ax.annotate(
+            _decimal(mcbio),
+            (mcbio, y_position),
+            xytext=(0, -9),
+            textcoords="offset points",
+            ha="center",
+            va="top",
+            fontsize=7,
+            color=COLORS["neutral"],
+        )
+        ax.annotate(
+            _decimal(medembed),
+            (medembed, y_position),
+            xytext=(0, -9),
+            textcoords="offset points",
+            ha="center",
+            va="top",
+            fontsize=7,
+            color=COLORS["primary_dark"],
+        )
+        # The gain, centred above the dumbbell.
+        gain = medembed - mcbio
+        ax.annotate(
+            f"$+{gain:.3f}$",
+            ((mcbio + medembed) / 2, y_position),
+            xytext=(0, 8),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            fontweight="bold",
+            color=COLORS["primary_dark"],
+        )
+    ax.set_xlim(0.315, 0.545)
+    ax.set_ylim(-0.55, 1.55)
     ax.set_yticks(y_positions, labels=regimes)
+    ax.set_xticks((0.35, 0.40, 0.45, 0.50))
     ax.set_xlabel(data.metric, fontsize=9)
     ax.spines["left"].set_visible(False)
     ax.xaxis.set_major_formatter(
@@ -333,10 +368,12 @@ def _make_novel_types_figure(data: NovelTypeData):
     )
     ax.grid(axis="x", color=COLORS["neutral"], alpha=0.2, linestyle=":", linewidth=0.6)
     ax.tick_params(axis="x", labelsize=8, width=0.5, length=3)
-    ax.tick_params(axis="y", length=0, labelsize=8.5, pad=8)
-    ax.scatter([], [], s=64, color=COLORS["primary"], label="MedEmbed")
-    ax.scatter([], [], s=44, color=COLORS["neutral"], label="Biomedical encoder")
-    ax.legend(frameon=False, fontsize=8, loc="lower right")
+    ax.tick_params(axis="y", length=0, labelsize=8, pad=6)
+    ax.scatter([], [], s=82, color=COLORS["primary"], label="MedEmbed")
+    ax.scatter([], [], s=46, color=COLORS["neutral"], label="ModernCamemBERT-bio")
+    ax.legend(frameon=False, fontsize=7.5, loc="upper center",
+              bbox_to_anchor=(0.5, 1.02), ncol=2, columnspacing=1.2,
+              handletextpad=0.4)
     return fig
 
 

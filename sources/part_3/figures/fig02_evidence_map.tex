@@ -1,38 +1,48 @@
 \begin{figure}[t]
   \centering
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    target/.style={
-      draw=ThesisNeutral!70, densely dashed, rounded corners=3pt,
-      fill=ThesisNeutral!8, text width=4.6cm, minimum height=1.5cm,
-      align=center, inner sep=6pt, text=ThesisNeutral},
-    proxy/.style={
+    anchorbox/.style={
+      draw=ThesisPrimaryDark, line width=1pt, rounded corners=3pt,
+      fill=ThesisPrimary!20, text width=5cm, minimum height=1.5cm,
+      align=center, inner sep=8pt, text=ThesisInk},
+    subbox/.style={
       draw=ThesisNeutral!55, rounded corners=3pt,
-      fill=ThesisPaper, text width=3.5cm, minimum height=1.35cm,
+      fill=ThesisPaper, text width=3.1cm, minimum height=1.05cm,
       align=center, inner sep=5pt, text=ThesisInk},
-    tests/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape},
-    link/.style={-{Stealth[length=4pt]}, draw=ThesisInk!30, line width=0.6pt,
-      densely dashed, shorten <=4pt, shorten >=4pt}]
+    note/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape,
+      text width=5.6cm},
+    subtitle/.style={text=ThesisNeutral, align=center, font=\scriptsize\itshape},
+    standin/.style={-{Stealth[length=4pt]}, draw=ThesisNeutral!60, line width=0.6pt,
+      densely dashed, shorten <=3pt, shorten >=4pt},
+    check/.style={-{Stealth[length=4pt]}, draw=ThesisPrimaryDark!55, line width=0.7pt,
+      shorten <=4pt, shorten >=4pt}]
 
-    % Unavailable clinical target at the centre
-    \node[target] (target) at (0,0)
-      {Clinician-filled eCRF\\from French hospital records};
-    \node[anchor=south, text=ThesisNeutral!85, font=\scriptsize\bfseries]
-      at (target.north) {not available};
+    % Discreet note: the real clinical target cannot be shared
+    \node[note] (real) at (0,2.65)
+      {Real target: a clinician-filled eCRF from French hospital records,
+       not shareable};
 
-    % Three present proxies, each labelled by what it tests
-    \node[proxy] (ecrf)   at (0,3.35)   {\textbf{Synthetic lymphoma eCRF}};
-    \node[proxy] (parhaf) at (-5.1,-2.5) {\textbf{PARHAF}};
-    \node[proxy] (fracco) at (5.1,-2.5)  {\textbf{FrACCO}};
+    % Anchor: the synthetic task under study (the contribution)
+    \node[anchorbox] (ecrf) at (0,0.55)
+      {\textbf{Synthetic lymphoma eCRF}\\[2pt]
+       {\normalfont\scriptsize the complete form-filling task}};
 
-    \node[tests, above=1pt of ecrf]   {the complete form-filling task};
-    \node[tests, below=1pt of parhaf] {transfer to short\\human-written reports};
-    \node[tests, below=1pt of fracco] {dense entity recognition};
+    \draw[standin] (real) -- (ecrf)
+      node[midway, right=2pt, text=ThesisNeutral, font=\scriptsize] {stands in for};
 
-    \draw[link] (ecrf)   -- (target);
-    \draw[link] (parhaf) -- (target);
-    \draw[link] (fracco) -- (target);
+    % Subordinate partial checks
+    \node[subbox] (parhaf) at (-3.7,-2.35) {\textbf{PARHAF}};
+    \node[subbox] (fracco) at (3.7,-2.35)  {\textbf{FrACCO}};
+    \node[subtitle, below=2pt of parhaf] {transfer to short\\human-written reports};
+    \node[subtitle, below=2pt of fracco] {dense entity\\recognition};
+
+    \node[text=ThesisNeutral, font=\scriptsize\itshape] (checklbl) at (0,-1.25)
+      {partial external checks};
+
+    \draw[check] (ecrf.south) -- (parhaf.north);
+    \draw[check] (ecrf.south) -- (fracco.north);
   \end{tikzpicture}
-  \caption{Three available proxies stand in for the unavailable clinical target,
-  each testing a different part of the task.}
+  \caption{Our synthetic lymphoma eCRF is the task under study, with two human
+  corpora giving partial external checks in place of the unshareable clinical target.}
   \label{fig:p3-evidence}
 \end{figure}

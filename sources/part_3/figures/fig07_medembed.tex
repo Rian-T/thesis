@@ -2,57 +2,53 @@
   \centering
   \resizebox{0.72\textwidth}{!}{%
   \begin{tikzpicture}[font=\small\sffamily,
-    anchorpt/.style={circle, fill=ThesisPrimaryDark, inner sep=2.4pt},
-    pospt/.style={circle, fill=ThesisSecondaryDark, inner sep=2.2pt},
-    negpt/.style={circle, fill=ThesisTertiaryDark, inner sep=2.2pt},
+    anchorpt/.style={circle, fill=ThesisPrimaryDark, inner sep=2.6pt},
+    pospt/.style={circle, fill=ThesisSecondaryDark, inner sep=2.4pt},
+    negpt/.style={circle, fill=ThesisTertiaryDark, inner sep=2.4pt},
     lbl/.style={font=\small\sffamily, text=ThesisInk},
     pull/.style={-{Stealth[length=2.6mm]}, ThesisSecondaryDark, line width=1.1pt,
-      shorten >=2.5pt, shorten <=2.5pt},
+      shorten >=3pt, shorten <=3pt},
     push/.style={-{Stealth[length=2.6mm]}, ThesisTertiaryDark, line width=1.1pt,
-      shorten >=2.5pt, shorten <=2.5pt},
-    axis/.style={ThesisNeutral!45, line width=0.6pt, -{Stealth[length=1.8mm]}},
+      shorten >=3pt, shorten <=3pt},
   ]
 
-    % --- embedding space, discreet neutral backdrop ---
+    % --- discreet backdrop grouping the three terms in one space ---
     \begin{scope}[on background layer]
-      \fill[ThesisNeutral!8, rounded corners=4pt] (-0.6,-1.7) rectangle (7.4,3.5);
+      \fill[ThesisNeutral!7, rounded corners=5pt] (-0.3,-1.5) rectangle (7.4,3.2);
     \end{scope}
-    \draw[axis] (-0.2,-1.3) -- (-0.2,3.2);
-    \draw[axis] (-0.2,-1.3) -- (6.9,-1.3);
-    \node[text=ThesisNeutral, font=\scriptsize\sffamily, anchor=south west]
-      at (-0.15,3.0) {embedding space};
 
     % --- points ---
-    \coordinate (anchor) at (2.4,1.35);
-    \coordinate (pos)    at (4.4,2.35);
-    \coordinate (neg)    at (5.4,-0.55);
+    \coordinate (anchor) at (2.5,1.2);
+    \coordinate (pos)    at (4.5,2.35);
+    \coordinate (neg)    at (5.3,-0.55);
 
     % contrastive forces: pull the synonym in, push the unrelated term out
-    \draw[pull] (pos)  -- (anchor)
-      node[midway, sloped, above=1pt, font=\scriptsize, text=ThesisSecondaryDark] {pull};
-    \draw[push] (neg) -- ($ (neg)!-0.9cm!(anchor) $)
-      node[midway, sloped, below=1pt, font=\scriptsize, text=ThesisTertiaryDark] {push};
+    \draw[pull] (pos) -- (anchor)
+      node[midway, sloped, above=1pt, font=\scriptsize, text=ThesisSecondaryDark] {pull together};
+    \draw[push] (neg) -- ($ (neg)!-1.0cm!(anchor) $)
+      node[midway, sloped, below=1pt, font=\scriptsize, text=ThesisTertiaryDark] {push apart};
 
     \node[anchorpt] at (anchor) {};
     \node[pospt]    at (pos)    {};
     \node[negpt]    at (neg)    {};
 
     % --- labels ---
-    \node[lbl, anchor=east, align=right] at ([xshift=-4pt]anchor)
+    \node[lbl, anchor=east, align=right] at ([xshift=-5pt]anchor)
       {lymphome diffus à\\grandes cellules B\\[1pt]
        {\scriptsize\itshape\color{ThesisNeutral}anchor}};
-    \node[lbl, anchor=west, text=ThesisSecondaryDark] at ([xshift=4pt]pos)
-      {\textbf{LDGCB}~{\scriptsize\itshape\mdseries(synonym)}};
-    \node[lbl, anchor=west, text=ThesisTertiaryDark] at ([xshift=4pt]neg)
+    \node[lbl, anchor=west, text=ThesisSecondaryDark] at ([xshift=5pt]pos)
+      {\textbf{LBDGC}~{\scriptsize\itshape\mdseries(synonym)}};
+    \node[lbl, anchor=west, text=ThesisTertiaryDark] at ([xshift=5pt]neg)
       {adénocarcinome~{\scriptsize\itshape\mdseries(unrelated)}};
 
     % --- provenance legend, small and discreet ---
     \node[text=ThesisNeutral, font=\scriptsize\sffamily, anchor=south west]
-      at (-0.2,-2.35)
+      at (-0.3,-2.25)
       {ModernCamemBERT-bio $+$ OntoBook term pairs $\rightarrow$ MedEmbed};
 
   \end{tikzpicture}%
   }
-  \caption{Contrastive training of MedEmbed from a biomedical encoder and terminology pairs.}
+  \caption{Contrastive training of MedEmbed pulls a term and its synonym together
+  while pushing an unrelated term apart.}
   \label{fig:p3-medembed}
 \end{figure}
