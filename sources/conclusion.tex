@@ -35,7 +35,7 @@ consumes. \Cref{tab:conclusion-savings} lists them.
     \textbf{Axis} & \textbf{Contribution} & \textbf{Reduction} \\
     \midrule
     Training data & corpus filtering (\Cref{chap:quality}) & one third of the tokens \\
-    Training compute & continual pretraining (\Cref{chap:encoders}) & 32$\times$ less carbon \\
+    Training carbon & full pipeline vs from scratch (\Cref{chap:objectives}) & about 10$\times$ less \\
     Inference & open-vocabulary extraction (\Cref{chap:architectures}) & 27$\times$ fewer parameters \\
     \bottomrule
   \end{tabular}
@@ -43,22 +43,32 @@ consumes. \Cref{tab:conclusion-savings} lists them.
 
 The paragraph-level filtering of \Cref{chap:quality} matched the performance of
 the full corpus while training on one third of the tokens, and its clinical
-recipe reached the same point with 2.5 times fewer tokens. Adapting an encoder by
-continual pretraining, rather than training one from scratch, showed the same
-effect on carbon. CamemBERT-bio was adapted in 78 GPU-hours, for an estimated
-0.80~kg of CO\textsubscript{2} at the French grid intensity of 34~g
-CO\textsubscript{2}eq per kWh over 2022 and 2023. A comparable model trained from
-scratch cost far more: DrBERT used 2{,}560 GPU-hours and 26.11~kg of
-CO\textsubscript{2}, and AliBERT 960 GPU-hours and 8.16~kg. The adapted encoder
-therefore emitted about 32 times less carbon than a model trained from scratch,
-and lost no accuracy for the saving (\Cref{fig:conclusion-energy}).
+recipe reached the same point with 2.5 times fewer tokens. The same restraint
+carries into pretraining, and the accounting is clearest across the whole
+pipeline. Training the encoder is the cheap part: ModernCamemBERT-bio was adapted
+by continual pretraining in about 16 GPU-hours, against roughly 383 for a
+comparable model trained from scratch, some twenty-four times less. The dominant
+cost lies elsewhere. On both sides, most of the budget goes to the language model
+that rewrites and annotates the training corpus (\Cref{fig:conclusion-carbon}).
+Counted end to end, the ModernCamemBERT-bio-v2 pipeline spends about 582
+GPU-hours and an estimated 17~kg of CO\textsubscript{2}, against 5{,}920
+GPU-hours and 169~kg for the from-scratch DoctoModernBERT, about ten times less.
+It stays lighter because it curates a small, targeted biomedical corpus rather
+than rephrasing a web-scale one. These figures count reserved GPU-hours at the
+French grid intensity of 34~g CO\textsubscript{2}eq per kWh, a convention that
+understates the gap, since our curation ran the accelerators well below their
+rated power. The same lesson first appeared at encoder scale, where CamemBERT-bio
+emitted 0.80~kg of CO\textsubscript{2} against 26.11 for DrBERT
+(\Cref{chap:encoders}).
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.72\textwidth]{plots/part_3/output/conclusion_energy.pdf}
-  \caption{Training carbon cost of DrBERT and AliBERT, trained from scratch,
-  against CamemBERT-bio, adapted by continual pretraining.}
-  \label{fig:conclusion-energy}
+  \includegraphics[width=0.85\textwidth]{plots/part_3/output/conclusion_carbon.pdf}
+  \caption{Training carbon of the full pipeline: the language model that curates
+  the corpus dominates both budgets, and targeting a small biomedical corpus
+  keeps the continually pretrained pipeline about ten times lighter than one
+  trained from scratch.}
+  \label{fig:conclusion-carbon}
 \end{figure}
 
 The extractor at the end of the route shows the same pattern in what it costs to
@@ -137,8 +147,9 @@ measured directly.
 \label{sec:conclusion-tabib}
 
 \begin{reviewrewrite}
-TABIB (\textit{Testing Adversarial Behaviors In Biomedical LLMs}) was designed
-for this setting. It evaluates French biomedical LLMs with perturbations that
+We began to explore these problems, beyond errors of stored knowledge, in a
+preliminary study we call TABIB (\textit{Testing Adversarial Behaviors In
+Biomedical LLMs}). It evaluates French biomedical LLMs with perturbations that
 preserve the medical truth while changing the form of the interaction. The first
 version uses the ANSM drug-interaction thesaurus and the French public drug
 database (BDPM)~\citep{ansm2023thesaurus,bdpm2024}. The ANSM thesaurus gives

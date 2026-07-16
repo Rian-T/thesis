@@ -1,52 +1,40 @@
 \begin{center}
   \centering
+  \providecommand{\convrole}[1]{{\tiny\textcolor{ThesisNeutral}{#1}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily, text=ThesisInk,
-    stage/.style={draw=ThesisNeutral!50, fill=white, rounded corners=2pt,
-      minimum width=2.15cm, minimum height=0.82cm, align=center, inner sep=3pt,
-      text=ThesisInk},
-    enc/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!16, rounded corners=2pt,
-      minimum width=2.15cm, minimum height=0.82cm, align=center, inner sep=3pt,
-      text=ThesisInk},
-    data/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!20, rounded corners=2pt,
-      minimum width=2.15cm, minimum height=0.82cm, align=center, inner sep=3pt,
-      text=ThesisInk},
-    chap/.style={text=ThesisNeutral, font=\tiny, anchor=north},
+    box/.style={rounded corners=2pt, align=center, inner sep=4pt,
+      text width=2.6cm, minimum height=0.95cm, text=ThesisInk},
+    stage/.style={box, draw=ThesisNeutral!50, fill=white},
+    enc/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16},
+    data/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!20},
     flow/.style={-{Stealth[length=4pt]}, draw=ThesisInk!40, line width=0.7pt,
       shorten <=2pt, shorten >=2pt},
     reuse/.style={-{Stealth[length=4pt]}, draw=ThesisSecondaryDark, line width=0.9pt,
       shorten <=2pt, shorten >=2pt}]
 
-    \def\dx{2.75}
+    \def\dx{3.35}
     % ---- main route: public text -> filled clinical form -----------------
-    \node[stage] (n1) at (0*\dx,0)  {public\\text};
-    \node[stage] (n2) at (1*\dx,0)  {filtered\\corpus};
-    \node[enc]   (n3) at (2*\dx,0)  {pretrained\\encoder};
-    \node[enc]   (n4) at (3*\dx,0)  {knowledge-enriched\\encoder};
-    \node[enc]   (n5) at (4*\dx,0)  {open-vocabulary\\extractor};
-    \node[stage] (n6) at (5*\dx,0)  {filled\\clinical form};
-
-    \node[chap] at (n2.south) {Ch.\ 10--12};
-    \node[chap] at (n3.south) {Ch.\ 13--14};
-    \node[chap] at (n4.south) {Ch.\ 15};
-    \node[chap] at (n5.south) {Ch.\ 17};
-    \node[chap] at (n6.south) {Ch.\ 18};
+    \node[stage] (n1) at (0*\dx,0) {public text\\[1pt]\convrole{sources}};
+    \node[stage] (n2) at (1*\dx,0) {Biomed-Enriched\\[1pt]\convrole{filtered corpus · Ch.\ 11}};
+    \node[enc]   (n3) at (2*\dx,0) {ModernCamemBERT-bio\\[1pt]\convrole{encoder · Ch.\ 13--14}};
+    \node[enc]   (n4) at (3*\dx,0) {OntoBook\\[1pt]\convrole{knowledge · Ch.\ 15}};
+    \node[enc]   (n5) at (4*\dx,0) {MC-bio-gliner\\[1pt]\convrole{extractor · Ch.\ 17}};
+    \node[stage] (n6) at (5*\dx,0) {lymphoma eCRF\\[1pt]\convrole{filled form · Ch.\ 18}};
 
     \foreach \a/\b in {n1/n2,n2/n3,n3/n4,n4/n5,n5/n6}
       \draw[flow] (\a) -- (\b);
 
     % ---- reuse branch: the same filter surfaces the evaluation data ------
-    \def\yb{-2.3}
-    \node[data] (b1) at (1*\dx,\yb) {open\\clinical cases};
-    \node[data] (b2) at (3*\dx,\yb) {synthetic eCRF\\records};
-    \node[chap] at (b1.south) {Ch.\ 11};
-    \node[chap] at (b2.south) {Ch.\ 16};
+    \def\yb{-2.15}
+    \node[data] (b1) at (1*\dx,\yb) {open clinical cases\\[1pt]\convrole{recovered · Ch.\ 11}};
+    \node[data] (b2) at (3*\dx,\yb) {synthetic records\\[1pt]\convrole{generated · Ch.\ 16}};
 
     \draw[reuse] (n2.south) -- (b1.north)
       node[midway, right=1pt, text=ThesisSecondaryDark, font=\tiny] {surfaces};
     \draw[reuse] (b1) -- (b2);
-    \draw[reuse] (b2.east) -- ($(n6.south)+(0,-0.05)$)
-      node[pos=0.62, above, text=ThesisSecondaryDark, font=\tiny] {evaluation};
+    \draw[reuse] (b2.north) .. controls +(0,0.9) and +(0,-1.1) .. (n6.south)
+      node[pos=0.55, right=1pt, text=ThesisSecondaryDark, font=\tiny] {evaluation};
   \end{tikzpicture}%
   }
   \captionof{figure}{One route runs from public text to a filled clinical form,
