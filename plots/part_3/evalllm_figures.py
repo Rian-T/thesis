@@ -178,26 +178,35 @@ def fig4():
     cols = ["B1\nSurface", "B2\nDistract.", "B3\nCapitul.", "B4\nCross-ling.",
             "B5\nCalibr.", "B6\nPrudence", "B7\nBias"]
     M = np.array([r[2] for r in rows])
-    # peach (bad, 0) -> pale -> lime (good, 1)
+    # high-contrast diverging map: deep peach (bad, 0) -> near-white -> deep lime (good, 1)
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "thesis_div",
-        [COLORS["tertiary_dark"], COLORS["tertiary"], "#F4EFE6",
-         COLORS["secondary"], COLORS["secondary_dark"]])
+        [COLORS["tertiary_dark"], "#E39A5E", "#F6EFE2",
+         "#9DBB63", COLORS["secondary_dark"]])
 
-    fig, ax = plt.subplots(figsize=(6.6, 4.0))
+    fig, ax = plt.subplots(figsize=(7.2, 4.4))
     im = ax.imshow(M, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    # thin white separators between cells
+    ax.set_xticks(np.arange(-0.5, len(cols), 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, len(rows), 1), minor=True)
+    ax.grid(which="minor", color="white", linewidth=1.4)
     for i in range(M.shape[0]):
         for j in range(M.shape[1]):
-            ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center",
-                    fontsize=8, color=COLORS["ink"])
-    ax.set_xticks(range(len(cols))); ax.set_xticklabels(cols, fontsize=8.5)
+            v = M[i, j]
+            tc = "white" if (v < 0.22 or v > 0.80) else COLORS["ink"]
+            ax.text(j, i, f"{v:.2f}", ha="center", va="center",
+                    fontsize=9.5, color=tc)
+    ax.set_xticks(range(len(cols))); ax.set_xticklabels(cols, fontsize=9.5)
     ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([f"{r[0]} ({r[1]:.2f})" for r in rows], fontsize=9)
+    ax.set_yticklabels([f"{r[0]} ({r[1]:.2f})" for r in rows], fontsize=10)
     ax.tick_params(length=0)
     for s in ax.spines.values():
         s.set_visible(False)
-    cb = fig.colorbar(im, ax=ax, fraction=0.032, pad=0.02)
-    cb.set_ticks([0, 0.5, 1.0]); cb.ax.tick_params(length=0, labelsize=8)
+    cb = fig.colorbar(im, ax=ax, fraction=0.030, pad=0.02)
+    cb.set_ticks([0, 0.5, 1.0])
+    cb.set_ticklabels(["0", "0.5", "1"])
+    cb.ax.tick_params(length=0, labelsize=8.5)
+    cb.set_label("1 = best behaviour", fontsize=8.5)
     cb.outline.set_visible(False)
     fig.tight_layout()
     fig.savefig(f"{OUT}/evalllm_fig4.pdf", bbox_inches="tight")
