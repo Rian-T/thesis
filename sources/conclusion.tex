@@ -4,6 +4,11 @@ incompletely digested.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 \chapter{What Holds Together}
 \label{sec:conclusion-holds-together}
 
+The parts of this thesis were built one at a time. Read together, at the close,
+they trace a single route from public text to a filled clinical form and share a
+single concern, the energy that route costs. This chapter follows the route and
+weighs the cost.
+
 \section{A Single Route Through Public Text}
 
 A hospital note runs through this thesis as a target, never as training
@@ -108,6 +113,11 @@ they are actually used. That is the question the next chapter takes up.
 
 \chapter{A New Problem}
 \label{sec:conclusion-evaluation}
+
+Filling a clinical form from public data was the thesis's target. Putting a model
+to work in a clinic raises a different question, about how it behaves rather than
+what it knows, and it is the one the field is least ready to answer. This chapter
+takes a first measurement of it.
 
 \section{When Efficiency Is Not the Direction}
 
@@ -254,7 +264,8 @@ share a shape. Each perturbation leaves the medical fact untouched and changes
 only the form of the interaction, yet the answer moves: every protocol exposes a
 different way that the behaviour, not the knowledge, gives way.
 \Cref{fig:conclusion-tabib-radar} gives the overview, and the paragraphs below
-read it one failure mode at a time. The first is surface form. Writing a pair with
+read it one failure mode at a time; \Cref{app:tabib-details} collects the
+per-protocol figures behind it. The first is surface form. Writing a pair with
 brand names instead of generic ones already flips answers, significantly for
 Gemma4 E4B, which loses 38 points, and for Qwen3.5 4B, which loses 9 (McNemar
 test, $p < 0.05$); the other models change in both directions at once, so a stable
@@ -262,7 +273,7 @@ average hides unstable decisions~\citep{mcnemar1947}.
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.74\textwidth]{plots/part_3/output/evalllm_fig4.pdf}
+\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig4.pdf}
 \caption{Behavioural profile of the seven TABIB models across the seven protocols.}
 \label{fig:conclusion-tabib-radar}
 \end{figure}
@@ -276,16 +287,7 @@ Nemotron shows the opposite pattern, with detection almost absent in direct
 questions and nearly systematic after clinical context is added. The surrounding
 text changes the model's behaviour even when the relevant medical fact is
 unchanged.
-\Cref{fig:conclusion-tabib-surface-distraction} shows surface robustness and
-contextual distraction.
 \end{reviewrewrite}
-
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig1.pdf}
-\caption{Surface robustness and contextual distraction.}
-\label{fig:conclusion-tabib-surface-distraction}
-\end{figure}
 
 Conversation is a further failure mode, and its lever is the register of pressure
 rather than any medical content. Under multi-turn pressure five of the seven
@@ -328,15 +330,7 @@ human supervision. MedGemma has the best ECE, 0.132, but only because it answers
 commits to anything. Prudence tells the same story. No model separates the four
 severity levels usefully, with Gemma4 E2B maximally cautious everywhere and
 MedGemma uniformly direct, so neither helps a clinician tell a critical
-contraindication from a minor precaution
-(\Cref{fig:conclusion-tabib-cap-cal}).
-
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig2.pdf}
-\caption{Capitulation and confidence calibration.}
-\label{fig:conclusion-tabib-cap-cal}
-\end{figure}
+contraindication from a minor precaution.
 
 \begin{reviewrewrite}
 Cross-lingual consistency is weak even when the substances are medically the
@@ -347,16 +341,7 @@ Gemma4 E4B have high raw agreement but $\kappa = 0$ because they mostly repeat
 the same answer in French. Ministral-3 8B is the only model above $\kappa = 0.5$,
 with $\kappa = 0.586$. Larger factual knowledge does not guarantee stable
 answers across languages~\citep{qi2023crosslingual}.
-\Cref{fig:conclusion-tabib-cross-bias} shows cross-lingual consistency and
-comparative triage stability.
 \end{reviewrewrite}
-
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig3.pdf}
-\caption{Cross-lingual consistency and comparative triage.}
-\label{fig:conclusion-tabib-cross-bias}
-\end{figure}
 
 \begin{reviewrewrite}
 The comparative triage protocol exposes another kind of failure. Every model
@@ -424,6 +409,10 @@ are the behaviours a factual benchmark, by construction, never sees.
 
 \chapter{Where Medical AI Is Going}
 \label{sec:conclusion-field-direction}
+
+The thesis argued for small, public-data models tested close to real use. This
+closing chapter turns outward, to where clinical AI is heading and to what that
+shift will demand of the way these models are evaluated.
 
 \section{From Models to Agents}
 

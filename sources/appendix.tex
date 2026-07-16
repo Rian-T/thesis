@@ -774,6 +774,33 @@ the extractor.
 This appendix holds the protocol details and the temperature sensitivity
 analysis behind the TABIB study of \Cref{sec:conclusion-evaluation}.
 
+\section{Per-protocol result figures}
+
+\Cref{fig:conclusion-tabib-surface-distraction,fig:conclusion-tabib-cap-cal,fig:conclusion-tabib-cross-bias} break the behavioural profile of \Cref{fig:conclusion-tabib-radar} down protocol by protocol.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig1.pdf}
+\caption{Surface robustness and contextual distraction.}
+\label{fig:conclusion-tabib-surface-distraction}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig2.pdf}
+\caption{Capitulation and confidence calibration.}
+\label{fig:conclusion-tabib-cap-cal}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{plots/part_3/output/evalllm_fig3.pdf}
+\caption{Cross-lingual consistency and comparative triage.}
+\label{fig:conclusion-tabib-cross-bias}
+\end{figure}
+
+\section{Protocol details}
+
 The adversarial pressure protocol uses five registers, each with ten increasing
 levels after a neutral opening turn. \Cref{tab:conclusion-tabib-ladders}
 shows the first and last prompt in each register. The LLM judge labels each
