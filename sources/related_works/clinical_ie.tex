@@ -294,7 +294,8 @@ natural-language descriptions of entity types \citep{zaratiana2024gliner}. A sin
 bidirectional transformer encodes the input text and the candidate entity types together. The
 types are written as natural language, such as ``disease'' or ``drug name'', rather than as
 fixed numeric labels, so a user can ask for any type at inference time. The model places span
-representations and type representations in a shared space and matches them by similarity.
+representations and type representations in a shared space and matches them by similarity, as
+shown in \Cref{fig:ie-gliner}.
 GLiNER reaches higher zero-shot scores than ChatGPT while using up to 300 million parameters,
 which is far smaller than a large language model. GLiNER2 extends this design into a single
 framework that covers named entity recognition, classification, and
@@ -307,6 +308,111 @@ asking ChatGPT to annotate text from the Pile, a large general corpus
 \citep{zhou2024universalner}. This yields about 45{,}000 instruction examples covering some
 13{,}000 entity types, and a model tuned on this data beats ChatGPT on named entity
 recognition by several points.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm, font=\sffamily,
+  sq/.style={draw=ThesisInk!35, fill=white, rounded corners=1.5pt,
+    minimum size=0.6cm, inner sep=0pt, text=ThesisInk},
+  esq/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!35, rounded corners=1.5pt,
+    minimum size=0.6cm, inner sep=0pt, text=ThesisInk, font=\tiny},
+  wlab/.style={rotate=90, font=\scriptsize, text=ThesisInk, inner sep=1pt},
+  idx/.style={font=\tiny, text=ThesisNeutral},
+  band/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!16, rounded corners=3pt,
+    text=ThesisInk, inner sep=3pt},
+  reg/.style={draw=ThesisNeutral!70, densely dashed, rounded corners=4pt, line width=0.6pt},
+  conn/.style={ThesisInk!30, line width=0.5pt},
+  vcell/.style={draw=ThesisNeutral!55, minimum width=0.42cm, minimum height=0.2cm,
+    inner sep=0pt},
+  hdr/.style={font=\scriptsize\bfseries, text=ThesisNeutral},
+  rlab/.style={font=\scriptsize, text=ThesisNeutral, align=left, anchor=west},
+  typechip/.style={draw=ThesisTertiaryDark, fill=ThesisTertiary!30, rounded corners=2pt,
+    minimum width=1.5cm, minimum height=0.5cm, inner sep=1pt, text=ThesisInk, font=\scriptsize},
+  colhdr/.style={font=\scriptsize, text=ThesisInk, align=center},
+  mcell/.style={draw=ThesisInk!25, minimum width=2.55cm, minimum height=0.72cm,
+    inner sep=0pt, text=ThesisInk, font=\scriptsize},
+  hit/.style={mcell, draw=ThesisSecondaryDark, line width=1pt, fill=ThesisSecondary!42,
+    font=\scriptsize\bfseries},
+  dasharr/.style={dashed, ThesisPrimaryDark, line width=0.8pt,
+    -{Stealth[length=4pt]}, shorten >=2pt, shorten <=2pt},
+]
+\newcommand{\vbar}[2]{%
+  \foreach \sh/\yo in {18/0.3,46/0.1,28/-0.1,60/-0.3}{
+    \node[vcell, fill=ThesisNeutral!\sh] at (#1,{#2+\yo}) {};}}
+% ============ TOP: region labels + dashed boundaries ============
+\node[hdr] at (0.42,2.35) {entity-type prompts};
+\node[hdr] at (6.65,2.35) {input sentence};
+\draw[reg] (-0.5,-0.95) rectangle (1.35,1.95);
+\draw[reg] (1.95,-0.95) rectangle (11.35,1.95);
+% ---- prompt units (peach [ENT] square + rotated name) ----
+\foreach \i/\w in {0/drug name, 1/disease}{
+  \pgfmathsetmacro{\x}{0.85*\i}
+  \node[esq] (e\i) at (\x,0) {[ENT]};
+  \node[wlab, text=ThesisTertiaryDark] at (\x,1.0) {\w};}
+% ---- sentence tokens (neutral square + rotated word + index) ----
+\foreach \j/\w in {0/The,1/patient,2/was,3/started,4/on,5/metformin,6/for,7/type,8/2,9/diabetes,10/.}{
+  \pgfmathsetmacro{\x}{2.4+0.85*\j}
+  \node[sq] (s\j) at (\x,0) {};
+  \node[wlab] at (\x,1.0) {\w};
+  \node[idx] at (\x,-0.62) {\j};}
+% ============ vertical connectors: squares -> transformer ============
+\foreach \x in {0,0.85,2.4,3.25,4.1,4.95,5.8,6.65,7.5,8.35,9.2,10.05,10.9}{
+  \draw[conn] (\x,-0.32) -- (\x,-1.02);}
+% ============ TRANSFORMER band ============
+\node[band, minimum width=11.95cm, minimum height=0.72cm] (tf) at (5.425,-1.4)
+  {Bidirectional transformer \; (BERT, DeBERTa, \dots)};
+% connectors transformer -> token representations
+\foreach \x in {0,0.85,2.4,3.25,4.1,4.95,5.8,6.65,7.5,8.35,9.2,10.05,10.9}{
+  \draw[conn] (\x,-1.78) -- (\x,-2.42);}
+% ============ token / word representations (grayscale vector bars) ============
+\foreach \x in {0,0.85,2.4,3.25,4.1,4.95,5.8,6.65,7.5,8.35,9.2,10.05,10.9}{ \vbar{\x}{-2.8} }
+\node[rlab] at (11.65,-2.8) {token / word\\ representations};
+% ============ FFN + span representation bands ============
+% connectors token reps -> bands
+\foreach \x in {0,0.85}{ \draw[conn] (\x,-3.22) -- (\x,-4.12); }
+\foreach \x in {2.4,3.25,4.1,4.95,5.8,6.65,7.5,8.35,9.2,10.05,10.9}{
+  \draw[conn] (\x,-3.22) -- (\x,-4.12); }
+\node[band, minimum width=1.9cm, minimum height=0.6cm] (ffn) at (0.42,-4.42) {FFN layer};
+\node[band, minimum width=9.4cm, minimum height=0.6cm] (spn) at (6.65,-4.42)
+  {span representation layer};
+% ============ entity-type embeddings + span embeddings ============
+\foreach \x in {0,0.85}{ \draw[conn] (\x,-4.72) -- (\x,-5.22); \vbar{\x}{-5.6} }
+\node[rlab, anchor=east, text width=1.7cm, align=right] at (-0.65,-5.6)
+  {entity-type\\ embeddings};
+\foreach \x in {4.1,6.65,9.2}{ \draw[conn] (\x,-4.72) -- (\x,-5.22); \vbar{\x}{-5.6} }
+\node[rlab] at (11.65,-5.6) {span\\ embeddings};
+% connectors span embeddings -> matrix column headers
+\foreach \x in {4.1,6.65,9.2}{ \draw[conn] (\x,-6.0) -- (\x,-6.55); }
+% ============ similarity matrix ============
+% column headers
+\node[colhdr] at (4.1,-6.82) {metformin\\ {\tiny\itshape\textcolor{ThesisNeutral}{(5,5)}}};
+\node[colhdr] at (6.65,-6.82) {type 2 diabetes\\ {\tiny\itshape\textcolor{ThesisNeutral}{(7,9)}}};
+\node[colhdr] at (9.2,-6.82) {patient\\ {\tiny\itshape\textcolor{ThesisNeutral}{(1,1)}}};
+% row headers (type chips)
+\node[typechip] (ra) at (1.7,-7.55) {drug name};
+\node[typechip] (rb) at (1.7,-8.30) {disease};
+% cells
+\node[hit]   at (4.1,-7.55) {0.97};
+\node[mcell] at (6.65,-7.55) {0.05};
+\node[mcell] at (9.2,-7.55) {0.11};
+\node[mcell] at (4.1,-8.30) {0.08};
+\node[hit]   at (6.65,-8.30) {0.95};
+\node[mcell] at (9.2,-8.30) {0.09};
+% dashed connectors: entity-type embeddings -> matrix rows
+\draw[dasharr] (0,-6.0) to[out=-90,in=180] (ra.west);
+\draw[dasharr] (0.85,-6.05) to[out=-90,in=180] (rb.west);
+% matrix caption line
+\node[font=\scriptsize, text=ThesisNeutral] at (6.65,-9.0)
+  {entity-type / span similarity matrix \; (dot product $+$ sigmoid)};
+\end{tikzpicture}}
+\caption{GLiNER encodes the entity-type prompts and the input sentence with one
+bidirectional transformer, applies a feed-forward layer to the type markers and a span
+layer to the token representations, then matches the resulting type and span embeddings in
+a similarity matrix whose high-scoring cells are the recognised entities
+\citep{zaratiana2024gliner}.}
+\label{fig:ie-gliner}
+\end{figure}
 
 \subsection{Other Approaches}
 
