@@ -80,3 +80,9 @@ gini1912variabilita             # Gini 1912 (classic, pre-index)
 lecun2022path                   # LeCun, "A Path Towards Autonomous ML Intelligence" 2022 (position paper, OpenReview)
 logit_lens                      # nostalgebraist, "interpreting GPT: the logit lens" 2020 (blog)
 xFormers2022                    # Meta xFormers library (software)
+
+# French clinical-AI news items (conclusion ch. 21): press articles, absent from
+# Crossref/arXiv/OpenAlex/DBLP by construction. Verification status is NOT equal:
+synapse_medgpt_2025   # Caducee.net, fetched and read: launch 16 Sep 2025, "agent conversationnel souverain". VERIFIED
+nabla_agentique_2025  # L'Usine Digitale. Headline only (site returns 403 to fetch); headline itself states "a l'ere de l'agentique". NOT fully verified
+alan_mo_2024          # L'Usine Digitale. Headline only (403 to fetch). NOT fully verified
