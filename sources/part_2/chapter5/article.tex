@@ -193,7 +193,7 @@ CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4
 \end{table*}
 
 \begin{reviewread}
-\Cref{tab:french-results} presents the French results. For Base, the CLM detour achieves 60.8\% average $F_1$, outperforming the MLM baseline on all 8 tasks (+2.9pp). For Large, CLM reaches 63.3\% versus 61.8\% for MLM (+1.5pp). CamemBERT-bio and CamemBERT average 36\% and 35\% overall, limited by their 512-token context on long clinical documents. We release the CLM-detour models as ModernCamemBERT-bio (Base and Large).
+\Cref{tab:french-results} presents the French results. For Base, the CLM detour $\theta_A$ achieves 60.8\% average $F_1$, outperforming the MLM baseline $\theta_B$ on all 8 tasks (+2.9pp). For Large, $\theta_A$ reaches 63.3\% versus 61.8\% for $\theta_B$ (+1.5pp). Since the two trajectories differ only in the Phase~1 objective, this gap is the effect of that objective alone. CamemBERT-bio and CamemBERT average 36\% and 35\% overall, limited by their 512-token context on long clinical documents. We release the CLM-detour models as ModernCamemBERT-bio (Base and Large).
 \end{reviewread}
 
 \subsection{English Biomedical Tasks}
