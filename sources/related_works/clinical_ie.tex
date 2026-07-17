@@ -340,25 +340,25 @@ recognition by several points.
 \newcommand{\vbar}[2]{%
   \foreach \sh/\yo in {18/0.3,46/0.1,28/-0.1,60/-0.3}{
     \node[vcell, fill=ThesisNeutral!\sh] at (#1,{#2+\yo}) {};}}
+\newcommand{\idxlab}[1]{{\tiny\textcolor{ThesisNeutral}{#1}}}
 % ============ TOP: region labels + dashed boundaries ============
-\node[hdr] at (0.42,2.35) {entity-type prompts};
-\node[hdr] at (6.65,2.35) {input sentence};
-\draw[reg] (-0.5,-0.95) rectangle (1.35,1.95);
-\draw[reg] (1.95,-0.95) rectangle (11.35,1.95);
+\node[hdr] at (0.42,2.75) {entity-type prompts};
+\node[hdr] at (6.65,2.75) {input sentence};
+\draw[reg] (-0.5,-0.05) rectangle (1.35,2.35);
+\draw[reg] (1.95,-0.05) rectangle (11.35,2.35);
 % ---- prompt units (peach [ENT] square + rotated name) ----
 \foreach \i/\w in {0/drug name, 1/disease}{
   \pgfmathsetmacro{\x}{0.85*\i}
-  \node[esq] (e\i) at (\x,0) {[ENT]};
-  \node[wlab, text=ThesisTertiaryDark] at (\x,1.0) {\w};}
-% ---- sentence tokens (neutral square + rotated word + index) ----
+  \node[esq] (e\i) at (\x,0.4) {[ENT]};
+  \node[wlab, text=ThesisTertiaryDark] at (\x,1.4) {\w};}
+% ---- sentence tokens (neutral square carrying its index + rotated word) ----
 \foreach \j/\w in {0/The,1/patient,2/was,3/started,4/on,5/metformin,6/for,7/type,8/2,9/diabetes,10/.}{
   \pgfmathsetmacro{\x}{2.4+0.85*\j}
-  \node[sq] (s\j) at (\x,0) {};
-  \node[wlab] at (\x,1.0) {\w};
-  \node[idx] at (\x,-0.62) {\j};}
+  \node[sq] (s\j) at (\x,0.4) {\idxlab{\j}};
+  \node[wlab] at (\x,1.4) {\w};}
 % ============ vertical connectors: squares -> transformer ============
 \foreach \x in {0,0.85,2.4,3.25,4.1,4.95,5.8,6.65,7.5,8.35,9.2,10.05,10.9}{
-  \draw[conn] (\x,-0.32) -- (\x,-1.02);}
+  \draw[conn] (\x,0.08) -- (\x,-1.02);}
 % ============ TRANSFORMER band ============
 \node[band, minimum width=11.95cm, minimum height=0.72cm] (tf) at (5.425,-1.4)
   {Bidirectional transformer \; (BERT, DeBERTa, \dots)};
@@ -390,18 +390,20 @@ recognition by several points.
 \node[colhdr] at (6.65,-6.82) {type 2 diabetes\\ {\tiny\itshape\textcolor{ThesisNeutral}{(7,9)}}};
 \node[colhdr] at (9.2,-6.82) {patient\\ {\tiny\itshape\textcolor{ThesisNeutral}{(1,1)}}};
 % row headers (type chips)
-\node[typechip] (ra) at (1.7,-7.55) {drug name};
-\node[typechip] (rb) at (1.7,-8.30) {disease};
+\node[typechip] (ra) at (1.7,-7.55) {disease};
+\node[typechip] (rb) at (1.7,-8.30) {drug name};
 % cells
-\node[hit]   at (4.1,-7.55) {0.97};
-\node[mcell] at (6.65,-7.55) {0.05};
-\node[mcell] at (9.2,-7.55) {0.11};
-\node[mcell] at (4.1,-8.30) {0.08};
-\node[hit]   at (6.65,-8.30) {0.95};
-\node[mcell] at (9.2,-8.30) {0.09};
-% dashed connectors: entity-type embeddings -> matrix rows
-\draw[dasharr] (0,-6.0) to[out=-90,in=180] (ra.west);
-\draw[dasharr] (0.85,-6.05) to[out=-90,in=180] (rb.west);
+\node[mcell] at (4.1,-7.55) {0.08};
+\node[hit]   at (6.65,-7.55) {0.95};
+\node[mcell] at (9.2,-7.55) {0.09};
+\node[hit]   at (4.1,-8.30) {0.97};
+\node[mcell] at (6.65,-8.30) {0.05};
+\node[mcell] at (9.2,-8.30) {0.11};
+% dashed connectors: entity-type embeddings -> matrix rows.
+% Rows are ordered so the left embedding feeds the lower row: the two paths nest
+% instead of crossing (same convention as the GLiNER paper's figure).
+\draw[dasharr] (0.85,-6.05) to[out=-90,in=180] (ra.west);
+\draw[dasharr] (0,-6.0) to[out=-90,in=180] (rb.west);
 % matrix caption line
 \node[font=\scriptsize, text=ThesisNeutral] at (6.65,-9.0)
   {entity-type / span similarity matrix \; (dot product $+$ sigmoid)};
