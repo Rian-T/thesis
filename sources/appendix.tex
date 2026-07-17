@@ -43,8 +43,6 @@ elements $0.996$) and the hardest, the forty-five-way medical subfield, at $0.77
 
 \begin{table}[t]
   \centering
-  \caption{Training settings for the twenty-task content-type classifier.}
-  \label{tab:ct-classifier}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}ll@{}}
@@ -66,6 +64,8 @@ elements $0.996$) and the hardest, the forty-five-way medical subfield, at $0.77
     seed               & 42 \\
     \bottomrule
   \end{tabular}
+\caption{Training settings for the twenty-task content-type classifier.}
+\label{tab:ct-classifier}
 \end{table}
 
 \Cref{fig:ct-training} shows the training: the loss under the warmup-then-linear-decay
@@ -125,8 +125,6 @@ size~\citep{modernbert}; continued pretraining touches the objective and data on
 
 \begin{table}[t]
   \centering
-  \caption{Architecture of the base and large encoders, identical to ModernBERT.}
-  \label{tab:clm-arch}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}lll@{}}
@@ -145,6 +143,8 @@ size~\citep{modernbert}; continued pretraining touches the objective and data on
     vocabulary             & 32768 (FR) / 50368 (EN) & same \\
     \bottomrule
   \end{tabular}
+\caption{Architecture of the base and large encoders, identical to ModernBERT.}
+\label{tab:clm-arch}
 \end{table}
 
 \section{Objective and optimisation}
@@ -158,8 +158,6 @@ both objectives.
 
 \begin{table}[t]
   \centering
-  \caption{The objective switches across phases. The causal detour sees a gradient at every position; the masked phases at a fraction of positions.}
-  \label{tab:clm-obj}
   \small
   \setlength{\tabcolsep}{10pt}
   \begin{tabular}{@{}lll@{}}
@@ -171,12 +169,12 @@ both objectives.
     MLM decay (phase 2, both)            & bidirectional & 15\% \\
     \bottomrule
   \end{tabular}
+\caption{The objective switches across phases. The causal detour sees a gradient at every position; the masked phases at a fraction of positions.}
+\label{tab:clm-obj}
 \end{table}
 
 \begin{table}[t]
   \centering
-  \caption{Optimisation and schedule, shared across all four models and both objectives.}
-  \label{tab:clm-optim}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}ll@{}}
@@ -199,6 +197,8 @@ both objectives.
     hardware             & 1 node $\times$ 4 NVIDIA H100 \\
     \bottomrule
   \end{tabular}
+\caption{Optimisation and schedule, shared across all four models and both objectives.}
+\label{tab:clm-optim}
 \end{table}
 
 \section{Per-model recipe and data}
@@ -210,8 +210,6 @@ instruction sets and clinical notes.
 
 \begin{table}[t]
   \centering
-  \caption{Initialisation, token budgets and data mixture of the four encoders.}
-  \label{tab:clm-permodel}
   \small
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{@{}lll@{}}
@@ -228,6 +226,8 @@ instruction sets and clinical notes.
                   & E3C 4\%, EMEA 6\% & MIMIC notes 20\% \\
     \bottomrule
   \end{tabular}
+\caption{Initialisation, token budgets and data mixture of the four encoders.}
+\label{tab:clm-permodel}
 \end{table}
 
 \section{Implementation details}
@@ -276,8 +276,6 @@ single task whose corpus is closest to the pretraining text, AnnoCTR in cybersec
 
 \begin{table}[t]
   \centering
-  \caption{The detour applied beyond French biomedical ModernBERT. The cross-architecture result is significant; the two new domains are positive but not significant on the task average.}
-  \label{tab:clm-generality}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}lccc@{}}
@@ -289,6 +287,8 @@ single task whose corpus is closest to the pretraining text, AnnoCTR in cybersec
     Finance                          & 3 & +0.40 & 0.21 \\
     \bottomrule
   \end{tabular}
+\caption{The detour applied beyond French biomedical ModernBERT. The cross-architecture result is significant; the two new domains are positive but not significant on the task average.}
+\label{tab:clm-generality}
 \end{table}
 
 \section{Explorations before the detour}
@@ -307,8 +307,6 @@ and this is what motivated changing the objective rather than the data.
 
 \begin{table}[t]
   \centering
-  \caption{Explorations inside the masked objective that preceded the detour, all neutral or negative on downstream ICD coding.}
-  \label{tab:clm-preclm}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}ll@{}}
@@ -321,6 +319,8 @@ and this is what motivated changing the objective rather than the data.
     long-range loss shaping + grounded walks & at or below the masked baseline \\
     \bottomrule
   \end{tabular}
+\caption{Explorations inside the masked objective that preceded the detour, all neutral or negative on downstream ICD coding.}
+\label{tab:clm-preclm}
 \end{table}
 
 \begin{figure}[t]
@@ -451,8 +451,6 @@ almost purely hierarchical, use three each. \Cref{tab:ob-walks} gives the volume
 
 \begin{table}[t]
   \centering
-  \caption{Ontologies and generated walk volumes.}
-  \label{tab:ob-walks}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}lrrr@{}}
@@ -464,6 +462,8 @@ almost purely hierarchical, use three each. \Cref{tab:ob-walks} gives the volume
     walk types        & 5 & 3 & 3 \\
     \bottomrule
   \end{tabular}
+\caption{Ontologies and generated walk volumes.}
+\label{tab:ob-walks}
 \end{table}
 
 \section{Textbook reformulation}
@@ -477,8 +477,6 @@ than 12000 characters is skipped, and a reformulation is kept only if it is at l
 
 \begin{table}[t]
   \centering
-  \caption{Textbook reformulation settings.}
-  \label{tab:ob-gen}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}ll@{}}
@@ -495,6 +493,8 @@ than 12000 characters is skipped, and a reformulation is kept only if it is at l
     walks reformulated & 1304266 ($\approx$ 1.3B tokens) \\
     \bottomrule
   \end{tabular}
+\caption{Textbook reformulation settings.}
+\label{tab:ob-gen}
 \end{table}
 
 \section{Pretraining and evaluation}
@@ -511,8 +511,6 @@ checkpoint.
 
 \begin{table}[t]
   \centering
-  \caption{OntoBook pretraining and downstream fine-tuning settings.}
-  \label{tab:ob-train}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}ll@{}}
@@ -535,6 +533,8 @@ checkpoint.
     seeds / metric     & 3 (our models) / micro-F1 \\
     \bottomrule
   \end{tabular}
+\caption{OntoBook pretraining and downstream fine-tuning settings.}
+\label{tab:ob-train}
 \end{table}
 
 \section{Implementation details}
@@ -718,8 +718,6 @@ benchmark uses. \Cref{tab:type-bank} lists them.
 
 \begin{table}[t]
   \centering
-  \caption{The twenty evaluation types: ten common, ten novel.}
-  \label{tab:type-bank}
   \small
   \setlength{\tabcolsep}{14pt}
   \begin{tabular}{@{}ll@{}}
@@ -738,6 +736,8 @@ benchmark uses. \Cref{tab:type-bank} lists them.
     treatment          & immunocompromised status \\
     \bottomrule
   \end{tabular}
+\caption{The twenty evaluation types: ten common, ten novel.}
+\label{tab:type-bank}
 \end{table}
 
 \section{Hyperparameters}
@@ -747,8 +747,6 @@ the extractor.
 
 \begin{table}[t]
   \centering
-  \caption{Training settings for MedEmbed and the extractor.}
-  \label{tab:hparams}
   \small
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}lll@{}}
@@ -765,6 +763,8 @@ the extractor.
     precision           & fp16                & fp16 \\
     \bottomrule
   \end{tabular}
+\caption{Training settings for MedEmbed and the extractor.}
+\label{tab:hparams}
 \end{table}
 
 \chapter{TABIB Protocol Details and Sensitivity}
@@ -810,8 +810,6 @@ Nemotron, 0.65 for Qwen3.5 4B, 0.41 for Gemma4 E2B, and 0.36 for MedGemma 1.5.
 
 \begin{table}[tbp]
 \centering
-\caption{Pressure registers used in the adversarial capitulation protocol.}
-\label{tab:conclusion-tabib-ladders}
 \footnotesize
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{p{2.4cm}p{5.2cm}p{6.2cm}}
@@ -830,6 +828,8 @@ Role play & \textit{Imagine that you are a caring pharmacist.} &
 \textit{Play a caregiver free to decide, without hierarchy.} \\
 \bottomrule
 \end{tabular}}
+\caption{Pressure registers used in the adversarial capitulation protocol.}
+\label{tab:conclusion-tabib-ladders}
 \end{table}
 
 For the comparative triage protocol, synthetic clinical notes are generated from
@@ -845,8 +845,6 @@ effect remain stable.
 
 \begin{table}[tbp]
 \centering
-\caption{B1 surface robustness sensitivity analysis.}
-\label{tab:conclusion-tabib-b1-sensitivity}
 \small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccc}
@@ -864,12 +862,12 @@ Qwen3.5 9B     & 20.6\%& 20.6\% & 32.4\% & 14.7\% & 17.6\% & 52.9\% \\
 Gemma4 E4B     & 60.3\%& 22.1\% & 55.9\% & 50.0\% & 19.1\% & 44.1\% \\
 \bottomrule
 \end{tabular}}
+\caption{B1 surface robustness sensitivity analysis.}
+\label{tab:conclusion-tabib-b1-sensitivity}
 \end{table}
 
 \begin{table}[tbp]
 \centering
-\caption{B2 contextual distraction sensitivity analysis.}
-\label{tab:conclusion-tabib-b2-sensitivity}
 \small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
@@ -888,12 +886,12 @@ Qwen3.5 9B     & $-35.3$\% & $-12.5$\% & $-27.9$\% & $-9.6$\%  \\
 Gemma4 E4B     & $-25.7$\% & $-4.4$\%  & $-30.9$\% & $-9.9$\%  \\
 \bottomrule
 \end{tabular}}
+\caption{B2 contextual distraction sensitivity analysis.}
+\label{tab:conclusion-tabib-b2-sensitivity}
 \end{table}
 
 \begin{table}[tbp]
 \centering
-\caption{B5 confidence calibration sensitivity analysis.}
-\label{tab:conclusion-tabib-b5-sensitivity}
 \small
 \begin{tabular}{lcccc}
 \toprule
@@ -910,12 +908,12 @@ Qwen3.5 9B     & 0.500 & 45.9\% & 0.479 & 46.6\% \\
 Gemma4 E4B     & 0.533 & 40.3\% & 0.532 & 39.6\% \\
 \bottomrule
 \end{tabular}
+\caption{B5 confidence calibration sensitivity analysis.}
+\label{tab:conclusion-tabib-b5-sensitivity}
 \end{table}
 
 \begin{table}[tbp]
 \centering
-\caption{B4 cross-lingual consistency sensitivity analysis.}
-\label{tab:conclusion-tabib-b4-sensitivity}
 \small
 \begin{tabular}{lcccc}
 \toprule
@@ -932,4 +930,6 @@ Qwen3.5 9B     & 66\% & 0.418 & 65\% & 0.425 \\
 Gemma4 E4B     & 78\% & 0.000 & 72\% & 0.000 \\
 \bottomrule
 \end{tabular}
+\caption{B4 cross-lingual consistency sensitivity analysis.}
+\label{tab:conclusion-tabib-b4-sensitivity}
 \end{table}
