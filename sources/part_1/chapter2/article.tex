@@ -144,12 +144,12 @@ We follow a two-stage annotation process on a single 8$\times$A100 node: 160 GPU
 \end{reviewread}
 
 \paragraph{Stage 1: LLM annotation.}
-We used Llama-3.1-70B-Instruct~\citep{touvron2024llama3} to annotate a diverse subset of 400,000 paragraphs (approximately 0.33\% of the corpus) across multiple dimensions: type classification (clinical case, study, review, other), domain categorization (clinical, biomedical, other), and educational quality (1--5 scale). Language was identified separately using langdetect.
+We used Llama-3.1-70B-Instruct~\citep{touvron2024llama3}, with the full prompt and the annotation schema given in \Cref{app:content-types}, to annotate a diverse subset of 400,000 paragraphs (approximately 0.33\% of the corpus) across multiple dimensions: type classification (clinical case, study, review, other), domain categorization (clinical, biomedical, other), and educational quality (1--5 scale). Language was identified separately using langdetect.
 
 % TODO: include annotation prompt in appendix, reference it here
 
 \paragraph{Stage 2: Distillation.}
-To scale annotation to the full corpus, we distilled the LLM annotations into a smaller XLM-RoBERTa-base model~\citep{conneau2020xlmr} trained to jointly predict all annotation dimensions. On 39,800 held-out paragraphs, the student closely matches the Llama-3.1-70B labels (\Cref{tab:distillation}). It is important to note that these annotations are not gold-standard labels verified by medical experts, but neural heuristics for data curation. Similar to FineWeb-Edu~\citep{penedo2024fineweb}, they guide which content to prioritize during pretraining.
+To scale annotation to the full corpus, we distilled the LLM annotations into a smaller XLM-RoBERTa-base model~\citep{conneau2020xlmr} trained to jointly predict all annotation dimensions. On 39,800 held-out paragraphs, the student closely matches the Llama-3.1-70B labels (\Cref{tab:distillation}). These annotations are neural heuristics for data curation, and no medical expert verified them. Similar to FineWeb-Edu~\citep{penedo2024fineweb}, they guide which content to prioritize during pretraining.
 
 \begin{table}[t]
 \centering

@@ -43,7 +43,8 @@ labels.
 
 The generalist corpus teaches the extractor to associate spans with descriptions
 of medical types. For each passage, Qwen3-235B proposes entity mentions together
-with a natural-language description of each type. We then search for every
+with a natural-language description of each type, following the prompt given in
+\Cref{app:gliner-prompts}. We then search for every
 proposed mention in the source passage and remove the ones we cannot locate, so
 that each retained span is guaranteed to appear in the text. Documents left with
 no remaining mention are kept as negative examples.
@@ -107,6 +108,7 @@ that have already occurred.
 
 The generated reports keep the chronology of the source case but replace its
 compact summary with documents written at distinct moments of care.
+\Cref{app:lymphoma-dossier} shows one generated record in full.
 
 The resulting corpus contains 2,050 longitudinal records, each with a median of
 eight reports and 22,314 characters, and 31\% of them include a second treatment

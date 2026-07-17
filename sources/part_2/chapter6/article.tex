@@ -74,8 +74,7 @@ To assign a code to a discharge summary, a hospital coder relies on facts that t
 
 The previous chapters improved biomedical encoders in two ways: by collecting and filtering a better pretraining corpus (\Cref{chap:collecting}) and by changing the pretraining objective (\Cref{chap:objectives}). Both operate on running text. An encoder trained this way learns medical vocabulary, but it never sees the relational structure of an ontology, because that structure is not written in sentences. Models such as CamemBERT-bio (\Cref{chap:encoders}) learn what a term means; they do not learn how its code relates to the others.
 
-This chapter asks whether that structure can be turned into a training signal for encoders. Medical coding makes the question concrete. French hospitals code more than 30 million stays a year with the CIM-10, CCAM, and ATC classifications, and accurate coding depends on the relations between codes.
-% TODO(cite): source for the >30M annual French hospital stays figure (PMSI/ATIH); left uncited pending verification
+This chapter asks whether that structure can be turned into a training signal for encoders. Medical coding makes the question concrete. French hospitals code more than 30 million stays a year~\citep{atih_pmsi} with the CIM-10, CCAM, and ATC classifications, and accurate coding depends on the relations between codes.
 We turn those relations into text. We walk the ontology graph to produce sequences of related codes, rewrite each walk into fluent textbook prose with a large language model, and train the encoder on this text with two objectives at once: masked language modeling and relation prediction between pairs of codes. The single condition that makes this work is that both objectives read the same text. We call this property \emph{alignment}, and we show it is necessary.
 
 We evaluate \method on three French medical coding benchmarks, study the contribution of each component, and release the 1.3 million reformulated textbooks across the three ontologies (CIM-10, CCAM, ATC) together with the pretrained checkpoints.
@@ -120,6 +119,8 @@ Phi-1 & & \checkmark & \\
 Automatic medical coding assigns diagnosis, procedure, or medication codes to clinical text. \Cref{chap:rw-ie} reviews the main approaches, from label-wise attention models such as CAML \citep{mullenbach2018caml} to fine-tuned encoders such as PLM-ICD \citep{huang2022plmicd}. \citet{kirchler2026grasp} recently showed that language-model embeddings improve the transfer of EHR-based predictions across countries and coding systems, which points to the value of encoding medical knowledge structure for cross-system generalization. These methods improve the classification head or the input representation, but they rely on generic encoders pretrained on flat text. Our contribution sits one step earlier, at pretraining: an encoder that has already learned ontology structure before it sees any coding data.
 
 \section{Method}
+
+\noindent The walk, generation and training settings behind this section are given in \Cref{app:ontobook-details}.
 \label{sec:method}
 
 \method converts medical ontology structure into pretraining signal through three stages: (1) generating random walks through ontology graphs, (2) reformulating these walks into fluent textbook prose using a large language model, and (3) training an encoder with multi-task learning combining masked language modeling and relation prediction. We first describe the ontologies used, then detail each stage. Figure~\ref{fig:ontobook-pipeline} illustrates the full pipeline.

@@ -34,7 +34,7 @@ PARHAF and the FrACCO NER dataset remain multi-mention tasks, where all predicti
 matched greedily by decreasing confidence. The two regimes are summarized in
 \Cref{fig:p3-metrics,tab:p3-metrics}.
 
-We report two eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
+The evaluation type bank and the training settings are given in \Cref{app:eval-details}. We report two eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
 reference, making it permissive about boundaries. Value-$F_1$ requires a Jaccard
 similarity of at least 0.5 between normalized token sets. It measures surface
 agreement and does not measure clinical equivalence. Main model comparisons use paired
