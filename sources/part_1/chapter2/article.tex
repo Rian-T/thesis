@@ -140,7 +140,7 @@ We extracted text from the PubMed Central (PMC) Open Access Subset, containing a
 \label{sec:annotation}
 
 \begin{reviewread}
-We follow a two-stage annotation process on a single 8$\times$A100 node: 160 GPU-hours for the first stage and 80 GPU-hours for the second.
+We follow the two-stage annotation process of \Cref{fig:pipeline}, on a single 8$\times$A100 node: 160 GPU-hours for the first stage and 80 GPU-hours for the second.
 \end{reviewread}
 
 \paragraph{Stage 1: LLM annotation.}
@@ -178,7 +178,7 @@ Document type & $F_1 = 0.925$, $\kappa = 0.821$ \\
 \label{sec:data-analysis}
 
 \begin{reviewread}
-Most PMC paragraphs receive an educational score of 4, with a mean of 3.48 and median of 4.00. This distribution varies by content type: reviews and studies contain the highest proportion of educational content (86.9\% and 78.7\% scoring 4, respectively), while clinical cases show more variance (57.0\% rated 4). Domain-wise, biomedical paragraphs score higher (75.3\% at score 4) than clinical text (44.0\%), and content labeled ``other'' rarely reaches high scores (2.1\%). These patterns support the score threshold ($\geq 3$) used in BE-Educational and BE-All, and explain why combining domain and quality filters yields consistent gains across tasks.
+Most PMC paragraphs receive an educational score of 4, with a mean of 3.48 and median of 4.00 (\Cref{fig:edu-scores}). This distribution varies by content type: reviews and studies contain the highest proportion of educational content (86.9\% and 78.7\% scoring 4, respectively), while clinical cases show more variance (57.0\% rated 4). Domain-wise, biomedical paragraphs score higher (75.3\% at score 4) than clinical text (44.0\%), and content labeled ``other'' rarely reaches high scores (2.1\%). These patterns support the score threshold ($\geq 3$) used in BE-Educational and BE-All, and explain why combining domain and quality filters yields consistent gains across tasks.
 \end{reviewread}
 
 \begin{figure}[t]
@@ -244,7 +244,7 @@ Each Biomed-Enriched variant was trained with exactly 33.6 billion tokens, using
 \subsection{Encoder Setup}
 
 \begin{reviewread}
-We also conducted continual-pretraining experiments on encoder models. Starting from ModernBERT-base~\citep{modernbert} after its context extension phase, we followed exactly the same hyperparameters as BioClinical-ModernBERT phase~1. Our baseline reproduces their standard continual pretraining setup on public PubMed/PMC. Our clinical-upsample recipe additionally applies educational filtering (score $\geq 3$) and upsamples clinical cases 100$\times$ and clinical domain content 10$\times$.
+We also conducted continual-pretraining experiments on encoder models. Starting from ModernBERT-base~\citep{modernbert} after its context extension phase, we followed exactly the same hyperparameters (\Cref{tab:encoder-hyperparams}) as BioClinical-ModernBERT phase~1. Our baseline reproduces their standard continual pretraining setup on public PubMed/PMC. Our clinical-upsample recipe additionally applies educational filtering (score $\geq 3$) and upsamples clinical cases 100$\times$ and clinical domain content 10$\times$.
 \end{reviewread}
 
 \begin{reviewread}
@@ -302,7 +302,7 @@ Tokens & 70B \\
 \subsection{Evaluation}
 
 \begin{reviewread}
-For decoders, our evaluation consists of zero-shot testing on MMLU medical subcategories, MedQA~\citep{jin2021medqa}, MedMCQA~\citep{pal2022medmcqa}, and PubMedQA~\citep{jin2019pubmedqa}. For the French adaptation assessment, we use 5-shot evaluation on FrenchMedMCQA~\citep{labrak-etal-2022}. We compare our models against three baselines: OLMo2-7B-stage1, Llama-3.1-8B, and Meditron-70B.
+For decoders (\Cref{tab:decoder-hyperparams}), our evaluation consists of zero-shot testing on MMLU medical subcategories, MedQA~\citep{jin2021medqa}, MedMCQA~\citep{pal2022medmcqa}, and PubMedQA~\citep{jin2019pubmedqa}. For the French adaptation assessment, we use 5-shot evaluation on FrenchMedMCQA~\citep{labrak-etal-2022}. We compare our models against three baselines: OLMo2-7B-stage1, Llama-3.1-8B, and Meditron-70B.
 \end{reviewread}
 
 \begin{reviewread}
@@ -316,7 +316,7 @@ For the encoder models, we evaluate on 11 tasks spanning clinical and biomedical
 \subsection{Decoder Results}
 
 \begin{reviewread}
-\Cref{tab:decoder-qa,tab:decoder-mmlu} present decoder results on medical QA and MMLU benchmarks. The combined strategy BE-All achieves the best average performance (61.08\%), with the strongest gains on MedQA (+2.4 pts) and MMLU Clinical Knowledge (+1.5 pts). Different enrichment strategies show complementary strengths: clinical upsampling yields a +4 point improvement on MMLU Professional Medicine, while educational filtering improves Medical Genetics by +2 points and MedMCQA by +1.2 points. BE-All reaches target performance using roughly one-third of the training tokens compared to BE-Base, with stable improvements visible from early checkpoints. BE-French also demonstrates successful adaptation to French medical QA (40.5\% vs 38.3\% baseline, \Cref{fig:french-performance}), showing that language-specific upsampling generalizes beyond English.
+\Cref{tab:decoder-qa,tab:decoder-mmlu} present decoder results on medical QA and MMLU benchmarks. The combined strategy BE-All achieves the best average performance (61.08\%), with the strongest gains on MedQA (+2.4 pts) and MMLU Clinical Knowledge (+1.5 pts). Different enrichment strategies show complementary strengths: clinical upsampling yields a +4 point improvement on MMLU Professional Medicine, while educational filtering improves Medical Genetics by +2 points and MedMCQA by +1.2 points. BE-All reaches target performance using roughly one-third of the training tokens compared to BE-Base, with stable improvements visible from early checkpoints (\Cref{fig:decoder-curves}). BE-French also demonstrates successful adaptation to French medical QA (40.5\% vs 38.3\% baseline, \Cref{fig:french-performance}), showing that language-specific upsampling generalizes beyond English.
 \end{reviewread}
 
 \begin{figure}[t]
@@ -406,7 +406,7 @@ OLMo2-7B-stage1 & 54.81 & 63.40 & \underline{69.44} & 53.18 & \underline{69.00} 
 \subsection{Encoder Results}
 
 \begin{reviewread}
-\Cref{tab:encoder-clinical,tab:encoder-biomed} present encoder results across 11 clinical and biomedical benchmarks. Our BE-Clinical recipe achieves 77.08\% average $F_1$, matching BioClinical-ModernBERT (77.05\%) while using 2.5$\times$ fewer tokens and only public PubMed/PMC data. Adding a decay phase with high-quality educational content brings slight additional gains: the Biomedical decay variant (edu $\geq 4$) achieves 77.32\%.
+\Cref{tab:encoder-clinical,tab:encoder-biomed} present encoder results across 11 clinical and biomedical benchmarks, and \Cref{fig:encoder-curves} shows how they develop during training. Our BE-Clinical recipe achieves 77.08\% average $F_1$, matching BioClinical-ModernBERT (77.05\%) while using 2.5$\times$ fewer tokens and only public PubMed/PMC data. Adding a decay phase with high-quality educational content brings slight additional gains: the Biomedical decay variant (edu $\geq 4$) achieves 77.32\%.
 \end{reviewread}
 
 \begin{reviewread}
@@ -536,7 +536,7 @@ We scored all documents using four quality classifiers: DCLM (FastText-based, us
 \end{figure}
 
 \begin{reviewread}
-The results reveal a striking pattern. The DCLM classifier ranks all MMLU and GSM8K samples in the top-5 percentiles. If only the top 5\% of documents are selected through filtering, the probability of encountering a benchmark sample in a training batch increases by a factor of approximately 20. The FineWeb-Edu classifier also ranks benchmark samples consistently higher, likely because its annotation prompt explicitly asks for documents with high educational value, which naturally favors exam-style items and step-by-step solutions.
+\Cref{fig:biahs} reveals a striking pattern. The DCLM classifier ranks all MMLU and GSM8K samples in the top-5 percentiles. If only the top 5\% of documents are selected through filtering, the probability of encountering a benchmark sample in a training batch increases by a factor of approximately 20. The FineWeb-Edu classifier also ranks benchmark samples consistently higher, likely because its annotation prompt explicitly asks for documents with high educational value, which naturally favors exam-style items and step-by-step solutions.
 \end{reviewread}
 
 \begin{reviewread}

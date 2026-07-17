@@ -130,7 +130,7 @@ report together with its date, document type, and corresponding events.
 
 For each report, the language model returns a field name together with a string
 meant to reproduce text from that report, but it predicts neither character
-offsets nor a normalized value. We recover the position ourselves: we search for
+offsets nor a normalized value. We recover the position ourselves, as \Cref{fig:p3-tapdl} shows: we search for
 the returned string, fall back to approximate matching when the literal search
 fails, and remap the match onto the complete record. When two fields claim
 exactly the same offsets, a final rule keeps a single assignment; partial

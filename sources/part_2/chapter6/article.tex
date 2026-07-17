@@ -403,7 +403,8 @@ Figure~\ref{fig:dynamics} shows training dynamics and hyperparameter sensitivity
 \subsection{Multi-Ontology Transfer}
 \label{sec:multi_onto}
 
-The main \method model uses CIM-10 walks (Table~\ref{tab:main_results}). To test whether other ontologies also provide useful pretraining signal, we train separate models on walks from each ontology individually and on all three combined.
+The main \method model uses CIM-10 walks (Table~\ref{tab:main_results}). To test whether other ontologies also provide useful pretraining signal, we train separate models on walks from each ontology individually and on all three combined
+(\Cref{tab:ontology_results}).
 
 \begin{table}[t]
 \centering
@@ -436,6 +437,7 @@ All three individual ontologies improve over the MLM-only baseline, indicating t
 \label{sec:probing}
 
 To understand how \method organizes code representations, we evaluate with three probing tasks on CIM-10 code embeddings (mean-pooled over code descriptions): chapter classification (26 classes), hierarchy depth prediction (4 levels), and distance correlation (Spearman $\rho$ between cosine distances and ontology tree distances). We compare against a code infilling variant (CodeInfill+MLM) that masks and predicts code tokens during pretraining.
+\Cref{tab:probing} reports the three probes.
 
 \begin{table}[t]
 \centering
