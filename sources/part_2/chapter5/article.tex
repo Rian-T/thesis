@@ -40,6 +40,8 @@ The useful lesson is to separate decoder continued pretraining from the decoder 
 
 This makes the causal objective worth revisiting for encoders. \citet{gisserot2025clm} control for scale and data by training matched models from 210M to 1B parameters. They find that MLM remains stronger on average for representation tasks, but that CLM is more data-efficient and gives more stable fine-tuning. Their best fixed-budget recipe trains first with CLM and then returns to MLM. The rest of the chapter tests the same direction in a biomedical continued-pretraining setting. We start from pretrained encoders, adapt them to biomedical text, and ask whether a temporary CLM phase leaves a useful trace after returning to MLM.
 
+One reason to expect a gain is that MLM makes poor use of its tokens at training time. With 15\% masking, the model sees a full sequence but only receives a training signal on about 15 of every 100 positions, since the loss is computed on the masked positions alone. The remaining tokens are read as context and never predicted. CLM computes a loss at every position, so the same sequence yields several times more predictions for the same forward and backward pass. For a fixed token budget, this is a large difference in how much supervision the model extracts from the corpus.
+
 \subsection{Architecture and Objective}
 
 \begin{reviewread}
@@ -88,33 +90,21 @@ Our approach consists of two phases, illustrated in \Cref{fig:clm-pipeline}.
 
 \paragraph{Phase 2: MLM decay.} After CLM pretraining, we restore bidirectional attention and train with MLM at 15\% masking for approximately 10\% of the Phase~1 budget. The optimizer state is kept between phases; only the learning rate scheduler resets. Phase~2 decays the learning rate from peak to 10\% of peak.
 
-\paragraph{Controlled comparison.} The MLM baseline follows the same two-phase structure with 30\% masking in Phase~1 and 15\% in Phase~2, identical schedule and optimizer. Both trajectories use identical architecture, data, and total compute:
+\paragraph{Controlled comparison.} The MLM baseline follows the same two-phase structure with 30\% masking in Phase~1 and 15\% in Phase~2, identical schedule and optimizer. Both trajectories use identical architecture, data, and total compute. We write $\Phi_{1,\text{CLM}}$ for a Phase~1 of causal training, $\Phi_{1,\text{MLM}30\%}$ for a Phase~1 of masked training at 30\% masking, and $\Phi_{2,\text{MLM}15\%}$ for the shared Phase~2 decay at 15\% masking. Each operator takes a set of weights and a token budget, and returns the weights obtained after training on that budget:
 \begin{align*}
-\theta_A &= T_{\text{MLM}}(T_{\text{CLM}}(\theta_0, n), 0.1n) && \text{(CLM detour)} \\
-\theta_B &= T_{\text{MLM}}(\theta_0, 1.1n) && \text{(MLM baseline)}
+\theta_A &= \Phi_{2,\text{MLM}15\%}(\Phi_{1,\text{CLM}}(\theta_0, n),\; 0.1n) && \text{(CLM detour)} \\
+\theta_B &= \Phi_{2,\text{MLM}15\%}(\Phi_{1,\text{MLM}30\%}(\theta_0, n),\; 0.1n) && \text{(MLM baseline)}
 \end{align*}
+Here $\theta_0$ is the pretrained encoder we start from, $n$ is the Phase~1 budget, and $0.1n$ is the Phase~2 budget. Both trajectories therefore train on $1.1n$ tokens in total and share the same Phase~2.
 \begin{reviewread}
 The only difference is the Phase~1 objective. Any performance gap is attributable to the training objective alone.
 \end{reviewread}
-
-\subsection{Freeze Interventions}
-\label{sec:freeze}
-
-\begin{reviewread}
-To test which layers carry the CLM benefit, we run three freeze experiments on the 22-layer French Base model, where the CLM-MLM gap is largest (+2.9pp):
-\end{reviewread}
-
-\begin{itemize}
-    \item \textbf{Experiment~1} (low freeze, CLM phase): Layers 0--7 frozen during CLM, then normal decay. Tests whether low-layer modification during CLM is necessary.
-    \item \textbf{Experiment~2} (low freeze, decay phase): Normal CLM, then layers 0--7 frozen during decay. Tests whether low-layer CLM changes persist without further updates.
-    \item \textbf{Experiment~3} (mid freeze, CLM phase): Layers 8--14 frozen during CLM, then normal decay. Together with Experiment~1, tests selectivity: if freezing low layers eliminates the benefit while freezing mid layers preserves it, this constitutes a double dissociation.
-\end{itemize}
 
 \subsection{Data}
 
 \paragraph{French.} We compile 10B tokens (Base) or 25B tokens (Large) from four sources. The main source (7B tokens) is French biomedical literature (scientific articles, clinical guidelines, medical theses), where each paragraph is scored for educational value using Qwen3-235B and articles are upsampled based on their proportion of high-scoring paragraphs, following the Biomed-Enriched approach (\Cref{chap:quality}). The remaining sources are synthetic medical QA from French coding systems (2B), clinical cases from the European Clinical Case Corpus (E3C, 400M), and drug package inserts from the European Medicines Agency (600M).
 
-\paragraph{English.} For the 50B scale, we mix three components: 60\% biomedical literature from Biomed-Enriched (PMC Open Access articles filtered by educational value $\geq 3.0$), 20\% medical instruction-following datasets (MedS-Ins, ReasonMed, MediFlow, UltraMedical, EHR-Ins-Reasoning), and 20\% MIMIC-III discharge summaries and clinical notes. The smaller 10B variant uses Biomed-Enriched with clinical case paragraphs upsampled 100$\times$ and other clinical documents 10$\times$ (80\%), plus MediFlow medical instructions (20\%), without MIMIC.
+\paragraph{English.} For the 50B scale, we mix three components: 60\% biomedical literature from Biomed-Enriched (PMC Open Access articles filtered by educational value $\geq 3.0$), 20\% medical instruction-following datasets (MedS-Ins, ReasonMed~\citep{sun2025reasonmed}, MediFlow~\citep{corbeil2025mediflow}, UltraMedical~\citep{zhang2024ultramedical}, EHR-Ins-Reasoning), and 20\% MIMIC-III discharge summaries and clinical notes. The smaller 10B variant uses Biomed-Enriched with clinical case paragraphs upsampled 100$\times$ and other clinical documents 10$\times$ (80\%), plus MediFlow medical instructions (20\%), without MIMIC.
 
 \subsection{Training Details}
 
@@ -124,7 +114,7 @@ All runs use decoupled AdamW with peak lr $2 \times 10^{-4}$, $\beta_1 = 0.9$, $
 
 \subsection{Fine-tuning Protocol}
 
-\paragraph{French tasks.} Classification (DiaMED) and multilabel tasks (MedDialog, FrACCO, CANTEMIST, DisTEMIST) use a linear head on the CLS token, trained for 15 epochs with lr $= 2 \times 10^{-5}$, batch size 4, and 10\% warmup. Multilabel tasks use max sequence length 4096 with weighted BCEWithLogitsLoss; classification uses 2048. NER tasks (EMEA, Medline) use a span-based architecture with BiLSTM, CRF, and biaffine scorer, trained for 4000 steps with lr $= 5 \times 10^{-5}$ for the encoder and $10^{-3}$ for the head, batch size 16, max length 1024. All tasks use AdamW with weight decay 0.01 and select the best checkpoint by validation $F_1$.
+\paragraph{French tasks.} Single-label classification (DiaMED) and multilabel classification (MedDialog~\citep{liu2024meddialog}, FrACCO~\citep{pignat2025fracco}, CANTEMIST~\citep{miranda2020cantemist}, DisTEMIST~\citep{miranda2022distemist}) use a linear head on the CLS token, trained for 15 epochs with lr $= 2 \times 10^{-5}$, batch size 4, and 10\% warmup. The multilabel classification tasks use max sequence length 4096 with weighted BCEWithLogitsLoss; single-label classification uses 2048. NER tasks (EMEA, Medline) use a span-based architecture with BiLSTM, CRF, and biaffine scorer, trained for 4000 steps with lr $= 5 \times 10^{-5}$ for the encoder and $10^{-3}$ for the head, batch size 16, max length 1024. All tasks use AdamW with weight decay 0.01 and select the best checkpoint by validation $F_1$.
 
 \paragraph{English tasks.} We follow the BioClinical-ModernBERT evaluation protocol~\citep{sounack2025bioclinicalmodernbert}: lr $= 5 \times 10^{-5}$, weight decay 0.01, batch size 16, 10 epochs for most tasks (20 for NER). All models are fine-tuned with the same hyperparameters per task.
 
@@ -360,7 +350,17 @@ A ratio of 1 means no CLM-specific effect. Low layers (0--7) show ratios of 5--4
 \end{figure}
 
 \begin{reviewread}
-Do these low-layer changes actually drive the downstream improvement? We answer with the freeze interventions described in \S\ref{sec:freeze}, summarized in \Cref{fig:freeze} and \Cref{tab:freeze}.
+Do these low-layer changes actually drive the downstream improvement? A freeze experiment holds a group of layers fixed during one phase of training, so that the rest of the model still trains normally around it. If the benefit depends on a layer group being modified during a given phase, freezing that group in that phase should remove the benefit. We run three such experiments on the 22-layer French Base model, where the CLM-MLM gap is largest (+2.9pp):
+\end{reviewread}
+
+\begin{itemize}
+    \item \textbf{Experiment~1} (low freeze, CLM phase): Layers 0--7 frozen during CLM, then normal decay. Tests whether low-layer modification during CLM is necessary.
+    \item \textbf{Experiment~2} (low freeze, decay phase): Normal CLM, then layers 0--7 frozen during decay. Tests whether low-layer CLM changes persist without further updates.
+    \item \textbf{Experiment~3} (mid freeze, CLM phase): Layers 8--14 frozen during CLM, then normal decay. Together with Experiment~1, tests selectivity: if freezing low layers eliminates the benefit while freezing mid layers preserves it, this constitutes a double dissociation.
+\end{itemize}
+
+\begin{reviewread}
+The three conditions are summarized in \Cref{fig:freeze} and \Cref{tab:freeze}.
 \end{reviewread}
 
 \begin{table}[t]
