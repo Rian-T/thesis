@@ -38,6 +38,9 @@
 
 \def\oubli#1{}
 
+% Let long URLs break at hyphens (news/web bib entries otherwise overflow the
+% bibliography by >100pt). Must be passed before hyperref loads url.
+\PassOptionsToPackage{hyphens}{url}
 
 \usepackage[%
   unicode,
@@ -100,7 +103,7 @@
 \usepackage{adjustbox}
 \usepackage[title,toc]{appendix}
 % Uncomment to hide all review highlights and margin labels thesis-wide.
-% \thesisreviewmarksfalse
+\thesisreviewmarksfalse  % review marks off (the soul \ul underlining also caused overfull lines)
 
 \renewcommand{\appendixname}{Appendix}
 
