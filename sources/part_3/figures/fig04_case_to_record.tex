@@ -5,25 +5,34 @@
   \begin{tikzpicture}[
     font=\small, text=ThesisInk, >={Stealth[length=2mm]},
     box/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
-                text width=4.0cm, minimum height=3.3cm, inner sep=9pt, align=left},
+                text width=4.6cm, minimum height=3.8cm, inner sep=9pt, align=left},
+    doc/.style={box, font=\small\itshape, text width=6.4cm},
+    lbl/.style={font=\scriptsize, text=ThesisInk},
     arr/.style={->, draw=ThesisNeutral, line width=0.7pt, shorten >=5pt, shorten <=5pt}]
-    \node[box] (case) at (-5.0,0) {\textbf{Published case summary}\\[5pt]
-      A patient was diagnosed with diffuse large B-cell lymphoma, received
-      CHOEP-14, achieved remission, and relapsed fourteen years later.};
+    \node[doc] (case) at (-6.8,0) {%
+      A 56 year old male patient was diagnosed with a diffuse large B-cell
+      lymphoma (DLBCL). He was treated by six cycles of rituximab,
+      cyclophosphamide, hydroxydaunorubicin, vincristine, and prednisolone
+      (R-CHOP), followed by two cycles of rituximab. He developed a relapse of a
+      composite lymphoma. Therapy with rituximab, dexamethasone, cytarabine, and
+      cisplatin (R-DHAP) was initiated.};
     \node[box] (timeline) at (0,0) {\textbf{Structured chronology}\\[6pt]
-      \textcolor{ThesisPrimaryDark}{2018} · diagnosis\\
-      \textcolor{ThesisPrimaryDark}{2018} · CHOEP-14\\
-      \textcolor{ThesisPrimaryDark}{2019} · remission\\
-      \textcolor{ThesisPrimaryDark}{2032} · relapse};
-    \node[box] (reports) at (5.0,0) {\textbf{Generated French reports}\\[5pt]
+      \textcolor{ThesisPrimaryDark}{2018} · diagnosis, DLBCL\\
+      \textcolor{ThesisPrimaryDark}{2018} · R-CHOP, six cycles\\
+      \textcolor{ThesisPrimaryDark}{2019} · rituximab, two cycles\\
+      \textcolor{ThesisPrimaryDark}{2020} · relapse\\
+      \textcolor{ThesisPrimaryDark}{2020} · R-DHAP};
+    \node[box] (reports) at (5.8,0) {\textbf{Generated French reports}\\[6pt]
       \textcolor{ThesisPrimaryDark}{18 May 2018} · pathology\\
       \textcolor{ThesisPrimaryDark}{22 May 2018} · tumour board\\
       \textcolor{ThesisPrimaryDark}{14 January 2019} · imaging\\
-      \textcolor{ThesisPrimaryDark}{25 April 2032} · relapse visit};
+      \textcolor{ThesisPrimaryDark}{25 April 2020} · relapse visit};
+    \node[lbl, above=2pt of case.north] {Published case, PubMed Central};
     \draw[arr] (case) -- (timeline);
     \draw[arr] (timeline) -- (reports);
   \end{tikzpicture}}
-  \captionof{figure}{Transformation of a fictional case summary into a dated longitudinal record.}
+  \captionof{figure}{A real published case, on the left, and the two stages that
+  turn it into a dated longitudinal record.}
   \label{fig:p3-case-to-record}
 \end{minipage}
 \end{center}
