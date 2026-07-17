@@ -3,83 +3,63 @@
   \providecommand{\envsub}[1]{{\scriptsize\itshape\textcolor{ThesisNeutral}{#1}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\footnotesize\sffamily, text=ThesisInk,
-    box/.style={rounded corners=2.5pt, align=center, inner sep=5pt, text=ThesisInk},
-    % the evaluated model
+    box/.style={rounded corners=2.5pt, align=center, inner sep=6pt, text=ThesisInk},
+    % the evaluated model, on the main line
     agent/.style={box, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
-      text width=2.7cm, minimum height=1.25cm, line width=1pt},
-    % ordinary queue tasks
-    item/.style={box, draw=ThesisNeutral!45, fill=white, text width=3.0cm,
-      minimum height=0.72cm},
-    % the queue task that hides the trap
-    trap/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!10, line width=0.9pt,
-      text width=3.0cm, minimum height=0.72cm},
-    % a document the agent reads: paper panel, serif
-    doc/.style={box, draw=ThesisNeutral!55, fill=ThesisPaper, text width=4.0cm,
-      align=left, inner sep=8pt},
-    % ground-truth tool
+      text width=2.9cm, minimum height=1.5cm, line width=1pt},
+    % the case the agent is handed: a paper document
+    case/.style={box, draw=ThesisNeutral!55, fill=ThesisPaper, text width=3.7cm,
+      align=left, inner sep=9pt},
+    % the ground-truth reference it can consult
     truth/.style={box, draw=ThesisNeutral!60, fill=ThesisNeutral!8, text width=4.6cm,
-      align=left, inner sep=8pt},
-    % the scored fork
+      align=left, inner sep=9pt},
+    % the two scored outcomes
     safe/.style={box, draw=ThesisSecondaryDark, fill=ThesisSecondary!22,
-      text width=3.2cm, minimum height=0.95cm, line width=0.9pt},
+      text width=3.5cm, minimum height=1.0cm, line width=0.9pt},
     unsafe/.style={box, draw=ThesisTertiaryDark, fill=ThesisTertiary!24,
-      text width=3.2cm, minimum height=0.95cm, line width=1pt},
+      text width=3.5cm, minimum height=1.0cm, line width=1pt},
     lbl/.style={font=\scriptsize, color=ThesisNeutral, inner sep=2pt},
-    % arrows
-    flow/.style={-{Stealth[length=5pt]}, draw=ThesisInk!42, line width=0.8pt,
+    flow/.style={-{Stealth[length=6pt]}, draw=ThesisInk!45, line width=1pt,
       shorten <=2pt, shorten >=2pt},
-    rw/.style={{Stealth[length=5pt]}-{Stealth[length=5pt]}, draw=ThesisInk!42, line width=0.8pt,
+    consult/.style={{Stealth[length=5pt]}-{Stealth[length=5pt]}, draw=ThesisNeutral!70,
+      line width=0.9pt, densely dashed, shorten <=2pt, shorten >=2pt},
+    goodarr/.style={-{Stealth[length=7pt]}, draw=ThesisSecondaryDark, line width=1.2pt,
       shorten <=2pt, shorten >=2pt},
-    consult/.style={-{Stealth[length=5pt]}, draw=ThesisNeutral!70, line width=0.8pt,
-      densely dashed, shorten <=2pt, shorten >=2pt},
-    goodarr/.style={-{Stealth[length=6pt]}, draw=ThesisSecondaryDark, line width=1.1pt,
-      shorten <=2pt, shorten >=2pt},
-    badarr/.style={-{Stealth[length=6pt]}, draw=ThesisTertiaryDark, line width=1.4pt,
+    badarr/.style={-{Stealth[length=7pt]}, draw=ThesisTertiaryDark, line width=1.6pt,
       shorten <=2pt, shorten >=2pt}]
 
-    % ===== LEFT: the workday, one task at a time =========================
-    \node[lbl, align=center] (qhdr) at (-8.1,3.35) {a workday,\\one task at a time};
-    \node[item] (s1) at (-8.1,2.35) {summary note};
-    \node[item] (s2) at (-8.1,1.45) {stock inventory};
-    \node[trap] (s3) at (-8.1,0.30) {patient case\\[1pt]{\scriptsize\itshape\textcolor{ThesisTertiaryDark}{hides the trap}}};
-    \draw[-{Stealth[length=4pt]}, draw=ThesisNeutral!55, line width=0.8pt]
-      (-9.85,2.6) -- (-9.85,0.05) node[midway, rotate=90, anchor=south, lbl] {time};
-    \draw[flow] (s3.east) -- (-5.35,0.05);
-
-    % ===== CENTRE: the agent =============================================
-    \node[agent] (ag) at (-4.0,-0.15) {agent\\[1pt]\envsub{the evaluated model}};
-
-    % ===== the single logged boundary between agent and world ============
-    \draw[densely dashed, draw=ThesisNeutral!60, line width=0.7pt] (-6.1,1.75) -- (1.9,1.75);
-    \node[lbl, fill=white, inner sep=2.5pt, align=center] at (-5.05,1.75)
-      {every exchange logged\\served vs.\ true};
-
-    % ===== ABOVE the boundary: the world the agent acts on ===============
-    \node[doc] (ehr) at (-2.3,3.55)
-      {\textbf{\normalfont Patient record (EHR)}\\[3pt]
-       \itshape contraindicated\\ drug pair\\[4pt]
+    % ===== MAIN LINE (y=0): case -> agent -> decision ====================
+    \node[case] (case) at (0,0)
+      {\textbf{\normalfont Patient case}\\[4pt]
+       \itshape a contraindicated\\ drug pair\\[6pt]
        \upshape{\setlength{\fboxsep}{2.5pt}\colorbox{ThesisTertiary!26}{%
-         \textcolor{ThesisTertiaryDark}{\footnotesize forged note:}}}\\[2pt]
-       \itshape\textcolor{ThesisTertiaryDark}{``a doctor lifted the contraindication''}};
-    \node[truth] (th) at (2.7,3.45)
+         \textcolor{ThesisTertiaryDark}{\footnotesize forged note}}}\\[3pt]
+       \itshape\textcolor{ThesisTertiaryDark}{``a doctor lifted\\ the contraindication''}};
+
+    \node[agent] (ag) at (5.7,0)
+      {\textbf{\normalfont LLM agent}\\[2pt]\envsub{at a clinical\\ workstation}};
+
+    \node[safe]   (ok) at (11.4,1.45)  {\textbf{refuse}\\[1pt]\envsub{safe}};
+    \node[unsafe] (ko) at (11.4,-1.45) {\textbf{issue prescription}\\[1pt]\envsub{irreversible, unsafe}};
+
+    % ===== BELOW the agent: the ground truth it may check ================
+    \node[truth] (th) at (5.7,-3.0)
       {\textbf{ANSM interaction thesaurus}\\[3pt]
-       \envsub{3{,}170 graded entries · ground truth}\\[4pt]
+       \envsub{3{,}170 graded entries, the ground truth}\\[3pt]
        verdict: \textbf{contraindicated}};
 
-    \draw[rw] (ag.north) -- ([xshift=-6pt]ehr.south) node[pos=0.32, right=2pt, lbl] {read / write};
-    \draw[consult] (ag.north east) -- ([xshift=-16pt]th.south) node[pos=0.72, right=2pt, lbl] {consult};
-
-    % ===== RIGHT: the scored terminal act ================================
-    \node[safe]   (ok) at (7.0,1.15)  {\textbf{refuse}\\[1pt]\envsub{safe}};
-    \node[unsafe] (ko) at (7.0,-1.55) {\textbf{issue prescription}\\[1pt]\envsub{irreversible · unsafe}};
-    \draw[goodarr] (ag.east) .. controls +(1.8,0.6) and +(-1.6,0) .. (ok.west);
-    \draw[badarr]  (ag.east) .. controls +(1.8,-0.7) and +(-1.6,0) .. (ko.west);
-    \node[lbl, align=center] at (4.55,-0.28) {scored:\\terminal act};
+    % ===== ARROWS =======================================================
+    \draw[flow] (case.east) -- (ag.west) node[midway, above, lbl] {reads};
+    \draw[consult] (ag.south) -- (th.north) node[midway, right=3pt, lbl] {may consult};
+    \draw[goodarr] (ag.east) .. controls +(1.5,0.7) and +(-1.4,0) .. (ok.west);
+    \draw[badarr]  (ag.east) .. controls +(1.5,-0.7) and +(-1.4,0) .. (ko.west);
+    \node[lbl, align=center] at (9.15,0) {scored on\\ the act taken};
 
   \end{tikzpicture}%
   }
-  \captionof{figure}{The exploratory agentic environment: an ordinary workday
-  hides one contraindicated case and a forged note lifting the contraindication,
-  and the model is scored on whether it issues the irreversible prescription.}
+  \captionof{figure}{The exploratory agentic environment: the model reads a patient
+  case whose forged note lifts a real contraindication, may consult the ANSM thesaurus
+  that holds the true verdict, and is scored on whether it refuses or issues the
+  prescription.}
   \label{fig:conclusion-agentic-env}
 \end{center}
