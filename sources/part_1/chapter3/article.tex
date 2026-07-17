@@ -70,7 +70,26 @@ A portion of HAL and ISTEX documents come with clean XML and proceed directly to
 
 \paragraph{Fidelity verification.} To ensure the LLM does not introduce content absent from the source, we measure character-level overlap between each extracted passage and its source document on 300 ISTEX passages (after typographic normalization). 94.4\% of passages have $\geq 90$\% overlap and 84.1\% have $\geq 99$\% overlap; the median rate of words absent from the source is zero (mean: 3.4\%). Manual inspection of edge cases shows that divergences come from OCR corrections (such as the surgical passage shown at the start of this chapter) or from converting tables into prose. The opposite case is also common: a clean 1{,}143-character passage on cancer-related depression is extracted with 100\% character overlap and no additional words introduced. These two cases bracket the typical behavior of the pipeline: it cleans aggressively when the source is corrupted by OCR, and copies verbatim when the source is already clean.
 
-\paragraph{LLM quality annotation.} The same LLM annotates each passage along four quality signals scored from 1 to 10: educational value (\texttt{edu}, mean 6.5), content richness (\texttt{cont}, 6.8), writing quality (\texttt{writ}, 7.6), and terminological precision (\texttt{term}, 7.6). The codes in parentheses are the abbreviations used in ablation tables. A content type is also assigned among nine categories: \texttt{research\_findings} (526k passages), \texttt{medical\_knowledge} (388k), \texttt{clinical\_guidance} (218k), \texttt{research\_methodology}, \texttt{drug\_information}, \texttt{background\_review}, \texttt{policy\_administrative}, \texttt{patient\_case} (36k), and \texttt{other}. In total, 2.16 million passages are annotated.
+\paragraph{LLM quality annotation.} The same LLM annotates each passage along four quality signals scored from 1 to 10, listed in \Cref{tab:quality-signals} with the abbreviations used in the ablation tables. A content type is also assigned among nine categories: \texttt{research\_findings} (526k passages), \texttt{medical\_knowledge} (388k), \texttt{clinical\_guidance} (218k), \texttt{research\_methodology}, \texttt{drug\_information}, \texttt{background\_review}, \texttt{policy\_administrative}, \texttt{patient\_case} (36k), and \texttt{other}. In total, 2.16 million passages are annotated.
+
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{llc}
+\toprule
+\textbf{Quality signal} & \textbf{Code} & \textbf{Mean} \\
+\midrule
+Educational value & \texttt{edu} & 6.5 \\
+Content richness & \texttt{cont} & 6.8 \\
+Writing quality & \texttt{writ} & 7.6 \\
+Terminological precision & \texttt{term} & 7.6 \\
+\bottomrule
+\end{tabular}
+\caption{The four quality signals annotated on each passage, with the code used in the ablation tables and the mean score over the 2.16 million annotated passages on the 1--10 scale.}
+\label{tab:quality-signals}
+\end{table}
 
 
 \section{Content-Type Ablation}
@@ -95,7 +114,7 @@ We measure the effect of each content type by ablation: we remove one type and c
 \midrule
 \rowcolor{ThesisTableSep}
 \multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{Controls}} \\[1pt]
-Random (same volume) & 63.72 & $+$0.04pp \\
+Random removal (same volume) & 63.72 & $+$0.04pp \\
 Full corpus (reference) & 63.68 & ref. \\
 \midrule
 \rowcolor{ThesisTableSep}
@@ -109,7 +128,7 @@ Full corpus (reference) & 63.68 & ref. \\
 \end{table}
 
 \begin{reviewread}
-We exclude \texttt{drug\_information} from the final corpus (redundant with the EMEA source already included separately) and \texttt{other}. Paragraphs shorter than 50 tokens are also excluded.
+We exclude \texttt{drug\_information} from the final corpus (redundant with the EMEA source already included separately) and \texttt{other}. Paragraphs shorter than 50 tokens, roughly 35 words, are also excluded.
 \end{reviewread}
 
 
