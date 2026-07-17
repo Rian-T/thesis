@@ -16,7 +16,9 @@
 > field competition) : MC-bio-gliner publié **0.640/0.503**, variante task-mixed **0.657** ≈ **Qwen3.5-4B 0.658**
 > (parquets `-de1540v2`, PAS les `-lp410`). **Qwen3.5-9B = 0.650, donc AU-DESSUS de nous** : l'abstract ET le
 > résumé affirmaient qu'on le battait, **c'était FAUX**, corrigé en « within 0.018 du meilleur générateur, 27× plus
-> gros ». QA baselines **ModernCamemBERT 0.336 / -bio 0.417**. GLiNER-BioMed **0.367** (certif GPU abandonnée).
+> gros ». QA baselines **ModernCamemBERT 0.336 / -bio 0.417**. GLiNER-BioMed = **0.380/0.397** (ce qu'imprime la table 18.2 ;
+> le **0.367** que cette note portait jusqu'au 2026-07-17 était un **chiffre de brouillon** qui ne vit que dans
+> `sources/drafts/partie3_tables_clean.tex`, jamais compilé — ne pas le ressusciter ; certif GPU abandonnée).
 > PARITÉ = HONNÊTE : publié = quasi-parité, SEULE la variante task-adapted atteint la parité. 27× (pas 25×).
 >
 > **NAMING (appliqué) :** `MC-bio-gliner` / `ModernCamemBERT-bio-gliner` (long, défini 1×) ; `GLiNER-BioMed` ;
@@ -188,8 +190,12 @@ phrases hachées/IA, pas de tirets cadratins) — **et il se relit souvent, pas 
   8B, qui est une *baseline*, sont déjà dans deux tables) → lui demander ce qu'il visait.
 - ⚪ **Ancres d'Éric disparues** (texte réécrit depuis sa relecture) → confirmer qu'on abandonne : ch6 « Table 15.1 »,
   ch8 « Solon 44.9 », ch8 « out-of-domain / zero-shot » (renommé « familiar / benchmark-absent »), ch9 p.3/4/5.
-- 🟠 **Appendix : 6 annexes sur 7 sont orphelines** (aucun `\Cref` du corps ne pointe vers elles ; seule
-  `app:tabib-details` est citée). Le fix vit dans **le corps**, pas dans l'appendix.
+- ✅ **Appendix orphelin : RÉGLÉ** (2026-07-17) — les **7/7** annexes sont atteignables depuis le corps.
+- ✅ **Flottants orphelins : RÉGLÉ** (2026-07-17) — 12 figures/tables s'imprimaient sans jamais être appelées
+  (ch2 ×7, ch6 ×2, ch9, web.tex ×2, intro) ; un `\Cref` a été greffé là où la prose en parlait déjà. Cause
+  racine ch2 : **héritée du papier Biomed-Enriched**, qui référence 7/7 tables mais seulement 3/6 figures.
+  ⚠️ Pour rebalayer : strip des commentaires avec `(?<!\\)%` (sinon les `\%` échappés coupent la ligne et
+  fabriquent de faux orphelins), et attention aux **plages** `Tables~\ref{b1}--\ref{b4}` (appel implicite).
 - 🟡 **Citations manquantes** : 30 M séjours PMSI (ch6 + clinical_ie ×2, `% TODO(cite)` posé), BioBERT 18 Md,
   AliBERT, tailles ICD-10/CCAM/ATC, split « échocardiographie ».
 - 🟡 **Sweep style** : antithèses « not X but Y » (clinical.tex, web.tex, ch2, ch3), captions multi-phrases,
