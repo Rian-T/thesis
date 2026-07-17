@@ -42,6 +42,11 @@
 % bibliography by >100pt). Must be passed before hyperref loads url.
 \PassOptionsToPackage{hyphens}{url}
 
+% Give TeX one extra pass with more stretch before it gives up and lets a line
+% run into the margin. Turns stubborn overfull lines (long identifiers, model
+% names) into slightly loose ones instead.
+\setlength{\emergencystretch}{3em}
+
 \usepackage[%
   unicode,
   colorlinks = true,
