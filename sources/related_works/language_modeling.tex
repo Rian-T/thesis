@@ -835,7 +835,7 @@ in the next section.
 
 The idea is simple. Between the generic pretraining of \Cref{sec:lm-objectives} and
 fine-tuning on a labelled task, we add another phase of self-supervised training on
-text closer to the target. \citet{gururangan2020dapt} studied this across four
+text closer to the target. \citet{gururangan_dont_2020} studied this across four
 domains, including biomedicine, and eight classification tasks, and named two
 variants. \emph{Domain-adaptive pretraining} continues training on a large in-domain
 corpus. \emph{Task-adaptive pretraining} continues it on the unlabelled text of the
@@ -870,7 +870,7 @@ when the task corpus is small (\Cref{fig:lm-dapt}).
 \captionof{figure}{Continued pretraining inserts one or two self-supervised phases
 between general pretraining and fine-tuning: domain-adaptive pretraining on a large
 in-domain corpus, then task-adaptive pretraining on the task's own unlabelled text
-\citep{gururangan2020dapt}.}
+\citep{gururangan_dont_2020}.}
 \label{fig:lm-dapt}
 \end{center}
 \medskip
