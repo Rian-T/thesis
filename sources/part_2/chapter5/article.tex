@@ -488,6 +488,11 @@ For biomedical encoder pretraining, the CLM detour improves results at no extra 
 
 \vspace{2em}
 
-\begin{reviewread}
-Parts~1 and 2 of this thesis have focused on data and pretraining: how to collect biomedical text, how to filter it, and how to train encoder models on it. But a pretrained model is only useful if it can be deployed on real tasks. In the next part, we turn to adaptation: how to extract clinical information when labeled data is scarce, labels number in the thousands, and the only available text is public.
-\end{reviewread}
+The corpus of \Cref{chap:collecting} and the objective of this chapter both work on
+text that someone has already written, and that is where every gain so far has come
+from. French hospitals also keep their medical knowledge in ontologies, which record
+tens of thousands of diagnoses, procedures, and drugs together with the relations that
+hold between them, and none of it has reached our pretraining
+(\Cref{sec:corpus-ontologies}). Pretraining consumes sentences, so that knowledge stays
+out of reach for as long as it stays a graph. \Cref{chap:ontobook} asks what it would
+take to bring it in.

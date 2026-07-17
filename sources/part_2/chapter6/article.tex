@@ -487,4 +487,7 @@ Ontology structure never appears in clinical text, yet a coder needs it to assig
 
 \vspace{2em}
 
-The textbooks in this chapter are synthetic, generated from an ontology rather than drawn from hospital records. That same move, building training text where none can be shared, is what the next part turns to. It leaves pretraining behind and puts an encoder to work on the task a clinical study needs: reading the reports written about a patient during care and filling the structured form the study keeps for that patient. No real hospital record can be shared to learn from, so the constraint that shaped the corpus and the encoders of the first two parts now shapes the task as well (\Cref{part:adaptation}).
+The gains of the first two parts were all measured on benchmarks whose label set was
+fixed in advance, which is not how the task that motivates this thesis arrives.
+\Cref{part:adaptation} takes a pretrained encoder to that task and asks what
+fine-tuning it there actually requires.
