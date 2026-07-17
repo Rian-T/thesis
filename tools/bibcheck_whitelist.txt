@@ -87,3 +87,10 @@ xFormers2022                    # Meta xFormers library (software)
 synapse_medgpt_2025   # Caducee.net, fetched and read: launch 16 Sep 2025, "agent conversationnel souverain". VERIFIED
 nabla_agentique_2025  # L'Usine Digitale. Headline only (site returns 403 to fetch); headline itself states "a l'ere de l'agentique". NOT fully verified
 alan_mo_2024          # L'Usine Digitale. Headline only (403 to fetch). NOT fully verified
+
+# Self-published web textbook (conclusion ch. 21). No DOI; not indexed in
+# Crossref/OpenAlex/DBLP. checkbib returns a FALSE POSITIVE here: with no DOI it
+# falls back to a title search and matches an unrelated work, then reports
+# VERIFIED with the note "author 'truong' weak vs source". Whitelisted so the bad
+# match cannot masquerade as a verification.
+truongkoyejo2026aims  # Truong & Koyejo, "AI Measurement Science", Stanford AIMS Lab. Fetched aimslab.stanford.edu/textbook/ and copied the authors' own BibTeX block verbatim from its Citation section; page states authors Sang T. Truong / Sanmi Koyejo, updated 30 June 2026. VERIFIED by hand against the publisher
