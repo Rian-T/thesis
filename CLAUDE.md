@@ -1,34 +1,48 @@
 # CLAUDE.md
 
-> 🚨 **EN COURS — PARTIE 3 : boucle de POLISH profonde (figures + narratif), multi-vagues fable/opus.**
-> Docs de travail À LIRE : `research/lymphome/DASHBOARD_NUIT.md` (chiffres), `FIGURE_GRAMMAR.md` (grammaire
-> visuelle), `canonical_scores.json` (source programmatique des chiffres). Scorers LOCAUX (parquets dans
-> `research/lymphome/data/`) : `score_valthr.py` (seuil-val), `score_calib.py` (§18.4.1), `verify_tables.py`
-> (parse le `.tex` et recalcule chaque nombre depuis les parquets = anti-hallucination).
+> 🚨 **EN COURS — relecture d'ÉRIC + polish global.** Le manuscrit compile propre : **266 p., 0 erreur,
+> 0 référence/citation indéfinie, 0 `(?)`, 9 overfull** (le pire à 17,5 pt). Punch-list consolidée :
+> **`AUDIT_PUNCHLIST.md`** (racine). Relecture d'Éric : **`TODO.md`** (ses PDF annotés sont dans `~/Downloads/`).
 >
-> **CHIFFRES — train-on-test-free, VÉRIFIÉS depuis les parquets (`results.json` PÉRIMÉ, ne pas l'utiliser).**
-> Capstone eCRF (après field competition) : MC-bio-gliner publié **0.640/0.503**, variante task-mixed **0.657**
-> ≈ **Qwen3.5-4B 0.658** (parquets `-de1540v2` = Qwen *fine-tuné sur les mêmes 1540 records*, le comparateur juste ;
-> PAS les `-lp410`). QA baselines propres **ModernCamemBERT 0.336 / ModernCamemBERT-bio 0.417** (seuil plat).
-> GLiNER-BioMed **0.367** (= crossfit, en cours de certif GPU propre : sbatch **1909861** sur JZ). §18.4.1 (Qwen
-> de1540v2) : AURC 0.239 vs **0.207**, prec@50 0.770 vs **0.828**, wrong-field 48.9% vs **38.8%**. PARITÉ = HONNÊTE :
-> publié = quasi-parité (« within 0.018 »), SEULE la variante task-adapted atteint la parité. 27× (pas 25×).
+> **⚠️ HYGIÈNE DE BUILD — ça a coûté 38 citations cassées.** `rm -rf build` **NE SUFFIT PAS** : des artefacts
+> périmés à la **RACINE** (`thesis.aux`, `.bbl`, `.blg`) *shadowent* ceux de `build/`, et bibtex résout alors une
+> **vieille liste de citations** → des `(?)` s'impriment **sans aucun warning**. Toujours : `latexmk -C` + `rm -f
+> thesis.aux thesis.bbl thesis.blg thesis.toc` + `rm -rf build`, puis `latexmk -g`. Contrôle qui ne ment pas :
+> `pdftotext thesis.pdf - | grep -c '(?)'` doit donner **0**. Corollaire : **ne jamais lancer deux `latexmk` en
+> parallèle** (les sous-agents qui compilent corrompent les `.aux` et produisent des erreurs fantômes — un
+> « `! Extra }` » fatal m'a fait reverter un sweep parfaitement valide).
 >
-> **NAMING (appliqué) :** `MC-bio-gliner` (court) / `ModernCamemBERT-bio-gliner` (long, défini 1×) ; `GLiNER-BioMed` ;
-> `Qwen3.5-…` ; retrieval terminologique = `ICD-O` (ex-« FrACCO », collision avec FrACCO-NER résolue). ZÉRO
-> parenthèse de rôle (aveu de faiblesse), ZÉRO codename (v3b/mix/de1540v2 jamais dans le manuscrit), noms de
-> modèles en **serif droit** jamais `\texttt`. eCRF défini à sa 1re occurrence.
+> **CHIFFRES — train-on-test-free, VÉRIFIÉS depuis les parquets (`results.json` PÉRIMÉ).** Capstone eCRF (après
+> field competition) : MC-bio-gliner publié **0.640/0.503**, variante task-mixed **0.657** ≈ **Qwen3.5-4B 0.658**
+> (parquets `-de1540v2`, PAS les `-lp410`). **Qwen3.5-9B = 0.650, donc AU-DESSUS de nous** : l'abstract ET le
+> résumé affirmaient qu'on le battait, **c'était FAUX**, corrigé en « within 0.018 du meilleur générateur, 27× plus
+> gros ». QA baselines **ModernCamemBERT 0.336 / -bio 0.417**. GLiNER-BioMed **0.367** (certif GPU abandonnée).
+> PARITÉ = HONNÊTE : publié = quasi-parité, SEULE la variante task-adapted atteint la parité. 27× (pas 25×).
 >
-> **GRAMMAIRE VISUELLE (`FIGURE_GRAMMAR.md`, à respecter partout) :** un bloc = UNE chose (jamais mélanger
-> texte-source + annotation + rôle) ; empan/mention = LAVANDE, valeur/prédiction produite = LIME, négatif = PÊCHE,
-> inactif/méta = NEUTRE ; panneau-Document = `ThesisPaper` serif italique, 1 texte cité ; flèches à sens unique
-> (flux `->` faded ; proxy pointillé ; pull/push contrastif coloré). Réfs canon : `fig02_evidence_map` (flèches),
-> `fig11_metrics` (couleurs). VÉRIFIER CHAQUE figure AU RENDU (pdftoppm), jamais à la source.
+> **NAMING (appliqué) :** `MC-bio-gliner` / `ModernCamemBERT-bio-gliner` (long, défini 1×) ; `GLiNER-BioMed` ;
+> `Qwen3.5-…` ; retrieval terminologique = `ICD-O`. ZÉRO parenthèse de rôle, ZÉRO codename, modèles en **serif
+> droit** jamais `\texttt`. eCRF défini à sa 1re occurrence. TABIB (conclusion) : noms **versionnés**
+> (`MedGemma 1.5`, `Nemotron-3-Nano`, `Ministral-3 8B`) — la version compte, ne pas la stripper.
 >
-> **NEXT :** (1) intégrer les 2 nouvelles figures `fig_parhaf_doc` + `fig_report_to_ecrf` (\input part-intro + ch18) ;
-> (2) placement des flottants (fig 17.4/18.6/16.1/16.3 dérivent → forcer non-float `\begin{center}\captionof`,
-> vérifier au rendu) ; (3) poller GLiNER (1909861) → recalculer la valeur propre + remplacer 0.367 ;
-> (4) compile + render-check global + commit. Puis éventuellement une vague fable/opus de plus.
+> **GRAMMAIRE VISUELLE (`FIGURE_GRAMMAR.md`) :** un bloc = UNE chose ; empan/mention = LAVANDE, valeur produite =
+> LIME, négatif = PÊCHE, inactif/méta = NEUTRE ; panneau-Document = `ThesisPaper` serif italique ; flèches à sens
+> unique. VÉRIFIER CHAQUE figure AU RENDU (pdftoppm), jamais à la source. **fable est bon en narratif, pas en
+> spatial** : pour la géométrie d'un TikZ, itérer soi-même render+vision.
+>
+> **CONVENTIONS FIGÉES (ne pas régresser) :** captions **TOUJOURS EN BAS** (31 tables basculées) et **jamais
+> orphelines** — tout bloc non-flottant `\begin{center}…\captionof` est enveloppé d'une `minipage`, **avec
+> `\centering` dedans** (une `minipage` exécute `\@parboxrestore`, qui **annule** le `\centering` de `center`).
+> Marques de relecture **désactivées** (`\thesisreviewmarksfalse` dans `thesis.tex`). URLs sécables
+> (`\PassOptionsToPackage{hyphens}{url}`) + `\emergencystretch=3em` → overfull 88 → 9.
+>
+> **NEXT (Éric, cf. `TODO.md` + `AUDIT_PUNCHLIST.md`) :** (1) 🔴 **ch1 p.88** « need evaluation results in this
+> chapter » — le chapitre corpus n'a aucune éval, seul vrai chantier restant ; (2) 🟠 **ch2 p.98** « Performance of
+> Llama-3-8B ? » — ambigu (l'annotateur est le **70B**, les perfs du 8B sont déjà données) → demander à Éric ;
+> (3) 🚨 **relecture clinicienne** : « dossiers jugés plausibles par des médecins via un outil web » est **déjà dans
+> l'abstract et le résumé** mais **n'a aucune trace dans le repo** → ne rien renforcer avant sa réponse ;
+> (4) ancres disparues à confirmer abandonnées (ch6 « Table 15.1 », ch8 « Solon 44.9 », ch8 OOD/zero-shot,
+> ch9 p.3/4/5) ; (5) sweep narratif des joints de parties (chaque partie doit passer une question vivante à la
+> suivante). Abandonnés : GLiNER-BioMed (certif), « Riccardo ».
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -94,19 +108,28 @@ These OVERRIDE any default Claude Code commit behavior:
 
 ## Current Status
 
-Chapter↔label↔source map (labels are set in the part orchestration files, not in `article.tex`):
+**Le manuscrit est écrit de bout en bout** (front matter, 6 parties, conclusion, 7 annexes) et compile
+propre : **266 p., 0 erreur, 0 référence/citation indéfinie, 0 `(?)`, 9 overfull**. Ce qui reste est de la
+relecture, pas de la rédaction. Punch-list : `AUDIT_PUNCHLIST.md`. Relecture d'Éric : `TODO.md`.
 
-| Ch | `\label` | Title | Source paper |
+Chapter↔label↔source map (les labels sont posés dans les fichiers d'orchestration, pas dans `article.tex`) :
+
+| Fichier | `\label` | Titre | Source |
 |----|----------|-------|--------------|
-| 1 | `chap:collecting` | Collecting Biomedical Text | CamemBERT-bio (corpus part) |
-| 2 | `chap:quality` | Detecting Content Types | Biomed-Enriched + BiaHS (GAPeron) |
-| 3 | `chap:mcbio` | Which Quality Signals Matter? | MC-Bio / biomed-fr-v2 (TALN 2026) |
-| 4 | `chap:encoders` | Encoder Models for French Biomedicine | CamemBERT-bio (pretraining/eval) |
-| 5 | `chap:objectives` | Beyond Masked Language Modeling | CLM Detour (COLM 2026) |
-| 6 | `chap:ontobook` | Knowledge-Enriched Pretraining | OntoBook (LREC 2026) |
-| 7 | `chap:limits` | Limits of Direct Fine-Tuning | discussion (no paper) |
-| 8 | `chap:architectures` | Architectures for Low-Resource Extraction | frenchmed-gliner / MedEmbed (WIP) |
-| 9 | `chap:synthetic` | Synthetic Data for Task Adaptation | OntoBook data + synthetic clinical reports (WIP) |
+| `part_1/chapter1` | `chap:collecting` | Collecting Biomedical Text | CamemBERT-bio (corpus) |
+| `part_1/chapter2` | `chap:quality` | Detecting Content Types | Biomed-Enriched (Findings ACL 2026) |
+| `part_1/chapter3` | `chap:mcbio` | Which Quality Signals Matter? | MC-Bio / biomed-fr-v2 (TALN 2026) |
+| `part_2/chapter4` | `chap:encoders` | Encoder Models for French Biomedicine | CamemBERT-bio (LREC-COLING 2024) |
+| `part_2/chapter5` | `chap:objectives` | Beyond Masked Language Modeling | CLM Detour (COLM 2026) |
+| `part_2/chapter6` | `chap:ontobook` | Knowledge-Enriched Pretraining | OntoBook (LREC 2026) |
+| `part_3/chapter9` | `chap:synthetic` | Synthetic Data for Task Adaptation | — |
+| `part_3/chapter8` | `chap:architectures` | Architectures for Low-Resource Extraction | frenchmed-gliner / MedEmbed |
+| `part_3/chapter7` | `chap:evaluation` | Evaluating Open-Vocabulary Extraction | capstone eCRF |
+
+> ⚠️ **PIÈGE — la Partie 3 se lit `chapter9` → `chapter8` → `chapter7`** : les numéros de fichiers sont
+> **inversés** par rapport à l'ordre de lecture. `chap:limits` **n'existe plus** (l'ancien « Ch 7 discussion »
+> a été absorbé). Conclusion = 3 chapitres dans le seul `sources/conclusion.tex` (`sec:conclusion-holds-together`,
+> `sec:conclusion-evaluation`, `sec:conclusion-field-direction`).
 
 ### NEW conceptual part "What is Biomedical Text?" (drafted June 2026, sits BEFORE Related Works)
 
@@ -122,31 +145,58 @@ Chapter↔label↔source map (labels are set in the part orchestration files, no
 
 The triptych prose is **DONE** (plain CamemBERT-bio voice; bilingual example figures, French original / English translation side by side). The lay/web figure is now a synthetic de-identified patient-forum message (the old Doctissimo-excerpt issue is resolved).
 
-**Pending / next steps (see `HANDOFF.md` at repo root for the full state):**
-- Prosify **5.8 Architectures modernes, 5.9 Tokenization, 5.10 Limites et transition** in `language_modeling.tex` (same fable-subagent + simplify method).
-- RW chapters `corpus_annotation.tex` (`chap:rw-corpus`) and `clinical_ie.tex` (`chap:rw-ie`) are now fully prosified (done this session).
-- `research/clinical_verify_todo.md`: verify the Harris "fewer words" claim before submission.
-- Dedup the GPT-3 bib entry (`gpt3` vs `brown2020language`).
-- Run `make checkbib`: many refs added across recent sessions (verified by curl to Crossref/OpenAlex/DBLP/ACL; legal/web entries whitelisted) — review before submission.
-- ~27 commits are unpushed; push only on Rian's signal.
+**État du related works :** les trois chapitres sont en prose complète, avec figures TikZ maison. Le RW a
+en plus **4 figures knowledge-graphs** (`fig:corpus-static` / `-inject` / `-contrastive` / `-g2t`) bâties sur
+**un même fragment d'ontologie réel** (diabète de type 2 `E11`, métformine `A10BA02`), et un **schéma GLiNER**
+(`fig:ie-gliner`) redessiné depuis l'archi du papier. `research/clinical_verify_todo.md` : vérifier la claim
+Harris « fewer words » avant soumission.
 
-**Conventions used here (follow them):** figures are forced to open the chapter via a non-float `\begin{center}…\captionof{figure}{…}\end{center}` (not `figure[t]`); text examples are TikZ boxes in thesis colours (`ThesisNeutral`/`ThesisPaper`/`ThesisInk`); captions are ONE sentence; new bib appended with `@comment` group headers; and `guidelines/working-with-rian.md` is the binding style/process guide (simple academic English, intuition before detail, introduce every name, data behind every number, no choppy/AI sentences, no em dashes).
+**Transitions de parties (2026-07-17, règle à tenir) :** *le pont pose la question, l'unité suivante y répond.*
+Un pont ne doit **jamais** écrire l'ouverture de ce qui suit — c'est le défaut qu'on a corrigé deux fois
+(un pont volait le hook de ch6 ; un autre pré-livrait l'intro de la Partie 3). ch5→ch6 pose la tension
+« les ontologies gardent la connaissance, mais le préentraînement consomme des phrases » ; ch6→Partie 3 pose
+la question du fine-tuning. `SEAM_PROPOSALS*.md` gardent les analyses de joints.
 
-### Chapters Done (draft)
-- **Ch 1 (`chap:collecting`)** — biomed-fr corpus (413M words, ISTEX/CLEAR/E3C). Hook, tables, vocab analysis, cliffhanger to Ch 4.
-- **Ch 2 (`chap:quality`)** — Biomed-Enriched (paragraph-level annotation, 2M clinical case paragraphs) + BiaHS as footnoted section. Full method/results/discussion. TODO: real PMC paragraph examples in the motivation figure; annotation prompt in appendix.
-- **Ch 3 (`chap:mcbio`)** — biomed-fr-v2 (10B tokens, 6 sources). Content-type + quality-signal ablations (writing-quality/term filters *degrade* perf). Done.
-- **Ch 4 (`chap:encoders`)** — CamemBERT-bio pretraining (+2.54 F1, 32× less CO2; DrBERT 20-pt loss = eval artifact). Done.
+**Conventions (follow them) :** captions **en bas, une phrase, jamais orphelines** (blocs non-flottants en
+`minipage` **avec `\centering` dedans**) ; exemples textuels en TikZ aux couleurs thèse ; bib ajouté avec des
+en-têtes `@comment` ; **`make checkbib` après TOUTE référence citée ajoutée** (la presse et le légal vont au
+whitelist, avec leur statut de vérification réel écrit noir sur blanc) ; les entrées de papiers publiés se
+prennent **verbatim depuis l'ACL Anthology / le DOI**, jamais à la main ; `guidelines/working-with-rian.md` est
+le guide contraignant (anglais académique simple, intuition avant détail, data derrière chaque chiffre, pas de
+phrases hachées/IA, pas de tirets cadratins) — **et il se relit souvent, pas une fois**.
 
-### Chapters Drafted But With Debt
-- **Ch 5 (`chap:objectives`)** — CLM Detour (COLM 2026). Body is integrated, BUT §2.1 "When Decoder Continue-Pretraining Stops Working" is **entirely a placeholder** (notes in comments: BioMistral -0.9, Meditron 332 GPU-h, Dorfner, forgetting, data overlap). 3 figures still TODO: needle-in-haystack, CKA combined, freeze interventions.
-- **Ch 6 (`chap:ontobook`)** — OntoBook (LREC 2026). Pasted verbatim, not yet thesis-ified: intro is the paper intro (not a hook); conclusion starts with "We presented…" (forbidden); uses `\section{Conclusion}` instead of `\section*`; tables/figures not yet on `thesis-style.sty`. Bib duplicates already fixed (now uses canonical keys: `lee_biobert_2019`, `gu_domain-specific_2022`, `martin-etal-2020-camembert`, `devlin_bert_2019`).
+### Tout est écrit (les anciennes dettes sont levées)
+- **Front matter** — abstract **bilingue** (EN + Résumé FR, chacun sur **une page**), `introduction.tex`,
+  `contemporary_ai.tex`, `contributions.tex` (7 contributions + roadmap qui annonce l'ouverture TABIB).
+- **Ch 5 (`chap:objectives`)** — le §« placeholder » sur le décrochage du CPT décodeur est **écrit** (« Lessons
+  from Decoder Pretraining », sourcé : Dorfner, BioMistral, Meditron, Jindal, Mannion, Obeidat, Lehman).
+  Notation de trajectoires **`Φ_{1,CLM}` / `Φ_{1,MLM30%}` / `Φ_{2,MLM15%}`** (demande d'Éric : lever la confusion
+  30 %/15 %), `θ_A`/`θ_B` **réellement utilisés** dans les résultats. Sous-section freeze **déplacée après** les
+  résultats (elle les anticipait).
+- **Ch 6 (`chap:ontobook`)** — **thesis-ifié** : hook (le codeur a besoin de ce que le compte-rendu ne dit jamais),
+  `\section*{Conclusion}` qui ferme sur l'insight d'alignement, related-work dédupliqué vers `\Cref{chap:rw-corpus}`,
+  tables déjà en booktabs + `ThesisTableSep`.
+- **Partie 3** — les trois chapitres sont écrits (supervision, extracteur ouvert, capstone eCRF).
+- **Conclusion** — triptyque de 3 chapitres × 3 sections (What Holds Together / A New Problem / Where Medical AI
+  Is Going), avec TABIB et l'environnement agentique.
+- **Appendix** — 7 chapitres (A–G).
 
-### To Write
-- **Ch 7 (`chap:limits`)** — discussion chapter (no paper). Sets up why direct fine-tuning fails for clinical IE (label scarcity, thousands of classes, public-text-only) to motivate Ch 8-9.
-- **Ch 8 (`chap:architectures`)** — frenchmed-gliner / MedEmbed. **Very WIP** (notes dated 2026-01-29 in `publications/frenchmed-gliner/paper/`): GLiNER2 bi-encoder, MedEmbed label encoder (ModernCamemBERT-base, 8192 ctx), ~1.5M training pairs (RDF/synthetic/persona), OntoBench-FR benchmark, MedEmbed-v4 = 32.9% avg (vs Solon 32.5%). No stable results yet.
-- **Ch 9 (`chap:synthetic`)** — §OntoBook data (currently duplicates Ch 6's walk-generation prose — should `\Cref` to Ch 6 instead of repeating); §synthetic clinical reports is a placeholder (paper in progress).
-- **Front matter** — abstract/résumé, introduction (with research questions), conclusion. Not started.
+### Ce qui reste (relecture, pas rédaction)
+- 🔴 **Éric ch1 p.88** — « need some evaluation results in this chapter, with comparison with other models » : le
+  chapitre corpus n'a **aucune éval**. **Seul vrai chantier de rédaction restant.**
+- 🟠 **Éric ch2 p.98** — « Performance of Llama-3-8B ? » : ambigu (l'annotateur est **Llama-3.1-70B** ; les perfs du
+  8B, qui est une *baseline*, sont déjà dans deux tables) → lui demander ce qu'il visait.
+- ⚪ **Ancres d'Éric disparues** (texte réécrit depuis sa relecture) → confirmer qu'on abandonne : ch6 « Table 15.1 »,
+  ch8 « Solon 44.9 », ch8 « out-of-domain / zero-shot » (renommé « familiar / benchmark-absent »), ch9 p.3/4/5.
+- 🟠 **Appendix : 6 annexes sur 7 sont orphelines** (aucun `\Cref` du corps ne pointe vers elles ; seule
+  `app:tabib-details` est citée). Le fix vit dans **le corps**, pas dans l'appendix.
+- 🟡 **Citations manquantes** : 30 M séjours PMSI (ch6 + clinical_ie ×2, `% TODO(cite)` posé), BioBERT 18 Md,
+  AliBERT, tailles ICD-10/CCAM/ATC, split « échocardiographie ».
+- 🟡 **Sweep style** : antithèses « not X but Y » (clinical.tex, web.tex, ch2, ch3), captions multi-phrases,
+  4 exemples placeholder en ch2, les 20 overfull restants (tous < 18 pt).
+- ⚪ **Décision de Rian (2026-07-17)** : l'affirmation « des cliniciens ont jugé les dossiers plausibles » **reste**
+  dans l'abstract et le résumé, bien qu'Éric n'en ait fourni aucun détail. Ne pas la re-soulever.
+- **Push** : de nombreux commits non poussés — **pousser uniquement sur signal de Rian**.
 
 ### Key Decisions Made
 - CamemBERT-bio paper split: corpus → Ch 1, pretraining/eval → Ch 4
