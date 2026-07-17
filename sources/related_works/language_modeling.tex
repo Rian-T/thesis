@@ -220,6 +220,7 @@ tokens.
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \begin{tikzpicture}[font=\scriptsize\sffamily,
   box/.style={rounded corners=2pt, minimum width=1.0cm, minimum height=0.6cm,
     inner sep=2pt, text=ThesisInk},
@@ -250,6 +251,7 @@ position the network combines the current input with the hidden state carried ov
 from the previous step (the horizontal arrows) and predicts the next token, so the
 running state lets a prediction depend on the whole past rather than a fixed window.}
 \label{fig:lm-rnn}
+\end{minipage}
 \end{center}
 \medskip
 
@@ -542,6 +544,7 @@ French.
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   pbox/.style={draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt,
@@ -563,6 +566,7 @@ the prompt (one- and few-shot) it picks up the pattern and answers (in green). N
 weights are updated; the examples are just text. The format and the final example are
 from \citet{gpt3}.}
 \label{fig:lm-fewshot}
+\end{minipage}
 \end{center}
 \medskip
 
@@ -714,6 +718,7 @@ principles, training from AI feedback instead of human feedback
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \resizebox{0.7\textwidth}{!}{%
 \begin{tikzpicture}[font=\footnotesize\sffamily,
   data/.style={rounded corners=3pt, minimum width=2.0cm, minimum height=1.0cm,
@@ -746,6 +751,7 @@ principles, training from AI feedback instead of human feedback
 completions, a reward model learned offline from human preference data scores them, and
 the scalar reward updates the policy \citep{ouyang2022instructgpt}.}
 \label{fig:lm-rlhf}
+\end{minipage}
 \end{center}
 \medskip
 
@@ -766,6 +772,7 @@ way a learned reward model can (\Cref{fig:lm-rlvr}).
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \resizebox{0.7\textwidth}{!}{%
 \begin{tikzpicture}[font=\footnotesize\sffamily,
   data/.style={rounded corners=3pt, minimum width=2.0cm, minimum height=1.0cm,
@@ -797,6 +804,7 @@ as \Cref{fig:lm-rlhf} but replaces the learned reward model with a rule that che
 answer or runs the code, so the reward needs no human labelling
 \citep{shao2024deepseekmath}.}
 \label{fig:lm-rlvr}
+\end{minipage}
 \end{center}
 \medskip
 
@@ -845,6 +853,7 @@ when the task corpus is small (\Cref{fig:lm-dapt}).
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[font=\footnotesize\sffamily,
   stage/.style={rounded corners=3pt, minimum width=2.8cm, minimum height=1.0cm,
@@ -872,6 +881,7 @@ between general pretraining and fine-tuning: domain-adaptive pretraining on a la
 in-domain corpus, then task-adaptive pretraining on the task's own unlabelled text
 \citep{gururangan_dont_2020}.}
 \label{fig:lm-dapt}
+\end{minipage}
 \end{center}
 \medskip
 
@@ -957,6 +967,7 @@ tokenizer and an initialisation built for general text (\Cref{fig:lm-scratch-con
 
 \medskip
 \begin{center}
+\begin{minipage}{\linewidth}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[font=\footnotesize\sffamily,
   stage/.style={rounded corners=3pt, minimum width=3.1cm, minimum height=1.1cm,
@@ -999,6 +1010,7 @@ model is cheap and keeps general competence but inherits a general tokenizer and
 forget, while pretraining from scratch fits the vocabulary to the domain and cannot
 forget but is expensive and starts with no general competence.}
 \label{fig:lm-scratch-continue}
+\end{minipage}
 \end{center}
 \medskip
 
