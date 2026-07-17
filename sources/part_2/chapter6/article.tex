@@ -6,9 +6,7 @@
 % Source: publications/OntoBook/
 % Sections concatenated verbatim from the paper:
 %   introduction.tex, related.tex, method.tex, experiments.tex, discussion.tex
-% TODO: adapt tables and figures to thesis-style.sty (visual-style.md)
-% TODO: rewrite intro as a thesis-contextualized hook (not the paper's intro)
-% TODO: integrate \Cref{} cross-references to other chapters
+% thesis-ified: hook intro, \section*{Conclusion} on insight, RW deferred to \Cref{chap:rw-corpus/lm/ie}, cross-refs added; tables on booktabs+ThesisTableSep. (remaining: trim multi-sentence captions in the global style sweep)
 
 % Local macro for OntoBook (matches publications/OntoBook/main.tex)
 \providecommand{\method}{OntoBook\xspace}
@@ -72,51 +70,25 @@
 \section{Introduction}
 \label{sec:intro}
 
-\begin{reviewread}
-Medical coding is the task of assigning standardized codes from medical ontologies to clinical documents. It is central to hospital billing, epidemiological surveillance, and clinical research. In France, over 30 million hospital stays per year require accurate coding using the CIM-10 classification (the French adaptation of ICD-10), CCAM procedure codes, and ATC medication codes. This task requires understanding not only medical vocabulary but also the relational structure of medical ontologies: hierarchical links between codes, causal associations, differential diagnoses, and exclusion rules. These relationships are explicitly encoded in ontology graphs but are absent from clinical text corpora.
-\end{reviewread}
+To assign a code to a discharge summary, a hospital coder relies on facts that the summary never states. Type 2 diabetes, coded E11, can cause a specific kidney disease coded N08.3. Two diagnoses may be mutually exclusive, so coding one rules out the other. One code sits several levels below another in a strict hierarchy. This knowledge lives in medical ontologies, which record codes and the relations between them as a graph. It does not appear in running text.
 
-\begin{reviewread}
-Pretrained biomedical language models such as BioBERT \citep{lee_biobert_2019}, PubMedBERT \citep{gu_domain-specific_2022}, and CamemBERT-bio \citep{touchent2023camembertbio} learn medical vocabulary from large text corpora. However, they do not capture the relational structure of medical ontologies, since this structure is not expressed in running text. Knowledge graph approaches such as RDF2Vec \citep{ristoski2016rdf2vec} and Snomed2Vec \citep{agarwal2019snomed2vec} encode ontology structure through random walks, but produce static, non-contextualized embeddings that cannot benefit from transformer pretraining. Knowledge-enhanced transformers such as DRAGON \citep{yasunaga2022dragon} and KEPLER \citep{wang2021kepler} integrate knowledge graph structure into language model pretraining, but they rely on existing text-graph alignment rather than generating new training data from ontology structure alone.
-\end{reviewread}
+The previous chapters improved biomedical encoders in two ways: by collecting and filtering a better pretraining corpus (\Cref{chap:collecting}) and by changing the pretraining objective (\Cref{chap:objectives}). Both operate on running text. An encoder trained this way learns medical vocabulary, but it never sees the relational structure of an ontology, because that structure is not written in sentences. Models such as CamemBERT-bio (\Cref{chap:encoders}) learn what a term means; they do not learn how its code relates to the others.
 
-We propose \method, a pretraining method that converts medical ontology structure into training signal for encoder language models. Our approach proceeds in three stages. First, we generate random walks through ontology graphs to produce sequences that capture hierarchical, causal, and differential relationships between medical codes. Second, we reformulate these walks into fluent medical prose using a large language model, creating synthetic textbooks grounded in ontology structure. Third, we train an encoder with two objectives on the same textbook data: masked language modeling and relation prediction between code pairs. We refer to this co-training on shared data as \emph{alignment}, and our experiments show that it is a necessary condition for the method to work.
+This chapter asks whether that structure can be turned into a training signal for encoders. Medical coding makes the question concrete. French hospitals code more than 30 million stays a year with the CIM-10, CCAM, and ATC classifications, and accurate coding depends on the relations between codes.
+% TODO(cite): source for the >30M annual French hospital stays figure (PMSI/ATIH); left uncited pending verification
+We turn those relations into text. We walk the ontology graph to produce sequences of related codes, rewrite each walk into fluent textbook prose with a large language model, and train the encoder on this text with two objectives at once: masked language modeling and relation prediction between pairs of codes. The single condition that makes this work is that both objectives read the same text. We call this property \emph{alignment}, and we show it is necessary.
 
-We evaluate \method on three French medical coding benchmarks and present ablation studies on the contribution of each component. We release 1.3 million LLM-reformulated medical textbooks across three French ontologies (CIM-10, CCAM, ATC) and all pretrained model checkpoints.
+We evaluate \method on three French medical coding benchmarks, study the contribution of each component, and release the 1.3 million reformulated textbooks across the three ontologies (CIM-10, CCAM, ATC) together with the pretrained checkpoints.
 \section{Related Work}
 \label{sec:related}
 
-\begin{reviewread}
-This section reviews three research directions: biomedical language model pretraining, knowledge-enhanced language models, and automatic medical coding.
-\end{reviewread}
+Two lines of work meet in this chapter: methods that bring ontology structure into language models, and automatic medical coding, the task we evaluate on. \Cref{chap:rw-corpus} reviews the first at length, so here we recall only what is needed and focus on the point of contact with our method.
 
-\subsection{Biomedical Pretrained Language Models}
+\subsection{Bringing Ontology Structure into Language Models}
 
-\begin{reviewread}
-Domain-specific pretraining has proven essential for biomedical NLP. BioBERT \citep{lee_biobert_2019} further pretrained BERT on PubMed abstracts and PMC full-text articles, improving named entity recognition and relation extraction. PubMedBERT \citep{gu_domain-specific_2022} demonstrated that pretraining from scratch on in-domain text outperforms mixed-domain initialization. ClinicalBERT \citep{huang2019clinicalbert} targeted clinical notes from MIMIC-III. For French, CamemBERT-bio \citep{touchent2023camembertbio} adapted CamemBERT \citep{martin-etal-2020-camembert} to biomedical text, while DrBERT \citep{labrak2023drbert} was trained on French biomedical and clinical text from the NACHOS corpus. These models learn from flat text corpora and do not capture the hierarchical structure of medical ontologies.
-\end{reviewread}
+Biomedical encoders such as BioBERT \citep{lee_biobert_2019}, PubMedBERT \citep{gu_domain-specific_2022}, and CamemBERT-bio \citep{touchent2023camembertbio} learn medical vocabulary from large text corpora (\Cref{chap:rw-lm}). They do not capture the relational structure of medical ontologies, since that structure is not expressed in running text. Two families of methods try to close this gap, both described in \Cref{chap:rw-corpus}. Static graph embeddings such as RDF2Vec and Snomed2Vec run random walks over an ontology and embed the resulting sequences, but they produce fixed vectors that cannot be used for transformer pretraining. Knowledge-enhanced transformers such as KEPLER and DRAGON inject graph structure into pretraining, but they rely on text that is already aligned with a graph rather than generating training text from the graph alone. The idea of generating synthetic textbook-quality data with a language model comes from the Phi series \citep{gunasekar2023textbooks} and, for knowledge sources, EntiGraph \citep{yang2025entigraph}.
 
-\subsection{Knowledge-Enhanced Language Models}
-
-\begin{reviewread}
-Random walks on knowledge graphs generate sequences capturing relational structure. RDF2Vec \citep{ristoski2016rdf2vec} adapted the walk-then-embed paradigm to RDF graphs. In the biomedical domain, Snomed2Vec \citep{agarwal2019snomed2vec} applied random walk and Poincar\'e embeddings to SNOMED-CT for clinical prediction tasks. OWL2Vec* \citep{chen2021owl2vec} combined random walk sequences with lexical and logical features from OWL ontologies. These methods produce static embeddings (Word2Vec-style) and cannot be used for transformer pretraining.
-\end{reviewread}
-
-\begin{reviewread}
-Several approaches inject knowledge graph structure into transformers. ERNIE \citep{zhang2019ernie} aligns entity embeddings with text representations. K-BERT \citep{liu2020kbert} injects knowledge triples into the input sequence using soft-position indices and a visibility mask. For multi-task pretraining, KEPLER \citep{wang2021kepler} combines MLM with TransE-style knowledge embedding on Wikidata. DRAGON \citep{yasunaga2022dragon} jointly trains MLM and knowledge graph link prediction, with a biomedical variant on UMLS achieving +3\% on MedQA. CODER \citep{yuan2021coder} uses UMLS relation triplets for contrastive pretraining, and SAPBERT \citep{liu2021sapbert} uses contrastive learning on UMLS synonyms for biomedical entity linking. Closest to the present work, BioOntoBERT \citep{shashikumar2023bioontobert} generates sentences from biomedical ontologies using Onto2Sen templates and pretrains BERT with MLM on the resulting corpus. However, the template-based generation produces formulaic sentences (e.g., ``X is a type of Y'') rather than fluent prose, and the method uses only MLM without multi-task relation prediction.
-\end{reviewread}
-
-\begin{reviewread}
-Recent work has explored synthetic data generation from knowledge sources. The Phi series \citep{gunasekar2023textbooks} demonstrated that LLM-generated textbook-quality data enables strong small-model performance. EntiGraph \citep{yang2025entigraph} generates entity-centric synthetic data from knowledge sources but targets decoder language models rather than encoder pretraining.
-\end{reviewread}
-
-\subsection{Automatic Medical Coding}
-
-\begin{reviewread}
-Medical coding assigns ICD, procedure, or medication codes to clinical text. CAML \citep{mullenbach2018caml} introduced label-wise attention for explainable predictions. PLM-ICD \citep{huang2022plmicd} showed that fine-tuning pretrained encoders with label attention directly improves coding performance. \citet{kirchler2026grasp} recently demonstrated that LLM embeddings improve transferability of EHR-based predictions across countries and coding systems, highlighting the importance of encoding medical knowledge structure for cross-system generalization. These methods improve the classification head or the input representations but rely on generic encoders pretrained on flat text corpora.
-\end{reviewread}
-
-Table~\ref{tab:related_comparison} summarizes how \method combines components not jointly present in prior work.
+Closest to the present work, BioOntoBERT \citep{shashikumar2023bioontobert} generates sentences from biomedical ontologies using Onto2Sen templates and pretrains BERT with masked language modeling on the resulting corpus. The template-based generation produces formulaic sentences (e.g., ``X is a type of Y'') rather than fluent prose, and the method uses only masked language modeling without relation prediction. \Cref{tab:related_comparison} summarizes how \method combines components not jointly present in prior work.
 
 \begin{table}[t]
 \centering
@@ -142,6 +114,11 @@ Phi-1 & & \checkmark & \\
 \caption{\textbf{Comparison with related approaches.} \method is the only listed approach that combines the three components for biomedical encoder pretraining.}
 \label{tab:related_comparison}
 \end{table}
+
+\subsection{Automatic Medical Coding}
+
+Automatic medical coding assigns diagnosis, procedure, or medication codes to clinical text. \Cref{chap:rw-ie} reviews the main approaches, from label-wise attention models such as CAML \citep{mullenbach2018caml} to fine-tuned encoders such as PLM-ICD \citep{huang2022plmicd}. \citet{kirchler2026grasp} recently showed that language-model embeddings improve the transfer of EHR-based predictions across countries and coding systems, which points to the value of encoding medical knowledge structure for cross-system generalization. These methods improve the classification head or the input representation, but they rely on generic encoders pretrained on flat text. Our contribution sits one step earlier, at pretraining: an encoder that has already learned ontology structure before it sees any coding data.
+
 \section{Method}
 \label{sec:method}
 
@@ -504,7 +481,10 @@ All experiments use French medical coding. Extending to English ontologies such 
 \paragraph{Future Work.}
 Future work will extend \method to English medical coding using UMLS and SNOMED-CT ontologies. A promising direction is cross-ontology walks that traverse edges between different ontologies (e.g., from a CIM-10 diagnosis to its ATC treatment to the CCAM procedure), generating richer walks that capture inter-ontology relationships in a single sequence.
 
-\section{Conclusion}
-\label{sec:conclusion}
+\section*{Conclusion}
 
-We presented \method, a method that converts medical ontology structure into pretraining signal for encoder language models through random walks, LLM-based textbook reformulation, and multi-task learning combining masked language modeling and relation prediction. Our key finding is that alignment between objectives is essential: both tasks must train on the same data, as misalignment causes a 30-point degradation. On French medical coding benchmarks, \method improves over MLM-only pretraining by +2.5 micro-F1 on FRACCO and +8.0 on Distemist. We release 1.3 million LLM-reformulated medical textbooks across three French ontologies (CIM-10, CCAM, ATC) and pretrained model checkpoints.
+Ontology structure never appears in clinical text, yet a coder needs it to assign the right code. Writing that structure out as textbook prose lets an encoder read it, and one condition decides whether the signal survives training: masked language modeling and relation prediction must run on the same text. When they do, the encoder improves on every French coding benchmark, by +2.5 micro-$F_1$ on FRACCO and +8.0 on Distemist over the same model trained with masked language modeling alone. When they run on different text, the two objectives pull against each other and performance drops by 30 points. Alignment is what separates a knowledge-grounded encoder from one that has only seen more text.
+
+\vspace{2em}
+
+The textbooks in this chapter are synthetic, generated from an ontology rather than drawn from hospital records. That same move, building training text where none can be shared, is what the next part turns to. It leaves pretraining behind and looks at the clinical tasks themselves, where labelled data is scarce and often cannot leave the hospital (\Cref{part:adaptation}).
