@@ -27,6 +27,7 @@ grice_logic_1975                # Grice, Logic and Conversation (sim 100; 1975 v
 austin_words_1962               # Austin, How to Do Things with Words, OUP 1962 (sim 100; 1962 vs 2009 reprint)
 wuster_einfuhrung_1979          # Wüster, allgemeine Terminologielehre (German classic, no DOI)
 tang2024txt360                  # TxT360 LLM pretraining dataset (HuggingFace, no DOI)
+gretton_kernel_2012             # Gretton et al., A Kernel Two-Sample Test, JMLR 13(25):723-773, 2012 (jmlr.org/papers/v13/gretton12a.html). checkbib misfires onto a 2025 arXiv "A Martingale Kernel Two-Sample Test"
 
 # Ch.1/Ch.2 intro expansion — books, legal texts, web stats (genuinely no resolvable DOI):
 mycin_book_1984                 # Buchanan & Shortliffe, MYCIN Experiments, Addison-Wesley 1984 (book)
