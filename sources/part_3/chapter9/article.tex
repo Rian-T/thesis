@@ -1,15 +1,8 @@
-The first two parts of this thesis built biomedical encoders by pretraining
-them on public text. This part puts those encoders to work on a real clinical
-task. A clinical study follows each of its patients over time and records what
-it learns in a structured form called an electronic case report form, or eCRF:
-one line per patient, with a fixed set of fields such as the treatment given or
-the date it started. The information needed to fill that form is written in the
-patient's own reports, the consultation notes, discharge summaries, and
-pathology results produced during care. These reports are longitudinal: they are
-written at successive moments as the disease unfolds rather than gathered in a
-single note, so a value can appear in one report and be revised in a later one.
-The task of this part is to read those reports and fill the matching line of the
-form, as \Cref{fig:p3-report-to-ecrf} shows on a single report.
+A clinical study keeps a structured form for each of its patients, the electronic
+case report form, or eCRF. It holds one line per patient, with a fixed set of
+fields such as the treatment given or the date it started, and it is filled from
+the patient's own reports. \Cref{fig:p3-report-to-ecrf} shows what that looks
+like on a single report.
 
 \input{sources/part_3/figures/fig_report_to_ecrf}
 
