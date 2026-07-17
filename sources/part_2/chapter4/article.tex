@@ -17,7 +17,7 @@ For French, \citet{labrak2023drbert} went further. They reported that continual 
 \end{reviewread}
 
 \begin{reviewread}
-In this chapter, we show that continual pretraining on \textit{biomed-fr} (\Cref{chap:collecting}) yields an average improvement of +2.54 $F_1$ across five biomedical NER benchmarks, using 2 V100 GPUs for 39 hours. We also identify the methodological differences that led to the contradictory conclusion.
+In this chapter, we show that continual pretraining on \textit{biomed-fr} (\Cref{chap:collecting}, whose composition is given in \Cref{tab:biomed-fr-composition}, and its 10\% subset \textit{biomed-fr-small}) yields an average improvement of +2.54 $F_1$ across five biomedical NER benchmarks, using 2 V100 GPUs for 39 hours. We also identify the methodological differences that led to the contradictory conclusion.
 \end{reviewread}
 
 
@@ -53,32 +53,32 @@ Regarding model evaluation, we collected three named entity recognition evaluati
 \setlength{\tabcolsep}{5pt}
 \sisetup{detect-weight=true}
 \begin{threeparttable}[b]
-\begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
+\begin{tabular}{l c c c}
 \toprule
 & & \multicolumn{2}{c}{\textbf{CamemBERT-bio}} \\
 \cmidrule(lr){3-4}
-\textbf{Dataset} & {\textbf{CamemBERT}} & {\textbf{biomed-fr-small}} & {\textbf{biomed-fr}} \\
+\textbf{Dataset} & \textbf{CamemBERT} & \textbf{biomed-fr-small} & \textbf{biomed-fr} \\
 \midrule
 \rowcolor{ThesisTableSep}
 \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Clinical}} \\[1pt]
-CAS1 & 70.50 & \underline{72.94} & \bfseries 73.03 \\
-CAS2 & 79.02 & \underline{80.00} & \bfseries 81.66 \\
-E3C  & 67.63 & \underline{67.96} & \bfseries 69.85 \\
+CAS1 & $70.50 \pm 1.75$ & \underline{$72.94 \pm 1.12$} & $\mathbf{73.03 \pm 1.29}$ \\
+CAS2 & $79.02 \pm 0.92$ & \underline{$80.00 \pm 0.32$} & $\mathbf{81.66 \pm 0.59}$ \\
+E3C  & $67.63 \pm 1.45$ & \underline{$67.96 \pm 1.85$} & $\mathbf{69.85 \pm 1.58}$ \\
 \midrule
 \rowcolor{ThesisTableSep}
 \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Leaflets}} \\[1pt]
-EMEA & 74.14 & \underline{75.93} & \bfseries 76.71 \\
+EMEA & $74.14 \pm 1.95$ & \underline{$75.93 \pm 2.42$} & $\mathbf{76.71 \pm 1.50}$ \\
 \midrule
 \rowcolor{ThesisTableSep}
 \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Scientific}} \\[1pt]
-MEDLINE & \underline{65.73} & 65.48 & \bfseries 68.47 \\
+MEDLINE & \underline{$65.73 \pm 0.40$} & $65.48 \pm 0.31$ & $\mathbf{68.47 \pm 0.54}$ \\
 \midrule
 \textbf{Average} & 71.40 & \underline{72.46} & \bfseries 73.94 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
   \small
-  \item $F_1$ scores (micro-average, seqeval strict, IOB2). Mean over 10 seeds. biomed-fr-s = biomed-fr-small (10\% subset).
+  \item $F_1$ scores (micro-average, seqeval strict, IOB2). Mean $\pm$ standard deviation over 10 seeds. biomed-fr-s = biomed-fr-small (10\% subset).
 \end{tablenotes}
 \end{threeparttable}
 \caption{\textbf{CamemBERT vs CamemBERT-bio} on five biomedical NER benchmarks. Continual pretraining on \textit{biomed-fr} yields +2.54 $F_1$ on average.}

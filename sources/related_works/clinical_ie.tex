@@ -100,7 +100,9 @@ enumerates candidate spans of text and classifies each span as an entity of some
 entity. This avoids the constraints of token-by-token tagging and handles nested entities,
 where one entity sits inside another. Nested entities are common in biomedicine. In ``right
 lung cancer'', an anatomy entity (``right lung'') sits inside a disease entity (``right lung
-cancer''), and the BIO scheme cannot give a token two labels at once.
+cancer''), and the BIO scheme cannot give a token two labels at once. This span-against-type
+view is also what lets a model be asked for a type it never saw in training, the design GLiNER
+builds on \citep{zaratiana2024gliner} and which \Cref{sec:ie-zeroshot} takes up.
 
 These methods work well on general-domain text, where entities such as people, places, and
 organizations follow fairly regular patterns. The biomedical domain raises its own
