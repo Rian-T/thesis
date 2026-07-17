@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Derive PARHAF and FrACCO NER results with held-out thresholds."""
+"""Derive PARHAF and FRACCO NER results with held-out thresholds."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ BENCHMARKS = {
             "Low-density adapted": "preds_lym_parhaf-bio-v3e-parhafbio.parquet",
         },
     },
-    "FrACCO": {
+    "FRACCO": {
         "directory": DATA / "fracco",
         "gold": "fracco_all.jsonl",
         "validation": "fracco_es.jsonl",

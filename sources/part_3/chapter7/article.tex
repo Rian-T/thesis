@@ -30,7 +30,7 @@ all requested fields jointly.
 
 The eCRF keeps one value per record and field: the prediction with the highest
 confidence. A wrong value contributes one false positive and one false negative.
-PARHAF and the FrACCO NER dataset remain multi-mention tasks, where all predictions are
+PARHAF and the FRACCO NER dataset remain multi-mention tasks, where all predictions are
 matched greedily by decreasing confidence. The two regimes are summarized in
 \Cref{fig:p3-metrics,tab:p3-metrics}.
 
@@ -54,7 +54,7 @@ the threshold. Generative models return values directly and need no threshold.
     \midrule
     eCRF value-$F_1$ & One value per field & Token Jaccard $\geq 0.5$ \\
     eCRF span-$F_1$ & One span per field & Any overlap \\
-    PARHAF and FrACCO & All mentions & Greedy span matching \\
+    PARHAF and FRACCO & All mentions & Greedy span matching \\
     \bottomrule
   \end{tabular}
 \caption{\textbf{Matching rules} used in each evaluation.}
@@ -238,9 +238,9 @@ annotation.
 
 The second question is external transfer. The synthetic eCRF measures the
 complete task but cannot establish transfer to
-human-written text. We therefore evaluate on PARHAF and FrACCO NER
+human-written text. We therefore evaluate on PARHAF and FRACCO NER
 (\Cref{tab:p3-external}). PARHAF contains two biomarker types and only 31 test
-documents, so small differences are unstable. FrACCO contains three ICD-O types
+documents, so small differences are unstable. FRACCO contains three ICD-O types
 and about 34 mentions per document, making it a substantially denser NER task.
 The MC-bio-gliner corpus contains only 0.2\% of documents with no retained
 mention; retraining it to match the sparser annotation density of these datasets
@@ -270,13 +270,13 @@ numerical comparison.
     MC-bio-gliner & 0.244 & 0.681 \\
     \midrule
     \rowcolor{ThesisTableSep}
-    \multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{FrACCO}} \\[1pt]
+    \multicolumn{3}{c}{\rule{0pt}{10pt}\textbf{FRACCO}} \\[1pt]
     GLiNER-BioMed & \bfseries 0.341 & \bfseries 0.762 \\
     \arrayrulecolor{ThesisNeutral!45}\cmidrule{1-3}\arrayrulecolor{black}
     MC-bio-gliner & 0.203 & 0.626 \\
     \bottomrule
   \end{tabular}
-\caption{\textbf{External transfer results} on PARHAF and FrACCO NER.
+\caption{\textbf{External transfer results} on PARHAF and FRACCO NER.
   Value-$F_1$; the confidence threshold is selected on the validation split and
   the test set is evaluated once. Best per column in bold. A dash marks a run
   with no usable output: Qwen3.5-2B returned a single span for the whole test set
@@ -289,7 +289,7 @@ above the size-matched GLiNER-BioMed at 0.562. Qwen3.5-2B and Qwen3.5-9B
 reach 0.741 and 0.726, respectively. Because the test set contains 31 documents,
 these small differences should not be read as a stable ranking.
 
-FrACCO gives a different result. After adaptation, the size-matched
+FRACCO gives a different result. After adaptation, the size-matched
 GLiNER-BioMed reaches 0.762, compared with 0.626 for MC-bio-gliner. On this
 dense, flat NER task the biomedical NER baseline keeps the advantage, and
 MC-bio-gliner is not the strongest model here. This result narrows the scope of the
@@ -329,7 +329,7 @@ footprint.
 
 The three evaluations delimit where the result holds. MC-bio-gliner wins the
 longitudinal form it was built for; on the narrower PARHAF biomarkers it beats
-the size-matched baseline but not the generator; and on the dense FrACCO NER the
+the size-matched baseline but not the generator; and on the dense FRACCO NER the
 biomedical baseline keeps the lead. Every part of this evidence is synthetic or
 silver, with no real hospital record or human annotation in the task. Matching a
 fine-tuned generative model at 27 times fewer parameters, with no clinical data,

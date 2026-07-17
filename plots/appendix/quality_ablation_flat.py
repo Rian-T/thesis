@@ -2,7 +2,7 @@
 quality_ablation_flat.py — appendix figure for the pre-detour negative result.
 
 Each point is one quality-signal document filter applied before the CLM decay,
-scored on FrACCO ICD-coding (top-100, micro-F1, mean +/- std over 3 seeds). The
+scored on FRACCO ICD-coding (top-100, micro-F1, mean +/- std over 3 seeds). The
 band is the spread of the points: every filter lands inside it, so filtering by a
 quality signal does not move downstream coding. Data read from the run JSONs in
 ~/dev/colm/ModernBERT/outputs/quality-ablation/.
@@ -48,7 +48,7 @@ ax.errorbar(means, list(y), xerr=stds, fmt="o", color=COLORS["primary_dark"],
             ecolor=COLORS["neutral"], elinewidth=1, capsize=2.5, markersize=4, zorder=3)
 ax.set_yticks(list(y))
 ax.set_yticklabels(labels)
-ax.set_xlabel("FrACCO top-100 micro-F1")
+ax.set_xlabel("FRACCO top-100 micro-F1")
 ax.set_title("Quality-signal document filters (3 seeds)", fontsize=9)
 ax.margins(y=0.08)
 

@@ -114,7 +114,7 @@ All runs use decoupled AdamW with peak lr $2 \times 10^{-4}$, $\beta_1 = 0.9$, $
 
 \subsection{Fine-tuning Protocol}
 
-\paragraph{French tasks.} Single-label classification (DiaMED~\citep{drbenchmark2024}) and multilabel classification (MedDialog \citep{liu2024meddialog}, FrACCO \citep{pignat2024fracco}, CANTEMIST \citep{miranda2020cantemist}, DisTEMIST \citep{miranda2022distemist}) use a linear head on the CLS token, trained for 15 epochs with lr $= 2 \times 10^{-5}$, batch size 4, and 10\% warmup. The multilabel classification tasks use max sequence length 4096 with weighted BCEWithLogitsLoss; single-label classification uses 2048. NER tasks (EMEA and Medline, from QUAERO~\citep{neveol14quaero}) use a span-based architecture with BiLSTM, CRF, and biaffine scorer, trained for 4000 steps with lr $= 5 \times 10^{-5}$ for the encoder and $10^{-3}$ for the head, batch size 16, max length 1024. All tasks use AdamW with weight decay 0.01 and select the best checkpoint by validation $F_1$.
+\paragraph{French tasks.} Single-label classification (DiaMED~\citep{drbenchmark2024}) and multilabel classification (MedDialog \citep{liu2024meddialog}, FRACCO \citep{pignat2024fracco}, CANTEMIST \citep{miranda2020cantemist}, DisTEMIST \citep{miranda2022distemist}) use a linear head on the CLS token, trained for 15 epochs with lr $= 2 \times 10^{-5}$, batch size 4, and 10\% warmup. The multilabel classification tasks use max sequence length 4096 with weighted BCEWithLogitsLoss; single-label classification uses 2048. NER tasks (EMEA and Medline, from QUAERO~\citep{neveol14quaero}) use a span-based architecture with BiLSTM, CRF, and biaffine scorer, trained for 4000 steps with lr $= 5 \times 10^{-5}$ for the encoder and $10^{-3}$ for the head, batch size 16, max length 1024. All tasks use AdamW with weight decay 0.01 and select the best checkpoint by validation $F_1$.
 
 \paragraph{English tasks.} We follow the BioClinical-ModernBERT evaluation protocol~\citep{sounack2025bioclinicalmodernbert}: lr $= 5 \times 10^{-5}$, weight decay 0.01, batch size 16, 10 epochs for most tasks (20 for NER). All models are fine-tuned with the same hyperparameters per task.
 
@@ -134,7 +134,7 @@ We evaluate on 8 French and 11 English biomedical tasks (\Cref{tab:eval-tasks}),
 \rowcolor{ThesisTableSep} \multicolumn{4}{c}{\rule{0pt}{9pt}\textbf{French}} \\[1pt]
 DiaMED & Classification & FR & 2048 \\
 MedDialog-FR & Multilabel & FR & 4096 \\
-FrACCO (30/100) & Multilabel & FR & 4096 \\
+FRACCO (30/100) & Multilabel & FR & 4096 \\
 CANTEMIST & Multilabel & FR & 4096 \\
 DisTEMIST & Multilabel & FR & 4096 \\
 QUAERO (EMEA/Medline) & NER & FR & 1024 \\
@@ -172,7 +172,7 @@ HoC & Classification & EN & 512 \\
 \toprule
 & & \multicolumn{5}{c}{\textbf{Multilabel Classification}} & {\textbf{CLS}} & \multicolumn{2}{c}{\textbf{NER}} & \\
 \cmidrule(lr){3-7} \cmidrule(lr){8-8} \cmidrule(lr){9-10}
-& \textbf{Ctx} & \textbf{FrACCO-30} & \textbf{FrACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
+& \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
 ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 63.4 & 55.3 & 55.6 \\
@@ -239,7 +239,7 @@ CLM detour & 8192 & 90.4 & 61.3 & 94.7 & \bfseries 56.5 & \bfseries 84.2 & \unde
 \subsection{Optimal Decay Ratio}
 
 \begin{reviewread}
-We sweep the decay length from 2.5\% to 50\% of the CLM phase at two scales, evaluating on 3 French tasks (DiaMED, FrACCO-30, FrACCO-100; \Cref{tab:decay-sweep}). At both scales, 10\% decay gives the best performance; shorter decay (2.5--4\%) scores about 1.0pp below optimal, and longer decay (20--50\%) provides no additional benefit. This ratio matches the cooldown lengths used in language model pretraining.
+We sweep the decay length from 2.5\% to 50\% of the CLM phase at two scales, evaluating on 3 French tasks (DiaMED, FRACCO-30, FRACCO-100; \Cref{tab:decay-sweep}). At both scales, 10\% decay gives the best performance; shorter decay (2.5--4\%) scores about 1.0pp below optimal, and longer decay (20--50\%) provides no additional benefit. This ratio matches the cooldown lengths used in language model pretraining.
 \end{reviewread}
 
 \begin{table}[t]
@@ -262,7 +262,7 @@ We sweep the decay length from 2.5\% to 50\% of the CLM phase at two scales, eva
 5.0B & 20\% & 72.7\% & 70.1\% \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Decay ratio sweep} on 3 French tasks (DiaMED, FrACCO-30, FrACCO-100; 9 seeds each). 10\% decay is optimal at both scales.}
+\caption{\textbf{Decay ratio sweep} on 3 French tasks (DiaMED, FRACCO-30, FRACCO-100; 9 seeds each). 10\% decay is optimal at both scales.}
 \label{tab:decay-sweep}
 \end{table}
 
@@ -295,7 +295,7 @@ Long-context encoding is critical in biomedical NLP, where clinical documents ro
 We generate 1,500 balanced positive/negative pairs across 5 lengths (512--8,192 tokens) and 3 positions (start, middle, end), split 70/15/15 for train/validation/test. We freeze each encoder and train a 2-layer MLP probe (Dropout $\to$ Linear $\to$ GELU $\to$ Dropout $\to$ Linear) on CLS representations for 3 epochs (lr $= 2 \times 10^{-5}$, batch size 4, AdamW), selecting the best checkpoint by validation accuracy.
 \end{reviewread}
 
-\paragraph{Results.} CLM outperforms MLM at every context length and position (\Cref{fig:needle}; +10.7pp overall: 62.2\% vs 51.6\%). MLM accuracy degrades monotonically with document length (57\% at 512 tokens to 43\% at 8,192), while CLM degrades more slowly and remains above MLM throughout. The CLM advantage is largest at mid-document positions, where the inserted fact is farthest from both sequence boundaries. This is consistent with the downstream pattern: the French tasks with the largest CLM gains (FrACCO, CANTEMIST) use sequence lengths of 4,096 tokens during fine-tuning.
+\paragraph{Results.} CLM outperforms MLM at every context length and position (\Cref{fig:needle}; +10.7pp overall: 62.2\% vs 51.6\%). MLM accuracy degrades monotonically with document length (57\% at 512 tokens to 43\% at 8,192), while CLM degrades more slowly and remains above MLM throughout. The CLM advantage is largest at mid-document positions, where the inserted fact is farthest from both sequence boundaries. This is consistent with the downstream pattern: the French tasks with the largest CLM gains (FRACCO, CANTEMIST) use sequence lengths of 4,096 tokens during fine-tuning.
 
 
 \section{Analysis: Why Does the CLM Detour Work?}
@@ -308,7 +308,7 @@ We measure representational similarity with linear Centered Kernel Alignment~\ci
 \[
 \text{CKA}(X, Y) = \frac{\text{tr}(KL)}{\sqrt{\text{tr}(K^2)\,\text{tr}(L^2)}}
 \]
-We report divergence $d = 1 - \text{CKA}$, so higher values indicate greater representational difference. CKA equals 1 when representations are identical up to invertible linear transformation, 0 when there is no linear relationship. All computations use float64 arithmetic. For French we use 500 held-out texts from DiaMED and FrACCO; for English, PubMed abstracts. Results are averaged over 3 seeds.
+We report divergence $d = 1 - \text{CKA}$, so higher values indicate greater representational difference. CKA equals 1 when representations are identical up to invertible linear transformation, 0 when there is no linear relationship. All computations use float64 arithmetic. For French we use 500 held-out texts from DiaMED and FRACCO; for English, PubMed abstracts. Results are averaged over 3 seeds.
 
 \subsection{The CLM Imprint Persists in Low Layers}
 \label{sec:persistence}
