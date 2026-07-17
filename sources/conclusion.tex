@@ -438,9 +438,9 @@ local hospital software, acting over several steps to complete a task instead of
 answering a single prompt. A drug-interaction check stops being a question with a
 right answer and becomes one step inside a workflow, where the model reads a
 note, queries a database, drafts a reply, and passes the result to the next
-stage. The safety question grows with the system: it is no longer whether the
-model holds the right medical fact. It is what the whole agent does with that fact
-across a chain of actions on real data.
+stage. The safety question grows with the system. Holding the right medical fact no
+longer settles it, because the agent acts on that fact across a chain of steps on
+real data.
 
 Testing such systems is harder than testing an answer. There is now evidence that
 models can tell when they are being examined. \citet{needham2025evalaware} show
@@ -510,24 +510,37 @@ static benchmark that reports only the unsafe rate would call this model safe.
 Supplying the official contraindication together with the case does not protect it
 either: about a fifth still prescribe against the verdict they have just read. The
 mechanism is deference under pressure to the authority artifact rather than a
-missing fact, so access-based fixes such as forced retrieval treat the symptom and
-not the cause. The practical point is narrow: a safety number from a chat or
+missing fact, so access-based fixes such as forced retrieval leave that
+mechanism untouched. The practical point is narrow: a safety number from a chat or
 multiple-choice benchmark is not an upper bound on the risk in deployment. Here it
 is wrong by a large factor, zero against a quarter, for the same model and the same
 artifact.
 
 \section{The Work That Remains}
 
-This is one model, one scenario, and twenty pairs, with wide intervals: an
-exploratory probe rather than a benchmark, whose value is to show that the
-apparatus, and not the model alone, decides the number.
+This is one model, one scenario, and twenty pairs, with intervals too wide to size
+the effect. What the probe points at does not depend on that size. A chat benchmark
+has no place to put a failure of this kind: it offers one question and one answer,
+and the failure needs a horizon to appear in. A whole class of failure therefore
+sits outside what the field's instruments can register, and a benchmark can report
+a model safe without having looked where the danger is.
 
-A shared, realistic
-environment of this kind for French clinical care still has to be built, and it
-runs into the constraint that shaped this whole thesis. The clinic cannot be
-exported, so the environment has to be rebuilt from public and synthetic material,
-and rebuilt well enough that a model cannot tell the reconstruction from the real
-thing. The principle that ran through this work, to build the resource in the open
-and to test it close to real use, is the one that points the way. Building these
-environments, so that a medical model is finally judged on the test that matters,
-is the work that remains.
+The systems reaching French clinical practice are becoming agents, acting over
+several steps on a record, while the evidence offered for them stays a table of
+question-answering scores. The distance between what is deployed and what is
+measured grows with every deployment.
+
+The same shift closes the obvious way out. Records cannot leave the hospital, so
+the evaluation cannot be run outside it. Inside, it is arguably worse. An agent
+under evaluation is an agent acting, and learning whether it issues a dangerous
+order means letting it reach a real record and issue one; the prescription tool
+that this simulation logs and scores would be a real prescription. The test is the
+hazard, which a question never was. Nor would it scale, since data cannot be pooled
+and neither can the evaluation, so each institution would rebuild the same
+apparatus behind its own walls and produce nothing the next one could use. That
+leaves one route, the one this thesis took for its corpora and its models and which
+its evaluation now needs in turn: rebuild the clinic from public and synthetic
+material, well enough that a model cannot tell the reconstruction from the real
+thing. Building it is what remains. Only then does the question a hospital actually
+has, whether an agent can be trusted to act on a patient's record, become one the
+field can ask.
