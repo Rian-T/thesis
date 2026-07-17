@@ -480,8 +480,11 @@ For the clinical domain this pattern is attractive for a practical reason. The l
 holds broad medical knowledge and can label text without supervision, while the small model it
 teaches is cheap to run and can be deployed inside a hospital where the data must stay. The
 expensive model does the labelling once, and the model that is deployed inherits much of its
-behaviour. The quality of the small model then depends on how reliable the large model is as an
-annotator, which is not guaranteed for technical clinical content.
+behaviour. \citet{meoni-etal-2023-large} apply this pattern to multilingual clinical entity
+extraction, annotating training data with a large model and training a smaller one on the
+result, precisely because confidentiality rules out sending the clinical text to the large
+model at inference time. The quality of the small model then depends on how reliable the large
+model is as an annotator, which is not guaranteed for technical clinical content.
 
 \subsection{Generating Synthetic Clinical Notes}
 
@@ -495,6 +498,9 @@ annotated set, with an ensemble used to filter low-quality generations. Asclepiu
 idea further by training a clinical language model entirely on synthetic notes. It used a large
 model to turn public case reports into realistic clinical notes and used no private clinical
 data. The result was competitive with models trained on real notes \citep{kweon2024asclepius}.
+\citet{meoni-etal-2024-generating} keep the private text out of the loop differently, generating
+documents from clinical keywords extracted without confidential information and refining them
+with a reward that scores each candidate against real reports.
 
 Synthetic notes built this way still tend to read as too clean and complete, and
 they lack the terse, telegraphic style of real clinical writing. The generator can also produce
