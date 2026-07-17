@@ -15,13 +15,13 @@
 \centering
 \begin{tikzpicture}[scale=0.78, transform shape,
   stage/.style={font=\scriptsize\sffamily\bfseries, text=#1},
-  frame/.style={rounded corners=5pt, draw=ThesisNeutral!40, minimum height=2.6cm},
+  frame/.style={rounded corners=5pt, draw=ThesisNeutral!40, minimum height=3.2cm},
 ]
 
   % === THREE FRAMES ===
   \node[frame, minimum width=2.5cm]  (f1) at (1.25, 1.0) {};
-  \node[frame, minimum width=5.0cm]  (f2) at (6.5,  1.0) {};
-  \node[frame, minimum width=4.5cm]  (f3) at (12.75,1.0) {};
+  \node[frame, minimum width=5.0cm]  (f2) at (7.4,  1.0) {};
+  \node[frame, minimum width=4.5cm]  (f3) at (14.55,1.0) {};
 
   % === STAGE LABELS ===
   \node[stage=ThesisPrimaryDark]   at (f1.north) [above=2pt] {Ontology};
@@ -49,11 +49,11 @@
 
   % === F3: two objectives ===
   \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
-        text width=3.6cm, font=\scriptsize, inner sep=4pt] (mlmex) at ([yshift=5.2mm]f3.center)
+        text width=3.6cm, font=\scriptsize, inner sep=4pt] (mlmex) at ([yshift=7mm]f3.center)
     {$\mathcal{L}_{\text{MLM}}$:\; Le \colorbox{ThesisTertiary!30}{[MASK]} (E11) peut
      \colorbox{ThesisTertiary!30}{[MASK]} une n\'ephropathie\ldots};
   \node[draw=ThesisTertiaryDark, fill=ThesisTertiary!15, rounded corners=2pt,
-        text width=3.6cm, font=\scriptsize, inner sep=4pt] (relex) at ([yshift=-6.8mm]f3.center)
+        text width=3.6cm, font=\scriptsize, inner sep=4pt] (relex) at ([yshift=-8.5mm]f3.center)
     {$\mathcal{L}_{\text{rel}}$:\qquad E11 $\xrightarrow{\;\colorbox{ThesisTertiary!30}{\textbf{?}}\;}$ N08};
 
   % === ARROWS ===
@@ -349,7 +349,7 @@ Figure~\ref{fig:dynamics} shows training dynamics and hyperparameter sensitivity
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.48\columnwidth, height=3.5cm,
+  width=0.48\columnwidth, height=4.5cm,
   xlabel={\scriptsize Epoch},
   ylabel={\scriptsize Avg F1},
   xmin=0.5, xmax=3.5,
@@ -372,7 +372,7 @@ Figure~\ref{fig:dynamics} shows training dynamics and hyperparameter sensitivity
 \hfill%
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.48\columnwidth, height=3.5cm,
+  width=0.48\columnwidth, height=4.5cm,
   xlabel={\scriptsize $\lambda$},
   ylabel={\scriptsize FRACCO F1},
   xmode=log,
@@ -487,4 +487,4 @@ Ontology structure never appears in clinical text, yet a coder needs it to assig
 
 \vspace{2em}
 
-The textbooks in this chapter are synthetic, generated from an ontology rather than drawn from hospital records. That same move, building training text where none can be shared, is what the next part turns to. It leaves pretraining behind and looks at the clinical tasks themselves, where labelled data is scarce and often cannot leave the hospital (\Cref{part:adaptation}).
+The textbooks in this chapter are synthetic, generated from an ontology rather than drawn from hospital records. That same move, building training text where none can be shared, is what the next part turns to. It leaves pretraining behind and puts an encoder to work on the task a clinical study needs: reading the reports written about a patient during care and filling the structured form the study keeps for that patient. No real hospital record can be shared to learn from, so the constraint that shaped the corpus and the encoders of the first two parts now shapes the task as well (\Cref{part:adaptation}).
