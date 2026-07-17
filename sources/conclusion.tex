@@ -124,7 +124,7 @@ chapter takes a first measurement of that behaviour.
 The methods in this thesis were built to be efficient. We trained small encoder
 models rather than large generative ones, and we pretrained and continually
 pretrained them at a low compute and carbon cost (\Cref{chap:encoders,chap:objectives}).
-This is not the direction French clinical NLP appears to be taking. Hospitals are
+There are signs that French clinical NLP is heading in another direction. Hospitals are
 acquiring their own GPU infrastructure and deploying large general-purpose models
 locally, so that patient data never leaves the institution. One survey found that
 261 hospitals in mainland China reported deploying DeepSeek-R1 on
@@ -133,7 +133,7 @@ and clinical informatics groups describe the same move toward on-premise models,
 chosen for privacy rather than for size~\citep{dennstadt2025implementing}. A single
 general model also covers many clinical tasks at once, where each of our encoders had
 to be fine-tuned for one. The efficient, small-model path this thesis took is
-defensible, but it is not where the field is going.
+defensible, but there are signs the field is moving another way.
 
 The encoders this thesis favoured have one property that matters here. Once
 fine-tuned, they return the same answer to the same input. Large decoder models do
@@ -398,6 +398,20 @@ into a minor precaution; and a triage order that shifts with a patient's name an
 postal code is exactly the behaviour a deployed triage tool must not have. These
 are the behaviours a factual benchmark, by construction, never sees.
 
+These numbers are a first probe. TABIB is a preliminary benchmark built on the
+ANSM interaction thesaurus, and its seven protocols are meant to grow in later
+versions. The panel is seven open-weight models of nine billion parameters or
+fewer, so it says nothing about the larger proprietary systems most likely to
+reach a clinic. An LLM judge scores the behavioural responses against the
+thesaurus, and no clinician has yet checked those judgments. The demographic
+protocol is the narrowest: it permutes five patient profiles over one hundred of
+the nine hundred generated cases, enough to expose a ranking bias but too small to
+pin down its size across the range of patients a triage tool would meet. What
+holds is the direction, that behaviour gives way under a change that leaves the
+medical fact intact; its magnitude, and how it moves for the models a hospital
+would run, waits on the larger and clinically validated benchmark this study sets
+up.
+
 
 \chapter{Where Medical AI Is Going}
 \label{sec:conclusion-field-direction}
@@ -409,8 +423,13 @@ shift will demand of how we evaluate them.
 \section{From Models to Agents}
 
 The previous chapter tested one model at a time, answering one question under
-pressure. The systems now reaching hospitals are larger than that. They are
-agents: models given tools, access to a patient record, incoming messages, and
+pressure. The systems beginning to reach clinical practice point in another
+direction. In France, the tools already in everyday use are taking on more of an
+agent's role: Nabla is turning its documentation tool into a multi-agent platform
+that proposes clinical and administrative steps \citep{nabla_agentique_2025}, Alan
+runs a patient-facing health assistant \citep{alan_mo_2024}, and Synapse offers a
+sourced conversational agent for clinicians \citep{synapse_medgpt_2025}. Such an
+agent is a model given tools, access to a patient record, incoming messages, and
 local hospital software, acting over several steps to complete a task instead of
 answering a single prompt. A drug-interaction check stops being a question with a
 right answer and becomes one step inside a workflow, where the model reads a
