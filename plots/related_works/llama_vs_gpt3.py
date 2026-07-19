@@ -1,7 +1,7 @@
 """
 LLaMA-13B vs GPT-3-175B on zero-shot common-sense reasoning.
 
-ALL numbers are VERBATIM from Table 4 ("tab:commonsense") of Touvron et al. 2023,
+ALL numbers are VERBATIM from Table 3 ("tab:commonsense") of Touvron et al. 2023,
 "LLaMA: Open and Efficient Foundation Language Models" (arXiv:2302.13971),
 acl2023.tex:292 (GPT-3) and :301 (LLaMA-13B). SIQA is omitted because GPT-3 has no
 value in the source table (printed as "-"); nothing is invented.

@@ -1106,8 +1106,8 @@ question this thesis returns to.
 
 Generative models were specialised in the same way, by continuing the pretraining of a
 general large language model on medical text, but at a much larger scale. BioMistral
-continued Mistral~7B on PubMed Central and reported that the adapted model beat the
-general instruction-tuned Mistral on eight of ten medical question-answering tasks. To
+continued Mistral~7B on PubMed Central and reported that, in a 3-shot in-context evaluation, the
+adapted model beat the general instruction-tuned Mistral on eight of ten medical question-answering tasks. To
 keep the general ability that specialisation can erode, the authors also merged the
 domain and general models, combining their strengths \citep{labrak-etal-2024-biomistral}.
 Meditron continued Llama-2, at seven and seventy billion parameters, on a curated
@@ -1151,8 +1151,8 @@ A second line attacked the cost of pretraining. MosaicBERT is a recipe for train
 BERT-style encoder cheaply \citep{portes2023mosaicbert}. It raises the masking rate to
 30\%, against BERT's 15\%, so each example teaches the model more, and it stacks several
 engineering changes: FlashAttention, ALiBi position information, gated linear units, and
-the removal of padding tokens from the computation. Together these let the authors train a
-BERT-base model in about 1.13 hours on eight A100 GPUs, for roughly twenty dollars. This
+the removal of padding tokens from the computation. Together these let the authors train
+MosaicBERT-Base to a 79.6 average GLUE development score in about 1.13 hours on eight A100 GPUs, for roughly twenty dollars. This
 recipe is the direct foundation of ModernBERT.
 
 \subsection{Efficient Attention}
