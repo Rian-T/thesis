@@ -152,7 +152,7 @@ In order to explore the impact of token labeling variations on the evaluation, w
 \toprule
 & \multicolumn{2}{c}{\textbf{EMEA}} & \multicolumn{2}{c}{\textbf{MEDLINE}} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-\textbf{Model} & {\textbf{w-$F_1$}} & {\textbf{m-$F_1$}} & {\textbf{w-$F_1$}} & {\textbf{m-$F_1$}} \\
+\textbf{Model} & {\textbf{Weighted $F_1$}} & {\textbf{Macro $F_1$}} & {\textbf{Weighted $F_1$}} & {\textbf{Macro $F_1$}} \\
 \midrule
 \rowcolor{ThesisTableSep}
 \multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{token-with-O}} \\[1pt]
@@ -169,7 +169,7 @@ CamemBERT & \underline{71.85} & 22.71 & \underline{60.95} & \underline{9.41} \\
 \end{tabular}
 \begin{tablenotes}
   \small
-  \item w-$F_1$ = weighted $F_1$, m-$F_1$ = macro $F_1$. Averaged over 10 runs.
+  \item Averaged over 10 runs.
 \end{tablenotes}
 \end{threeparttable}
 \caption{\textbf{Impact of evaluation methodology.} The best model varies depending on the metric and the treatment of the ``O'' token.}
