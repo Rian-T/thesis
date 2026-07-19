@@ -332,11 +332,12 @@ into the model and at what stage of training they do it.
 
 \subsection{Static Graph Embeddings}
 
-The first family turns a graph into fixed vectors, one per node, without any context. Node2Vec
-learns node representations by running random walks on a graph and feeding the resulting
-sequences to a skip-gram model, the same kind of model used for word embeddings
-\citep{grover2016node2vec}. RDF2Vec adapts this walk-plus-skip-gram idea to RDF graphs, and it
-became the basis for later walk-based ontology methods \citep{ristoski2016rdf2vec}. Snomed2Vec
+The first family turns a graph into fixed vectors, one per node, without textual context. Node2Vec
+learns node representations from biased random walks and a skip-gram objective
+\citep{grover2016node2vec}. RDF2Vec instead derives sequences from traversals of directed RDF
+graphs and may retain relation predicates in those sequences before applying a word2vec-style
+objective \citep{ristoski2016rdf2vec}. It became the basis for later path-based ontology
+methods. Snomed2Vec
 applies Node2Vec to SNOMED-CT and reports a large gain on concept similarity
 \citep{agarwal2019snomed2vec}. OWL2Vec* extends the approach by running walks over OWL
 ontologies \citep{chen2021owl2vec}. These methods share one limit. The embeddings are static
@@ -350,7 +351,8 @@ surrounding text says. \Cref{fig:corpus-static} shows this pipeline.
   gnode/.style={draw=ThesisInk!35, rounded corners=2pt, fill=white, inner sep=3pt,
     align=center, text=ThesisInk, minimum width=2.1cm, minimum height=0.72cm},
   elab/.style={font=\scriptsize\itshape, text=ThesisNeutral},
-  gedge/.style={ThesisNeutral!70, line width=0.7pt},
+  gedge/.style={-{Stealth[length=3pt]}, ThesisNeutral!70, line width=0.7pt, shorten >=1.5pt, shorten <=1.5pt},
+  xedge/.style={-{Stealth[length=3pt]}, ThesisPrimaryDark!75, dashed, line width=0.8pt, shorten >=1.5pt, shorten <=1.5pt},
   walkchip/.style={draw=ThesisPrimaryDark, fill=ThesisPrimary!16, rounded corners=2pt,
     text=ThesisInk, align=center, inner sep=2.5pt, minimum height=0.62cm, minimum width=1.7cm},
   walk/.style={-{Stealth[length=3.5pt]}, ThesisPrimaryDark, line width=1.1pt, shorten >=1.5pt, shorten <=1.5pt},
@@ -362,28 +364,28 @@ surrounding text says. \Cref{fig:corpus-static} shows this pipeline.
   hdr/.style={font=\scriptsize\sffamily\bfseries, text=ThesisNeutral},
 ]
 \newcommand{\code}[1]{{\ttfamily\tiny\textcolor{ThesisNeutral}{#1}}}
-% --- Stage 1: ontology fragment (vertical chain) ---
-\node[gnode] (dm)  at (0,3.9) {Diabetes mellitus\\ \code{E08-E13}};
-\node[gnode] (t2)  at (0,2.6) {Type 2 diabetes\\ mellitus\ \code{E11}};
-\node[gnode] (met) at (0,1.3) {Metformin\\ \code{A10BA02}};
-\node[gnode] (big) at (0,0.0) {Biguanides\\ \code{A10BA}};
+% --- Stage 1: illustrative cross-ontology graph ---
+\node[gnode] (dm)  at (0,3.9) {Diabetes mellitus\\ \code{ICD-10 E10--E14}};
+\node[gnode] (t2)  at (0,2.6) {Type 2 diabetes\\ mellitus\ \code{ICD-10 E11}};
+\node[gnode] (met) at (0,1.3) {Metformin\\ \code{ATC A10BA02}};
+\node[gnode] (big) at (0,0.0) {Biguanides\\ \code{ATC A10BA}};
 \draw[gedge] (t2) -- (dm) node[elab, midway, right=2pt] {is-a};
-\draw[gedge] (met) -- (t2) node[elab, midway, right=2pt] {treated-by};
-\draw[gedge] (big) -- (met) node[elab, midway, right=2pt] {is-a};
-\node[hdr] at (0,4.7) {ontology fragment};
-% --- Stage 2: random walk ---
+\draw[xedge] (met) -- (t2) node[elab, midway, right=2pt, text=ThesisPrimaryDark] {treats};
+\draw[gedge] (met) -- (big) node[elab, midway, right=2pt] {is-a};
+\node[hdr, align=center] at (0,4.7) {illustrative cross-\\ontology graph};
+\node[elab, align=center] at (0,-0.72) {dashed: illustrative\\clinical association};
+% --- Stage 2: sampled graph path ---
 \def\wx{3.4}
-\node[walkchip] (w1) at (\wx,3.0) {Diabetes\\ mellitus};
-\node[walkchip] (w2) at (\wx,2.0) {Type 2 diabetes\\ mellitus};
-\node[walkchip] (w3) at (\wx,1.0) {Metformin};
-\node[walkchip] (w4) at (\wx,0.0) {Biguanides};
-\draw[walk] (w1) -- (w2);
-\draw[walk] (w2) -- (w3);
-\draw[walk] (w3) -- (w4);
-\node[hdr, align=center] at (\wx,4.7) {random\\ walk};
-\draw[flow] (dm.east) to[out=0,in=180] (w1.west);
+\node[walkchip] (w1) at (\wx,3.0) {Metformin};
+\node[walkchip] (w2) at (\wx,1.65) {Type 2 diabetes\\ mellitus};
+\node[walkchip] (w3) at (\wx,0.3) {Diabetes\\ mellitus};
+\draw[walk] (w1) -- (w2) node[elab, midway, right=2pt, text=ThesisPrimaryDark] {treats};
+\draw[walk] (w2) -- (w3) node[elab, midway, right=2pt] {is-a};
+\node[hdr, align=center] at (\wx,4.7) {sampled\\ graph path};
+\node[elab, align=center] at (\wx,-0.72) {relations may also be retained\\in RDF2Vec sequences};
+\draw[flow] (met.east) to[out=0,in=180] (w1.west);
 % --- Stage 3: skip-gram ---
-\node[model] (sg) at (6.3,1.5) {skip-gram};
+\node[model] (sg) at (6.3,1.5) {word2vec-style\\ objective};
 \draw[flow] (w2.east) -- (sg.west);
 \draw[flow] (w3.east) -- (sg.west);
 % --- Stage 4: fixed vectors ---
@@ -396,27 +398,29 @@ surrounding text says. \Cref{fig:corpus-static} shows this pipeline.
 \draw[flow] (sg.east) -- (v3.west);
 \node[hdr, align=center] at (\vx,4.7) {one fixed vector\\ per node};
 \end{tikzpicture}}
-\caption{Static graph embeddings run random walks over the ontology, feed the walks to
-a skip-gram model, and store one fixed vector per node, computed once and used with no
-regard to context \citep{grover2016node2vec,ristoski2016rdf2vec}.}
+\caption{Static graph-embedding methods derive sequences from graph traversals and learn one
+fixed vector per node with a word2vec-style objective, using biased random walks for Node2Vec
+and directed RDF traversals that may retain relation predicates for RDF2Vec
+\citep{grover2016node2vec,ristoski2016rdf2vec}.}
 \label{fig:corpus-static}
 \end{figure}
 
 \subsection{Injecting Knowledge into Transformers}
 
-A second family puts entities inside the model. ERNIE aligns entity embeddings with text
-representations during pretraining \citep{zhang2019ernie}. KnowBERT inserts entity linkers as
-extra attention layers within BERT \citep{peters2019knowbert}. K-BERT injects knowledge-graph
+A second family couples textual representations with explicit entities or graph structure. ERNIE
+aligns entity embeddings with text representations during pretraining \citep{zhang2019ernie}.
+KnowBERT inserts entity linkers as extra attention layers within BERT
+\citep{peters2019knowbert}. K-BERT injects knowledge-graph
 triples into the input using soft-position information, so that the added triples do not
 disturb the sentence order \citep{liu2020kbert}. A later generation pretrains on language and
 knowledge together. KEPLER trains masked language modeling and a knowledge-embedding objective
 at the same time on Wikidata, with one shared encoder \citep{wang2021kepler}. CoLAKE builds
 word-knowledge graphs that unify text and knowledge context, then pretrains a modified masked
-objective on them \citep{sun2020colake}. DRAGON jointly pretrains, in both directions, masked
-language modeling and link prediction over PubMed text and the UMLS graph. It reports about
-3\% higher accuracy on a medical question-answering benchmark, with larger gains on questions
-that need several reasoning steps \citep{yasunaga2022dragon}. \Cref{fig:corpus-inject}
-illustrates this idea.
+objective on them \citep{sun2020colake}. DRAGON instead encodes a text segment and a relevant
+knowledge subgraph as separate modalities, fuses them bidirectionally at multiple layers, and
+pretrains with masked language modeling and link prediction \citep{yasunaga2022dragon}.
+\Cref{fig:corpus-inject} illustrates K-BERT's input-level mechanism; DRAGON does not use this
+layout.
 
 \begin{figure}[t]
 \centering
@@ -430,12 +434,17 @@ illustrates this idea.
   elab/.style={font=\scriptsize\itshape, text=ThesisNeutral},
   gedge/.style={-{Stealth[length=3pt]}, ThesisNeutral!75, line width=0.7pt, shorten >=1.5pt, shorten <=1.5pt},
   inject/.style={-{Stealth[length=4pt]}, ThesisPrimaryDark, line width=1.1pt, shorten >=2pt, shorten <=2pt},
+  flow/.style={-{Stealth[length=4pt]}, ThesisInk!40, line width=0.9pt, shorten >=3pt, shorten <=3pt},
   model/.style={rounded corners=4pt, draw=ThesisPrimaryDark, fill=ThesisPrimary!14,
     text=ThesisInk, align=center, minimum height=1.0cm},
+  prep/.style={rounded corners=3pt, draw=ThesisSecondaryDark, fill=ThesisSecondary!18,
+    text=ThesisInk, align=center, minimum height=0.86cm},
 ]
 \newcommand{\code}[1]{{\ttfamily\tiny\textcolor{ThesisNeutral}{#1}}}
 % transformer band
-\node[model, minimum width=9.4cm] (tf) at (4.3,2.7) {Transformer\\ \footnotesize contextual representations};
+\node[model, minimum width=10.4cm] (tf) at (4.7,3.35) {Transformer\\ \footnotesize contextual representations};
+\node[prep, minimum width=10.4cm] (prep) at (4.7,1.75) {flattened sequence\\
+  \footnotesize soft positions + visibility matrix};
 % token row
 \def\tx{1.35}
 \node[tok] (k0) at (0*\tx,0) {The};
@@ -445,17 +454,20 @@ illustrates this idea.
 \node[tok] (k4) at (4*\tx,0) {on};
 \node[ent] (k5) at (5*\tx,0) {metformin};
 \node[tok] (k6) at (6*\tx,0) {.};
-\foreach \k in {k0,k1,k2,k3,k4,k5,k6} \draw[ThesisInk!25, line width=0.7pt] (\k.north) -- (\k.north |- tf.south);
-% injected triple
-\node[gnode] (met) at (5*\tx-0.3,-1.9) {Metformin\\ \code{A10BA02}};
-\node[gnode] (t2)  at (5*\tx+2.6,-1.9) {Type 2 diabetes\\ mellitus\ \code{E11}};
-\draw[gedge] (met) -- (t2) node[elab, midway, above] {treats};
-\draw[inject] (met.north) to[out=90,in=270] (k5.south);
-\node[elab, text=ThesisPrimaryDark, anchor=west] at (5*\tx+0.35,-0.95) {triple injected at the entity token};
+\foreach \k in {k0,k1,k2,k3,k4,k5,k6} \draw[ThesisInk!25, line width=0.7pt] (\k.north) -- (\k.north |- prep.south);
+\draw[flow] (prep.north) -- (tf.south);
+% K-BERT knowledge branch
+\node[gnode, draw=ThesisPrimaryDark, fill=ThesisPrimary!12] (rel) at (7.7,-1.45) {treats};
+\node[gnode, draw=ThesisPrimaryDark, fill=ThesisPrimary!12] (t2) at (9.8,-1.45) {Type 2 diabetes\\ mellitus\ \code{ICD-10 E11}};
+\draw[inject] (k5.south) to[out=270,in=150] (rel.west);
+\draw[gedge] (rel) -- (t2);
+\draw[flow] (t2.north) to[out=90,in=0] (prep.east);
+\node[elab, text=ThesisPrimaryDark, align=center] at (8.45,-2.25) {knowledge branch attached\\to the entity mention};
 \end{tikzpicture}}
-\caption{Injection methods place a knowledge-graph triple at the entity token inside
-the model, so the added fact becomes part of the contextual representation the
-transformer builds for the sentence \citep{liu2020kbert,yasunaga2022dragon}.}
+\caption{K-BERT attaches a knowledge-graph branch to an entity mention and flattens the
+resulting sentence tree with soft positions and a visibility matrix before the transformer
+encodes it, while other knowledge-enhanced models use different integration mechanisms
+\citep{liu2020kbert}.}
 \label{fig:corpus-inject}
 \end{figure}
 
@@ -463,107 +475,126 @@ transformer builds for the sentence \citep{liu2020kbert,yasunaga2022dragon}.}
 
 A third family uses contrastive learning to pull related medical terms together in the
 embedding space. SapBERT does self-alignment pretraining on UMLS synonyms. It treats synonyms
-as positive pairs and unrelated terms as negatives, scales to millions of concepts, and
-reaches strong biomedical entity-linking results with a single model for all entity types
-\citep{liu2021sapbert}. CODER extends this idea by adding relation triples from UMLS on top of
-synonyms, which helps with medical term normalization \citep{yuan2022coder}. Both methods read
-the graph through pairs of terms rather than through full sentences, as shown in
-\Cref{fig:corpus-contrastive}.
+as positive pairs and terms from different UMLS concepts as negatives, scales to millions of
+concepts, and reaches strong biomedical entity-linking results with a single model for all entity types
+\citep{liu2021sapbert}. CODER adds contrastive supervision from term--relation--term triples,
+injecting relational knowledge beyond synonym alignment \citep{yuan2022coder}.
+\Cref{fig:corpus-contrastive} gives a schematic two-dimensional projection of SapBERT's
+synonym-alignment objective; placements and distances are illustrative, and CODER's relation-level
+objective is not shown.
 
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[font=\scriptsize\sffamily,
   term/.style={draw=ThesisInk!30, rounded corners=2pt, fill=white, text=ThesisInk,
     inner sep=3pt, align=center},
-  anchornode/.style={term, draw=ThesisPrimaryDark, fill=ThesisPrimary!20},
+  synonym/.style={term, draw=ThesisSecondaryDark, fill=white},
   neg/.style={term, draw=ThesisTertiaryDark, fill=ThesisTertiary!24},
-  pull/.style={-{Stealth[length=3.5pt]}, ThesisSecondaryDark, line width=1.1pt, shorten >=2pt, shorten <=2pt},
-  push/.style={-{Stealth[length=3.5pt]}, ThesisTertiaryDark, line width=1.1pt, shorten >=2pt, shorten <=2pt},
   lbl/.style={font=\scriptsize\sffamily\bfseries},
+  note/.style={font=\scriptsize\itshape, text=ThesisNeutral},
 ]
-% cluster tint
+% Schematic plane and same-concept neighbourhood.
 \begin{scope}[on background layer]
-  \fill[ThesisSecondary!12, rounded corners=10pt] (-2.7,-1.55) rectangle (2.7,1.75);
+  \fill[ThesisInk!3, rounded corners=10pt] (-4.8,-1.8) rectangle (4.8,1.8);
+  \draw[ThesisInk!18, rounded corners=10pt, line width=0.7pt]
+    (-4.8,-1.8) rectangle (4.8,1.8);
+  \fill[ThesisSecondary!14] (-2.55,0.0) ellipse [x radius=1.95cm, y radius=1.25cm];
 \end{scope}
-\node[anchornode] (a) at (0,0.1) {Type 2 diabetes\\ mellitus};
-\node[term] (s1) at (-2.0,1.15) {T2DM};
-\node[term] (s2) at (2.0,1.15) {NIDDM};
-\node[term] (s3) at (0,-1.2) {diab\`ete de type 2};
-\draw[pull] (s1) -- (a);
-\draw[pull] (s2) -- (a);
-\draw[pull] (s3) -- (a);
-\node[neg] (n) at (6.1,0.1) {Type 1 diabetes\\ mellitus};
-\draw[push] (a.east) -- (n.west);
-\node[lbl, text=ThesisSecondaryDark] at (0,2.25) {synonyms pulled together};
-\node[lbl, text=ThesisTertiaryDark, align=center] at (4.35,-1.2) {unrelated term\\ pushed apart};
+\node[synonym] at (-3.45,0.5) {T2DM};
+\node[synonym] at (-1.7,0.55) {NIDDM};
+\node[synonym] at (-2.55,-0.45) {diab\`ete de type 2};
+\node[lbl, text=ThesisSecondaryDark] at (-2.55,-1.35) {same UMLS concept};
+\node[neg] at (2.75,0.15) {Type 1 diabetes\\ mellitus};
+\node[lbl, text=ThesisTertiaryDark, align=center] at (2.75,-0.95)
+  {different but related concept\\ negative pair};
+\node[lbl, text=ThesisNeutral] at (0,2.35) {illustrative 2D embedding projection};
+\node[note, anchor=north east] at (4.55,1.55) {not to scale};
 \end{tikzpicture}
-\caption{Contrastive methods read the graph as term pairs, pulling the synonyms of a
-concept together in the embedding space and pushing unrelated terms apart
-\citep{liu2021sapbert,yuan2022coder}.}
+\caption{Schematic two-dimensional projection of SapBERT's objective, where synonymous terms
+associated with the same UMLS concept occupy a compact neighbourhood while a term from a
+different concept is separated, with placements and distances illustrative and not to scale
+\citep{liu2021sapbert}.}
 \label{fig:corpus-contrastive}
 \end{figure}
 
-\subsection{Graph-to-Text for Pretraining}
+\subsection{Synthetic Data for Pretraining}
 
-A recent direction turns the graph into text that a language model can read directly. The
-``Textbooks Are All You Need'' work showed that high-quality, textbook-like synthetic data
-lets small models perform well. This suggests that the structure and quality of the data can
-matter more than its raw volume \citep{gunasekar2023textbooks}. EntiGraph follows this line
-with an entity-centric augmentation method. It breaks a corpus into entities and generates
-text about the relations between them, turning about 1.3 million real tokens into about 455
-million synthetic tokens. Accuracy scales roughly log-linearly in the number of synthetic
-tokens. The method targets decoder models and has not yet been tested on encoders
-\citep{yang2025entigraph}. \Cref{fig:corpus-g2t} shows this route.
+A recent direction uses synthetic data to make pretraining or continued pretraining more
+data-efficient. The ``Textbooks Are All You Need'' work showed that high-quality,
+textbook-like synthetic data can support strong small models, suggesting that data structure
+and quality matter alongside raw volume \citep{gunasekar2023textbooks}. EntiGraph addresses
+continued pretraining from a small source corpus. It extracts salient entities from each
+source document, samples groups of those entities, and prompts a language model with access
+to the source document to generate text analysing their relations. In its main experiment,
+about 1.3 million real tokens produced about 455 million synthetic tokens, with accuracy
+scaling roughly log-linearly in the number of synthetic tokens. The method targets decoder
+models and has not yet been tested on bidirectional encoders \citep{yang2025entigraph}.
+\Cref{fig:corpus-g2t} shows this route.
 
 \begin{figure}[t]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[font=\scriptsize\sffamily,
   gnode/.style={draw=ThesisInk!35, rounded corners=2pt, fill=white, inner sep=3pt,
-    align=center, text=ThesisInk, minimum height=0.66cm},
+    align=center, text=ThesisInk, minimum height=0.66cm, minimum width=2.2cm},
   elab/.style={font=\scriptsize\itshape, text=ThesisNeutral},
-  gedge/.style={ThesisNeutral!70, line width=0.7pt},
   flow/.style={-{Stealth[length=4pt]}, ThesisInk!40, line width=0.9pt, shorten >=3pt, shorten <=3pt},
   model/.style={rounded corners=4pt, draw=ThesisPrimaryDark, fill=ThesisPrimary!16,
     text=ThesisInk, align=center, inner sep=5pt, minimum height=1.0cm},
+  source/.style={draw=ThesisInk!35, fill=white, rounded corners=3pt,
+    text=ThesisInk, align=left, inner sep=7pt, text width=3.1cm},
   gen/.style={draw=ThesisSecondaryDark, fill=ThesisSecondary!18, rounded corners=3pt,
-    text=ThesisInk, align=left, inner sep=7pt, text width=4.6cm},
+    text=ThesisInk, align=left, inner sep=7pt, text width=3.8cm},
   hdr/.style={font=\scriptsize\sffamily\bfseries, text=ThesisNeutral},
 ]
 \newcommand{\code}[1]{{\ttfamily\tiny\textcolor{ThesisNeutral}{#1}}}
-% graph fragment
-\node[gnode] (dm)  at (0,1.7) {Diabetes mellitus\\ \code{E08-E13}};
-\node[gnode] (t2)  at (0,0.2) {Type 2 diabetes\\ mellitus\ \code{E11}};
-\node[gnode] (met) at (0,-1.4) {Metformin\\ \code{A10BA02}};
-\draw[gedge] (t2) -- (dm) node[elab, midway, right=2pt] {is-a};
-\draw[gedge] (t2) -- (met) node[elab, midway, right=2pt] {treated-by};
-\node[hdr] at (0,2.5) {ontology fragment};
-% generator
-\node[model] (lm) at (3.9,0.2) {language\\ model};
-\draw[flow] (dm.east) to[out=0,in=180] (lm.west);
-\draw[flow] (t2.east) -- (lm.west);
-\draw[flow] (met.east) to[out=0,in=180] (lm.west);
+% Four equally spaced columns, sharing one main-flow baseline.
+\def\colsrc{0}
+\def\colent{4.2}
+\def\colrel{8.4}
+\def\coltxt{12.6}
+\def\flowy{0}
+\def\heady{2.5}
+% source document
+\node[source] (src) at (\colsrc,\flowy) {\itshape The source document mentions type 2 diabetes and
+metformin in context.};
+\node[hdr] at (\colsrc,\heady) {small source document};
+% entity extraction and sampling
+\node[model] (extract) at (\colent,1.25) {entity\\ extraction};
+\node[gnode] (egroup) at (\colent,\flowy) {Type 2 diabetes\\ + Metformin};
+\draw[flow] (src.east) to[out=10,in=180] (extract.west);
+\draw[flow] (extract.south) -- (egroup.north);
+\node[hdr, align=center] at (\colent,\heady) {salient entities};
+\node[elab, align=center] at (\colent,-0.95) {sampled pair or triple};
+% relation analysis conditioned on both entities and source
+\node[model, minimum width=3.4cm, minimum height=1.7cm] (lm) at (\colrel,\flowy)
+  {LLM relation analysis\\ \footnotesize conditioned on the\\ \footnotesize source document};
+\draw[flow] (egroup.east) -- (lm.west);
+\draw[flow] (src.south) to[out=270,in=270,looseness=0.75] (lm.south);
+\node[hdr] at (\colrel,\heady) {relation analysis};
 % generated text
-\node[gen] (txt) at (8.7,0.2) {\itshape Type 2 diabetes mellitus is a form of diabetes
-mellitus, commonly treated with metformin.};
+\node[gen] (txt) at (\coltxt,\flowy) {\itshape The document discusses metformin as a treatment
+in relation to type 2 diabetes.};
 \draw[flow] (lm.east) -- (txt.west);
-\node[hdr, text=ThesisSecondaryDark] at (8.7,1.6) {generated text};
-\node[elab, align=center] at (8.7,-1.5) {\code{1.3M} real tokens $\rightarrow$ \code{455M} synthetic tokens};
+\node[hdr, text=ThesisSecondaryDark] at (\coltxt,\heady) {relation-focused synthetic text};
+\node[elab, align=center] at (\coltxt,-1.2) {\code{1.3M} real tokens $\rightarrow$ \code{455M} synthetic tokens};
 \end{tikzpicture}}
-\caption{Graph-to-text methods generate running sentences from the graph, so a language
-model can read the knowledge directly; EntiGraph expands about 1.3 million real tokens
-into about 455 million synthetic tokens this way \citep{yang2025entigraph}.}
+\caption{EntiGraph extracts salient entities from a small source corpus, samples groups of
+entities, and prompts a language model conditioned on the source document to generate
+relation-focused synthetic text, turning about 1.3 million source tokens into about 455
+million synthetic tokens in its main experiment \citep{yang2025entigraph}.}
 \label{fig:corpus-g2t}
 \end{figure}
 
 Several gaps remain open across these families. Most of the work is in English and built on
-UMLS, so other languages and other knowledge sources stay unexplored. Graph-to-text for
-pretraining is recent, with the main results appearing between 2023 and 2025, and it has not
-been studied for bidirectional encoders, since DRAGON uses link prediction rather than
-generated text. National ontologies, such as the French ICD-10 maintained by the ATIH and the
-CCAM procedure coding, have not been used for pretraining. Contrastive methods such as SapBERT
-and CODER use UMLS through pairs of terms rather than by generating text from the graph. These
-open problems set up the limits we discuss next.
+UMLS, so other languages and other knowledge sources stay unexplored. Entity-centric synthetic
+augmentation for continued pretraining is recent, with the main results appearing between 2023
+and 2025, and it has not been studied for bidirectional encoders, since DRAGON uses link
+prediction rather than generated text. National ontologies, such as the French ICD-10
+maintained by the ATIH and the CCAM procedure coding, have not been used for pretraining.
+Contrastive methods such as SapBERT and CODER use UMLS through term pairs and relation triples
+rather than by synthesising relation-focused text from source documents. These open problems
+set up the limits we discuss next.
 \section{Limits and Transition}
 \label{sec:corpus-limitations}
 
