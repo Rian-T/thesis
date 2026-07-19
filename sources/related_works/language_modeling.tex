@@ -62,7 +62,7 @@ model that predicts the next symbol well has learned how the language works.
   every axis plot/.style={fill=ThesisPrimary, draw=ThesisPrimaryDark, line width=0.6pt},
 ]
 \addplot+[error bars/.cd, y dir=both, y explicit]
-  coordinates {(0,4.76) +- (0,0) (1,4.14) +- (0,0) (2,3.56) +- (0,0) ({$\approx$100},0.95) +- (0,0.35)};
+  coordinates {(0,4.76) +- (0,0) (1,4.03) +- (0,0) (2,3.32) +- (0,0) ({$\approx$100},0.95) +- (0,0.35)};
 \end{axis}
 \end{tikzpicture}
 \caption{The entropy of printed English falls as more preceding context is used,
@@ -1174,7 +1174,7 @@ training practical.
 \subsection{Long Context}
 
 Context length is a concrete limit for clinical work. BERT accepts at most 512 tokens,
-while a hospital discharge summary often runs past 2000 tokens. Feeding such a document to
+while a hospital discharge summary often exceeds that limit. Feeding such a document to
 BERT means cutting it short, and the part that is dropped may carry the diagnosis, the
 treatment, or the outcome. The model then never sees information that the task depends on.
 

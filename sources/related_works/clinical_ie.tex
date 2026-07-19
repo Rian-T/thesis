@@ -22,7 +22,7 @@ fields. Most medical concepts appear only in the free text, which leaves reports
 prescriptions as the main source \citep{raghavan_how_2014}.
 France adds a further reason to study the problem. The PMSI, the national system that describes
 hospital activity, requires every hospital stay to be coded with ICD-10 diagnosis codes and
-CCAM procedure codes, covering about 30 million stays a year~\citep{atih_pmsi}. This coding is still done by hand
+CCAM procedure codes, covering tens of millions of stays a year~\citep{atih_pmsi}. This coding is still done by hand
 by professional coders and reported to the ATIH, the national agency for hospital information.
 This makes automation a practical and economic priority.
 
@@ -181,13 +181,13 @@ assigns codes from an ontology with thousands of possible labels to a whole docu
 Medical coding assigns standardised codes to a whole clinical document. The codes come from
 controlled systems such as ICD-10 for diagnoses, CCAM for procedures, and ATC for drugs. In
 France, the PMSI requires that each hospital stay be coded with a principal diagnosis, a set of
-associated diagnoses, and the CCAM procedures performed. This covers about 30 million stays a
+associated diagnoses, and the CCAM procedures performed. This covers tens of millions of stays a
 year, and the coding is done by hand. The codes feed both hospital funding and national health
 statistics, so a coding error has financial and epidemiological consequences.
 
-The task is hard for several reasons. The label space is very large, with about 17{,}000 codes
+The task is hard for several reasons. The label space is very large, with tens of thousands of codes
 in the French version of ICD-10, about 8{,}000 CCAM codes, and about 6{,}000 ATC codes. The
-documents are long, since a discharge summary runs from 1000 to 3000 tokens, well beyond the
+documents are long, since a discharge summary often exceeds the
 512-token limit of BERT. The code distribution is very skewed, with a few codes that appear
 often and a long tail of codes that appear rarely. Finally, a single stay is multi-label, since
 one principal diagnosis and several associated diagnoses must be predicted at once.
@@ -284,7 +284,7 @@ Medical label sets are not fixed. New diagnostic codes are added, new clinical t
 new eligibility criteria, and new diseases appear, as the arrival of COVID-19 showed. A model
 that extracts information from clinical text must therefore handle labels that did not exist
 when it was trained. Collecting annotated examples for every possible label is not realistic.
-The ICD-10 classification alone contains about 17{,}000 codes, and annotating clinical text
+The ICD-10 classification alone contains tens of thousands of codes, and annotating clinical text
 for each one would take more effort than any project can afford. Classic named entity
 recognition models do not help here, because a BERT model with a linear classification head
 has a fixed number of output classes chosen before training. This situation motivates models
@@ -410,7 +410,7 @@ recognition by several points.
 \draw[dasharr] (0,-6.0) to[out=-90,in=180] (rb.west);
 % matrix caption line
 \node[font=\scriptsize, text=ThesisNeutral] at (6.65,-9.0)
-  {entity-type / span similarity matrix \; (dot product $+$ sigmoid)};
+  {entity-type / span similarity matrix, illustrative scores \; (dot product $+$ sigmoid)};
 \end{tikzpicture}}
 \caption{GLiNER encodes the entity-type prompts and the input sentence with one
 bidirectional transformer, applies a feed-forward layer to the type markers and a span
