@@ -26,13 +26,13 @@ reconstruire à partir de texte public.
 Mais le texte biomédical public n'est pas prêt à l'emploi. Il est dispersé et
 massivement anglophone~\citep{labrak-etal-2024-biomistral}, et la machinerie qui a rendu
 possible la curation à l'échelle du web~\citep{penedo2024fineweb}, comme les méthodes
-récentes qui transforment une ontologie en texte d'entraînement~\citep{yang2025entigraph},
+récentes de génération de texte d'entraînement synthétique~\citep{yang2025entigraph},
 ont été conçues pour l'anglais et le domaine général. La curation biomédicale existante
 filtre au niveau du document~\citep{chen2023meditron}, sans distinguer le pertinent du
 générique à l'intérieur d'un article. Et la connaissance structurée dont dépendent
 les tâches cliniques reste sous-exploitée : la recherche est dominée par UMLS~\citep{lindberg_unified_1993},
 alors que les hôpitaux français codent avec des ontologies nationales, la CIM-10
-maintenue par l'ATIH~\citep{atih_pmsi}, qu'aucun pré-entraînement n'a utilisées.
+maintenue par l'ATIH~\citep{atih_pmsi}, que nous n'avons vu aucun pré-entraînement exploiter.
 
 La tâche visée, enfin, résiste par sa structure même. L'essentiel de l'information
 clinique est dans les comptes-rendus~\citep{raghavan_how_2014}, mais le codage médical

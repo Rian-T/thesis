@@ -24,14 +24,14 @@ public text.
 
 But public biomedical text is not ready to use. It is scattered and overwhelmingly
 English~\citep{labrak-etal-2024-biomistral}, and the machinery that made web-scale
-curation possible~\citep{penedo2024fineweb}, like the recent methods that turn an
-ontology into training text~\citep{yang2025entigraph}, were built for English and the
+curation possible~\citep{penedo2024fineweb}, like the recent methods that generate synthetic
+training text~\citep{yang2025entigraph}, were built for English and the
 general domain. Existing biomedical curation filters at the document
 level~\citep{chen2023meditron}, without telling the relevant from the boilerplate
 inside an article. And the structured knowledge the clinic depends on stays underused:
 research is dominated by UMLS~\citep{lindberg_unified_1993}, whereas French hospitals
 code with national ontologies, ICD-10 as maintained by the ATIH~\citep{atih_pmsi}, which
-no pretraining work has used.
+we have not seen any pretraining work use.
 
 The target task, finally, resists by its very structure. Most clinical information sits
 in the reports~\citep{raghavan_how_2014}, but medical coding has tens of thousands of
