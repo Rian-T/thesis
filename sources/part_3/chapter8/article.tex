@@ -27,9 +27,9 @@ to be trained to select spans from that space. We build the first part on top of
 biomedical encoder, and the second part on generalist annotations that carry no
 hospital label.
 
-MedEmbed builds the first part, the space in which descriptions and spans are
-compared. It starts from ModernCamemBERT-bio, the biomedical encoder developed in
-\Cref{chap:objectives}. Medical terms and relations derived from the resources
+ModernCamemBERT-bio-embed, MC-bio-embed for short, builds the first part, the space in
+which descriptions and spans are compared. It starts from ModernCamemBERT-bio, the
+biomedical encoder developed in \Cref{chap:objectives}. Medical terms and relations derived from the resources
 of \Cref{chap:ontobook} provide the contrastive pairs that train this description
 space, as summarized in \Cref{fig:p3-medembed}.
 
@@ -37,7 +37,7 @@ space, as summarized in \Cref{fig:p3-medembed}.
 
 We first test this space through terminology retrieval. OntoBench-FR asks a
 model to match a French clinical term to its correct entry across four
-terminologies, CIM-10, ATC, CCAM, and ICD-O. MedEmbed reaches 60.35\% mean
+terminologies, CIM-10, ATC, CCAM, and ICD-O. MC-bio-embed reaches 60.35\% mean
 accuracy at rank one, compared with 50.84\% for the strongest baseline
 (\Cref{tab:p3-medembed}).
 
@@ -58,7 +58,7 @@ accuracy at rank one, compared with 50.84\% for the strongest baseline
       \midrule
       \rowcolor{ThesisTableSep}
       \multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{Our model}} \\[1pt]
-      MedEmbed & \bfseries 64.27 & 62.32 & \bfseries 61.37 & \bfseries 53.46 & \bfseries 60.35 \\
+      MC-bio-embed & \bfseries 64.27 & 62.32 & \bfseries 61.37 & \bfseries 53.46 & \bfseries 60.35 \\
       \bottomrule
     \end{tabular}
   \end{threeparttable}
@@ -129,7 +129,7 @@ We call descriptions constructed to be absent from the evaluation benchmarks
 \emph{benchmark-absent}, though they are not guaranteed to be absent from every
 training source, and we report them separately from familiar descriptions. The
 comparison changes only the description encoder, replacing ModernCamemBERT-bio
-with MedEmbed while the extractor remains fixed. \Cref{fig:p3-novel-types} reports
+with MC-bio-embed while the extractor remains fixed. \Cref{fig:p3-novel-types} reports
 both conditions.
 
 \begin{center}
@@ -142,7 +142,7 @@ both conditions.
 \end{center}
 
 For familiar descriptions, LLM-judge MAP increases from 0.478 with
-ModernCamemBERT-bio to 0.517 with MedEmbed, a gain of 0.039. For benchmark-absent
+ModernCamemBERT-bio to 0.517 with MC-bio-embed, a gain of 0.039. For benchmark-absent
 descriptions, it increases from 0.333 to 0.382, a gain of 0.049. The larger gain
 in the second condition is consistent with the intended role of contrastive
 description training. These scores reflect the preferences of a reference-free LLM
@@ -163,7 +163,7 @@ effect of that intervention, but they do not identify its linguistic cause.
 Trained only on generalist annotations, with no hospital label, the extractor
 still reads clinical text and returns the values of fields described in natural
 language at inference time. What makes its open queries useful is the description
-encoder. MedEmbed improves terminology retrieval on OntoBench-FR and helps locate
+encoder. MC-bio-embed improves terminology retrieval on OntoBench-FR and helps locate
 spans for benchmark-absent descriptions, so the extractor can be asked for new
 fields rather than only the ones fixed at training time. Two
 questions stay open. Target-form performance and transfer to other descriptions

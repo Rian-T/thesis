@@ -742,7 +742,7 @@ benchmark uses. \Cref{tab:type-bank} lists them.
 
 \section{Hyperparameters}
 
-\Cref{tab:hparams} gives the training settings for the MedEmbed encoder and for
+\Cref{tab:hparams} gives the training settings for the MC-bio-embed encoder and for
 the extractor.
 
 \begin{table}[t]
@@ -751,9 +751,9 @@ the extractor.
   \setlength{\tabcolsep}{12pt}
   \begin{tabular}{@{}lll@{}}
     \toprule
-    Setting & MedEmbed & Extractor \\
+    Setting & MC-bio-embed & Extractor \\
     \midrule
-    backbone            & ModernCamemBERT-bio & MedEmbed \\
+    backbone            & ModernCamemBERT-bio & MC-bio-embed \\
     parameters          & 149M                & 149M \\
     context length      & 8192                & 8192 \\
     objective           & contrastive (ranking + triplet) & span matching \\
@@ -763,7 +763,7 @@ the extractor.
     precision           & fp16                & fp16 \\
     \bottomrule
   \end{tabular}
-\caption{Training settings for MedEmbed and the extractor.}
+\caption{Training settings for MC-bio-embed and the extractor.}
 \label{tab:hparams}
 \end{table}
 
