@@ -1,0 +1,11 @@
+## Build config for the condensed thesis.
+## Resolve all root-relative paths (sources/, plots/, static/, mimosis.cls,
+## thesis-style.sty, thesis.bib) against the repo root, so lines copy-pasted
+## from thesis.tex and the figure fragments work unchanged.
+ensure_path('TEXINPUTS', '..//');
+ensure_path('BIBINPUTS', '..');
+ensure_path('BSTINPUTS', '..');
+
+$pdf_mode = 4;                       # lualatex
+$lualatex = 'lualatex -shell-escape -interaction=nonstopmode %O %S';
+$bibtex_use = 2;

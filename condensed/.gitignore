@@ -1,0 +1,26 @@
+# LaTeX build artifacts — keep only sources (.tex, latexmkrc, README) and the
+# two built PDFs (summary_en.pdf, summary_fr.pdf).
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.brf
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+*.ist
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.png

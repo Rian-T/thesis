@@ -1,0 +1,121 @@
+% Partie V condensée (FR). Trois tables de résultats + schéma du détour. En-têtes
+% traduits, nombres en virgule décimale (comme la table de l'article CamemBERT-bio).
+
+\noindent Nous entraînons ensuite des encodeurs biomédicaux compacts. Poursuivre le
+pré-entraînement d'un modèle français généraliste sur \emph{biomed-fr} améliore les
+cinq jeux de reconnaissance d'entités nommées biomédicales testés
+(\Cref{tab:bioVSbase}), sans en entraîner un nouveau à partir de zéro, pour un gain
+moyen de 2,54 points et pour une fraction du coût. CamemBERT-bio a été adapté pour
+environ 0,80\,kg de CO\textsubscript{2}, contre 26,11 pour DrBERT entraîné à partir de
+zéro.
+
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{threeparttable}[b]
+\begin{tabular}{l c c c}
+\toprule
+& & \multicolumn{2}{c}{\textbf{CamemBERT-bio}} \\
+\cmidrule(lr){3-4}
+\textbf{Jeu} & \textbf{CamemBERT} & \textbf{biomed-fr-small} & \textbf{biomed-fr} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Clinique}} \\[1pt]
+CAS1 & 70,50 $\pm$ 1,75 & \underline{72,94 $\pm$ 1,12} & \textbf{73,03 $\pm$ 1,29} \\
+CAS2 & 79,02 $\pm$ 0,92 & \underline{80,00 $\pm$ 0,32} & \textbf{81,66 $\pm$ 0,59} \\
+E3C  & 67,63 $\pm$ 1,45 & \underline{67,96 $\pm$ 1,85} & \textbf{69,85 $\pm$ 1,58} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Notices}} \\[1pt]
+EMEA & 74,14 $\pm$ 1,95 & \underline{75,93 $\pm$ 2,42} & \textbf{76,71 $\pm$ 1,50} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Scientifique}} \\[1pt]
+MEDLINE & \underline{65,73 $\pm$ 0,40} & 65,48 $\pm$ 0,31 & \textbf{68,47 $\pm$ 0,54} \\
+\midrule
+\textbf{Moyenne} & 71,40 & \underline{72,46} & \textbf{73,94} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+  \item F-mesure (micro-moyenne, seqeval strict, IOB2). Moyenne $\pm$ écart-type sur 10 amorces. biomed-fr-small = sous-ensemble de 10\%.
+\end{tablenotes}
+\end{threeparttable}
+\caption{\textbf{CamemBERT vs CamemBERT-bio} sur cinq jeux de reconnaissance d'entités nommées biomédicales. Le pré-entraînement continu sur \textit{biomed-fr} apporte +2,54 de F-mesure en moyenne.}
+\label{tab:bioVSbase}
+\end{table}
+
+Nous introduisons ensuite un détour causal : le modèle apprend par prédiction du
+prochain token, puis revient au masquage bidirectionnel standard. Comme le montre la
+\Cref{fig:clm-pipeline}, le détour laisse l'architecture inchangée et ne modifie que
+le masque d'attention et la fonction de coût. Pendant la phase causale, le modèle ne
+peut pas regarder en avant : il doit donc compresser l'information dans chaque
+représentation de token, et la redescente ultérieure vers le masquage ne le ramène pas
+à un état de type MLM.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=1.8cm, >=Stealth, scale=0.85, transform shape,
+  box/.style={rectangle, rounded corners=3pt, draw=ThesisNeutral, minimum height=0.9cm, minimum width=2.4cm, align=center, font=\small\sffamily}
+]
+  \node[box, fill=ThesisPrimary!20] (base) {encodeur MLM\\(ModernBERT)};
+  \node[box, fill=ThesisTertiary!30, right=of base] (clm) {phase CLM\\(10--50\,Md tokens)};
+  \node[box, fill=ThesisSecondary!30, right=of clm] (decay) {décroissance MLM\\(10\% de la Phase 1)};
+  \node[box, fill=ThesisPrimary!30, right=of decay] (out) {ModernCamem-\\BERT-bio};
+
+  \draw[->, thick, ThesisNeutral] (base) -- (clm) node[midway, above, font=\tiny\sffamily] {masque causal};
+  \draw[->, thick, ThesisNeutral] (clm) -- (decay) node[midway, above, font=\tiny\sffamily] {masque bidir.};
+  \draw[->, thick, ThesisNeutral] (decay) -- (out);
+\end{tikzpicture}
+\caption{\textbf{La chaîne du détour CLM.} À partir d'un encodeur MLM pré-entraîné, on poursuit le pré-entraînement avec un objectif causal (Phase~1), puis on redescend vers le MLM (Phase~2). Le modèle ne revient pas à un état de type MLM.}
+\label{fig:clm-pipeline}
+\end{figure}
+
+Sur les huit tâches biomédicales françaises, le détour dépasse la référence MLM
+appariée, comme le rapporte la \Cref{tab:french-results}.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{\textbf{Résultats biomédicaux français} (F-mesure macro, 9 amorces). En gras : meilleur par colonne ; souligné : deuxième.}
+\label{tab:french-results}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccccc}
+\toprule
+& & \multicolumn{5}{c}{\textbf{Classification multi-étiquettes}} & {\textbf{CLS}} & \multicolumn{2}{c}{\textbf{NER}} & \\
+\cmidrule(lr){3-7} \cmidrule(lr){8-8} \cmidrule(lr){9-10}
+& \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Moy.} \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Références}} \\[1pt]
+ModernCamemBERT & 8192 & 70,1 & 55,3 & 63,3 & 20,2 & 60,6 & 56,4 & 63,4 & 55,3 & 55,6 \\
+DrBERT & 512 & 53,0 & 35,6 & 37,9 & 21,4 & \underline{63,6} & 57,0 & \textbf{68,0} & \textbf{62,3} & 49,9 \\
+CamemBERT-bio & 512 & 41,9 & 20,1 & 12,8 & 9,6 & 38,6 & 47,7 & 61,6 & 56,6 & 36,1 \\
+CamemBERT & 512 & 40,8 & 19,4 & 11,9 & 9,5 & 37,4 & 40,6 & 61,5 & 54,7 & 34,5 \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Nos modèles (Base, 150M)}} \\[1pt]
+Référence MLM & 8192 & 69,9 & 56,8 & 64,9 & 23,5 & 62,5 & 63,4 & 65,4 & 56,8 & 57,9 \\
+Détour CLM & 8192 & 74,8 & 60,1 & 71,0 & 25,5 & \underline{63,6} & \textbf{67,4} & 65,9 & 58,2 & 60,8 \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Nos modèles (Large, 350M)}} \\[1pt]
+Référence MLM & 8192 & \underline{79,4} & \underline{63,3} & \underline{72,6} & \underline{29,1} & \textbf{64,5} & 61,2 & 66,1 & 58,0 & \underline{61,8} \\
+Détour CLM & 8192 & \textbf{80,7} & \textbf{65,4} & \textbf{74,4} & \textbf{30,4} & \textbf{64,5} & \underline{64,8} & \underline{67,0} & \underline{59,5} & \textbf{63,3} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Il atteint 60,8\% de F-mesure moyenne contre 57,9\% en Base, et 63,3\% contre 61,8\%
+en Large. Comme les deux trajectoires ne diffèrent que par l'objectif de la Phase~1,
+l'écart est l'effet de cet objectif seul, sans coût supplémentaire, et il se transfère
+à l'anglais. Nous publions ces modèles sous le nom ModernCamemBERT-bio.
+
+Nous introduisons aussi \emph{OntoBook}, qui complète le pré-entraînement textuel en
+transformant des ontologies médicales en manuels synthétiques : un sous-graphe
+d'ontologie est converti en une marche aléatoire puis reformulé en prose fluide, et
+l'encodeur s'entraîne dessus avec deux objectifs alignés, le masquage et la prédiction
+de relation entre paires de codes. Il dépasse toutes les références sur les trois jeux
+de codage français, avec le plus grand gain sur le codage fin DISTEMIST, où il réduit
+aussi la variance de $\pm$5,8 à $\pm$1,1.
+
+Nous publions les modèles et les données obtenus.

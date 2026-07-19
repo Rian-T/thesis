@@ -1,0 +1,50 @@
+% Condensed Related Works (EN) — NARRATIVE. Tells the story of the field that sets
+% up the thesis's starting situation; the (real) citations serve the story rather
+% than pile up.
+
+\noindent Natural language processing has converged, over recent years, on a single recipe:
+pretrain a model on large amounts of text, then adapt it to a task. BERT-style
+models~\citep{devlin_bert_2019}, built on the Transformer~\citep{vaswani2017attention},
+established that recipe, and CamemBERT~\citep{martin-etal-2020-camembert} carried it to
+French; the scaling of generative models~\citep{gpt3,touvron2023llama} is its
+continuation. All of it rests on one condition: text, in abundance, in the target
+domain. Specialising a model to medicine then follows naturally through continual
+pretraining on biomedical text~\citep{gururangan_dont_2020}, as
+BioBERT~\citep{lee_biobert_2019} and then PubMedBERT~\citep{gu_domain-specific_2022}
+showed.
+
+It is exactly this condition that the clinic lacks. The text the model would most need,
+the hospital report, is also the one it cannot have: personal data, regulated in France
+under the CNIL, it does not leave the hospital, and a model trained inside cannot leave
+either. The French adaptations that did succeed did so on private hospital records, and
+stayed private~\citep{dura_learning_2022}; the public attempts leaned on small
+corpora~\citep{copara_contextualized_2020,le_clercq_de_lannoy_strategies_2022}. The
+field then faces a choice: give up the clinical target, or rebuild everything from
+public text.
+
+But public biomedical text is not ready to use. It is scattered and overwhelmingly
+English~\citep{labrak-etal-2024-biomistral}, and the machinery that made web-scale
+curation possible~\citep{penedo2024fineweb}, like the recent methods that turn an
+ontology into training text~\citep{yang2025entigraph}, were built for English and the
+general domain. Existing biomedical curation filters at the document
+level~\citep{chen2023meditron}, without telling the relevant from the boilerplate
+inside an article. And the structured knowledge the clinic depends on stays underused:
+research is dominated by UMLS~\citep{lindberg_unified_1993}, whereas French hospitals
+code with national ontologies, ICD-10 as maintained by the ATIH~\citep{atih_pmsi}, which
+no pretraining work has used.
+
+The target task, finally, resists by its very structure. Most clinical information sits
+in the reports~\citep{raghavan_how_2014}, but medical coding has tens of thousands of
+labels: a fixed-head classifier cannot cover codes it never saw in training.
+Open-vocabulary extractors, GLiNER~\citep{zaratiana2024gliner} and
+UniversalNER~\citep{zhou2024universalner}, lift that limit by describing each label in
+free text, but, trained on web text, they lose accuracy on clinical writing and rare
+codes, including their biomedical variant~\citep{zaratiana2025glinerbiomed}. Evaluation
+itself is not settled~\citep{drbenchmark2024}, the scores depending on the tokenizer.
+Yet for these extraction tasks, encoders remain competitive and small enough to run
+where the data has to stay~\citep{lehman_we_2023}.
+
+This is the situation from which the thesis starts. Building a shareable clinical
+extractor, without ever seeing a real record, forces the whole chain to be rebuilt from
+public text: the corpus, the model, the supervision, and, in the end, the evaluation
+itself.

@@ -1,0 +1,204 @@
+%!TEX TS-program = lualatex
+%!TEX encoding = UTF-8 Unicode
+%!BIB program = bibtex
+%
+% ============================================================================
+% CONDENSED THESIS — working English version, ~10% of the body (~19 pp target).
+%
+% SAME thesis: identical class (mimosis), identical preamble as thesis.tex,
+% identical style (thesis-style.sty), identical part openers and figures.
+% Only the CONTENT is condensed. Prose is copy-pasted verbatim from the thesis
+% and cut to the load-bearing sentences; figures/tables/schemas are reused
+% AS-IS by \input of the same fragment files.
+%
+% Root-relative paths (sources/..., plots/..., thesis.bib, mimosis, thesis-style)
+% resolve via latexmkrc (TEXINPUTS=..//). Build, isolated in this folder:
+%   cd condensed && LC_ALL=C latexmk summary_en.tex
+%
+% The body of the full thesis (Introduction -> Conclusion, no appendices/bib)
+% is 187 pp; 10% => ~18-20 pp of content here. Translation to French is the
+% LAST step, once the English version fits and reads.
+% ============================================================================
+
+\PassOptionsToPackage{usenames,dvipsnames,table}{xcolor}
+\documentclass{mimosis}
+
+\usepackage{metalogo}
+
+\usepackage{etoolbox}
+
+\usepackage{siunitx}
+\DeclareSIUnit\px{px}
+\sisetup{%
+  detect-all           = true,
+  detect-family        = true,
+  detect-mode          = true,
+  detect-shape         = true,
+  detect-weight        = true,
+}
+
+\def\oubli#1{}
+
+\PassOptionsToPackage{hyphens}{url}
+\setlength{\emergencystretch}{3em}
+
+\usepackage[%
+  unicode,
+  colorlinks = true,
+  citecolor  = RoyalBlue,
+  linkcolor  = RoyalBlue,
+  urlcolor   = RoyalBlue,
+  unicode,
+  backref    = page,
+  ]{hyperref}
+\hypersetup{
+  pdftitle={Improving Clinical Information Extraction with Public-Data Pretraining -- Condensed},
+  pdfauthor=Rian Touchent,
+}
+
+\usepackage{bookmark}
+
+\ifxetexorluatex
+  \setmainfont[Ligatures=TeX]{TeX Gyre Pagella} % Palatino clone
+  \linespread{1.05} % a bit more for Palatino
+  \RequirePackage{unicode-math}
+  \setmathfont{TeX Gyre Pagella Math}
+\else
+  \usepackage[lf]{ebgaramond}
+  \usepackage[oldstyle,scale=0.7]{sourcecodepro}
+  \singlespacing
+\fi
+
+\usepackage{microtype}
+
+\renewcommand{\th}{\textsuperscript{\textup{th}}\xspace}
+
+\input{sources/glossary}
+
+\makeindex
+\makeglossaries
+
+\usepackage[nameinlink]{cleveref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{arydshln}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{thesis-style}  % Centralized visual style
+\usepackage{placeins}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\graphicspath{{../}{./}}   % resolve plots/... and static/... against repo root
+
+\usepackage{ragged2e}
+\usepackage{adjustbox}
+\usepackage[title,toc]{appendix}
+\thesisreviewmarksfalse    % review marks off
+
+\renewcommand{\appendixname}{Appendix}
+
+\usetikzlibrary{positioning, backgrounds, fit, arrows.meta, decorations.pathreplacing, calc}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\crefname{lemma}{Lemma}{Lemmas}
+\DeclareMathOperator{\rank}{rank}
+
+\usepackage{stackengine}
+\def\ucr{\scalebox{1}{\stackinset{c}{}{c}{-.1pt}{%
+  \textcolor{white}{\sffamily\bfseries\small ?}}{%
+  \rotatebox{45}{$\blacksquare$}}}}
+
+% --- Compact part header (thesis palette, no full-page plate, no blank verso) --
+% Same typographic identity as the book's part plates (scshape "Part N" + title),
+% rendered inline so content follows directly and the 10% page budget is spent
+% on content, not chrome.
+\newcounter{condpart}
+\renewcommand{\thecondpart}{\Roman{condpart}}
+\newcommand{\cpart}[1]{%
+  \FloatBarrier % flush the previous part's floats so none drifts across parts
+  \par\addvspace{2.6ex plus 1ex}%
+  \refstepcounter{condpart}%
+  \addcontentsline{toc}{part}{\protect\numberline{\thecondpart}#1}%
+  \markboth{#1}{#1}%
+  {\noindent\color{ThesisPrimary}\rule[0.32ex]{2.6em}{1.7pt}}\hspace{0.7em}%
+  {\normalsize\scshape\color{ThesisNeutral}Part~\thecondpart}\par
+  \nopagebreak{\vspace{0.3ex}\LARGE\scshape\color{ThesisInk}#1\par}%
+  \nopagebreak\addvspace{1.1ex}%
+}
+
+% OntoBook's chapter defines \method; provide it so reused result tables compile.
+\providecommand{\method}{OntoBook}
+
+\title{Improving Clinical Information Extraction with Public-Data Pretraining}
+\author{Rian Touchent}
+
+\begin{document}
+
+\frontmatter
+
+% --- Simple title in the native aesthetic (not the official cover page) ------
+\thispagestyle{empty}
+\begin{center}
+  \includegraphics[height=1.5cm]{static/media/sorbonne}\hspace{2.4em}%
+  \includegraphics[height=1.5cm]{static/media/inria}
+\end{center}
+\vspace*{0.16\textheight}
+\begin{center}
+  {\LARGE\scshape\color{ThesisInk} Improving Clinical Information Extraction\\[0.4em]
+    with Public-Data Pretraining}\\[2em]
+  {\large\scshape\color{ThesisNeutral} Extended Summary}\\[0.7em]
+  {\small\color{ThesisNeutral} Doctoral thesis \enspace$\cdot$\enspace Sorbonne Universit\'e}\\[3em]
+  {\color{ThesisInk} Rian Touchent}\\[1.4em]
+  {\small\color{ThesisNeutral}%
+    Supervisor: Laurent Romary\\[0.35em]
+    Co-supervisor: \'Eric Villemonte de la Clergerie}\\[1.8em]
+  {\footnotesize\color{ThesisNeutral} INRIA Paris \enspace$\cdot$\enspace ALMAnaCH}
+\end{center}
+\clearpage
+
+\tableofcontents
+
+\mainmatter
+
+% ============================================================================
+% BODY — condensed. Each part keeps the SAME illustrated opener as the thesis.
+% Fill each chapter with verbatim pulls cut to problem -> idea -> result -> take,
+% plus the single most emblematic figure/table, \input as-is.
+% Budget ~19 pp of content. See README.md for the per-part allocation.
+% ============================================================================
+
+\cpart{Introduction}
+\label{part:intro}
+\input{parts/01_introduction}
+
+\cpart{What Is Biomedical Text?}
+\label{part:biomedtext}
+\input{parts/02_biomedical_text}
+
+\cpart{Related Works}
+\input{parts/03_related_works}
+
+\cpart{Building a Biomedical Corpus}
+\label{part:corpus}
+\input{parts/04_corpus}
+
+\cpart{Pretraining Language Models}
+\label{part:pretraining}
+\input{parts/05_pretraining}
+
+\cpart{Adapting to Clinical Tasks}
+\label{part:adaptation}
+\input{parts/06_clinical_tasks}
+
+\cpart{Conclusion}
+\label{part:conclusion}
+\input{parts/07_conclusion}
+
+\backmatter
+\bibliographystyle{acl_natbib}
+\bibliography{thesis}
+
+\end{document}

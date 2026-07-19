@@ -1,0 +1,89 @@
+% Condensed Introduction. Verbatim pulls from sources/introduction.tex and
+% sources/contributions.tex, cut to: thesis statement -> historical pivot
+% (knowledge came from the system's own records; results did not transfer) ->
+% the question and its three sub-questions -> the seven contributions -> roadmap.
+% No figures (budget: 0 for the introduction).
+
+\partepigraph{``The biggest lesson that can be read from 70 years of AI research is
+that general methods that leverage computation are ultimately the most effective, and
+by a large margin.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
+
+\noindent How can we teach an artificial intelligence to read hospital notes when hospital
+notes cannot be used to teach it? The notes themselves would be
+the best examples because they contain the words, shortcuts, and clinical habits
+the system needs to learn. But they describe real patients, so they stay inside
+the hospital, and a system trained on them may have to stay there too. This
+thesis asks whether public biomedical text can be used instead.
+
+The question is old. In 1959, Robert Ledley and Lee Lusted set a medical goal for
+the new field of artificial intelligence: a computer that could weigh a patient's
+signs toward a likely disease~\citep{ledley_lusted_1959}.
+Their question is also
+the question of this thesis: where does the knowledge that drives such a system
+come from, and can a machine be given enough of it to be useful in care? The early
+medical systems answered from their own records. De~Dombal's acute-abdomen system
+reached 91.8\% diagnostic accuracy on 304 patients at a single centre in
+1972~\citep{dedombal_1972}, but when it was taken to a multicentre trial across
+eight centres and 16{,}737 patients, accuracy with the aid in place rose only to
+65.3\%~\citep{adams_1986}. A system tuned on Leeds patients did not carry its
+91.8\% to other hospitals, because the probabilities it relied on came from one
+place and the new patients came from many. A learning system depends on the data
+its knowledge was built from, so a result measured in one setting may not hold in
+another.
+
+In the 1970s, medical AI shifted toward \emph{expert systems}, which stored
+specialist knowledge as explicit rules. MYCIN, at Stanford, advised on antibiotics
+through IF--THEN rules~\citep{mycin_1975}; in a blind test, eight infectious-disease
+specialists judged it acceptable in 65\% of cases, on par with the
+faculty~\citep{mycin_eval_1979}. It passed the benchmark and was never used to treat a
+patient~\citep{internist1_1982}. A program could win a blind benchmark and still be
+unusable, because winning the benchmark was not what physicians were asking for.
+
+Machine learning later changed how systems acquired knowledge. Instead of being
+told the rules, systems learned what to do from large sets of examples, and the
+gains were large: by 2016 a network trained on 128{,}175 retinal photographs read
+them for diabetic eye disease about as accurately as
+ophthalmologists~\citep{gulshan_2016}. In the biomedical literature, expert-system
+papers peak around 1991, then a deep-learning line near zero before 2015 climbs past
+twenty thousand papers a year. These results raised a new requirement, the one that
+organises this thesis: a system that learns from examples needs many well-matched
+examples, and clinical text does not circulate freely.
+
+Most modern natural language processing starts by pretraining a language model on
+large collections of raw text, before adapting it to a task. In the clinical
+setting this path is hard to follow. Real clinical notes are personal data and
+cannot be shared, so France has no public corpus of them to pretrain on. A model
+trained inside one hospital on its own records carries the same constraint and
+cannot be released to others. A shareable clinical model has to be built from
+public text.
+
+This thesis asks one question: can public data support language models for French
+clinical information extraction, without training on sensitive clinical records?
+The manuscript answers it through three questions.
+
+\begin{itemize}
+  \item Can we assemble a useful public French biomedical corpus, and does its content and quality change what the model learns?
+  \item Given such a corpus, how should we pretrain a language model on it: by adapting an existing model, choosing the training objective, or adding knowledge from outside the text?
+  \item How can we adapt these models to clinical extraction tasks when labelled clinical data is scarce, through model architecture and synthetic data?
+\end{itemize}
+
+\noindent This thesis makes seven contributions.
+
+\begin{itemize}
+  \item \emph{biomed-fr}, a public French biomedical corpus of 413 million words, used to train CamemBERT-bio. The adapted model finds biomedical terms in French text, such as drugs and diseases, more accurately than the general model it started from, with a 2.54-point average gain and at a fraction of the cost of training from scratch~\citep{touchent2023camembertbio}.
+  \item \emph{Biomed-Enriched}, a labelling of the open biomedical literature (PubMed Central) by content type and quality. It identifies about two million paragraphs of clinical cases and improves a model trained further on them~\citep{touchent-etal-2026-biomed}.
+  \item \emph{MC-Bio}, a ten-billion-token French biomedical corpus, and a study of which content types and quality signals help. The experiments show that some common filters degrade performance.
+  \item A pretraining method that trains the model on a different task for a while and then switches back to the main objective, improving the model at no extra cost.
+  \item \emph{OntoBook}, a way to add structured medical knowledge to pretraining by turning a medical knowledge base into training text.
+  \item Model designs, frenchmed-gliner and MedEmbed, that find clinical terms from only a handful of labelled examples.
+  \item A method for generating synthetic clinical reports by rewriting public biomedical text into hospital style, so that extractors can be trained without access to real hospital data.
+\end{itemize}
+
+\noindent The parts follow these questions. The first asks what biomedical text is and how
+far its public forms are from the clinical notes we care about. The second builds
+and studies a public French biomedical corpus. The third pretrains language models
+on it, through model adaptation, training objectives, and knowledge enrichment. The
+final part adapts these models to clinical extraction tasks under scarce labelled
+data. The conclusion then opens onto a question this work leaves behind: once such
+models are built, how they behave when someone actually uses them becomes its own
+problem.

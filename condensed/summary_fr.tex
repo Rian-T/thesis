@@ -1,0 +1,222 @@
+%!TEX TS-program = lualatex
+%!TEX encoding = UTF-8 Unicode
+%!BIB program = bibtex
+
+% ============================================================================
+% THÈSE CONDENSÉE — version française (~19 pages de contenu).
+
+% Traduction de summary_en.tex. Style : celui de l'article CamemBERT-bio
+% (TALN-RÉCITAL 2023) — « nous » académique, phrases sobres, virgule décimale,
+% « pré-entraînement », « affinage », « reconnaissance d'entités nommées »,
+% « jeu d'évaluation », termes techniques en italique avec glose française,
+% noms de modèles et de métriques inchangés.
+
+% Mêmes classe, style, figures et tables que la version anglaise. Seule la
+% langue change. Build isolé :
+%   cd condensed && LC_ALL=C latexmk summary_fr.tex
+% ============================================================================
+
+\PassOptionsToPackage{usenames,dvipsnames,table}{xcolor}
+\documentclass{mimosis}
+
+\usepackage{metalogo}
+\usepackage{etoolbox}
+
+\usepackage{siunitx}
+\DeclareSIUnit\px{px}
+\sisetup{%
+  detect-all           = true,
+  detect-family        = true,
+  detect-mode          = true,
+  detect-shape         = true,
+  detect-weight        = true,
+}
+
+\def\oubli#1{}
+
+\PassOptionsToPackage{hyphens}{url}
+\setlength{\emergencystretch}{3em}
+
+\usepackage[%
+  unicode,
+  colorlinks = true,
+  citecolor  = RoyalBlue,
+  linkcolor  = RoyalBlue,
+  urlcolor   = RoyalBlue,
+  unicode,
+  backref    = page,
+  ]{hyperref}
+\hypersetup{
+  pdftitle={Améliorer l'extraction d'information clinique par un pré-entraînement sur données publiques — version condensée},
+  pdfauthor=Rian Touchent,
+}
+
+\usepackage{bookmark}
+
+\ifxetexorluatex
+  \setmainfont[Ligatures=TeX]{TeX Gyre Pagella}
+  \linespread{1.05}
+  \RequirePackage{unicode-math}
+  \setmathfont{TeX Gyre Pagella Math}
+\else
+  \usepackage[lf]{ebgaramond}
+  \usepackage[oldstyle,scale=0.7]{sourcecodepro}
+  \singlespacing
+\fi
+
+\usepackage{microtype}
+
+% --- Français ---------------------------------------------------------------
+\usepackage[french]{babel}
+% Virgule décimale et espace de milliers, comme dans l'article CamemBERT-bio.
+\sisetup{output-decimal-marker={,}, group-separator={\,}, group-minimum-digits=4}
+
+% mimosis fige certains libellés en anglais malgré babel ; on les force en français.
+\AtBeginDocument{%
+  \renewcommand{\contentsname}{Table des matières}%
+  \renewcommand{\bibname}{Bibliographie}%
+  \renewcommand{\listfigurename}{Table des figures}%
+  \renewcommand{\listtablename}{Liste des tableaux}%
+}
+
+\renewcommand{\th}{\textsuperscript{\textup{th}}\xspace}
+
+\input{sources/glossary}
+
+\makeindex
+\makeglossaries
+
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{arydshln}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{thesis-style}
+\graphicspath{{../}{./}}
+\thesisreviewmarksfalse
+
+\usepackage[nameinlink]{cleveref}
+% Noms français, minuscule pour coller au style « cf. table X ».
+\crefname{figure}{figure}{figures}
+\Crefname{figure}{Figure}{Figures}
+\crefname{table}{table}{tables}
+\Crefname{table}{Table}{Tables}
+
+\usepackage{placeins}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{ragged2e}
+\usepackage{adjustbox}
+\usepackage[title,toc]{appendix}
+\renewcommand{\appendixname}{Annexe}
+
+\usetikzlibrary{positioning, backgrounds, fit, arrows.meta, decorations.pathreplacing, calc}
+
+\newtheorem{theorem}{Théorème}[section]
+\newtheorem{corollary}{Corollaire}[theorem]
+\newtheorem{lemma}[theorem]{Lemme}
+\DeclareMathOperator{\rank}{rank}
+
+\usepackage{stackengine}
+\def\ucr{\scalebox{1}{\stackinset{c}{}{c}{-.1pt}{%
+  \textcolor{white}{\sffamily\bfseries\small ?}}{%
+  \rotatebox{45}{$\blacksquare$}}}}
+
+% --- En-tête de partie compact (identique à la version anglaise) ------------
+\newcounter{condpart}
+\renewcommand{\thecondpart}{\Roman{condpart}}
+\newcommand{\cpart}[1]{%
+  \FloatBarrier % flush the previous part's floats so none drifts across parts
+  \par\addvspace{2.6ex plus 1ex}%
+  \refstepcounter{condpart}%
+  \addcontentsline{toc}{part}{\protect\numberline{\thecondpart}#1}%
+  \markboth{#1}{#1}%
+  {\noindent\color{ThesisPrimary}\rule[0.32ex]{2.6em}{1.7pt}}\hspace{0.7em}%
+  {\normalsize\scshape\color{ThesisNeutral}Partie~\thecondpart}\par
+  \nopagebreak{\vspace{0.3ex}\LARGE\scshape\color{ThesisInk}#1\par}%
+  \nopagebreak\addvspace{1.1ex}%
+}
+
+% Le chapitre OntoBook définit \method ; on le fournit pour les tables reprises.
+\providecommand{\method}{OntoBook}
+
+\title{Améliorer l'extraction d'information clinique par un pré-entraînement sur données publiques}
+\author{Rian Touchent}
+
+% mimosis code le titre de la bibliographie en dur ("Bibliography") ; on redéfinit
+% l'environnement avec le titre français.
+\makeatletter
+\def\thebibliography#1{\vskip\parskip\vskip\baselineskip
+  \def\baselinestretch{1}%
+  \ifx\@currsize\normalsize\@normalsize\else\@currsize\fi
+  \vskip-\parskip\vskip-\baselineskip
+  \chapter*{Bibliographie\@mkboth{Bibliographie}{Bibliographie}}\list
+    {}{\setlength{\labelwidth}{0pt}\setlength{\leftmargin}{\parindent}%
+    \setlength{\itemindent}{-\parindent}}%
+  \def\newblock{\hskip .11em plus .33em minus -.07em}%
+  \sloppy\clubpenalty4000\widowpenalty4000
+  \sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+\makeatother
+
+\begin{document}
+
+\frontmatter
+
+% --- Titre simple dans l'esthétique native (pas la page de couverture officielle) ---
+\thispagestyle{empty}
+\begin{center}
+  \includegraphics[height=1.5cm]{static/media/sorbonne}\hspace{2.4em}%
+  \includegraphics[height=1.5cm]{static/media/inria}
+\end{center}
+\vspace*{0.16\textheight}
+\begin{center}
+  {\LARGE\scshape\color{ThesisInk} Améliorer l'extraction d'information clinique\\[0.4em]
+    par un pré-entraînement sur données publiques}\\[2em]
+  {\large\scshape\color{ThesisNeutral} Résumé substantiel en français}\\[0.7em]
+  {\small\color{ThesisNeutral} Thèse de doctorat \enspace$\cdot$\enspace Sorbonne Universit\'e}\\[3em]
+  {\color{ThesisInk} Rian Touchent}\\[1.4em]
+  {\small\color{ThesisNeutral}%
+    Directeur de th\`ese : Laurent Romary\\[0.35em]
+    Co-encadrant : \'Eric Villemonte de la Clergerie}\\[1.8em]
+  {\footnotesize\color{ThesisNeutral} INRIA Paris \enspace$\cdot$\enspace ALMAnaCH}
+\end{center}
+\clearpage
+
+\tableofcontents
+
+\mainmatter
+
+\cpart{Introduction}
+\label{part:intro}
+\input{parts/fr/01_introduction}
+
+\cpart{Qu'est-ce qu'un texte biomédical ?}
+\label{part:biomedtext}
+\input{parts/fr/02_biomedical_text}
+
+\cpart{État de l'art}
+\input{parts/fr/03_related_works}
+
+\cpart{Construire un corpus biomédical}
+\label{part:corpus}
+\input{parts/fr/04_corpus}
+
+\cpart{Pré-entraîner des modèles de langue}
+\label{part:pretraining}
+\input{parts/fr/05_pretraining}
+
+\cpart{Adapter aux tâches cliniques}
+\label{part:adaptation}
+\input{parts/fr/06_clinical_tasks}
+
+\cpart{Conclusion}
+\label{part:conclusion}
+\input{parts/fr/07_conclusion}
+
+\backmatter
+\bibliographystyle{acl_natbib}
+\bibliography{thesis}
+
+\end{document}

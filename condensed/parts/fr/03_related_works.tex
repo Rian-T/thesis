@@ -1,0 +1,52 @@
+% Partie III condensée (FR) — état de l'art NARRATIF. Il raconte l'histoire du champ
+% qui pose la situation initiale de la thèse ; les citations (réelles) servent le
+% récit, elles ne s'empilent pas.
+
+\noindent Le traitement automatique des langues a convergé, ces dernières années, vers une même
+recette : pré-entraîner un modèle sur de grandes quantités de texte, puis l'adapter à
+une tâche. Les modèles de type BERT~\citep{devlin_bert_2019}, fondés sur le
+Transformer~\citep{vaswani2017attention}, ont imposé cette recette, et
+CamemBERT~\citep{martin-etal-2020-camembert} l'a portée au français ; la montée en
+échelle des modèles génératifs~\citep{gpt3,touvron2023llama} en est le prolongement.
+Tout cela repose sur une même condition : du texte, en abondance, dans le domaine visé.
+Spécialiser un modèle à la médecine se fait alors naturellement par un pré-entraînement
+continu sur du texte biomédical~\citep{gururangan_dont_2020}, comme l'ont montré
+BioBERT~\citep{lee_biobert_2019} puis PubMedBERT~\citep{gu_domain-specific_2022}.
+
+C'est précisément cette condition qui manque au domaine clinique. Le texte dont le modèle
+aurait le plus besoin, le compte-rendu hospitalier, est aussi celui qu'il ne peut pas
+obtenir : donnée personnelle, réglementée en France par la CNIL, il ne quitte pas
+l'hôpital, et un modèle entraîné en son sein ne peut en sortir non plus. Les
+adaptations françaises qui ont réussi l'ont fait sur des dossiers hospitaliers privés,
+et sont restées privées~\citep{dura_learning_2022} ; les tentatives publiques se sont
+appuyées sur des corpus restreints~\citep{copara_contextualized_2020,le_clercq_de_lannoy_strategies_2022}.
+Le champ se trouve alors devant une alternative : renoncer à la cible clinique, ou tout
+reconstruire à partir de texte public.
+
+Mais le texte biomédical public n'est pas prêt à l'emploi. Il est dispersé et
+massivement anglophone~\citep{labrak-etal-2024-biomistral}, et la machinerie qui a rendu
+possible la curation à l'échelle du web~\citep{penedo2024fineweb}, comme les méthodes
+récentes qui transforment une ontologie en texte d'entraînement~\citep{yang2025entigraph},
+ont été conçues pour l'anglais et le domaine général. La curation biomédicale existante
+filtre au niveau du document~\citep{chen2023meditron}, sans distinguer le pertinent du
+générique à l'intérieur d'un article. Et la connaissance structurée dont dépendent
+les tâches cliniques reste sous-exploitée : la recherche est dominée par UMLS~\citep{lindberg_unified_1993},
+alors que les hôpitaux français codent avec des ontologies nationales, la CIM-10
+maintenue par l'ATIH~\citep{atih_pmsi}, qu'aucun pré-entraînement n'a utilisées.
+
+La tâche visée, enfin, résiste par sa structure même. L'essentiel de l'information
+clinique est dans les comptes-rendus~\citep{raghavan_how_2014}, mais le codage médical
+compte des dizaines de milliers d'étiquettes : un classifieur à tête fixe ne peut
+couvrir des codes jamais vus à l'entraînement. Les extracteurs à vocabulaire ouvert,
+GLiNER~\citep{zaratiana2024gliner} et UniversalNER~\citep{zhou2024universalner}, lèvent
+cette limite en décrivant chaque étiquette en texte libre, mais, entraînés sur du texte
+web, ils perdent en précision sur l'écrit clinique et les codes rares, y compris leur
+variante biomédicale~\citep{zaratiana2025glinerbiomed}. L'évaluation elle-même n'est pas
+stabilisée~\citep{drbenchmark2024}, les scores dépendant du tokeniseur. Pourtant, pour
+ces tâches d'extraction, les encodeurs restent compétitifs et assez petits pour tourner
+là où les données doivent rester~\citep{lehman_we_2023}.
+
+Telle est la situation dont part cette thèse. Construire un extracteur clinique
+partageable, sans jamais voir de dossier réel, oblige à reconstruire toute la chaîne
+depuis le texte public : le corpus, le modèle, la supervision et, à la fin,
+l'évaluation elle-même.

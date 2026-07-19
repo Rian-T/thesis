@@ -1,0 +1,111 @@
+% Partie II condensée (FR). Une seule figure : le compte-rendu de sortie (signature).
+% Les registres article/forum sont évoqués en prose (contrainte 15 pages).
+
+\noindent
+\begin{center}
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      inner sep=10pt] {%
+\begin{tabular}{@{}l !{\hspace{6pt}\textcolor{ThesisNeutral}{\vrule width 0.3pt}\hspace{6pt}} l@{}}
+\begin{minipage}[t]{0.40\textwidth}
+\scriptsize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} FRANÇAIS}\\[4pt]
+{\bfseries CENTRE HOSPITALIER DE SAINT-AUBIN}\\ Dossier n\textsuperscript{o} 4471902\\[1pt]
+Cardiologie, Soins Intensifs\\ Séjour : 03/11--08/11/2024\\[4pt]
+{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[4pt]
+\textbf{Patient :} CARON Julien, né le 14/03/1962 (62 ans). \textbf{Dest. :} D\textsuperscript{r} S.~Lemaire.\\[5pt]
+\textbf{Motif.} Douleur thoracique constrictive rétrosternale, irradiation bras G, depuis 2h.\\[5pt]
+\textbf{Antécédents.} HTA. DT2 sous metformine. Tabac 30 PA. Dyslipidémie.\\[5pt]
+\textbf{Examen.} TA 148/92, FC 98, SpO\textsubscript{2} 96\% AA, EVA 7/10. Pas de signe d'IVG.\\[5pt]
+\textbf{Paraclinique.} ECG : sus-décalage ST V1--V4. Tropo T 4520 ng/L (N $<$14). Coro : occlusion IVA proximale, angioplastie + stent actif, TIMI 3. ETT : FEVG 40\%.\\[5pt]
+\textbf{Au total.} SCA ST+ antérieur (I21.0).\\[5pt]
+\textbf{Ttt sortie.} Kardégic 75, ticagrélor 90x2, atorvastatine 80, bisoprolol 2,5, ramipril 5.\\[5pt]
+\textbf{CAT.} Réadaptation cardiaque. Consultation cardio à 1 mois.\hfill D\textsuperscript{r} C.~Després
+\end{minipage}
+&
+\begin{minipage}[t]{0.40\textwidth}
+\scriptsize\color{ThesisNeutral}
+{\tiny\sffamily\color{ThesisNeutral} ENGLISH · TRANSLATION}\\[4pt]
+{\bfseries SAINT-AUBIN HOSPITAL}\\ Record no. 4471902\\[1pt]
+Cardiology, Intensive Care\\ Stay: 03/11--08/11/2024\\[4pt]
+{\color{ThesisNeutral}\rule{\linewidth}{0.3pt}}\\[4pt]
+\textbf{Patient:} CARON Julien, b.\ 14/03/1962 (62 y). \textbf{To:} Dr S.~Lemaire.\\[5pt]
+\textbf{Reason.} Constrictive retrosternal chest pain, radiating to L arm, for 2h.\\[5pt]
+\textbf{History.} HTN. T2DM on metformin. Smoking 30 PY. Dyslipidaemia.\\[5pt]
+\textbf{Exam.} BP 148/92, HR 98, SpO\textsubscript{2} 96\% RA, pain 7/10. No sign of LVF.\\[5pt]
+\textbf{Workup.} ECG: ST elevation V1--V4. Trop T 4520 ng/L (N $<$14). Angiography: proximal LAD occlusion, angioplasty + drug-eluting stent, TIMI 3. Echo: LVEF 40\%.\\[5pt]
+\textbf{Summary.} Anterior STEMI (I21.0).\\[5pt]
+\textbf{Discharge tx.} Aspirin 75, ticagrelor 90x2, atorvastatin 80, bisoprolol 2.5, ramipril 5.\\[5pt]
+\textbf{Plan.} Cardiac rehabilitation. Cardiology review at 1 month.\hfill Dr C.~Després
+\end{minipage}
+\end{tabular}%
+};
+\end{tikzpicture}
+\captionof{figure}{Un compte-rendu de sortie pour un infarctus du myocarde aigu ; original français, traduction anglaise.}
+\label{fig:bt-clinical-note}
+\end{center}
+\medskip
+
+\noindent La \Cref{fig:bt-clinical-note} est une lettre d'un cardiologue à un confrère. Pour un
+lecteur français ordinaire, elle est très difficile à lire : peu de verbes, des
+phrases télégraphiques, une information dense simplement séparée par des virgules
+comme dans un tableau. Ce n'est pas de la négligence, mais un style de communication
+spécialement ajusté à la communauté à laquelle il s'adresse. Le linguiste Zellig
+Harris a appelé une telle forme spécialisée et régie par ses propres règles un
+\textit{sous-langage}~\citep{harris_mathematical_1968}, et le compte-rendu clinique
+en est le cas le mieux documenté~\citep{sager_nlip_1981}. C'est avant tout une forme
+de compression : \citet{anderson_compression_1975} a montré que l'abrègement clinique
+obéit à un petit ensemble de règles de suppression, ne retirant que ce que le lecteur
+peut rétablir. Dans la \Cref{fig:bt-clinical-note}, \emph{Pas de signe d'IVG} tient
+pour \emph{il n'y a pas de signe d'insuffisance ventriculaire gauche} ; ce qui
+disparaît est la part que le lecteur expert connaît déjà~\citep{stalnaker_common_2002}.
+Le compte-rendu est aussi performatif : une ordonnance permet au patient d'obtenir le
+médicament, un ordre de transfert enclenche le transfert~\citep{austin_words_1962}.
+
+Tout cela rend le compte-rendu précieux à étudier, mais aussi difficile à obtenir. Il
+quitte rarement l'hôpital qui l'a produit, car il est rempli de données personnelles,
+et retirer les identifiants évidents ne suffit pas : un compte-rendu pseudonymisé
+n'est pas anonyme. Pour le français, le problème est pire. Il n'existe pas de corpus
+partageable de vrais dossiers hospitaliers français~\citep{neveol_clinical_2018}. Les
+données publiques sont une alternative : cas cliniques publiés, notices de
+médicaments, résumés d'articles. Mais un cas clinique est écrit pour enseigner ; il se
+lit comme un récit, en phrases complètes et au passé. Le même infarctus, raconté dans
+un article de recherche ou sur un forum de patients (\Cref{fig:bt-web}), est abondant
+et public, mais il parle une autre langue.
+
+\begin{center}
+\begin{tikzpicture}
+\node[draw=ThesisNeutral, fill=ThesisPaper, rounded corners=3pt, line width=0.5pt,
+      inner sep=10pt] {%
+\begin{tabular}{@{}l !{\hspace{6pt}\textcolor{ThesisNeutral}{\vrule width 0.3pt}\hspace{6pt}} l@{}}
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisInk}
+{\tiny\sffamily\color{ThesisNeutral} FRANÇAIS}\\[5pt]
+\textit{Bonjour, mon père a fait une crise cardiaque la semaine dernière. Il a eu
+une grosse douleur dans la poitrine qui descendait dans le bras gauche, il était
+tout pâle et en sueur, on a appelé le 15 tout de suite. Est-ce que quelqu'un sait
+combien de temps dure la convalescence après un infarctus ? Merci d'avance.}
+\end{minipage}
+&
+\begin{minipage}[t]{0.40\textwidth}
+\footnotesize\color{ThesisNeutral}
+{\tiny\sffamily\color{ThesisNeutral} ENGLISH · TRANSLATION}\\[5pt]
+\textit{Hello, my father had a heart attack last week. He had a strong pain in the
+chest that went down into the left arm, he was all pale and sweating, we called
+emergency services right away. Does anyone know how long recovery takes after a
+heart attack? Thanks in advance.}
+\end{minipage}
+\end{tabular}%
+};
+\end{tikzpicture}
+\captionof{figure}{Un forum de patients à propos de l'infarctus du myocarde ; original français, traduction anglaise.}
+\label{fig:bt-web}
+\end{center}
+\medskip
+
+Un texte biomédical n'est pas une langue unique. La même connaissance médicale change
+selon qui écrit, qui lit et ce que le texte est censé faire. Comptes-rendus cliniques,
+articles de recherche et textes destinés aux patients offrent donc des vues
+différentes de la médecine, et seules les deux dernières sont largement disponibles.
+Le défi pour la suite de cette thèse est d'utiliser ce texte public sans perdre de vue
+la langue clinique dont nous avons finalement besoin.

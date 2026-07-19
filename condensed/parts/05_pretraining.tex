@@ -1,0 +1,120 @@
+% Condensed Part 2 (Pretraining Language Models). Three reused result tables carry
+% the SOTA claims (encoders, the CLM detour, OntoBook), plus the detour schema.
+% All floats copied verbatim from sources/part_2/chapter{4,5,6}.
+
+\noindent We then train compact biomedical encoders. Continuing a general French model's
+pretraining on \emph{biomed-fr} improves all five biomedical NER benchmarks tested
+(\Cref{tab:bioVSbase}) without training a new one from scratch, for a 2.54-point
+average gain and at a fraction of the cost. CamemBERT-bio was adapted for an estimated
+0.80~kg of CO\textsubscript{2}, against 26.11 for the from-scratch DrBERT.
+
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\sisetup{detect-weight=true}
+\begin{threeparttable}[b]
+\begin{tabular}{l c c c}
+\toprule
+& & \multicolumn{2}{c}{\textbf{CamemBERT-bio}} \\
+\cmidrule(lr){3-4}
+\textbf{Dataset} & \textbf{CamemBERT} & \textbf{biomed-fr-small} & \textbf{biomed-fr} \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Clinical}} \\[1pt]
+CAS1 & $70.50 \pm 1.75$ & \underline{$72.94 \pm 1.12$} & $\mathbf{73.03 \pm 1.29}$ \\
+CAS2 & $79.02 \pm 0.92$ & \underline{$80.00 \pm 0.32$} & $\mathbf{81.66 \pm 0.59}$ \\
+E3C  & $67.63 \pm 1.45$ & \underline{$67.96 \pm 1.85$} & $\mathbf{69.85 \pm 1.58}$ \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Leaflets}} \\[1pt]
+EMEA & $74.14 \pm 1.95$ & \underline{$75.93 \pm 2.42$} & $\mathbf{76.71 \pm 1.50}$ \\
+\midrule
+\rowcolor{ThesisTableSep}
+\multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Scientific}} \\[1pt]
+MEDLINE & \underline{$65.73 \pm 0.40$} & $65.48 \pm 0.31$ & $\mathbf{68.47 \pm 0.54}$ \\
+\midrule
+\textbf{Average} & 71.40 & \underline{72.46} & \bfseries 73.94 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+  \item $F_1$ scores (micro-average, seqeval strict, IOB2). Mean $\pm$ standard deviation over 10 seeds. biomed-fr-s = biomed-fr-small (10\% subset).
+\end{tablenotes}
+\end{threeparttable}
+\caption{\textbf{CamemBERT vs CamemBERT-bio} on five biomedical NER benchmarks. Continual pretraining on \textit{biomed-fr} yields +2.54 $F_1$ on average.}
+\label{tab:bioVSbase}
+\end{table}
+
+We next introduce a causal detour: the model learns from next-token prediction,
+then returns to standard bidirectional masked language modelling. As
+\Cref{fig:clm-pipeline} shows, the detour keeps the architecture unchanged and only
+swaps the attention mask and loss. During the causal phase the model cannot look
+ahead, so it must compress information into each token representation, and the later
+decay back to masking does not return it to an MLM-like state.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=1.8cm, >=Stealth, scale=0.85, transform shape,
+  box/.style={rectangle, rounded corners=3pt, draw=ThesisNeutral, minimum height=0.9cm, minimum width=2.4cm, align=center, font=\small\sffamily}
+]
+  \node[box, fill=ThesisPrimary!20] (base) {MLM encoder\\(ModernBERT)};
+  \node[box, fill=ThesisTertiary!30, right=of base] (clm) {CLM phase\\(10--50B tokens)};
+  \node[box, fill=ThesisSecondary!30, right=of clm] (decay) {MLM decay\\(10\% of Phase 1)};
+  \node[box, fill=ThesisPrimary!30, right=of decay] (out) {ModernCamem-\\BERT-bio};
+
+  \draw[->, thick, ThesisNeutral] (base) -- (clm) node[midway, above, font=\tiny\sffamily] {causal mask};
+  \draw[->, thick, ThesisNeutral] (clm) -- (decay) node[midway, above, font=\tiny\sffamily] {bidir.\ mask};
+  \draw[->, thick, ThesisNeutral] (decay) -- (out);
+\end{tikzpicture}
+\caption{\textbf{The CLM detour pipeline.} Starting from a pretrained MLM encoder, we continue pretraining with a causal objective (Phase~1), then decay back to MLM (Phase~2). The model does not return to an MLM-like state.}
+\label{fig:clm-pipeline}
+\end{figure}
+
+On the eight French biomedical tasks the detour beats the matched MLM baseline, as
+\Cref{tab:french-results} reports.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{\textbf{French biomedical results} (macro $F_1$, 9 seeds). Bold: best per column; underline: second best.}
+\label{tab:french-results}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccccc}
+\toprule
+& & \multicolumn{5}{c}{\textbf{Multilabel Classification}} & {\textbf{CLS}} & \multicolumn{2}{c}{\textbf{NER}} & \\
+\cmidrule(lr){3-7} \cmidrule(lr){8-8} \cmidrule(lr){9-10}
+& \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
+ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 63.4 & 55.3 & 55.6 \\
+DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & \textbf{68.0} & \textbf{62.3} & 49.9 \\
+CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & 61.6 & 56.6 & 36.1 \\
+CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 61.5 & 54.7 & 34.5 \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Base, 150M)}} \\[1pt]
+MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 65.4 & 56.8 & 57.9 \\
+CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 65.9 & 58.2 & 60.8 \\
+\midrule
+\rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Large, 350M)}} \\[1pt]
+MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & 66.1 & 58.0 & \underline{61.8} \\
+CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & \underline{67.0} & \underline{59.5} & \textbf{63.3} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+It reaches 60.8\% average $F_1$ against 57.9\% at Base, and 63.3\% against 61.8\% at
+Large. Since the two trajectories differ only in the Phase~1 objective, the gap is
+the effect of that objective alone, at no extra cost, and it transfers to English.
+We release these models as ModernCamemBERT-bio.
+
+We also introduce \emph{OntoBook}, which complements text pretraining by converting
+medical ontologies into synthetic textbooks: an ontology subgraph is turned into a
+random walk and reformulated into fluent prose, and the encoder trains on it with
+two aligned objectives, masked language modelling and relation prediction between
+code pairs. It outperforms all baselines on the three French coding benchmarks, with
+the largest gain on the fine-grained DISTEMIST coding, where it also cuts the
+variance from $\pm$5.8 to $\pm$1.1.
+
+We release the resulting models and data.
