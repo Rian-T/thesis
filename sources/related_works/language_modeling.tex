@@ -79,8 +79,8 @@ text breaks down exactly into a product of next-symbol predictions,
 \]
 so modeling language comes down to estimating a single conditional distribution: the
 probability of the next token given those before it (\Cref{fig:lm-nexttoken}).
-Every model in this chapter estimates that one quantity, and the history
-of the field is the history of estimating it better.
+For an autoregressive language model, estimating that one quantity is the whole task,
+and much of this chapter's history is the history of estimating it better.
 
 \begin{figure}[t]
 \centering
@@ -204,8 +204,8 @@ $\text{king}-\text{man}+\text{woman}\approx\text{queen}$ as a parallelogram, wit
 
 All of the models so far read a fixed window of context. A \emph{recurrent neural
 network} removes that limit. It reads the sequence one token at a time and carries
-a running summary forward. The idea goes back to \citet{rnn_origins} and was first
-made to work as a language model by \citet{mikolov10_interspeech}. At each step $t$
+a running summary forward. The idea goes back to \citet{rnn_origins} and was brought to competitive
+language modeling by \citet{mikolov10_interspeech}. At each step $t$
 the network takes the current token $x_t$ and the previous hidden state $h_{t-1}$,
 and combines them into a new hidden state,
 \[
@@ -300,8 +300,8 @@ positions are what the next architecture was built around.
 
 \subsection{Self-attention}
 
-The Transformer \citep{vaswani2017attention} keeps the same goal, predicting the next
-token. It changes how the model reads its context. Its core operation is \emph{self-attention}.
+The Transformer \citep{vaswani2017attention} changes how the model reads its context.
+Its core operation is \emph{self-attention}.
 It lets every token look directly at every other token. From the input representations
 $X$, the model computes three projections, a set of queries, keys, and values:
 \[
@@ -334,13 +334,12 @@ order. \emph{The cat sat} and \emph{sat the cat} look the same to it, so positio
 has to be supplied separately. The original Transformer added fixed sinusoidal
 signals to the embeddings \citep{vaswani2017attention}. BERT instead learned a
 vector for each position \citep{devlin_bert_2019}. Both encode an \emph{absolute}
-position, and both cope badly with sequences longer than those seen in training. Later
+position, and neither reliably handles sequences longer than those seen in training. Later
 methods encode \emph{relative} position. ALiBi adds a small penalty that grows with
 the distance between two tokens \citep{alibi}. RoPE rotates the queries and keys
 by an angle that depends on their position, so that their dot product ends up
-depending only on how far apart they are \citep{rope}. RoPE handles long and
-variable lengths well, and it is now the default in recent models such as LLaMA,
-Mistral, and ModernBERT.
+depending only on how far apart they are \citep{rope}. RoPE is now the default in recent
+models such as LLaMA, Mistral, and ModernBERT.
 
 \subsection{Encoders and decoders}
 
@@ -379,7 +378,7 @@ follow.}
 \label{fig:lm-attention}
 \end{figure}
 
-The same Transformer block can be wired in two ways. The only difference is
+The same Transformer block can be wired in two ways. The main difference is
 which tokens each one is allowed to see (\Cref{fig:lm-attention}). In an \emph{encoder}, every token attends
 to the whole sequence, left and right. This two-sided view suits tasks that read a
 text and label it, such as classification or entity recognition. It underlies
@@ -389,7 +388,7 @@ restriction. It is what makes generation possible, one token at a time, as in GP
 \citep{Radford2018ImprovingLU} and LLaMA. A third design keeps both: an encoder to
 read an input and a decoder to write an output, as in T5 \citep{raffel2020t5}. This
 design is natural for translation and other input-to-output tasks, but it is less common
-today. The two are built the same way. What really separates them is the training
+today. The two share the same block. What further separates them is the training
 objective, the subject of the next section.
 
 
@@ -673,7 +672,7 @@ is fine-tuned on many existing datasets, each rewritten as a natural-language
 instruction paired with its answer. After this it follows instructions phrased the same
 way, including instructions for tasks it never saw during tuning.
 
-\citet{wei2022flan} introduced the idea and the name. They took a 137-billion-parameter
+\citet{wei2022flan} brought this recipe to scale and popularized the name. They took a 137-billion-parameter
 model and tuned it on more than sixty datasets phrased as instructions. Its zero-shot
 accuracy then rose above that of the much larger GPT-3 on twenty of the twenty-five
 evaluation datasets they tried. The gain came from teaching the model to read
@@ -770,8 +769,8 @@ and then train for. On tasks such as mathematics or programming the answer can b
 checked automatically, by matching the solution or running the code. This yields a
 reward computed by a rule rather than predicted by a learned model. Training against
 such a signal has been named \emph{reinforcement learning with verifiable rewards}
-\citep{lambert2024tulu3}. The reward is a correctness check, so it cannot be gamed the
-way a learned reward model can (\Cref{fig:lm-rlvr}).
+\citep{lambert2024tulu3}. The reward is a correctness check computed by a rule rather than a
+learned reward model (\Cref{fig:lm-rlvr}).
 
 \medskip
 \begin{center}
@@ -815,13 +814,14 @@ answer or runs the code, so the reward needs no human labelling
 The DeepSeekMath work introduced an efficient optimiser for this setting, Group
 Relative Policy Optimization. It drops the separate value network of standard policy
 optimisation and instead judges an answer against a group of sampled answers to the
-same question \citep{shao2024deepseekmath}. DeepSeek-R1 then pushed the idea to its
-limit. A model trained by reinforcement learning alone, with no supervised fine-tuning
-first, developed reasoning behaviours such as self-checking and changing strategy from
-the reward signal, and this reasoning could afterwards be distilled into smaller
-models \citep{deepseek_r1_2025}. The strength of the approach is also its boundary.
-Verifiable rewards exist for mathematics and code, where correctness is a computable
-rule. They do not exist for open-ended writing, where there is no automatic check.
+same question \citep{shao2024deepseekmath}. The DeepSeek-R1 work then pushed the idea to its
+limit. Its R1-Zero variant, trained by reinforcement learning alone with no supervised
+fine-tuning first, developed reasoning behaviours such as self-checking and changing
+strategy from the reward signal, and this reasoning could afterwards be distilled into
+smaller models \citep{deepseek_r1_2025}. The strength of the approach is also its boundary.
+Verifiable rewards work well for mathematics and code, where correctness is a computable
+rule. They are much harder to define for open-ended writing, where there is no single
+automatic check.
 
 Two cautions close this picture. Models are tuned to follow instructions and
 increasingly trained on data shaped or generated by other models, so the line between
@@ -902,7 +902,7 @@ continued pretraining, since it is the one this thesis uses.
 Continuing to train a network has a cost. When a connectionist model is trained on new
 material, the weights that encoded the old material are overwritten. This failure was
 named \emph{catastrophic interference} when it was first described
-\citep{mccloskey1989catastrophic}. The standard remedy keeps the new training from
+\citep{mccloskey1989catastrophic}. A classic remedy keeps the new training from
 straying too far. Elastic weight consolidation adds a penalty that, in the authors'
 words, works by ``selectively slowing down learning on the weights important for'' the
 earlier tasks \citep{kirkpatrick2017ewc}. For a model adapted to a domain the same risk
@@ -941,8 +941,8 @@ it, then re-decay it, and they replay a small fraction of the original data alon
 the new domain. This combination, they report, is ``sufficient to match the
 performance of fully re-training from scratch on all available data'' while ``using
 only a fraction of the compute'', and they verify it at both the 405-million and
-10-billion parameter scales. So continued pretraining can reach the same place as
-starting over, far more cheaply.
+10-billion parameter scales. So continued pretraining can come close to retraining from
+scratch, far more cheaply.
 
 Two refinements sharpen this. First, less data can work better than more. Choosing a
 small, relevant slice of the domain corpus rather than all of it can match or beat
@@ -1058,8 +1058,8 @@ mixed-domain paradigm: start from a general model, then keep training on domain 
 A second line questioned that paradigm by training from scratch, with a vocabulary
 built from domain text rather than inherited. SciBERT measured what is at stake.
 Between BERT's general vocabulary and one learned from scientific text, only 42\% of
-frequent tokens overlap, so a general tokenizer splits more than half of the common
-scientific words into pieces \citep{beltagy_scibert_2019}. Training from scratch
+frequent tokens overlap, so the two domains favour substantially different frequent
+subwords \citep{beltagy_scibert_2019}. Training from scratch
 on 1.14 million papers fixes this. PubMedBERT made the strongest version of the claim:
 pretraining from scratch on biomedical text, with an in-domain vocabulary, ``substantially
 outperforms continual pretraining of generic language models'', and they released the
@@ -1069,7 +1069,7 @@ that related documents are seen together, for a further gain on biomedical quest
 answering \citep{yasunaga-etal-2022-linkbert}. Clinical text adds a constraint of its
 own. ClinicalBERT was trained on the notes of the MIMIC-III intensive-care database, and
 while its weights are public the underlying notes are not, since they sit behind credentialed
-access \citep{alsentzer-etal-2019-publicly}. The current strongest encoder follows the
+access \citep{alsentzer-etal-2019-publicly}. The most recent of these encoders follows the
 continued route again, on a far larger and more varied corpus. BioClinical ModernBERT
 continues a modern long-context encoder on more than 53 billion tokens drawn from twenty
 datasets across institutions \citep{sounack2025bioclinicalmodernbert}, with the
@@ -1088,7 +1088,7 @@ retrained the family on more recent data, with a longer context, an updated toke
 and new architectures, to counter the temporal concept drift caused by outdated training
 data \citep{antoun2024camembert2}.
 
-The two dedicated French biomedical encoders were both trained from scratch. DrBERT
+Two prominent French biomedical encoders were trained from scratch. DrBERT
 trained a RoBERTa model on NACHOS, a corpus of French biomedical and clinical text, and
 its experiments argued for the from-scratch route: models trained from scratch gave the
 best results, and continuing the pretraining of a French general model never reached the
@@ -1099,8 +1099,8 @@ that publicly available biomedical text could match or beat private hospital dat
 point that bears directly on the use of public corpora for the clinic. AliBERT, the other
 French biomedical encoder, was also trained from scratch, with a regularised Unigram
 tokenizer built for the domain \citep{berhe:hal-03911564}. On this evidence, whether
-continuing from a French general model can be made to match a from-scratch biomedical one
-is still an open question.
+continuing from a French general model can match a from-scratch biomedical one is a
+question this thesis returns to.
 
 \subsection{Biomedical Decoders}
 
@@ -1124,8 +1124,8 @@ knowledge. The contrast with the encoders is the lesson of this section. For enc
 continued pretraining on domain text is close to a default win on extraction tasks. For
 large decoders, specialising on a domain is a riskier trade, where in-domain gains can
 come at the cost of general ability and do not always survive an independent test. Why
-the two architectures should behave so differently is not settled, and it is one of the
-threads this thesis follows. These models, finally, are built on architectures that have
+domain adaptation should help the encoder setting yet often hurt the decoder one is not
+settled, and it is one of the threads this thesis follows. These models, finally, are built on architectures that have
 moved on from the original Transformer, which is where we turn next.
 \section{Modern Architectures}
 \label{sec:lm-modern}
@@ -1165,7 +1165,7 @@ GPU, using tiling and kernel fusion so that intermediate results stay in fast me
 times faster in practice, and it is now a standard component. Grouped-query attention
 addresses memory at inference time by sharing key and value heads across several query
 heads, which shrinks the cache that the model must hold while generating
-\citep{ainslie-etal-2023-gqa}; it is used in models such as Llama-2 and Mistral. RMSNorm
+\citep{ainslie-etal-2023-gqa}; it is used in models such as Llama-2 70B and Mistral 7B. RMSNorm
 simplifies layer normalisation by dropping the mean-centring step. This makes it cheaper
 to compute and is now common in large models \citep{zhang2019rmsnorm}. These are
 engineering refinements, and together they made large-scale and long-context
@@ -1189,10 +1189,9 @@ window \citep{modernbert}. It combines FlashAttention, RoPE positional encoding
 30\% masking rate from MosaicBERT. This is the long-context recipe that
 \Cref{sec:lm-biomedical} pointed forward to.
 
-BioClinical ModernBERT carries this long-context encoder to clinical text and is, on
-current evidence, the strongest biomedical and clinical encoder
+BioClinical ModernBERT carries this long-context encoder to clinical text
 \citep{sounack2025bioclinicalmodernbert}. It inherits the 8192-token window, which lets it
-read a full clinical note rather than a truncated fragment. These architectures still
+read many clinical notes in full rather than as truncated fragments. These architectures still
 inherit a vocabulary and a tokenizer, which is the next lever we examine.
 \section{Tokenization}
 \label{sec:lm-tokenization}
@@ -1232,10 +1231,10 @@ training.
 
 A tokenizer trained on general text is a poor fit for a technical domain. SciBERT measured
 this gap directly \citep{beltagy_scibert_2019}. Between the general vocabulary of BERT and
-a vocabulary learned from scientific text, only 42\% of the frequent tokens overlap. More
-than half of the common scientific words are therefore split into pieces by the general
-tokenizer. The model has to reassemble each technical term from generic fragments, which
-makes those terms harder to learn and to represent.
+a vocabulary learned from scientific text, only 42\% of the frequent tokens overlap. A
+general tokenizer therefore splits many technical terms into generic fragments, and the
+model has to reassemble each such term from the pieces, which makes those terms harder to
+learn and to represent.
 
 The same mismatch appears in French biomedical text. A general French tokenizer splits a
 technical term such as ``échocardiographie'' into several generic pieces, for example
@@ -1268,7 +1267,7 @@ limit points past the models to the data they need.
 The first limit is data rarity. Every method here assumes a large in-domain corpus, either
 to pretrain a model from scratch or to continue training an existing one. For clinical text
 that assumption does not hold. Clinical notes are private and regulated, in France under
-the CNIL, and a model trained inside one hospital cannot be shared with another
+the CNIL, and a model trained inside one hospital cannot be shared freely with another
 institution. This is why public sources of biomedical text become attractive, and it
 raises a practical question that the models alone do not answer: how to build a corpus that
 is usable and shareable.

@@ -220,12 +220,12 @@ models trained on it generalise to other settings.
 
 \subsection{Article-Level Curation for Biomedicine}
 
-Some work tries to improve these corpora by scoring articles before training. The corpus
-used for Meditron \citep{chen2023meditron} scores each article using its MeSH subject tags,
-its publication type, the reputation of the journal, its recency, and its citation count.
-High-scoring articles are upsampled and low-scoring ones are filtered out, which yields a
-corpus of about 46 billion tokens. The same limit returns here, because the scoring acts on
-whole articles and so still mixes relevant and non-relevant content within a single article.
+Some work tries to improve these corpora by scoring articles before training. The Meditron
+work \citep{chen2023meditron} evaluates an article-level scheme that scores articles by
+features such as their MeSH subject tags, publication type, journal, recency, and citation
+count, upsampling high-scoring articles and filtering out low-scoring ones. The same limit
+returns here, because the scoring acts on whole articles and so still mixes relevant and
+non-relevant content within a single article.
 
 A second example is the corpus used for BioClinical ModernBERT
 \citep{sounack2025bioclinicalmodernbert}, which combines PubMed, PMC, and around twenty
@@ -260,7 +260,7 @@ These French results are mixed, and their cause is not settled. We do not know w
 disappointing outcomes come from the corpora, which may be too small or not well targeted, or
 from the continual-pretraining method. These difficulties sharpen the clinical scarcity
 introduced earlier. Clinical text is private, and in France it is governed by the data-protection
-rules of the CNIL. Models trained inside one hospital cannot be shared between institutions.
+rules of the CNIL. Models trained inside one hospital cannot be shared freely between institutions.
 And the public French sources are fragmented and small next to PubMed and PMC.
 
 Biomedical corpora help models learn the vocabulary and style of medical text. But language
@@ -279,12 +279,13 @@ prescribed for it are recorded as concepts and links, rather than left to be inf
 word statistics. Several large ontologies of this kind cover the biomedical domain, and a few
 of them are central to clinical work in France.
 
-The Unified Medical Language System (UMLS) is the meta-ontology maintained by the United
-States National Library of Medicine (NLM) \citep{lindberg_unified_1993}. It brings together about 189 source vocabularies,
+The Unified Medical Language System (UMLS) is a large collection of biomedical vocabularies
+maintained by the United States National Library of Medicine (NLM) \citep{lindberg_unified_1993}.
+It brings together roughly two hundred source vocabularies,
 including SNOMED-CT, the Medical Subject Headings (MeSH), the International Classification of
-Diseases (ICD), and the Anatomical Therapeutic Chemical classification (ATC). In its current releases it contains
-roughly 3.5 million concepts and over 15 million unique concept names. For each concept
-it gives synonyms, hierarchical and associative relations, and definitions.
+Diseases (ICD), and the Anatomical Therapeutic Chemical classification (ATC). Recent releases contain
+several million concepts and over ten million distinct concept names. It records synonyms,
+hierarchical and associative relations, and definitions, with coverage that varies by source.
 
 SNOMED-CT holds about 371{,}000 clinical concepts. They are connected by hierarchical
 relations, of the is-a kind, and by associative relations such as finding site and causative
@@ -307,8 +308,8 @@ about 6{,}000 codes at the fifth level.
 
 \subsection{Formal Representations}
 
-Ontologies are published in a small set of standard formats defined by the World Wide Web
-Consortium (W3C). The Resource Description Framework (RDF) stores facts as
+Many ontologies are represented in a small set of standard formats defined by the World Wide
+Web Consortium (W3C), though some clinical terminologies use resource-specific formats. The Resource Description Framework (RDF) stores facts as
 subject-predicate-object triples. The Web Ontology Language (OWL) adds description logic,
 which allows automatic reasoning over classes and properties. The Simple Knowledge
 Organization System (SKOS) provides a lighter vocabulary for thesauri. It uses prefLabel and
@@ -338,7 +339,7 @@ learns node representations from biased random walks and a skip-gram objective
 graphs and may retain relation predicates in those sequences before applying a word2vec-style
 objective \citep{ristoski2016rdf2vec}. It became the basis for later path-based ontology
 methods. Snomed2Vec
-applies Node2Vec to SNOMED-CT and reports a large gain on concept similarity
+evaluates graph-embedding methods on SNOMED-CT and reports large gains on concept similarity
 \citep{agarwal2019snomed2vec}. OWL2Vec* extends the approach by running walks over OWL
 ontologies \citep{chen2021owl2vec}. These methods share one limit. The embeddings are static
 and live outside any transformer, so a concept gets a single fixed vector whatever the
@@ -587,11 +588,11 @@ million synthetic tokens in its main experiment \citep{yang2025entigraph}.}
 \end{figure}
 
 Several gaps remain open across these families. Most of the work is in English and built on
-UMLS, so other languages and other knowledge sources stay unexplored. Entity-centric synthetic
-augmentation for continued pretraining is recent, with the main results appearing between 2023
-and 2025, and it has not been studied for bidirectional encoders, since DRAGON uses link
-prediction rather than generated text. National ontologies, such as the French ICD-10
-maintained by the ATIH and the CCAM procedure coding, have not been used for pretraining.
+UMLS, so other languages and other knowledge sources remain comparatively underexplored.
+Entity-centric synthetic augmentation for continued pretraining is recent, with the main
+results appearing between 2023 and 2025, and it has so far targeted decoder models rather
+than bidirectional encoders. National ontologies, such as the French ICD-10 maintained by
+the ATIH and the CCAM procedure coding, have seen little use in pretraining.
 Contrastive methods such as SapBERT and CODER use UMLS through term pairs and relation triples
 rather than by synthesising relation-focused text from source documents. These open problems
 set up the limits we discuss next.
@@ -624,12 +625,10 @@ right domain-specific quality criteria for biomedical text are still unknown.
 
 Two further gaps concern knowledge. Research on medical ontologies is dominated by UMLS, but
 French hospital systems use ICD-10 as maintained by the ATIH, along with CCAM for procedures
-and ATC for drugs. No pretraining work has used these national ontologies, which is a clear
-gap for medical coding in French. At the same time, turning ontology graphs into text for
-pretraining is recent, and the existing work targets decoder models in English, as in
-EntiGraph \citep{yang2025entigraph}. Whether textbook-like text generated from a national
-ontology could help has not been tested for bidirectional encoders or for non-English
-ontologies.
+and ATC for drugs. We did not find prior pretraining work that uses these French national
+coding resources, which matters for medical coding in French. Generating textbook-like text
+from such resources to continue pretraining a French encoder, and evaluating it on the target
+clinical tasks, is the specific combination we take up later.
 
 This chapter covered the data used to pretrain and adapt language models. The next chapter
 turns to the task these models are ultimately built for, clinical information extraction, and

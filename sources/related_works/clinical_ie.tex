@@ -167,9 +167,9 @@ frequent as well, because clinicians type quickly under time pressure.
 For these reasons, models trained on scientific or general text perform poorly on clinical
 text, which is why domain-pretrained models were developed (discussed in
 \Cref{sec:lm-biomedical}). These specialised models help, but they remain supervised, so each
-target class still needs annotated examples. One architectural alternative is ClinicalMamba,
-which adapts state-space models to clinical text with linear-time complexity in sequence
-length, useful for long clinical documents \citep{yang2024clinicalmamba}.
+target class still needs annotated examples. For long clinical documents, ClinicalMamba
+explores a different backbone, adapting state-space models to clinical text with linear-time
+complexity in sequence length \citep{yang2024clinicalmamba}.
 
 We now have benchmarks and models for biomedical NER. Medical coding is a different task: it
 assigns codes from an ontology with thousands of possible labels to a whole document.
@@ -211,10 +211,10 @@ network that uses UMLS synonyms for each code. This helps because clinical text 
 expressions for one concept, and a synonym table lets the model match these variants to the
 same code.
 
-Large language models do poorly on coding. \citet{soroush2024gpt4coding} benchmarked large
-language models for medical coding and found them highly error-prone. Specialised approaches such as PLM-ICD and
-MSMN remain stronger, so for coding a specialised encoder still outperforms a generic large
-model.
+Large language models do poorly on coding. \citet{soroush2024gpt4coding} found off-the-shelf
+large language models highly error-prone when asked to produce medical codes, which is why
+specialised coders such as PLM-ICD and MSMN remain the standard approach. That benchmark does
+not, however, compare the two directly.
 
 \subsection{Coding in French}
 
@@ -244,10 +244,11 @@ tasks deal with the gap between how clinicians write and how knowledge bases sto
 Entity linking differs from medical coding in scope. Linking operates on a single mention and
 assigns it one concept, whereas coding operates on a whole document and assigns a set of codes
 that summarize the encounter. The two tasks
-are connected, and linking can be seen as a building block of coding. A typical pipeline first
+are connected, and linking can serve as a building block of coding. One pipeline first
 recognizes entities with named entity recognition, then links each mention to a concept, and
-finally aggregates these concepts into document-level codes. Strong linking is therefore
-useful well beyond the linking task on its own.
+finally aggregates these concepts into document-level codes, though many coding systems instead
+predict document-level labels directly. Strong linking is therefore useful well beyond the
+linking task on its own.
 
 \subsection{Approaches}
 
@@ -266,10 +267,10 @@ results.
 
 These methods share clear limits. Most of the work is done in English and built on UMLS. UMLS
 covers English vocabulary well, but it matches French clinical language poorly, with its
-informal abbreviations and local synonyms. The methods also treat each concept in isolation.
-They do not use the structure of the ontology, such as parent concepts, exclusions, and
-complications, and they ignore the RDF and SKOS relations that connect concepts, including
-broader, narrower, related, and exactMatch links.
+informal abbreviations and local synonyms. Most of them also treat each concept largely in
+isolation, making little use of the ontology's structure, such as parent concepts, exclusions,
+and complications. CODER is a partial exception in that it uses UMLS relation triples, but none
+of these methods encode the operational coding constraints of a target ontology.
 
 These methods can normalize a mention once it has been found and once its label exists in
 training. But clinical extraction needs to recognize and normalize text across thousands of
@@ -287,7 +288,7 @@ The ICD-10 classification alone contains about 17{,}000 codes, and annotating cl
 for each one would take more effort than any project can afford. Classic named entity
 recognition models do not help here, because a BERT model with a linear classification head
 has a fixed number of output classes chosen before training. This situation motivates models
-that can recognise entity types they have never seen during training.
+that can handle labels they have never seen during training.
 
 \subsection{GLiNER}
 
@@ -428,7 +429,7 @@ follow detailed definitions, at the cost of being larger and slower than an enco
 a compact named entity recognition foundation model built on a RoBERTa-base encoder
 \citep{bogdanov2024nuner}. It is pretrained with contrastive learning on GPT-3.5 annotations of
 the C4 web corpus, and its authors find that the size and diversity of this training data
-matter more than any other choice. Large language models have also been applied directly to
+are the most influential factors in their setting. Large language models have also been applied directly to
 clinical named entity recognition. Early work was encouraging \citep{agrawal_large_2022},
 but \citet{lehman_we_2023} argued that BERT-style models remain
 competitive on extractive clinical tasks, that large models are hard to run inside a hospital,
@@ -436,14 +437,15 @@ and that sending clinical text to a proprietary API raises confidentiality probl
 
 \subsection{Limits of Current Zero-shot}
 
-Several open problems remain. GLiNER and similar models are pretrained on general data such as
-the Pile, not on clinical text, so they carry the same domain gap that motivated specialised
-biomedical models. Entity types are given as short text descriptions, which do not capture the
+Several open problems remain. Generalist open NER models such as GLiNER and UniversalNER are
+pretrained on general data such as the Pile, not on clinical text, so they carry the same
+domain gap that motivated specialised biomedical models. Biomedical adaptations such as
+GLiNER-BioMed reduce this gap, but still learn from public rather than real clinical text. Entity types are given as short text descriptions, which do not capture the
 hierarchy of a medical ontology. The relations between codes, such as parent and child, mutual
-exclusion, or synonymy, are not used by the model. Performance also drops on the rare codes
-that make up the long tail of medical classifications, where examples are scarcest. Zero-shot
+exclusion, or synonymy, are not used by the model. Performance also drops on the rare entity
+types in the long tail of medical vocabularies, where examples are scarcest. Zero-shot
 named entity recognition is a promising answer to the problem of thousands of unseen labels.
-But the strongest models are trained on general web text, while clinical data are private and
+But these models are trained on public text, while real clinical data are private and
 cannot be shared. This raises the question of how to train for the clinical domain without
 access to real clinical data.
 \section{Synthetic Data for Clinical NLP}
@@ -455,8 +457,8 @@ Clinical text is hard to obtain because it is private. In France, the CNIL regul
 patient data, and in the United States HIPAA plays the same role. A model trained on the
 records of one hospital carries information about its patients, so it cannot be shared freely
 with another institution. This is the central obstacle for clinical information extraction:
-the data that matters most cannot leave the hospital where it was produced. Models and their
-training corpora fall under the same rules, which makes collaboration between hospitals
+the data that matters most cannot leave the hospital where it was produced. A model can inherit
+constraints from the data it was trained on, which makes collaboration between hospitals
 difficult.
 
 Public annotated French clinical resources exist, but they are small and not fully clinical.
@@ -499,16 +501,17 @@ annotated set, with an ensemble used to filter low-quality generations. Asclepiu
 idea further by training a clinical language model entirely on synthetic notes. It used a large
 model to turn public case reports into realistic clinical notes and used no private clinical
 data. The result was competitive with models trained on real notes \citep{kweon2024asclepius}.
-\citet{meoni-etal-2024-generating} keep the private text out of the loop differently, generating
+\citet{meoni-etal-2024-generating} keep the real reports inside a private environment, generating
 documents from clinical keywords extracted without confidential information and refining them
-with a reward that scores each candidate against real reports.
+with a reward, hosted at the clinical institution, that scores each candidate against real reports.
 
 Synthetic notes built this way still tend to read as too clean and complete, and
 they lack the terse, telegraphic style of real clinical writing. The generator can also produce
 stereotyped cases that under-represent rare presentations and unusual patients. When a large
 model supplies the labels rather than the text, those labels are not gold-standard expert
 annotations, and errors in them pass on to the model that learns from them. These caveats
-temper the otherwise encouraging finding that generated data can replace real data.
+temper the otherwise encouraging finding that generated data can partially substitute for real
+data in the settings evaluated.
 
 Synthetic data is one answer to the scarcity of clinical text, but it raises a further
 question: how do we evaluate a model trained on generated data correctly, and more generally
@@ -555,7 +558,7 @@ two vocabularies can diverge sharply: SciBERT found only a 42\% overlap between 
 BERT vocabulary and a vocabulary built from scientific text \citep{beltagy_scibert_2019}. A
 tokenizer that over-splits technical terms produces more tokens to predict, and therefore more
 chances to make an error. The word ``échocardiographie'' is a clear case. A general tokenizer
-breaks it into three pieces, while a specialised one breaks it into two. This changes the
+breaks it into several generic pieces, while a specialised one keeps it in fewer. This changes the
 number of predictions for the same word, and so changes the score. Token-level metrics are
 biased by the choice of tokenizer, and that bias is hard to separate from genuine differences
 in model quality.
@@ -573,9 +576,9 @@ models.
 
 DrBenchmark was a step toward a shared protocol, gathering several French biomedical tasks under
 a common evaluation \citep{drbenchmark2024}. Comparing very different architectures is
-harder still. Encoders, large language models, and GLiNER-style bi-encoders use different
-tokenizers and different fine-tuning procedures, so a token-level or even an entity-level score
-computed on one model's tokenization does not transfer cleanly to another. This points toward
+harder still. Encoders, large language models, and GLiNER-style span--type matching models use
+different tokenizers and fine-tuning procedures, so a token-level score tied to one model's own
+subword units does not transfer cleanly to another. This points toward
 evaluation at the character level, which is independent of the tokenizer and so allows models
 of any architecture to be placed on the same scale. Such an evaluation is an open need rather
 than a solved problem, and the closing section takes up this missing piece of a fair,
@@ -606,8 +609,8 @@ Zero-shot extraction, the apparent way around the label space, is itself not ada
 clinic. Models such as
 GLiNER and UniversalNER recognise entities described by free-text labels, which removes the
 fixed head, but they are trained on general web text. On clinical writing, and especially on
-rare codes, their accuracy drops. Closing this gap requires adapting these models to the
-biomedical domain.
+rare or specialised entities, their accuracy can drop. Closing this gap requires adapting these
+models to the biomedical domain.
 
 Ontologies are also underused. Coding systems are published as
 structured resources in formats such as RDF and SKOS, with a hierarchy of concepts, exclusion
@@ -615,10 +618,10 @@ rules, and lists of synonyms. Zero-shot models reduce each label to a short desc
 ignore this structure. The field needs ways to bring ontological knowledge into the
 representation of labels.
 
-Finally, evaluation is not standardised. There is no shared benchmark for
-French biomedical natural language processing. Token-level scores depend on how each model
-splits text, so the tokenizer biases the comparison, and protocols differ from one paper to the
-next. Fair comparison calls for an evaluation that does not depend on the tokenizer.
+Finally, evaluation is not standardised. Existing French benchmarks such as DrBenchmark focus on
+masked-language-model encoders and do not yet place NER, normalization, and coding architectures
+on one protocol. Token-level scores depend on how each model splits text, so the tokenizer biases
+the comparison, and protocols differ from one paper to the next. Fair comparison calls for an evaluation that does not depend on the tokenizer.
 
 One point cuts across all of these. Much recent attention has gone to large decoder
 models, yet for extractive clinical tasks encoder models remain competitive. They are also
