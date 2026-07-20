@@ -38,11 +38,10 @@ peu coûteuse, et l'essentiel va au modèle de langue qui réécrit et annote le
 où notre chaîne reste plus légère parce qu'elle sélectionne un corpus biomédical petit
 et ciblé plutôt que de reformuler un corpus à l'échelle du web.
 
-La cohorte de lymphome est le point où les fils séparés se rejoignent. Deux millions de
-cas cliniques, remontés lors du filtrage du corpus et publiés en ensemble ouvert, sont
-devenus plus tard la semence des dossiers longitudinaux synthétiques sur lesquels
-l'extracteur a été évalué. Des données récupérées en construisant le corpus sont
-devenues le terrain sur lequel la tâche finale a été mesurée.
+Les dossiers synthétiques de lymphome partent de cas cliniques issus de
+Biomed-Enriched, sélectionnés pour leur qualité et parce qu'ils portent sur le
+lymphome. Le corpus construit dans cette thèse fournit ainsi les données qui servent à
+évaluer sa tâche finale.
 
 Remplir un formulaire clinique à partir de données publiques était la cible. Mettre un
 modèle au travail en contexte clinique pose une autre question, sur la façon dont il se
@@ -108,11 +107,12 @@ que du modèle.
   \label{fig:conclusion-agentic-gradient}
 \end{figure}
 
-En suivant le même modèle, avec la même connaissance et la même note falsifiée, il ne
-commet aucun acte dangereux dans une configuration de conversation propre et atteint un
-quart des cas sous pression agentique. Un jeu d'évaluation de type conversation pose une
-question et prend une réponse, et cet échec a besoin de plusieurs étapes pour
-apparaître : le jeu ne le mesure pas mal, il ne le voit pas du tout. Fournir la
+Avec le même modèle et la même note falsifiée, aucune prescription dangereuse n'est
+produite lors des vingt essais limités à une seule question. Lorsque le modèle dispose
+d'outils et que le patient insiste au fil de plusieurs échanges, il prescrit dans cinq
+cas sur vingt. Cet échec n'apparaît donc qu'au cours d'une interaction en plusieurs
+étapes et reste invisible dans un jeu d'évaluation fondé sur une question et une
+réponse. Fournir la
 contre-indication officielle avec le cas ne protège pas non plus le modèle : environ un
 cinquième prescrivent quand même contre le verdict qu'ils viennent de lire. Un chiffre
 de sécurité issu d'un jeu de type conversation ou de questions à choix multiples n'est
@@ -132,23 +132,25 @@ Son évaluation en a besoin maintenant.
 \FloatBarrier
 
 Nous y voilà. \textit{Un ordinateur capable de pondérer les signes d'un patient vers
-une maladie probable} ne semble plus hors de portée à personne, et quelque chose
-d'approchant s'installe dans les hôpitaux. Des systèmes automatisés sont vendus à la
+une maladie probable} n'est plus une perspective lointaine, et des systèmes qui s'en
+rapprochent font leur entrée dans les hôpitaux. Des systèmes automatisés sont vendus à la
 médecine depuis des décennies, et ceux qui les ont construits ont travaillé avec soin
-sous les contraintes de leur temps. Ce qui est différent, c'est l'échelle commerciale.
+sous les contraintes de leur temps. Ce qui est différent aujourd'hui, c'est l'échelle commerciale.
 Ces systèmes sont développés et vendus par des entreprises qui se disputent les mêmes
 hôpitaux, et un hôpital qui en installe un est difficile à en détacher. Arriver le
 premier garde le service pendant des années : la pression est donc de déployer tôt,
 avant que les preuves ne soient réunies. Cette pression appartient aux entreprises, et
 c'est aussi ce qui fait d'elles la mauvaise partie pour mesurer le résultat.
 
-Une évaluation indépendante est ce que la situation réclame, et elle n'existe pas au
+Une évaluation indépendante est ce que la situation nécessite, et elle n'existe pas au
 niveau qu'ont atteint ces systèmes. La construire est la part de la recherche.
-L'évaluation que le champ pratique établit ce qu'un modèle sait et à quelle fréquence il
-répond correctement, ce qui suffisait tant que les modèles répondaient. Elle n'établit
+L'évaluation telle qu'elle est souvent pratiquée mesure surtout ce qu'un modèle sait et
+la fréquence à laquelle il répond correctement, ce qui suffisait tant que les modèles
+répondaient. Elle n'établit
 pas comment il se comporte lorsqu'il agit. Ce qui manque, c'est une discipline : des
-environnements assez réalistes pour y agir, des mesures assez fines pour saisir un
-comportement, et des preuves sur celles de ces mesures auxquelles on peut se fier.
+environnements assez réalistes pour observer les modèles en situation, des mesures
+assez fines pour saisir leur comportement, et des preuves sur la fiabilité de ces
+mesures.
 Aucune entreprise n'a de raison de la construire. L'évaluation dans ce champ est une
 collection d'exercices séparés depuis aussi longtemps que le champ
 existe~\citep{truongkoyejo2026aims}. La médecine en a construit une pour ses propres

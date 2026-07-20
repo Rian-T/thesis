@@ -78,54 +78,55 @@ de modèles génère les dossiers et propose leurs
 étiquettes, ce qui peut favoriser les conventions du générateur plutôt que la vérité
 clinique.
 
-La chaîne de génération a été affinée avec le retour de cliniciens en exercice de CHU
-français. À travers une interface d'annotation web et des échanges en visioconférence,
-ils ont examiné des versions successives des dossiers synthétiques, en jugeant à la
-fois la qualité des annotations automatiques et le réalisme du texte généré, et leurs
-remarques ont nourri les versions suivantes. Cette relecture a façonné les dossiers
-mais est restée informelle. Une évaluation structurée et reproductible du réalisme
+La chaîne de génération a été affinée avec les retours d'une équipe de cliniciens de
+CHU français. Recueillis à travers une interface d'annotation web et des échanges avec
+cette équipe, ces retours portaient sur plusieurs versions des dossiers synthétiques,
+la qualité des annotations automatiques et le réalisme du texte généré. Ils ont guidé
+les versions suivantes. Une évaluation structurée et reproductible du réalisme
 clinique, avec un protocole défini et un panel de cliniciens, reste à mener.
 
-La supervision générée entraîne des extracteurs compacts à vocabulaire ouvert, dont
-les descriptions des champs cibles sont fournies en texte à l'inférence. Sur un jeu
-d'évaluation eCRF synthétique, notre plus petit modèle adapté à la tâche dépasse les
-questions-réponses extractives et se situe à 0,018 de value-$F_1$ du meilleur
-générateur affiné, un modèle vingt-sept fois plus grand ; une variante adaptée à la
-tâche comble entièrement l'écart, 0,657 contre 0,658. L'adaptation est aussi efficace
-en données : la value-$F_1$ passe de 0,182 avec dix dossiers générés à 0,485 avec
-cinquante et 0,659 avec l'ensemble d'entraînement complet.
+Pour exploiter ces annotations, nous construisons MC-bio-gliner, un extracteur de
+150 millions de paramètres fondé sur l'architecture GLiNER. Le modèle compare les
+segments du document à une description en langage naturel de chaque champ recherché.
+Il peut ainsi traiter à l'inférence des champs qui n'étaient pas fixés lors de son
+pré-entraînement. Nous l'adaptons au formulaire à partir des dossiers générés.
+
+Nous l'évaluons de deux manières. La value-$F_1$ mesure si le contenu extrait
+correspond à la valeur attendue, tandis que la span-$F_1$ vérifie si le modèle a
+localisé le passage correspondant dans le texte. Sur le jeu d'évaluation eCRF
+synthétique, MC-bio-gliner dépasse les modèles de questions-réponses extractives et
+obtient une value-$F_1$ de 0,640. Le meilleur générateur affiné, Qwen3.5-4B, atteint
+0,658 avec vingt-sept fois plus de paramètres. Une variante de MC-bio-gliner entraînée
+sur un mélange d'exemples généralistes et de dossiers générés atteint 0,657.
+
+Dans une expérience distincte, la value-$F_1$ passe de 0,182 avec dix dossiers
+générés à 0,485 avec cinquante et 0,659 avec l'ensemble des 1\,540 dossiers
+d'entraînement.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.82\textwidth]{plots/part_3/output/money_params_vs_f1.pdf}
   \caption{Value-$F_1$ sur l'eCRF du lymphome en fonction du nombre de paramètres,
-  après compétition des champs. MC-bio-gliner, à 150 millions de paramètres, se situe
-  à 0,018 de value-$F_1$ du meilleur générateur Qwen3.5-4B avec 27 fois moins de
-  paramètres, tandis que la référence GLiNER-BioMed de taille comparable, affinée sur
-  les mêmes dossiers, reste loin derrière.}
+  après compétition entre les champs.}
   \label{fig:p3-money}
 \end{figure}
 
-La \Cref{fig:p3-money} place chaque système sur l'axe des paramètres. L'encodeur
-adapté à la tâche atteint le niveau d'un générateur de quatre milliards de paramètres,
-et faire passer ce générateur à neuf milliards n'aide pas. Les générateurs gardent l'avantage
-sur le span-$F_1$, jusqu'à 0,567 contre 0,503 pour MC-bio-gliner, et parmi ses erreurs
-l'encodeur affecte une valeur correcte au mauvais champ 48,9\% du temps, contre 38,8\%
-pour le meilleur générateur : davantage de ses fautes sont des confusions de rôle, la
-bonne chaîne placée dans le mauvais champ.
+Les deux familles de modèles obtiennent ainsi une value-$F_1$ comparable, mais ne
+commettent pas les mêmes erreurs. Les générateurs localisent plus précisément les
+passages, avec une span-$F_1$ de 0,567 contre 0,503 pour MC-bio-gliner. Parmi ses
+erreurs, MC-bio-gliner attribue une valeur correcte au mauvais champ dans 48,9\% des
+cas, contre 38,8\% pour Qwen3.5-4B. L'encodeur retrouve donc plus souvent la bonne
+chaîne de caractères sans identifier correctement son rôle dans le formulaire.
 
 L'écart de taille est aussi un écart de déploiement. La confidentialité et le RGPD
 tiennent les dossiers d'un hôpital à l'écart de toute API externe, et la seule
-alternative sur site, un générateur de plusieurs milliards de paramètres, ne tient pas
-sur le matériel modeste d'un service clinique. L'encodeur, lui, y tient : il tourne là
-où les données restent.
+alternative sur site, un générateur de plusieurs milliards de paramètres, ne tient pas toujours
+sur le matériel modeste d'un service clinique. L'encodeur, lui, est beaucoup plus frugal.
 
-L'eCRF synthétique mesure la tâche complète mais ne peut établir le transfert vers du
-texte écrit par des humains. Sur des jeux de NER humains (PARHAF, FRACCO), l'avantage
-se restreint d'ailleurs à la tâche de remplissage longitudinal pour laquelle
-l'extracteur a été construit : sur une NER dense et plate, une référence de taille
-comparable reprend le dessus. Tous les éléments de cette évaluation sont synthétiques
-ou annotés automatiquement, sans aucun dossier hospitalier réel ni annotation humaine
-dans la tâche. Il reste donc à établir si le résultat se transfère aux dossiers écrits
-par des humains,
-étape nécessaire avant tout usage clinique.
+L'eCRF synthétique permet d'évaluer la tâche complète, mais pas son transfert vers de
+véritables dossiers hospitaliers. PARHAF et FRACCO apportent une première évaluation
+sur des textes écrits et annotés par des humains, mais seulement pour des tâches de
+reconnaissance d'entités. Après adaptation sur seulement 100 documents, MC-bio-gliner
+dépasse la référence de taille comparable sur PARHAF, mais reste en dessous sur la NER
+plus dense de FRACCO. Il reste donc à évaluer le remplissage complet du formulaire sur
+des dossiers réels conservés dans les hôpitaux avant d'envisager tout usage clinique.
