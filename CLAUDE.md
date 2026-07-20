@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-> 🚨 **EN COURS — campagne d'audits pré-dépôt.** Le manuscrit compile propre : **270 p., 0 erreur,
+> 🚨 **EN COURS — campagne d'audits pré-dépôt.** Le manuscrit compile propre : **268 p., 0 erreur,
 > 0 référence/citation indéfinie, 0 `(?)`, overfull résiduels < 1,85 pt**. Relecture d'Éric : **`TODO.md`**
 > (ses PDF annotés sont dans `~/Downloads/`) — c'est le seul document de suivi resté à la racine.
 >
@@ -18,10 +18,28 @@
 > **⚠️ HYGIÈNE DE BUILD — ça a coûté 38 citations cassées.** `rm -rf build` **NE SUFFIT PAS** : des artefacts
 > périmés à la **RACINE** (`thesis.aux`, `.bbl`, `.blg`) *shadowent* ceux de `build/`, et bibtex résout alors une
 > **vieille liste de citations** → des `(?)` s'impriment **sans aucun warning**. Toujours : `latexmk -C` + `rm -f
-> thesis.aux thesis.bbl thesis.blg thesis.toc` + `rm -rf build`, puis `latexmk -g`. Contrôle qui ne ment pas :
-> `pdftotext thesis.pdf - | grep -c '(?)'` doit donner **0**. Corollaire : **ne jamais lancer deux `latexmk` en
+> thesis.aux thesis.bbl thesis.blg thesis.toc` + `rm -rf build`, **puis RECRÉER l'arborescence** (voir juste en
+> dessous), puis `latexmk -g`. Corollaire : **ne jamais lancer deux `latexmk` en
 > parallèle** (les sous-agents qui compilent corrompent les `.aux` et produisent des erreurs fantômes — un
-> « `! Extra }` » fatal m'a fait reverter un sweep parfaitement valide).
+> « `! Extra }` » fatal m'a fait reverter un sweep parfaitement valide ; le 2026-07-20, un build FR lancé
+> pendant un build EN a donné 20 p. et **28 citations cassées**).
+>
+> **⚠️ `rm -rf build` SEUL CASSE LE BUILD.** `latexmkrc` fixe `$aux_dir = 'build'`, et chaque
+> `\include{sources/…}` écrit son `.aux` dans `build/sources/…`. Latexmk ne crée **pas** ces sous-dossiers
+> récursivement : « `Couldn't create directory 'build/sources/title'` » → « `Fatal error occurred, no output
+> PDF` », **et latexmk déplace quand même un `build/thesis.pdf` partiel à la racine, écrasant le bon PDF par
+> un fichier tronqué**. Toujours enchaîner :
+> ```bash
+> rm -rf build && find sources -type d | sed 's|^|build/|' | xargs mkdir -p && mkdir -p build/plots build/static
+> ```
+>
+> **🚨 LE CONTRÔLE `grep -c '(?)'` MENT SUR UN PDF MORT.** `pdftotext` sur un PDF tronqué échoue et
+> `grep -c` renvoie **0**, donc « 0 (?) » = vert alors que le fichier est illisible. **Vérifier le code de
+> sortie de `latexmk` D'ABORD**, puis que `pdfinfo thesis.pdf` répond, et seulement ensuite les `(?)`.
+> Même piège avec `git checkout` : un contrôle qui lit un artefact restauré ne prouve rien sur le build.
+> Contrôle complet : `latexmk … ; echo $?` = 0, puis `pdfinfo thesis.pdf | grep Pages`, puis
+> `pdftotext thesis.pdf - | grep -c '(?)'` = **0**, puis `grep -c 'undefined' build/thesis.log` (attention :
+> les 3 `Font shape … undefined` de TeXGyrePagellaMath sont normaux, ce ne sont pas des références).
 >
 > **CHIFFRES — train-on-test-free, VÉRIFIÉS depuis les parquets (`results.json` PÉRIMÉ).** Capstone eCRF (après
 > field competition) : MC-bio-gliner publié **0.640/0.503**, variante task-mixed **0.657** ≈ **Qwen3.5-4B 0.658**
