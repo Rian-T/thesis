@@ -1,8 +1,19 @@
 # CLAUDE.md
 
-> 🚨 **EN COURS — relecture d'ÉRIC + polish global.** Le manuscrit compile propre : **266 p., 0 erreur,
-> 0 référence/citation indéfinie, 0 `(?)`, 9 overfull** (le pire à 17,5 pt). Punch-list consolidée :
-> **`AUDIT_PUNCHLIST.md`** (racine). Relecture d'Éric : **`TODO.md`** (ses PDF annotés sont dans `~/Downloads/`).
+> 🚨 **EN COURS — campagne d'audits pré-dépôt.** Le manuscrit compile propre : **270 p., 0 erreur,
+> 0 référence/citation indéfinie, 0 `(?)`, overfull résiduels < 1,85 pt**. Relecture d'Éric : **`TODO.md`**
+> (ses PDF annotés sont dans `~/Downloads/`) — c'est le seul document de suivi resté à la racine.
+>
+> **AUDITS 2026-07-20 (`archive/reviews/`, synthèse = `2026-07-20-thesis-audit-synthesis.md`).** 16 rapports,
+> aucun `.tex`/`.bib` touché pendant l'audit. Verdict : ni méthode ni chiffres ne sont en cause (tous les
+> recalculs passent), le risque est concentré sur **la provenance de quelques résultats, deux contradictions
+> entre parties, et des formulations plus fortes que les preuves**. P0 déjà corrigés dans le working tree :
+> MIMIC-III (« No **French** model… »), Raghavan (59 %/77 % des critères, PAS « 80 % des entités »), 61.08 →
+> **61.71**, « double dissociation » → asymétrie, `ensure` → « designed to ». **P0 restants** : `visual_data.json`
+> a 30 entrées au statut `final` hors schéma (le garde-fou `registered/provisional` est contourné) ;
+> `medgemma2026` cite le rapport 2025, pas MedGemma 1.5 ; registres concurrents en partie 3. **P1** : OntoBook
+> sélectionne époque et `lambda` sur les scores aval, ses p-values ne sont pas reproductibles,
+> `ModernCamemBERT-bio-v2` apparaît en conclusion sans config documentée.
 >
 > **⚠️ HYGIÈNE DE BUILD — ça a coûté 38 citations cassées.** `rm -rf build` **NE SUFFIT PAS** : des artefacts
 > périmés à la **RACINE** (`thesis.aux`, `.bbl`, `.blg`) *shadowent* ceux de `build/`, et bibtex résout alors une
@@ -37,7 +48,8 @@
 > Marques de relecture **désactivées** (`\thesisreviewmarksfalse` dans `thesis.tex`). URLs sécables
 > (`\PassOptionsToPackage{hyphens}{url}`) + `\emergencystretch=3em` → overfull 88 → 9.
 >
-> **NEXT (Éric, cf. `TODO.md` + `AUDIT_PUNCHLIST.md`) :** (1) 🔴 **ch1 p.88** « need evaluation results in this
+> **NEXT (Éric, cf. `TODO.md` ; punch-list historique dans `archive/notes/AUDIT_PUNCHLIST.md`, datée du
+> 2026-07-16 et partiellement périmée) :** (1) 🔴 **ch1 p.88** « need evaluation results in this
 > chapter » — le chapitre corpus n'a aucune éval, seul vrai chantier restant ; (2) 🟠 **ch2 p.98** « Performance of
 > Llama-3-8B ? » — ambigu (l'annotateur est le **70B**, les perfs du 8B sont déjà données) → demander à Éric ;
 > (3) 🚨 **relecture clinicienne** : « dossiers jugés plausibles par des médecins via un outil web » est **déjà dans
@@ -112,7 +124,11 @@ These OVERRIDE any default Claude Code commit behavior:
 
 **Le manuscrit est écrit de bout en bout** (front matter, 6 parties, conclusion, 7 annexes) et compile
 propre : **266 p., 0 erreur, 0 référence/citation indéfinie, 0 `(?)`, 9 overfull**. Ce qui reste est de la
-relecture, pas de la rédaction. Punch-list : `AUDIT_PUNCHLIST.md`. Relecture d'Éric : `TODO.md`.
+relecture, pas de la rédaction. Relecture d'Éric : `TODO.md`. Audits pré-dépôt : `archive/reviews/`.
+
+> 🗄️ **`archive/`** recueille ce qui est terminé : `notes/` (punch-list, HANDOFF, propositions de joints et de
+> fin), `drafts/` (les `.md` antérieurs aux `.tex`, janvier–février), `plans/` (plans superpowers livrés),
+> `reviews/` (les 16 rapports d'audit). Rien n'y est vivant, mais rien n'est perdu non plus.
 
 Chapter↔label↔source map (les labels sont posés dans les fichiers d'orchestration, pas dans `article.tex`) :
 
@@ -141,7 +157,7 @@ Chapter↔label↔source map (les labels sont posés dans les fichiers d'orchest
 - `scientific.tex` (`chap:bt-scientific`, "Scientific Text"): genre as social action (Miller), CARS/gap (Swales), IMRAD is recent + real data (Sollaci 1297 articles), SOAP contrast (Weed), metadiscourse/hedges (Hyland), quantitative register (Biber) + phraseology (Nwogu/Luzón), one-line Latour, Friedman punchline (abundance ≠ substitutability). Figure = real HAL passage on post-infarction mitral insufficiency (from `rntc/mc-bio-corpus`).
 - `web.tex` (`chap:bt-web`, "Lay and Web Text"): Fleck (esoteric→exoteric), drug leaflets / *notices* (Directive 2001/83/EC, EMA QRD template), naming variation (Wüster foil / Cabré / Gaudin), Temmerman (fuzzy concepts), UMLS many-to-many (Bodenreider, 2.5M names / 900k concepts), ontology-vs-text gap (Smith & Ceusters), one-line Hacking + Biber; synthesis closes the part ("public data for the clinic = crossing register + resolving names").
 
-**Related Works ch "Language Models" (`chap:rw-lm`, `sources/related_works/language_modeling.tex`):** sections **5.1–5.7 are now full prose, plain CamemBERT-bio voice** (Introduction Markov→Shannon→chain rule→Bengio→Vaswani; From Statistical to Neural; Transformer; Pretraining Objectives; Scaling Laws & LLMs incl. instruction tuning / RLHF-HHH / reasoning-RLVR-DeepSeek-R1; Continual Pretraining; Biomedical Language Models), with hand-built TikZ figures throughout (entropy, next-token, word2vec parallelogram, RNN, gradient bound, attention masks, CLM/MLM, few-shot 3-panel, Chinchilla + LLaMA plots, DAPT/TAPT). **The whole Related Works is now full prose: 5.8 Modern Architectures, 5.9 Tokenization, 5.10 Limits/Transition were prosified, and the other two RW chapters (`corpus_annotation.tex` = `chap:rw-corpus`; `clinical_ie.tex` = `chap:rw-ie`) are fully prosified too — all via fable subagents + a per-chapter fable review pass, ~53 exact refs added by curl. See HANDOFF.md.**
+**Related Works ch "Language Models" (`chap:rw-lm`, `sources/related_works/language_modeling.tex`):** sections **5.1–5.7 are now full prose, plain CamemBERT-bio voice** (Introduction Markov→Shannon→chain rule→Bengio→Vaswani; From Statistical to Neural; Transformer; Pretraining Objectives; Scaling Laws & LLMs incl. instruction tuning / RLHF-HHH / reasoning-RLVR-DeepSeek-R1; Continual Pretraining; Biomedical Language Models), with hand-built TikZ figures throughout (entropy, next-token, word2vec parallelogram, RNN, gradient bound, attention masks, CLM/MLM, few-shot 3-panel, Chinchilla + LLaMA plots, DAPT/TAPT). **The whole Related Works is now full prose: 5.8 Modern Architectures, 5.9 Tokenization, 5.10 Limits/Transition were prosified, and the other two RW chapters (`corpus_annotation.tex` = `chap:rw-corpus`; `clinical_ie.tex` = `chap:rw-ie`) are fully prosified too — all via fable subagents + a per-chapter fable review pass, ~53 exact refs added by curl. Voir `archive/notes/HANDOFF.md`.**
 
 **Research substrate (gitignored `research/`).** Deep-research notes to READ before writing more: `clinical.md`, `scientific.md`, `web.md`, `french_clinical.md`, `lay_leaflets.md`, `rw_language_modeling.md`, plus `*_outline.md`. Built by Opus subagents from primary sources (curl). `research/` also holds PII screenshots + downloaded PDFs → **never commit it**. Scratch LaTeX buffers live in gitignored `sources/drafts/` (e.g. `example_clinical_note.tex` = the synthetic note source).
 
@@ -157,7 +173,7 @@ Harris « fewer words » avant soumission.
 Un pont ne doit **jamais** écrire l'ouverture de ce qui suit — c'est le défaut qu'on a corrigé deux fois
 (un pont volait le hook de ch6 ; un autre pré-livrait l'intro de la Partie 3). ch5→ch6 pose la tension
 « les ontologies gardent la connaissance, mais le préentraînement consomme des phrases » ; ch6→Partie 3 pose
-la question du fine-tuning. `SEAM_PROPOSALS*.md` gardent les analyses de joints.
+la question du fine-tuning. `archive/notes/SEAM_PROPOSALS*.md` gardent les analyses de joints.
 
 **Conventions (follow them) :** captions **en bas, une phrase, jamais orphelines** (blocs non-flottants en
 `minipage` **avec `\centering` dedans**) ; exemples textuels en TikZ aux couleurs thèse ; bib ajouté avec des
@@ -226,7 +242,7 @@ phrases hachées/IA, pas de tirets cadratins) — **et il se relit souvent, pas 
 ```
 sources/
 ├── title/title.tex              # Title page (French) - DONE
-├── abstract.tex                 # Abstract - TODO
+├── abstract.tex                 # DONE — bilingue (EN + Résumé FR), une page chacun
 ├── introduction.tex             # Introduction with Sutton quote - DRAFT
 ├── related_works.tex            # Orchestration file (\input the 3 RW chapters)
 ├── related_works/               # live drafts in .tex (.md are older source drafts)
@@ -241,13 +257,13 @@ sources/
 ├── part_2/                      # Pretraining Language Models
 │   ├── extensions_lm.tex        # Orchestration file (sets chap labels)
 │   ├── chapter4/article.tex     # DONE — CamemBERT-bio pretraining (chap:encoders)
-│   ├── chapter5/article.tex     # DRAFT (debt) — CLM Detour, COLM 2026 (chap:objectives); §2.1 placeholder, 3 figs TODO
-│   └── chapter6/article.tex     # DRAFT (debt) — OntoBook, LREC 2026 (chap:ontobook); not thesis-ified yet
+│   ├── chapter5/article.tex     # DONE — CLM Detour, COLM 2026 (chap:objectives)
+│   └── chapter6/article.tex     # DONE — OntoBook, LREC 2026 (chap:ontobook); thesis-ifié
 ├── part_3/                      # Adapting to Clinical Tasks
 │   ├── clinical_tasks.tex       # Orchestration file (sets chap labels)
-│   ├── chapter7/article.tex     # TODO — fine-tuning limits discussion (chap:limits)
-│   ├── chapter8/article.tex     # TODO — frenchmed-gliner / MedEmbed, WIP (chap:architectures)
-│   └── chapter9/article.tex     # DRAFT (partial) — OntoBook data + clinical reports placeholder (chap:synthetic)
+│   ├── chapter7/article.tex     # DONE — capstone eCRF (chap:evaluation); chap:limits n'existe plus
+│   ├── chapter8/article.tex     # DONE — frenchmed-gliner / MC-bio-embed (chap:architectures)
+│   └── chapter9/article.tex     # DONE — données synthétiques pour l'adaptation (chap:synthetic)
 ├── conclusion.tex
 └── appendix.tex
 ```
