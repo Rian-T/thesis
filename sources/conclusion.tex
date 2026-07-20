@@ -1,30 +1,22 @@
 \partepigraph{``[\ldots] The eventual success is tinged with bitterness, and often
 incompletely digested.''}{Richard S. Sutton, \textit{The Bitter Lesson}}
 
-Don't get too excited. Building the models is the easy part.
+Let's not get too excited. Building the models is the easy part.
 
 \chapter{What Holds Together}
 \label{sec:conclusion-holds-together}
 
-The parts of this thesis were built one at a time. Read together, at the close,
-they trace a single route from public text to a filled clinical form and share a
-single concern, the energy that route costs. This chapter follows the route and
-weighs the cost.
-
-\section{A Single Route Through Public Text}
-
-A hospital note runs through this thesis as a target, never as training
-material. No model built here was shown a real patient record. What the models
-learned, they learned from public text: scientific articles, drug leaflets,
-ontologies, and clinical cases that had already been published. From this
-material, one route runs the length of the manuscript. Public text becomes a
-filtered corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}); the corpus
-pretrains an encoder (\Cref{chap:encoders,chap:objectives}); the encoder is
-enriched with knowledge drawn from ontologies (\Cref{chap:ontobook}); the
-enriched encoder becomes an extractor that can be asked for new fields at
-inference time (\Cref{chap:architectures}); and the extractor fills the
-structured clinical form of a study (\Cref{chap:evaluation}). Each part handed
-its output to the next, as \Cref{fig:conclusion-convergence} shows.
+Hospital notes are the target throughout this thesis, but they are never used as
+training data. None of the French models developed here was trained on a real
+patient record. We instead use public scientific articles, drug leaflets,
+medical ontologies, and published clinical cases. We filter this material to
+build a training corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}), which
+we use to pretrain a biomedical encoder
+(\Cref{chap:encoders,chap:objectives}). We then enrich the encoder with knowledge
+from medical ontologies (\Cref{chap:ontobook}) and train it to extract new fields
+described at inference time (\Cref{chap:architectures}). Finally, the extractor
+fills the structured clinical form of a study (\Cref{chap:evaluation}).
+\Cref{fig:conclusion-convergence} summarizes this process.
 
 \input{sources/part_3/figures/fig_convergence}
 
@@ -305,7 +297,7 @@ asking the model to role-play a free-handed caregiver acts as a generic jailbrea
 pushing unsafe advice to 60 percent for Ministral-3 and 55 percent for Qwen3.5 4B,
 far above the realistic patient-pressure registers. These rates match what is
 known about sycophancy and multi-turn
-capitulation~\citep{sharma2024sycophancy,hong2025sycon}. Only MedGemma stays at
+capitulation~\citep{sharma2024sycophancy,hong2025sycon}. MedGemma stays at
 zero, and it does so by never engaging: 61 percent of its turns are deflections,
 the same non-engagement that reappears in calibration and prudence.
 

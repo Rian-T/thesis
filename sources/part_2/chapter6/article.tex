@@ -184,7 +184,7 @@ Raw walks contain structured markers (e.g., ``\texttt{>> \`A distinguer de:}'') 
 \end{reviewread}
 
 \begin{reviewread}
-We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. This ensures the textbook content remains grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4 NVIDIA H100 GPUs using vLLM \citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies. Figure~\ref{fig:textbook_example} shows an example transformation.
+We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization to transform each walk into a coherent paragraph. The prompt instructs the model to: (1) preserve all medical codes and their relationships exactly as stated, (2) use natural medical language without lists or bullet points, (3) not add any information beyond what appears in the walk. The prompt is designed to keep the textbook content grounded in the ontology structure. We apply two filters: we discard reformulations shorter than 50 characters or that fail to mention the source codes. The reformulation runs on 4 NVIDIA H100 GPUs using vLLM \citep{kwon2023vllm} with guided decoding to ensure valid JSON output, taking approximately 20 hours for all 1.3 million walks. The resulting textbooks contain approximately 1.3 billion tokens across all three ontologies. Figure~\ref{fig:textbook_example} shows an example transformation.
 \end{reviewread}
 
 \begin{figure}[t]
@@ -212,7 +212,7 @@ We prompt Qwen3-235B-A22B-Instruct \citep{yang2025qwen3} with FP8 quantization t
   };
   \node[above=0.1cm of textbook, font=\scriptsize\sffamily\bfseries, text=ThesisSecondaryDark] {Medical Textbook};
 \end{tikzpicture}
-\caption{\textbf{Walk-to-textbook transformation.} The structured walk is reformulated into fluent medical prose while preserving all codes and relations.}
+\caption{\textbf{Walk-to-textbook transformation.} The structured walk is reformulated into fluent medical prose with instructions to preserve all codes and relations.}
 \label{fig:textbook_example}
 \end{figure}
 
