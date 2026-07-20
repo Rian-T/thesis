@@ -11,13 +11,13 @@ Pour en faire des systèmes utiles, nous abordons la tâche qui motive cette th�
 extraire de documents cliniques des variables propres à chaque étude. Chaque projet
 demande des champs différents, généralement avec peu ou pas de données annotées. Aucun
 jeu de données ouvert n'associe un dossier hospitalier français à un formulaire rempli
-par un clinicien, et les dossiers eux-mêmes ne peuvent quitter l'hôpital : la
+par un clinicien, et les dossiers eux-mêmes ne peuvent quitter l'hôpital, la
 supervision doit donc être construite plutôt que collectée. Nous utilisons de grands
 modèles de langue pour annoter du texte public, pour juger des types jamais observés
 quand les références fixes font défaut, et pour générer des dossiers synthétiques de
 lymphome dérivés de cas cliniques publiés dans des articles scientifiques. Les deux
 voies utilisent Qwen3-235B avec une sortie JSON contrainte, et les annotations
-obtenues sont argentées (\textit{silver}) plutôt qu'humaines.
+obtenues sont automatiques, dites \textit{silver}, plutôt que produites par des humains.
 
 \begin{center}
 \begin{minipage}{\linewidth}
@@ -64,23 +64,24 @@ cas publié devient un dossier longitudinal daté, un substitut synthétique de 
 séquence de comptes-rendus à partir de laquelle un formulaire d'étude est rempli.
 
 La génération suit la chronologie clinique. Nous convertissons d'abord le cas source
-en une frise temporelle française structurée, puis nous générons les comptes-rendus un
-à un, en réextrayant la frise après chaque compte-rendu comme contrôle de cohérence,
+en une frise temporelle française structurée, puis nous générons les documents cliniques un
+à un, en réextrayant la frise après chaque génération comme contrôle de cohérence,
 de sorte qu'un compte-rendu à une date donnée ne reçoive que les événements déjà
 survenus. Le corpus obtenu contient 2\,050 dossiers longitudinaux, chacun avec une
-médiane de huit comptes-rendus et de 22\,314 caractères, et 31\% d'entre eux
-comportent une deuxième ligne de traitement. En faire une référence d'extraction est
-une étape supplémentaire : chaque valeur doit être reliée à l'un des 89 champs du
-formulaire et localisée dans le dossier complet, et une seule passe du modèle de
-langue sur 16\,375 comptes-rendus produit 237\,194 affectations d'empans sur ces
-champs. La référence est argentée, non humaine : la même famille de modèles génère les
-dossiers et propose leurs étiquettes, si bien qu'elle peut récompenser les conventions
-du générateur plutôt que la vérité clinique.
+médiane de huit documents et de 22\,314 caractères, et 31\% d'entre eux
+comportent une deuxième ligne de traitement. En faire un jeu d'entraînement pour l'extraction est
+l'étape suivante : chaque valeur doit être reliée à l'un des 89 champs du
+formulaire qui nous intéresse et localisée dans le dossier complet. Une dernière passe du modèle de
+langue sur 16\,375 comptes-rendus produit 237\,194 annotations reliant des segments de
+texte à ces champs. La référence est automatique plutôt qu'humaine. La même famille
+de modèles génère les dossiers et propose leurs
+étiquettes, ce qui peut favoriser les conventions du générateur plutôt que la vérité
+clinique.
 
 La chaîne de génération a été affinée avec le retour de cliniciens en exercice de CHU
 français. À travers une interface d'annotation web et des échanges en visioconférence,
 ils ont examiné des versions successives des dossiers synthétiques, en jugeant à la
-fois la qualité des annotations argentées et le réalisme du texte généré, et leurs
+fois la qualité des annotations automatiques et le réalisme du texte généré, et leurs
 remarques ont nourri les versions suivantes. Cette relecture a façonné les dossiers
 mais est restée informelle. Une évaluation structurée et reproductible du réalisme
 clinique, avec un protocole défini et un panel de cliniciens, reste à mener.
@@ -123,7 +124,8 @@ L'eCRF synthétique mesure la tâche complète mais ne peut établir le transfer
 texte écrit par des humains. Sur des jeux de NER humains (PARHAF, FRACCO), l'avantage
 se restreint d'ailleurs à la tâche de remplissage longitudinal pour laquelle
 l'extracteur a été construit : sur une NER dense et plate, une référence de taille
-comparable reprend le dessus. Chaque élément de cette évidence est synthétique ou
-argenté, sans aucun dossier hospitalier réel ni annotation humaine dans la tâche :
-reste donc à établir si le résultat se transfère aux dossiers écrits par des humains,
+comparable reprend le dessus. Tous les éléments de cette évaluation sont synthétiques
+ou annotés automatiquement, sans aucun dossier hospitalier réel ni annotation humaine
+dans la tâche. Il reste donc à établir si le résultat se transfère aux dossiers écrits
+par des humains,
 étape nécessaire avant tout usage clinique.

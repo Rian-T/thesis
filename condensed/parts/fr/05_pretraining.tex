@@ -7,7 +7,7 @@ cinq jeux de reconnaissance d'entités nommées biomédicales testés
 (\Cref{tab:bioVSbase}), sans en entraîner un nouveau à partir de zéro, pour un gain
 moyen de 2,54 points et pour une fraction du coût. CamemBERT-bio a été adapté pour
 environ 0,80\,kg de CO\textsubscript{2}, contre 26,11 pour DrBERT entraîné à partir de
-zéro.
+zéro~\citep{labrak2023drbert,touchent2023camembertbio}.
 
 \begin{table}[ht]
 \centering
@@ -108,14 +108,14 @@ Détour CLM & 8192 & \textbf{80,7} & \textbf{65,4} & \textbf{74,4} & \textbf{30,
 Il atteint 60,8\% de F-mesure moyenne contre 57,9\% en Base, et 63,3\% contre 61,8\%
 en Large. Comme les deux trajectoires ne diffèrent que par l'objectif de la Phase~1,
 l'écart est l'effet de cet objectif seul, sans coût supplémentaire, et il se transfère
-à l'anglais. Nous publions ces modèles sous le nom ModernCamemBERT-bio, MC-bio en abrégé.
+à l'anglais. Nous publions ces modèles français sous le nom ModernCamemBERT-bio, MC-bio en abrégé.
 
 Nous introduisons aussi \emph{OntoBook}, qui complète le pré-entraînement textuel en
 transformant des ontologies médicales en manuels synthétiques : un sous-graphe
 d'ontologie est converti en une marche aléatoire puis reformulé en prose fluide, et
 l'encodeur s'entraîne dessus avec deux objectifs alignés, le masquage et la prédiction
 de relation entre paires de codes. Il dépasse toutes les références sur les trois jeux
-de codage français, avec le plus grand gain sur le codage fin DISTEMIST, où il réduit
+de codage français, avec le plus grand gain sur le codage fin, où il réduit
 aussi la variance de $\pm$5,8 à $\pm$1,1.
 
 Nous publions les modèles et les données obtenus.

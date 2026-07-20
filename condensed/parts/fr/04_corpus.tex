@@ -2,11 +2,11 @@
 % virgules décimales.
 
 \noindent Nous déterminons d'abord quels textes publics fournissent un signal d'entraînement
-pertinent. Nous constituons et publions des corpus biomédicaux français à partir de
-sources publiques : \emph{biomed-fr}, 413 millions de mots, puis \emph{biomed-fr-v2}, dix
-milliards de tokens. Comme leurs documents mêlent contenu médical pertinent et contenu
-générique, nous les annotons au niveau du paragraphe par type de contenu et par
-qualité.
+pertinent. Nous constituons et publions \emph{biomed-fr}, un corpus biomédical
+français de 413 millions de mots tiré de sources publiques. Ses documents mêlent
+contenu médical et contenu générique, si bien que le problème n'est plus de collecter
+du texte mais de choisir quoi en garder. Nous traitons cette question sur la
+littérature anglophone, où le volume permet de mesurer ce que chaque choix rapporte.
 
 \begin{figure}[ht]
 \centering
@@ -30,10 +30,14 @@ scores de valeur éducative les plus élevés, le texte clinique varie davantage
 contenu générique en obtient rarement, ce qui rend le filtrage au niveau du paragraphe
 utile.
 
-Quels signaux de qualité aident réellement est moins évident qu'il n'y paraît. Nous
-annotons chaque passage selon quatre signaux — valeur éducative, richesse du contenu,
-qualité de rédaction et précision terminologique — sur les 2,16 millions de passages
-annotés. En les retirant un à un, nous constatons que la valeur éducative et la
+Nous appliquons ensuite cette méthode aux sources biomédicales françaises publiques.
+Chaque article y est répété en proportion de sa part de paragraphes de haute qualité,
+de 4,3 à 34,1 fois, et ceux qui n'en comptent aucun sont écartés. Le mélange
+d'entraînement obtenu, \emph{biomed-fr-v2}, atteint dix milliards de tokens,
+répétitions comprises, pour un contenu unique plus restreint. Nous en annotons
+2,16 millions de paragraphes selon quatre signaux : valeur éducative, richesse du
+contenu, qualité de rédaction et précision terminologique.
+En les retirant un à un, nous constatons que la valeur éducative et la
 richesse du contenu améliorent les performances, tandis que la qualité de rédaction et
 la précision terminologique les dégradent. Nous montrons aussi que les filtres
 neuronaux de qualité génériques peuvent amplifier la contamination des jeux

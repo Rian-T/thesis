@@ -11,43 +11,49 @@ seraient pourtant les meilleurs exemples, car ils contiennent les mots, les
 raccourcis et les habitudes cliniques que le système doit apprendre. Mais ils
 décrivent des patients réels : ils restent donc à l'intérieur de l'hôpital, et un
 modèle entraîné sur ces données pourrait devoir y rester aussi. Cette thèse étudie
-si un texte biomédical public peut être utilisé à la place.
+si du texte biomédical public peut être utilisé à la place.
 
-La question est ancienne. En 1959, Robert Ledley et Lee Lusted fixent au nouveau
-domaine de l'intelligence artificielle un objectif médical : un ordinateur capable
+La question est ancienne. En 1959, Robert Ledley et Lee Lusted donnent au nouveau
+domaine de l'intelligence artificielle un objectif médical, la création d'un ordinateur capable
 de pondérer les signes d'un patient vers une maladie probable~\citep{ledley_lusted_1959}.
 Leur question est aussi celle de cette thèse : d'où vient la connaissance qui fait
 fonctionner un tel système, et peut-on en fournir assez à une machine pour qu'elle
 soit utile aux soins ? Les premiers systèmes médicaux répondaient à partir de leurs
 propres dossiers. Le système de \citet{dedombal_1972} pour l'abdomen aigu atteint
-91,8\% d'exactitude diagnostique sur 304 patients dans un seul centre en 1972, mais
-lorsqu'il est repris dans un essai multicentrique sur huit centres et 16\,737
-patients, l'exactitude ne monte plus qu'à 65,3\%~\citep{adams_1986}. Un système réglé
-sur les patients de Leeds n'a pas transporté ses 91,8\% vers d'autres hôpitaux, car
-les probabilités sur lesquelles il repose venaient d'un seul endroit et les nouveaux
-patients de plusieurs. Un système qui apprend dépend des données à partir desquelles
+91,8\% d'exactitude diagnostique sur 304 patients à Leeds en 1972. Repris dans un
+essai multicentrique sur huit centres et 16\,737 patients, il n'y est plus évalué
+seul, mais comme une aide : l'exactitude initiale des médecins passe de 45,6\% avant
+son installation à 65,3\% avec lui~\citep{adams_1986}. L'essai est un succès, et ce
+qui n'a pas voyagé, c'est l'ambition de 1972 : ailleurs, le programme a été placé à
+côté du clinicien plutôt que devant lui, car sa connaissance était une table de
+fréquences venue d'un seul hôpital. Un système qui apprend dépend des données à partir desquelles
 sa connaissance a été construite ; un résultat mesuré dans un cadre peut donc ne pas
 se vérifier dans un autre.
 
 Dans les années 1970, l'IA médicale se tourne vers les \textit{systèmes experts},
-qui stockent la connaissance des spécialistes sous forme de règles explicites. MYCIN,
-à Stanford, conseillait les antibiotiques par des règles SI--ALORS~\citep{mycin_1975} ;
-lors d'un test en aveugle, huit spécialistes des maladies infectieuses le jugèrent
-acceptable dans 65\% des cas, contre 55,5\% pour les enseignants~\citep{mycin_eval_1979}. Il a
-passé le test et n'a jamais servi à soigner un patient~\citep{internist1_1982}. Un
-programme pouvait remporter un test en aveugle et rester inutilisable, car remporter le
-test n'était pas ce que les médecins demandaient.
+qui représentent les connaissances des spécialistes sous forme de règles explicites.
+À Stanford, MYCIN recommandait des antibiotiques à l'aide de règles
+SI--ALORS~\citep{mycin_1975}. Lors d'une évaluation en aveugle, huit spécialistes des
+maladies infectieuses jugèrent ses recommandations acceptables dans 65\% des cas,
+contre 42,5\% à 62,5\% pour les cinq médecins enseignants~\citep{mycin_eval_1979}. Malgré ces
+résultats, MYCIN ne fut jamais utilisé en pratique clinique. Ses règles devaient être
+rédigées et vérifiées une à une par des spécialistes, puis mises à jour à mesure que
+les connaissances médicales évoluaient. Maintenir une telle base était coûteux, et son
+exhaustivité ne pouvait jamais être garantie. Les systèmes experts fonctionnaient donc
+sur des tâches étroites, mais leur connaissance construite à la main passait
+difficilement à l'échelle.
 
-L'apprentissage automatique a ensuite changé la façon dont les systèmes acquièrent
-leur connaissance. Plutôt que de recevoir les règles, ils apprennent quoi faire à
+L'apprentissage automatique a changé cette manière d'acquérir la connaissance.
+Plutôt que de recevoir les règles, les systèmes apprennent quoi faire à
 partir de grands ensembles d'exemples, et les gains ont été importants : dès 2016, un
 réseau entraîné sur 128\,175 photographies de rétine les lisait pour la rétinopathie
 diabétique avec une exactitude proche de celle des ophtalmologues~\citep{gulshan_2016}.
-Dans la littérature biomédicale, les articles sur les systèmes experts culminent vers
-1991, puis une courbe de l'apprentissage profond, proche de zéro avant 2015, dépasse
-les vingt mille articles par an. Ces résultats ont fait naître une exigence nouvelle,
-celle qui organise cette thèse : un système qui apprend à partir d'exemples a besoin de
-nombreux exemples bien appariés, et le texte clinique ne circule pas librement.
+Dans la littérature biomédicale, le nombre d'articles sur les systèmes experts
+culmine vers 1991, tandis que les publications consacrées à l'apprentissage profond,
+encore rares avant 2015, dépassent ensuite les vingt mille par an. Cette évolution
+pose le problème au cœur de cette thèse : l'apprentissage automatique exige beaucoup
+de données adaptées à la tâche, alors que les textes cliniques sont rarement
+accessibles.
 
 La plupart des traitements automatiques des langues modernes commencent par
 pré-entraîner un modèle de langue sur de grandes collections de texte brut, avant de
@@ -56,11 +62,11 @@ comptes-rendus cliniques sont des données personnelles et ne peuvent être part
 la France n'a donc pas de corpus public sur lequel les pré-entraîner. Un modèle
 entraîné à l'intérieur d'un hôpital sur ses propres dossiers hérite de la même
 contrainte et ne peut être diffusé aux autres. Un modèle clinique partageable doit
-être construit à partir de texte public. Cette clôture s'étend à l'évaluation. Un
-modèle qui ne peut être entraîné à l'intérieur de l'hôpital ne peut pas non plus y
-être testé facilement. Le matériel clinique sur lequel nous évaluons est donc lui
-aussi reconstruit à partir de sources publiques, et son réalisme a été examiné par
-des cliniciens en exercice de CHU français.
+être construit à partir de texte public. Ce manque de données limite aussi
+l'évaluation. Sans dossiers cliniques accessibles, il est aussi difficile de mesurer
+les capacités cliniques des modèles que de les entraîner. Le matériel utilisé pour
+les évaluer est donc reconstruit à partir de sources publiques, puis examiné par des
+cliniciens de CHU français.
 
 Cette thèse pose une seule question : des données publiques peuvent-elles soutenir
 des modèles de langue pour l'extraction d'information clinique en français, sans
@@ -69,7 +75,7 @@ trois questions.
 
 \begin{itemize}
   \item Pouvons-nous constituer un corpus biomédical français public utile, et son contenu et sa qualité changent-ils ce que le modèle apprend ?
-  \item Étant donné un tel corpus, comment pré-entraîner un modèle de langue dessus : en adaptant un modèle existant, en choisissant l'objectif d'entraînement, ou en ajoutant de la connaissance venue de l'extérieur du texte ?
+  \item Étant donné un tel corpus, comment pré-entraîner un modèle de langue en combinant l'adaptation d'un modèle existant, le choix de l'objectif d'entraînement et l'ajout de connaissances extérieures au texte ?
   \item Comment adapter ces modèles à des tâches d'extraction clinique quand les données annotées sont rares, par l'architecture du modèle et par des données synthétiques ?
 \end{itemize}
 
@@ -78,7 +84,7 @@ trois questions.
 \begin{itemize}
   \item \emph{biomed-fr}, un corpus biomédical français public de 413 millions de mots, utilisé pour entraîner CamemBERT-bio. Le modèle adapté repère les termes biomédicaux d'un texte français, comme les médicaments et les maladies, plus précisément que le modèle généraliste dont il part, avec un gain moyen de 2,54 points et pour une fraction du coût d'un entraînement à partir de zéro~\citep{touchent2023camembertbio}.
   \item \emph{Biomed-Enriched}, un étiquetage de la littérature biomédicale ouverte (PubMed Central) par type de contenu et par qualité. Il identifie environ deux millions de paragraphes de cas cliniques et améliore un modèle dont on poursuit l'entraînement sur ces paragraphes~\citep{touchent-etal-2026-biomed}.
-  \item \emph{biomed-fr-v2}, un corpus biomédical français de dix milliards de tokens, avec une étude des signaux de qualité qui aident. Certains filtres courants se révèlent dégrader les performances.
+  \item \emph{biomed-fr-v2}, une amélioration du corpus biomédical français avec dix milliards de tokens, et une étude des signaux de qualité qui aident le plus. Certains filtres courants se révèlent dégrader les performances.
   \item \emph{ModernCamemBERT-bio}, le premier modèle français biomédical et clinique à contexte long, construit avec une méthode de pré-entraînement qui améliore l'adaptation au domaine.
   \item \emph{OntoBook}, une approche et un jeu de données qui transforment une base de connaissances médicale en texte d'entraînement et améliorent le codage médical français.
   \item \emph{MC-bio-gliner} et \emph{MC-bio-embed}, deux variantes de ModernCamemBERT-bio, l'une qui extrait de l'information des comptes-rendus cliniques, l'autre qui apparie des termes à des codes médicaux, toutes deux à partir de peu de données annotées.
