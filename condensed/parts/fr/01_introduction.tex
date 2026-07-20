@@ -56,7 +56,11 @@ comptes-rendus cliniques sont des données personnelles et ne peuvent être part
 la France n'a donc pas de corpus public sur lequel les pré-entraîner. Un modèle
 entraîné à l'intérieur d'un hôpital sur ses propres dossiers hérite de la même
 contrainte et ne peut être diffusé aux autres. Un modèle clinique partageable doit
-être construit à partir de texte public.
+être construit à partir de texte public. Cette clôture s'étend à l'évaluation. Un
+modèle qui ne peut être entraîné à l'intérieur de l'hôpital ne peut pas non plus y
+être testé facilement. Le matériel clinique sur lequel nous évaluons est donc lui
+aussi reconstruit à partir de sources publiques, et son réalisme a été examiné par
+des cliniciens en exercice de CHU français.
 
 Cette thèse pose une seule question : des données publiques peuvent-elles soutenir
 des modèles de langue pour l'extraction d'information clinique en français, sans
@@ -74,10 +78,10 @@ trois questions.
 \begin{itemize}
   \item \emph{biomed-fr}, un corpus biomédical français public de 413 millions de mots, utilisé pour entraîner CamemBERT-bio. Le modèle adapté repère les termes biomédicaux d'un texte français, comme les médicaments et les maladies, plus précisément que le modèle généraliste dont il part, avec un gain moyen de 2,54 points et pour une fraction du coût d'un entraînement à partir de zéro~\citep{touchent2023camembertbio}.
   \item \emph{Biomed-Enriched}, un étiquetage de la littérature biomédicale ouverte (PubMed Central) par type de contenu et par qualité. Il identifie environ deux millions de paragraphes de cas cliniques et améliore un modèle dont on poursuit l'entraînement sur ces paragraphes~\citep{touchent-etal-2026-biomed}.
-  \item \emph{MC-Bio}, un corpus biomédical français de dix milliards de tokens, et une étude des types de contenu et des signaux de qualité qui aident. Les expériences montrent que certains filtres courants dégradent les performances.
-  \item Une méthode de pré-entraînement qui entraîne le modèle sur une autre tâche pendant un temps, puis revient à l'objectif principal, améliorant le modèle sans coût supplémentaire.
-  \item \emph{OntoBook}, une façon d'ajouter de la connaissance médicale structurée au pré-entraînement en transformant une base de connaissances médicale en texte d'entraînement.
-  \item Des architectures de modèles, MC-bio-gliner et MC-bio-embed, qui repèrent les termes cliniques à partir d'une poignée d'exemples annotés seulement.
+  \item \emph{biomed-fr-v2}, un corpus biomédical français de dix milliards de tokens, avec une étude des signaux de qualité qui aident. Certains filtres courants se révèlent dégrader les performances.
+  \item \emph{ModernCamemBERT-bio}, le premier modèle français biomédical et clinique à contexte long, construit avec une méthode de pré-entraînement qui améliore l'adaptation au domaine.
+  \item \emph{OntoBook}, une approche et un jeu de données qui transforment une base de connaissances médicale en texte d'entraînement et améliorent le codage médical français.
+  \item \emph{MC-bio-gliner} et \emph{MC-bio-embed}, deux variantes de ModernCamemBERT-bio, l'une qui extrait de l'information des comptes-rendus cliniques, l'autre qui apparie des termes à des codes médicaux, toutes deux à partir de peu de données annotées.
   \item Une méthode pour générer des comptes-rendus cliniques synthétiques en réécrivant du texte biomédical public dans le style hospitalier, afin d'entraîner des extracteurs sans accès à de vraies données hospitalières.
 \end{itemize}
 
