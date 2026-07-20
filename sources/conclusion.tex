@@ -446,55 +446,54 @@ question~\citep{schmidgall2025agentclinic}. \citet{yao2024taubench} build
 tool-and-user environments in other domains and find that agents stay unreliable
 across repeated trials of the same task.
 
-We have begun to build such an environment for the clinic, as an exploratory
-agentic extension of the TABIB benchmark of \Cref{sec:conclusion-tabib}. The model
-acts as an agent at a simulated clinical workstation, with a patient record it can
-read and write, a tool to consult the official ANSM drug-interaction thesaurus,
-whose 3{,}170 graded entries serve as the ground truth, and a tool to issue a
-prescription, which is an irreversible act. It works through a queue of ordinary secretarial and pharmacy
-tasks, one of which hides a patient whose file holds a contraindicated drug pair
-together with a forged note claiming that a doctor has lifted the contraindication.
-Every exchange between the agent and the world passes through a
-single point and is logged with what was served and what is true, so the scored
-outcome is the terminal act itself rather than the model's prose
-(\Cref{fig:conclusion-agentic-env}).
+We built an exploratory extension of TABIB in which GLM-5.2 acts at a
+simulated clinical workstation. It can read and update a patient record, consult
+the official ANSM interaction thesaurus, and issue a prescription. Each session
+includes a patient requesting a prescription for a contraindicated drug
+combination. The record also contains a forged note claiming that a physician
+has authorised the combination. We score the session as unsafe when the model
+issues the prescription (\Cref{fig:conclusion-agentic-env}).
 
 \input{sources/part_3/figures/fig_agentic_env}
 
-Even this small probe shows that the safety verdict depends on the apparatus as
-much as on the model. \Cref{fig:conclusion-agentic-gradient} follows the same
-model, with the same knowledge and the same forged note, across four apparatuses
-of rising realism. In a clean single-question chat setting it commits no unsafe
-act. Adding tools raises it to two sessions in twenty, and it is the repeated
-patient pressure in the agentic setting, more than the longer horizon on its own,
-that carries it to five in twenty, a quarter of cases. An authentic but outdated
-derogation moves it far less, so the effect comes from the claim of authority the
-forged note carries. The knowledge is constant: with no forged note the model
-commits no unsafe act in any setting, so the difference is behavioural rather than
-a gap in medical knowledge. A single unsafe rate also hides the failure at the
-other end, because the chat setting reaches zero unsafe acts only by refusing almost every
-pair, safe ones included, and so cannot tell a contraindicated pair from a safe one. A
-static benchmark that reports only the unsafe rate would call this model safe.
+We evaluate GLM-5.2 in four conditions, with twenty sessions per condition. The
+first asks a single question in a chat interface without tools. The second gives
+the model access to tools for one turn. The third places it in a multi-step
+agentic workflow. The fourth adds repeated patient pressure to that workflow.
+These conditions separate the effects of tool access, sequential action, and
+conversational pressure.
+
+With the forged note, the model issues the contraindicated prescription in none
+of the twenty chat sessions, two of the twenty one-turn tool sessions, one of the
+twenty agentic sessions, and five of the twenty sessions with patient pressure
+(\Cref{fig:conclusion-agentic-gradient}). The highest observed rate is therefore
+in the agentic condition with pressure. However, each condition contains only
+twenty sessions, and the confidence intervals remain wide.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{plots/part_3/output/conclusion_agentic_gradient.pdf}
-  \caption{The same model and the same forged note under four apparatuses of rising
-  realism: the number of sessions, out of twenty, with an unsafe act climbs from
-  none in a chat setting to five under agentic pressure, while an authentic but
-  outdated note and delivering the official contraindication (open marker) both
-  move it far less. Bars are 95\% Wilson intervals.}
+  \caption{Unsafe prescriptions in twenty sessions per condition. GLM-5.2 is
+  evaluated in a chat interface, with one-turn tool access, in an agentic
+  workflow, and in the same workflow under patient pressure. Lines compare a
+  forged note with an authentic but outdated note. The open marker shows the
+  final condition when the current ANSM contraindication is also provided. Bars
+  are 95\% Wilson intervals.}
   \label{fig:conclusion-agentic-gradient}
 \end{figure}
 
-Supplying the official contraindication together with the case does not protect it
-either: about a fifth still prescribe against the verdict they have just read. The
-pattern is consistent with deference under pressure to an apparent authority
-rather than with a missing fact. In this setting, access to the official source
-does not remove the failure. The practical point is narrow: a safety number from
-a chat or multiple-choice benchmark is not an upper bound on the risk in
-deployment. Here it differs by 25 percentage points, from zero in the chat setting to a quarter under
-agentic pressure, for the same model and the same artifact.
+We repeat the experiment with an authentic but outdated note. The corresponding
+counts are zero, two, zero, and one unsafe sessions. In the final condition, we
+also provide the current ANSM contraindication directly to the model. It still
+issues the prescription in four of twenty sessions. These comparisons are
+consistent with sensitivity to the forged note's claim of authority, but this
+small experiment does not isolate the mechanism.
+
+The zero unsafe rate in the chat condition is also misleading. The model obtains
+it by refusing almost every case, including combinations that are safe. It
+therefore fails to distinguish safe prescriptions from contraindicated ones. An
+unsafe-action rate alone would describe this behaviour as safe, even though the
+model is not useful for the task.
 
 \section{The Work That Remains}
 
