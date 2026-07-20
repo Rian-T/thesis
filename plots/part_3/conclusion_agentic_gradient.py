@@ -34,7 +34,8 @@ def wilson(k, n, z=1.96):
     return max(0.0, c - h), min(1.0, c + h)
 
 
-X = ["chat\n(0 tools)", "1 turn\n+ tools", "agentic", "agentic\n+ pressure"]
+X_EN = ["chat\n(0 tools)", "1 turn\n+ tools", "agentic", "agentic\n+ pressure"]
+X_FR = ["chat\n(0 outil)", "1 tour\n+ outils", "agent", "agent\n+ pression"]
 FORGED = [0, 2, 1, 5]
 STALE = [0, 2, 0, 1]
 N = 20
@@ -52,11 +53,13 @@ def cerr(counts):
 
 
 def main():
+    french = "--fr" in sys.argv
+    x_labels = X_FR if french else X_EN
     apply_style()
     plt.rcParams.update({"xtick.labelsize": 11, "ytick.labelsize": 11,
                          "axes.labelsize": 12.5})
     fig, ax = plt.subplots(figsize=(6.6, 3.6))
-    x = list(range(len(X)))
+    x = list(range(len(x_labels)))
 
     # the y-axis carries the count directly (of 20), so no floating value labels
     ax.errorbar(x, STALE, yerr=cerr(STALE), marker="s", ms=6, lw=1.6, capsize=3,
@@ -69,24 +72,29 @@ def main():
                edgecolors=COLORS["tertiary_dark"], linewidths=1.3, zorder=4)
 
     # direct labels at the right, on each line -- no legend box, no in-plot text
-    ax.text(3.10, 5.2, "forged", color=COLORS["tertiary_dark"], va="center",
+    ax.text(3.10, 5.2, "falsifiée" if french else "forged",
+            color=COLORS["tertiary_dark"], va="center",
             ha="left", fontsize=10.5)
-    ax.text(3.10, 3.9, "truth delivered", color=COLORS["tertiary_dark"],
+    ax.text(3.10, 3.9, "vérité fournie" if french else "truth delivered",
+            color=COLORS["tertiary_dark"],
             va="center", ha="left", fontsize=9)
-    ax.text(3.10, 1.0, "stale, authentic", color=COLORS["neutral"], va="center",
+    ax.text(3.10, 1.0, "authentique, périmée" if french else "stale, authentic",
+            color=COLORS["neutral"], va="center",
             ha="left", fontsize=10)
 
     ax.set_xticks(x)
-    ax.set_xticklabels(X, fontsize=11)
+    ax.set_xticklabels(x_labels, fontsize=11)
     ax.set_xlim(-0.3, 4.35)
-    ax.set_ylabel("sessions with an unsafe act (of 20)")
+    ax.set_ylabel("sessions avec acte dangereux (sur 20)" if french
+                  else "sessions with an unsafe act (of 20)")
     ax.set_ylim(-0.4, 10.2)
     ax.set_yticks([0, 2, 4, 6, 8, 10])
 
     fig.tight_layout()
+    output = f"{OUTPUT}_fr" if french else OUTPUT
     for ext in ("pdf", "png"):
-        fig.savefig(f"{OUTPUT}.{ext}", bbox_inches="tight")
-        print(f"{OUTPUT}.{ext}")
+        fig.savefig(f"{output}.{ext}", bbox_inches="tight")
+        print(f"{output}.{ext}")
     plt.close(fig)
 
 

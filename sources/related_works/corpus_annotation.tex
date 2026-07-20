@@ -9,41 +9,21 @@
 \section{Introduction}
 \label{sec:corpus-intro}
 
-The previous chapter ended on a simple point: language models are only as good as the data
-they are trained on. The scale of that data is now very large. GPT-3 was trained on about
-300 billion tokens \citep{gpt3}, and the LLaMA models on one to 1.4 trillion tokens
-\citep{touvron2023llama}. These numbers are not arbitrary. The Chinchilla scaling result
-showed that, for a fixed compute budget, the strongest models use far more data than
-earlier practice assumed, and that data and model size should grow together
-\citep{chinchilla_scaling}. Good performance therefore depends on assembling
-corpora at this scale.
+Modern language models require very large training corpora. GPT-3 was trained on
+about 300 billion tokens~\citep{gpt3}, and the LLaMA models on one to 1.4
+trillion~\citep{touvron2023llama}. Scaling-law studies further showed that model
+size and training data should grow together for a fixed compute
+budget~\citep{chinchilla_scaling}.
 
-Scale alone does not settle the matter. The quality and composition of a pretraining
-corpus shape what a model can later do. A corpus drawn mostly from web pages teaches a
-model the language of the web, and a corpus rich in scientific writing teaches it the
-language of science. What to include, what to remove, and in what
-proportions are part of how the model is built. These choices receive less attention than
-model design, yet they account for much of the difference between models of similar size.
+Scale alone is not sufficient. The composition and quality of a corpus determine
+which language and domains a model learns. Decisions about which documents to
+include, remove, or prioritise are therefore part of model design.
 
-This chapter considers two kinds of resources used to pretrain language models. The first
-is raw text, such as web crawls, scientific articles, and books. The second is structured
-knowledge, such as medical ontologies and knowledge graphs, where facts are stored as
-explicit relations rather than as running prose. Both have been used to train and adapt
-biomedical models, and each raises different questions about how it is collected and
-prepared.
-
-For a French clinical setting, the target data face a triple scarcity. The text must be
-French, it must be biomedical, and it must be clinical, all at the same time. Each of these
-constraints reduces the amount of usable text. French biomedical text is far less abundant
-than English biomedical text, and clinical text is the scarcest of all, because patient
-records are private and rarely leave the hospitals that produce them. This combination
-remains a standing difficulty for anyone building models for French clinical language.
-
-The chapter follows the path of the data. It starts from general web corpora and the
-methods used to collect them, then turns to quality filtering and how it changes what a
-corpus contains. It then moves to biomedical and clinical sources, where this scarcity
-becomes concrete. Finally, it presents medical ontologies and discusses how such structured
-knowledge can be folded into the pretraining of language models.
+French clinical models face a particular shortage of suitable data. French
+biomedical text is less abundant than its English counterpart, while hospital
+records are private and rarely available for pretraining. This chapter examines
+two possible sources of knowledge under these constraints: public text corpora
+and structured medical resources such as ontologies.
 \section{Web-Scale Pretraining Corpora}
 \label{sec:corpus-web}
 
@@ -596,14 +576,8 @@ the ATIH and the CCAM procedure coding, have seen little use in pretraining.
 Contrastive methods such as SapBERT and CODER use UMLS through term pairs and relation triples
 rather than by synthesising relation-focused text from source documents. These open problems
 set up the limits we discuss next.
-\section{Limits and Transition}
+\section{Limits}
 \label{sec:corpus-limitations}
-
-This chapter examined the data behind pretrained language models. We looked at web-scale
-corpora and how they are collected, at quality filtering and curation, at biomedical and
-clinical sources, at medical ontologies, and at ways to add structured knowledge to
-pretraining. Together, these threads leave several open problems for biomedical text in
-a lower-resource language such as French.
 
 The first problem is scarcity outside English. The biomedical text drawn from PMC is about 98\% English
 \citep{labrak-etal-2024-biomistral}, and French biomedical corpora remain small and
@@ -629,8 +603,3 @@ and ATC for drugs. We did not find prior pretraining work that uses these French
 coding resources, which matters for medical coding in French. Generating textbook-like text
 from such resources to continue pretraining a French encoder, and evaluating it on the target
 clinical tasks, is the specific combination we take up later.
-
-This chapter covered the data used to pretrain and adapt language models. The next chapter
-turns to the task these models are ultimately built for, clinical information extraction, and
-to how pretrained models are put to work on named entity recognition, medical coding, and
-normalization.

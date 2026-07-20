@@ -34,6 +34,7 @@ LLM = [                            # Qwen3.5 generative family
 
 
 def main():
+    french = "--fr" in sys.argv
     apply_style()
     fig, ax = plt.subplots(figsize=(5.6, 4.0))
 
@@ -64,7 +65,8 @@ def main():
     ax.set_xticks([0.15, 0.3, 1, 3, 9])
     ax.set_xticklabels(["0.15", "0.3", "1", "3", "9"])
     ax.minorticks_off()
-    ax.set_xlabel("Parameters (billions, log scale)")
+    ax.set_xlabel("Paramètres (milliards, échelle log)" if french
+                  else "Parameters (billions, log scale)")
     ax.set_ylabel(r"Value-$F_1$")
     ax.grid(True, axis="y", alpha=0.2, linestyle="--", color=COLORS["neutral"])
     ax.set_facecolor("white")
@@ -90,10 +92,11 @@ def main():
     fig.tight_layout()
     out = os.path.join(os.path.dirname(__file__), "output")
     os.makedirs(out, exist_ok=True)
-    fig.savefig(os.path.join(out, "money_params_vs_f1.pdf"), bbox_inches="tight")
-    fig.savefig(os.path.join(out, "money_params_vs_f1.png"), dpi=150,
+    stem = "money_params_vs_f1_fr" if french else "money_params_vs_f1"
+    fig.savefig(os.path.join(out, f"{stem}.pdf"), bbox_inches="tight")
+    fig.savefig(os.path.join(out, f"{stem}.png"), dpi=150,
                 bbox_inches="tight")
-    print("wrote money_params_vs_f1.{pdf,png}")
+    print(f"wrote {stem}.{{pdf,png}}")
 
 
 if __name__ == "__main__":

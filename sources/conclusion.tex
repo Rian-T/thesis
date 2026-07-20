@@ -22,8 +22,8 @@ fills the structured clinical form of a study (\Cref{chap:evaluation}).
 
 \section{The Same Capability at Lower Cost}
 
-The same route can be read as a sequence of savings, one on each axis a model
-consumes. \Cref{tab:conclusion-savings} lists them.
+The contributions reduce the resources required at three stages of the system.
+\Cref{tab:conclusion-savings} lists these savings.
 
 \begin{center}
 \begin{minipage}{\linewidth}
@@ -45,8 +45,8 @@ consumes. \Cref{tab:conclusion-savings} lists them.
 
 The paragraph-level filtering of \Cref{chap:quality} matched the performance of
 the full corpus while training on one third of the tokens, and its clinical
-recipe reached the same point with 2.5 times fewer tokens. The same restraint
-carries into pretraining. Across models and generations, adapting a public base
+recipe reached the same point with 2.5 times fewer tokens. Continual pretraining
+shows similar savings. Across models and generations, adapting a public base
 by continual pretraining emits far less carbon than training a biomedical encoder
 from scratch (\Cref{fig:conclusion-carbon}). CamemBERT-bio was adapted for an
 estimated 0.80~kg of CO\textsubscript{2}, against 26.11 for the from-scratch
@@ -77,45 +77,39 @@ rated power.
   \label{fig:conclusion-carbon}
 \end{figure}
 
-The extractor at the end of the route shows the same pattern in what it costs to
-run. MC-bio-gliner has 150 million parameters, and on the synthetic clinical
+The extractor also reduces the resources required at inference. MC-bio-gliner
+has 150 million parameters, and on the synthetic clinical
 form its value $F_1$ of 0.640 comes within 0.018 of the 0.658 reached by
 Qwen3.5-4B, a generative model about twenty-seven times its size fine-tuned on
-the same data. The small encoder fits the hardware a clinical service already
-owns, where a multi-billion-parameter generator does not. Several of the methods
-in this thesis, each on its own, lower the compute, the data, or the energy
-needed to reach a given clinical capability. That is what holds the chapters
-together, more than any single model does.
+the same data. Its weights require less than one gigabyte at common precisions,
+compared with roughly eight gigabytes for the generator. Several of the methods
+in this thesis, each on its own, lower the compute, the data, or the energy needed
+to reach a given clinical capability.
 
-\section{A Corpus That Paid Off Twice}
+\section{A Corpus Used Twice}
 
-The chapters hold together most tightly in one place. The filtering of \Cref{chap:quality}
-let models train on one third of the tokens, and while doing so it found
-something else. Two million clinical cases were sitting inside scientific
-articles, described in passing and never labelled as clinical text. The filter
-surfaced them, and they were released as an open set of clinical cases. Later, in
-\Cref{chap:synthetic}, those same cases became the seed for generating the
-synthetic longitudinal records of a relapsed-lymphoma cohort, the very records
-used in \Cref{chap:evaluation} to measure the extractor. Data recovered while
-building the corpus became the ground on which the final task was scored. The
-lymphoma cohort is where the separate threads of the thesis meet.
+Biomed-Enriched served two purposes. Its paragraph-level filtering reduced the
+training corpus to one third of its tokens. It also identified about two million
+clinical cases described inside scientific articles and released them as an open
+dataset. In \Cref{chap:synthetic}, cases selected for their quality and relevance
+to lymphoma were used to generate the synthetic longitudinal records on which the
+extractor was evaluated. The corpus construction therefore also provided the data
+for the final task.
 
 None of this is ready for a hospital ward. The evaluation ran on synthetic
-records. Practising clinicians at French university hospitals reviewed them for realism,
-but they remain synthetic, the fields were known in advance, and a real clinical study
-would bring messier text and stricter checks than any benchmark applied here. What the route
-does show is how far public text and generated data can carry a clinical task
-before a real record is ever needed, further than the privacy constraint
-suggests. That result invites a harder question: how these models behave once
-they are actually used. That is the question the next chapter takes up.
+records, and practising clinicians at French university hospitals provided
+informal feedback on their realism. The fields were known in advance, and a real
+clinical study would bring messier text and stricter checks than any benchmark
+applied here. The results show how far public and generated data can support a
+clinical task before a real record is needed. They do not show how these models
+behave once they are used, which is the subject of the next chapter.
 
 \chapter{A New Problem}
 \label{sec:conclusion-evaluation}
 
 Filling a clinical form from public data was the thesis's target. Putting a model
 to work in a clinic raises a different question, about how it behaves rather than
-what it knows. It is the question the field is least ready to answer, and this
-chapter takes a first measurement of that behaviour.
+what it knows. TABIB provides a preliminary measurement of that behaviour.
 
 \section{When Efficiency Is Not the Direction}
 
@@ -133,19 +127,19 @@ general model also covers many clinical tasks at once, where each of our encoder
 to be fine-tuned for one. The efficient, small-model path this thesis took is
 defensible, but there are signs the field is moving another way.
 
-The encoders this thesis favoured have one property that matters here. Once
-fine-tuned, they return the same answer to the same input. Large decoder models do
-not. Their output can change when the surface form of a question changes, when a
-fact is moved into a longer context, or when a user pushes back over several turns.
+Fine-tuned encoders are usually evaluated through a fixed prediction for a fixed
+input. Generative models are used through open-ended prompts and interactions,
+where the answer can change with the wording, the surrounding context, the
+decoding procedure, or pressure applied over several turns.
 This behavioural instability is largely invisible to the benchmarks the field uses
 to judge medical models. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and DrBenchmark
 mostly test factual medical knowledge through clean
 questions~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
 HealthBench and CARES move closer to real use by testing safety and refusal at
-larger scale~\citep{arora2025healthbench,chen2025cares}. None of them ask the
-narrow question that instability raises: when the medical fact is unchanged, does
-the model keep the same behaviour once that fact is embedded in a prescription, a
-long clinical note, a patient's insistence, or a triage list?
+larger scale~\citep{arora2025healthbench,chen2025cares}. They do not systematically
+test the question that this instability raises: when the medical fact is unchanged,
+does the model keep the same behaviour once that fact is embedded in a prescription,
+a long clinical note, a patient's insistence, or a triage list?
 
 The same question appears in regulation. The European AI Act places medical
 decision support and triage among its high-risk uses, and requires accuracy,
@@ -257,9 +251,9 @@ Mme Fatou Diallo   & female & sub-Saharan & 93200 & CSS  \\
 \section{What Fails}
 \label{sec:conclusion-tabib-results}
 
-Across the seven protocols, no model is safe on all of them, and the failures
-share a shape. Each perturbation leaves the medical fact untouched and changes
-only the form of the interaction, yet the answer moves: every protocol exposes a
+Across the seven protocols, no model remains robust under every perturbation,
+and the failures share a shape. Each perturbation leaves the medical fact
+untouched and changes only the form of the interaction, yet the answer moves: every protocol exposes a
 different way that the behaviour, not the knowledge, gives way.
 \Cref{fig:conclusion-tabib-radar} gives the overview, and the paragraphs below
 work through it one failure mode at a time; \Cref{app:tabib-details} collects the
@@ -376,13 +370,10 @@ Gemma4 E4B      & 0.55 & \textbf{2.36} & 3.10 & \textit{3.36} & 3.16 & 3.02 \\
 \end{table}
 
 Two threads run through these failures. The first concerns medical
-specialization. MedGemma, the only medically fine-tuned model in the panel, is
-not the safest of the seven: it reaches the best calibration score only by
-refusing almost every pair, and it is the least stable of all under the
-comparative triage. Fine-tuning a model for medicine can therefore hide its
-visible errors, through near-blanket refusal, without repairing the behaviour
-underneath, and at times while making it worse. The second thread is
-methodological. The demographic bias is invisible to an evaluation that scores one
+specialization. In this panel, medical specialization does not guarantee safer
+behaviour. MedGemma obtains its best calibration score through near-blanket
+refusal, while remaining the least stable model in comparative triage. The second
+thread is methodological. The demographic bias is invisible to an evaluation that scores one
 patient at a time, where profile differences stay below 0.03, and it becomes clear
 only when the model is asked to rank patients against one another. A benchmark that
 scores answers in isolation underreports the risk that surfaces the moment the
@@ -404,19 +395,13 @@ reach a clinic. An LLM judge scores the behavioural responses against the
 thesaurus, and no clinician has yet checked those judgments. The demographic
 protocol is the narrowest: it permutes five patient profiles over one hundred of
 the nine hundred generated cases, enough to expose a ranking bias but too small to
-pin down its size across the range of patients a triage tool would meet. What
-holds is the direction, that behaviour gives way under a change that leaves the
-medical fact intact; its magnitude, and how it moves for the models a hospital
-would run, waits on the larger and clinically validated benchmark this study sets
-up.
+pin down its size across the range of patients a triage tool would meet. The
+study establishes that these failures occur in this setting, but not how
+frequent they would be across other patients, models, or clinical tasks.
 
 
 \chapter{Where Medical AI Is Going}
 \label{sec:conclusion-field-direction}
-
-The thesis argued for small, public-data models tested close to real use. This
-closing chapter turns outward, to where clinical AI is heading and to what that
-shift will demand of how we evaluate them.
 
 \section{From Models to Agents}
 
@@ -504,55 +489,53 @@ static benchmark that reports only the unsafe rate would call this model safe.
 
 Supplying the official contraindication together with the case does not protect it
 either: about a fifth still prescribe against the verdict they have just read. The
-mechanism is deference under pressure to the authority artifact rather than a
-missing fact, so access-based fixes such as forced retrieval leave that
-mechanism untouched. The practical point is narrow: a safety number from a chat or
-multiple-choice benchmark is not an upper bound on the risk in deployment. Here it
-is wrong by a large factor, zero against a quarter, for the same model and the same
-artifact.
+pattern is consistent with deference under pressure to an apparent authority
+rather than with a missing fact. In this setting, access to the official source
+does not remove the failure. The practical point is narrow: a safety number from
+a chat or multiple-choice benchmark is not an upper bound on the risk in
+deployment. Here it differs by 25 percentage points, from zero in the chat setting to a quarter under
+agentic pressure, for the same model and the same artifact.
 
 \section{The Work That Remains}
 
-This is one model, one scenario, and twenty pairs, and the intervals are wide. What
-the probe shows does not depend on its size. A chat benchmark asks one question and
-takes one answer, and this failure needs several steps to appear. The benchmark does
-not measure it badly; it does not see it at all. It can report the model as safe
-without ever looking where the danger is.
+This probe covers one model, one scenario, and twenty pairs, so the intervals are
+wide and the observed rate is not a stable estimate. Its central limitation is
+nonetheless clear. A benchmark based on one question and one answer cannot capture
+a failure that appears only after tool use and repeated patient pressure.
 
-The systems reaching French clinical practice are becoming agents. They act over
-several steps on a patient record. The evidence offered for them is still a table of
-question-answering scores, and the gap between what hospitals deploy and what the
-field measures grows every year.
+Systems reaching French clinical practice increasingly act over several steps on
+a patient record. Their supporting evidence still consists largely of
+question-answering scores, which do not measure this sequential behaviour.
 
-There is no easy way around this. Records cannot leave the hospital, so the test
-cannot be run outside. Running it inside is arguably worse. An agent under
-evaluation is an agent that acts, and the only way to find out whether an action is
-dangerous is to let the agent take it. It would not scale either, because data
-cannot be pooled. Each hospital would rebuild the same setup behind its own walls,
-and no result would carry to the next one. That leaves one route. The clinic has to
-be rebuilt from public and synthetic material, well enough that a model cannot tell
-the reconstruction from the real thing. This thesis took that route for its corpora
-and its models. Its evaluation needs it now.
+Real hospital records cannot leave the institution, while testing an acting agent
+inside the hospital could expose patients to the actions being evaluated. Local
+evaluation would also be difficult to compare across hospitals because the data
+cannot be pooled. Simulations built from public and synthetic material offer a
+scalable alternative. This thesis used that approach for its corpora and models,
+and the same principle can support their evaluation.
 
 Here we are. \textit{A computer that could weigh a patient's signs toward a likely
-disease} no longer sounds far-fetched to anyone, and something close to it is being
-installed in hospitals. Automated systems have been sold to medicine for
+disease} no longer seems like a distant prospect, and systems approaching it are
+entering hospitals. Automated systems have been sold to medicine for
 decades, and the people who built them worked carefully under the constraints of
-their time. What is different is the commercial scale. These systems are developed
+their time. What is different today is the commercial scale. These systems are developed
 and sold by companies competing for the same hospitals, and a hospital that installs
-one is hard to move off it. Arriving first keeps the ward for years, so the pressure is to
-deploy early, before the evidence is in. That pressure is the companies' to own, and
-it is also what makes them the wrong party to measure the result.
+one may depend on it for years. Arriving first can secure a place in the ward for
+years, creating pressure to deploy before the evidence is complete. That pressure
+belongs to the companies, and it also makes them poorly placed to evaluate their
+own systems.
 
-Independent evaluation is what the situation asks for, and it does not exist at the
-level these systems have reached. Building it is research's part. The evaluation the
-field practises establishes what a model knows and how often it answers correctly,
-which was enough while the models answered. It does not establish how one behaves
-when it acts. What is missing is a discipline, with environments
-realistic enough to act in, measurements fine enough to catch a behaviour, and
-evidence about which of those measurements can be trusted. No company has a reason to
-build it. Evaluation in this field has been a collection of separate exercises for as
-long as the field has existed \citep{truongkoyejo2026aims}. Medicine built one for its own treatments, with controlled
-trials and surveillance after release. Aviation built one too, and much of its testing
-runs in simulators, for the same reason the clinic cannot serve as a testbed. Next to
-either, the evaluation of AI systems looks improvised. The mountain in front of us is a \textit{Science of Evaluation}.
+Independent evaluation is what the situation calls for, and it has not kept pace
+with these systems. Building it is a research task. Evaluation as it is often
+practised measures primarily what a model knows and how often it answers correctly,
+which was sufficient while models only answered questions. It does not establish
+how they behave when they act. What is missing is a discipline with environments
+realistic enough to observe models in use, measurements sensitive enough to capture
+their behaviour, and evidence that these measurements can be trusted. Companies
+have little incentive to build it. Evaluation in this field has been a collection
+of separate exercises for as long as the field has existed
+\citep{truongkoyejo2026aims}. Medicine built such a discipline for treatments,
+through controlled trials and surveillance after release. Aviation did the same,
+with much of its testing conducted in simulators because real systems cannot serve
+as testbeds. Compared with either, the evaluation of AI systems still looks
+improvised. The mountain in front of us is a \textit{Science of Evaluation}.

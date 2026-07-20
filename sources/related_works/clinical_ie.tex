@@ -35,20 +35,6 @@ a single concept in a knowledge base such as the UMLS or SNOMED-CT. These tasks 
 combined in a pipeline, since a coded record usually needs both the entities and the concepts
 they refer to.
 
-These tasks are the right place to close the related work, because they are where the
-pretrained models of the earlier chapters are finally put to use and judged. Once a model has
-been built and adapted, its value shows in how well it supports named entity recognition,
-coding, and normalisation on real clinical text. The difficulties that recur across these tasks
-also frame the open problems of the field. Labelled clinical data are scarce, because the text
-is sensitive and annotation requires medical expertise. The label space can be very large,
-since coding systems contain tens of thousands of codes. Evaluation is not standardised, which
-makes results hard to compare across datasets and studies.
-
-The chapter follows the structure of these tasks. It starts from the fundamentals of named
-entity recognition, then reviews biomedical and clinical benchmarks. It moves on to medical
-coding and to entity linking, before turning to zero-shot approaches and to the use of
-synthetic data. It closes with a discussion of how clinical information extraction is
-evaluated.
 \section{Named Entity Recognition}
 \label{sec:ie-ner}
 
@@ -583,13 +569,8 @@ evaluation at the character level, which is independent of the tokenizer and so 
 of any architecture to be placed on the same scale. Such an evaluation is an open need rather
 than a solved problem, and the closing section takes up this missing piece of a fair,
 standardised comparison.
-\section{Limits and Transition}
+\section{Limits}
 \label{sec:ie-limitations}
-
-This chapter reviewed how clinical information extraction is done in French, from the tasks and
-corpora to the models that perform them. Across these topics, the same difficulties came back.
-These are structural features of the setting, and together they define the questions the rest
-of this thesis takes up.
 
 The most immediate difficulty is the scarcity of clinical data. French hospital text is personal data,
 and the CNIL places strict conditions on its use. A model trained inside a hospital cannot be
@@ -627,8 +608,3 @@ One point cuts across all of these. Much recent attention has gone to large deco
 models, yet for extractive clinical tasks encoder models remain competitive. They are also
 small enough to run on the hardware available inside a hospital, which matters when the data
 cannot be moved off-site. This keeps encoders at the centre of the work that follows.
-
-These three survey chapters covered the language models used in biomedical natural language
-processing, the data used to pretrain them, and the clinical tasks they are built for. The gaps
-above set the agenda for the contributions of this thesis. The next part begins with the first
-of them, the construction of a biomedical corpus for French from public sources.

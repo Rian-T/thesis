@@ -2,13 +2,10 @@
 jewels, and repeated over and over until he knew them better than I did.''}{%
 Jeff VanderMeer, \textit{Borne}}
 
-A corpus is only useful once a model has learned from it. This part puts the
-biomedical corpus to work and asks what makes pretraining on it effective. We first
-continue the pretraining of an existing French encoder on biomedical text. We then
-return to the changes that made recent decoder models stronger, and test which of
-them can help an encoder. These changes concern modern architecture, causal
-training, and better data selection. The final chapter adds another source of signal by turning structured
-medical knowledge into text the model can read.
+This part studies how French biomedical text can be used to train an encoder. It
+compares continued pretraining with training from scratch, tests architectural and
+training choices borrowed from recent decoder models, and adds knowledge derived
+from medical ontologies.
 
 \chapter{Encoder Models for French Biomedicine}
 \label{chap:encoders}

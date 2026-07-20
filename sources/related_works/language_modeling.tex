@@ -103,24 +103,17 @@ probability of a whole text is the product of these next-token predictions.}
 \label{fig:lm-nexttoken}
 \end{figure}
 
-Estimating that conditional is harder than it sounds. The simplest idea is the one
-Markov and the early n-gram models used: count how often each short
-sequence is followed by each next word. But counting runs out almost at once. Most
-word sequences never appear twice, even in a large corpus, so the counts are zero
-exactly where we need them. Much of the history of language modeling is the search
-for estimators that get around this problem. The rest of this chapter follows
-that search, from n-gram counts to neural networks to the Transformer.
+Estimating this conditional distribution is difficult because most word
+sequences remain rare, even in large corpora. N-gram models addressed this
+problem through smoothing, while neural models learned representations that
+could generalise across similar contexts. The sections that follow trace this
+development from count-based models to modern pretrained architectures.
 
-For this thesis the point is practical. Clinical information extraction rests
-entirely on these models. They are pretrained on large corpora and then adapted to
-a task. Adaptation is the hard part, because the target combines three scarcities
-at once, French, biomedical, and clinical. As the previous part showed, the
-text we can gather most easily is the least like the text we need. This chapter
-reviews the methods that make this adaptation possible: the architectures and
-pretraining objectives, how they scale, how they are specialised to a domain
-through continual pretraining, and the tokenization and long-context choices that
-matter for clinical documents. Continual pretraining, the central mechanism of
-this thesis, comes last and in the most detail.
+For clinical information extraction, the main difficulty is adaptation. The
+available training text differs from the French hospital records on which the
+model must eventually operate. This chapter therefore focuses on the
+architectures, pretraining objectives, and domain-adaptation methods that
+determine how well knowledge transfers between these sources.
 
 
 \section{From Statistical to Neural Language Models}
@@ -1252,17 +1245,8 @@ between a fitted vocabulary and a cheap training path therefore stays open.
 
 Tokenizer mismatch is one of several limits that matter for a clinical, French, and
 biomedical target, and we turn to those limits next.
-\section{Limits and Transition}
+\section{Limits}
 \label{sec:lm-limitations}
-
-This chapter followed language modeling from Shannon and n-grams to neural and recurrent
-models, then to the Transformer and its two main pretraining objectives. It then covered
-scaling laws and large language models, with instruction tuning, alignment, and reasoning,
-and the use of continual pretraining to specialise a model to a domain. It closed on
-biomedical models, efficient attention, long context, and tokenization. One thread runs
-through all of it: the target of this thesis, text that is at once French, biomedical,
-and clinical. Seen from that target, the methods above share a set of limits, and each
-limit points past the models to the data they need.
 
 The first limit is data rarity. Every method here assumes a large in-domain corpus, either
 to pretrain a model from scratch or to continue training an existing one. For clinical text
@@ -1283,7 +1267,3 @@ size of standard encoders. The long-context architectures of \Cref{sec:lm-modern
 Longformer, BigBird, and ModernBERT, raise this ceiling. Using them well on clinical text
 still calls for adapting them to the domain, which brings the discussion back to the
 question of in-domain data.
-
-The chapter has described the models. The next chapter turns to what they need, the
-data: the corpora and the structured knowledge used to pretrain these models, and how such
-resources are collected, filtered, and prepared.

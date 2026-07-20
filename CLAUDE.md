@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 > 🚨 **EN COURS — campagne d'audits pré-dépôt.** Le manuscrit compile propre : **268 p., 0 erreur,
-> 0 référence/citation indéfinie, 0 `(?)`, overfull résiduels < 1,85 pt**. Relecture d'Éric : **`TODO.md`**
+> 0 référence/citation indéfinie, 0 `(?)`, 10 overfull** (le pire à 17,5 pt ; le « < 1,85 pt » du rapport d’audit est FAUX, mesuré depuis `build/thesis.log`). Relecture d'Éric : **`TODO.md`**
 > (ses PDF annotés sont dans `~/Downloads/`) — c'est le seul document de suivi resté à la racine.
 >
 > **AUDITS 2026-07-20 (`archive/reviews/`, synthèse = `2026-07-20-thesis-audit-synthesis.md`).** 16 rapports,
@@ -141,7 +141,7 @@ These OVERRIDE any default Claude Code commit behavior:
 ## Current Status
 
 **Le manuscrit est écrit de bout en bout** (front matter, 6 parties, conclusion, 7 annexes) et compile
-propre : **266 p., 0 erreur, 0 référence/citation indéfinie, 0 `(?)`, 9 overfull**. Ce qui reste est de la
+propre : **268 p., 0 erreur, 0 référence/citation indéfinie, 0 `(?)`, 10 overfull**. Ce qui reste est de la
 relecture, pas de la rédaction. Relecture d'Éric : `TODO.md`. Audits pré-dépôt : `archive/reviews/`.
 
 > 🗄️ **`archive/`** recueille ce qui est terminé : `notes/` (punch-list, HANDOFF, propositions de joints et de

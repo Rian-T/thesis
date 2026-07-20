@@ -1,21 +1,17 @@
-A clinical study keeps a structured form for each of its patients, the electronic
-case report form, or eCRF. It holds one line per patient, with a fixed set of
-fields such as the treatment given or the date it started, and it is filled from
-the patient's own reports. \Cref{fig:p3-report-to-ecrf} shows what that looks
-like on a single report.
+\section{Supervision Without a Reference}
+
+Filling an electronic case report form normally requires reading a patient's
+reports and assigning each relevant value to a predefined field.
+\Cref{fig:p3-report-to-ecrf} shows this mapping for a single report.
 
 \input{sources/part_3/figures/fig_report_to_ecrf}
 
-\section{Supervision Without a Reference}
-
-Learning this task in the usual way would need examples of reports paired with
-the form a clinician filled from them. No such data is available. No open
-dataset pairs a French hospital record with a clinician-filled form, and the
-records themselves cannot leave the hospital. The supervision for this task
-therefore has to be built rather than collected. We separate the evidence
-we have, as summarized in \Cref{fig:p3-evidence}: synthetic records test
-the complete longitudinal task, while human-written corpora test narrower forms
-of transfer.
+Training an extractor for this task would require examples of French hospital
+reports paired with forms completed by clinicians. No such open dataset exists,
+and the reports themselves cannot be shared freely. The supervision must
+therefore be constructed rather than collected. As summarized in
+\Cref{fig:p3-evidence}, synthetic records test the complete longitudinal task,
+while human-written corpora test narrower forms of transfer.
 
 \input{sources/part_3/figures/fig02_evidence_map}
 
@@ -113,13 +109,12 @@ The generated reports keep the chronology of the source case but replace its
 compact summary with documents written at distinct moments of care.
 \Cref{app:lymphoma-dossier} shows one generated record in full.
 
-The generation pipeline was refined with feedback from practising clinicians at French
-university hospitals (CHU). Through a web annotation interface and discussion over video
-calls, they reviewed successive versions of the synthetic records, examining both the
-quality of the silver annotations and the realism of the generated text, and their feedback
-informed later versions of the pipeline. This review shaped the records but stayed informal;
-a structured, reproducible assessment of synthetic clinical realism, with a defined protocol
-and a panel of clinicians, is left for future work.
+Practising clinicians at French university hospitals (CHU) reviewed successive
+versions of the synthetic records through a web annotation interface and
+discussions. Their feedback concerned both the silver annotations and the realism
+of the generated text, and informed later versions of the pipeline. This review
+remained informal. A reproducible assessment with a defined protocol and a panel
+of clinicians is left for future work.
 
 The resulting corpus contains 2,050 longitudinal records, each with a median of
 eight reports and 22,314 characters, and 31\% of them include a second treatment

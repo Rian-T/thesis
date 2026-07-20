@@ -2,27 +2,17 @@
 life''}{%
 Ludwig Wittgenstein, \textit{Philosophical Investigations}}
 
-This part uses one of those pretrained encoders on a clinical task.
+A clinical study follows each patient over time and records a fixed set of
+variables, such as the treatment given and its start date, in a structured form.
+These values already appear in consultation notes, discharge summaries, and
+pathology reports, but later documents may correct earlier ones. Filling the form
+therefore requires finding each value and determining which statement still holds.
 
-The task comes from clinical research. A study follows each of its patients over
-time and keeps a structured form for each one, with a fixed set of fields such as
-the treatment given or the date it started. The values are already written down,
-in the consultation notes, discharge summaries and pathology results produced
-during care. Filling the form means reading those reports and putting each value
-in the right field. The difficulty is that the reports are written at successive
-moments as the disease unfolds, so a value stated in one report can be corrected
-in a later one, and the model has to work out which statement still holds.
-
-The same constraint applies here as in the first two parts. There is no corpus of
-French hospital reports paired with the form a clinician filled from them, so the
-supervision has to be built rather than collected. Confidentiality also keeps
-those records away from a cloud API, which means the model has to run inside the
-hospital, on the hardware a clinical service has. The next three chapters build
-the supervision (\Cref{chap:synthetic}), design an extractor that can be asked
-for new fields at inference time (\Cref{chap:architectures}), and evaluate it
-against much larger generative models (\Cref{chap:evaluation}). The question they
-share is whether public and generated text are enough for a task whose real data
-no one can show us.
+No open corpus pairs French hospital reports with forms completed by clinicians.
+The supervision must therefore be constructed from public and generated text.
+Because confidential records cannot be sent to an external API, the resulting
+extractor must also run on hospital hardware. The question is whether public and
+generated text are enough for a task whose real data no one can show us.
 
 \chapter{Synthetic Data for Task Adaptation}
 \label{chap:synthetic}
