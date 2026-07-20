@@ -14,121 +14,159 @@
   aibub/.style={rectangle callout, rounded corners=3pt, callout pointer width=0.16cm,
     fill=ThesisPrimary!12, draw=ThesisPrimary!70, line width=0.6pt,
     inner sep=8pt, align=left, font=\small, text=ThesisInk},
+  % elided turns: same bubble, drawn hollow and dashed so it reads as "more of the
+  % same happened here and is not shown".
+  ghostbub/.style={rectangle, rounded corners=3pt, dashed, draw=ThesisNeutral!45,
+    line width=0.5pt, inner sep=8pt, align=center, font=\small,
+    text=ThesisNeutral, minimum width=2.6cm},
   av/.style={circle, minimum size=8.5mm, inner sep=0pt, text=white, font=\small},
   role/.style={font=\footnotesize\itshape, text=ThesisNeutral},
   flow/.style={-{Stealth[length=2.4mm]}, ThesisNeutral!65, line width=0.7pt},
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% PAGE 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
+% One unnumbered chapter, two unnumbered sections. \chapter* and \section* stay out
+% of the ToC on their own; the \addcontentsline gives the note its single entry.
+% \chapter* resets the page style, so \thispagestyle{empty} comes after it.
+\chapter*{Note on the Use of AI}
 \thispagestyle{empty}
 \addcontentsline{toc}{chapter}{Note on the Use of AI}
 
+\section*{Brainstorming out loud}
+
+\noindent The arrival of AI agents let me try a different way of brainstorming. I
+would think out loud about the plan of the thesis, the order of the arguments, and
+the narrative to develop, while the agent took notes directly in the codebase and
+adjusted it as I spoke.\footnote{The agent sometimes wrote into the plan something
+other than what I had said. More than once, that misreading was a better
+organisation than the one I had proposed.}
+
+\smallskip
 \begin{center}
-  \textsc{Note on the Use of AI}
+% Same panel grammar as page 2. Here the flow loops back on itself, because this
+% stage repeated for weeks; page 2 is linear, from draft to final wording.
+% Verbatim from a dictated turn of 2026-06-16; the reply is translated from French.
+\begin{tikzpicture}[
+  panel/.style={rounded corners=3pt, draw=ThesisNeutral!55, fill=ThesisPaper,
+    line width=0.5pt, text width=8.4cm, inner sep=10pt, align=left,
+    font=\small, text=ThesisInk},
+  aipanel/.style={panel, fill=ThesisPrimary!12, draw=ThesisPrimary!70},
+  flowstep/.style={-{Stealth[length=2.6mm]}, ThesisNeutral!65, line width=0.8pt},
+]
+  \node[panel] (q1)
+    {\textsf{\footnotesize En fait, je ne sais plus exactement quoi mettre dans
+     cette partie-l\`a. Attends, je je suis je suis en train de r\'efl\'echir\dots\
+     et je pense que dans la partie quatre, oui, en fait la premi\`ere partie,
+     c'est une discussion autour de Gliner et pourquoi Gliner a besoin, enfin
+     non, c'est une discussion autour de les mod\`eles Bert ont besoin de
+     donn\'ees, mais on n'a pas assez de donn\'ees}};
+  \node[av, fill=ThesisTertiary, left=5mm of q1] {\faMicrophone};
+  \node[role, anchor=south west] at ([yshift=2pt]q1.north west)
+    {Me, thinking out loud (dictated, French)};
+
+  \node[aipanel, below=14mm of q1] (q2)
+    {\textbf{Part 4, reordered.}\\[3pt]
+     1.\ \ Limits of Direct Fine-Tuning\\
+     2.\ \ Synthetic Data for Task Adaptation\\
+     3.\ \ Architectures for Low-Resource Extraction\\[3pt]
+     Steps 2 and 3 are swapped with respect to what you said, because the
+     extractor is trained on the data built in the previous chapter.};
+  \node[av, fill=ThesisPrimaryDark, left=5mm of q2] {\faRobot};
+  \node[role, anchor=south west] at ([yshift=2pt]q2.north west)
+    {Assistant, answers with a plan};
+
+  \draw[flowstep] (q1) -- (q2);
+  % Loop back: the stage repeated for weeks. Kept narrow so the picture stays
+  % inside the text block (there is no \resizebox to absorb an overflow).
+  \draw[flowstep, dashed] (q2.east) .. controls +(1.5,0) and +(1.5,0) .. (q1.east);
+  \node[role, anchor=west, text width=2.4cm]
+    at ([xshift=13mm]$(q1.east)!0.5!(q2.east)$) {again, for weeks};
+\end{tikzpicture}
 \end{center}
-\bigskip
 
-\noindent\textbf{Brainstorming out loud.}\quad I think by talking: walking the
-room, saying the argument as it comes. Speech transcription turns that stream
-into a first draft, which the assistant then structures.
-
-\bigskip
-\begin{center}
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}
-  % --- human: avatar + spoken bubble ---
-  \node[av, fill=ThesisTertiary] (m) at (0,0) {\faMicrophone};
-  \node[mebub, text width=8.6cm, anchor=north west,
-        callout absolute pointer={(m.east)}] (mb) at (1.05,0.55)
-    {Bon\dots\ la partie sur les t\^aches cliniques. Faut montrer que le
-     fine-tuning direct, \c{c}a suffit pas --- trop peu de labels, le vocabulaire
-     qui bouge tout le temps. Du coup deux r\'eponses : g\'en\'erer des donn\'ees,
-     et\dots\ ouais, changer d'architecture aussi. Et \`a la fin le cas du
-     lymphome qui rassemble tout, c'est \c{c}a le climax.};
-  \node[role, anchor=south west] at ([yshift=1pt]mb.north west)
-    {Me, thinking out loud (French)};
-
-  % --- assistant: avatar + structured bubble ---
-  \node[av, fill=ThesisPrimaryDark] (a) at (11.7,-3.85) {\faRobot};
-  \node[aibub, text width=8.6cm, anchor=north east,
-        callout absolute pointer={(a.west)}] (ab) at (10.65,-3.25)
-    {\textbf{Part on clinical tasks.} Open on why direct fine-tuning fails:
-     scarce labels, a label set that keeps shifting. Two answers follow ---
-     synthetic data, then a low-resource architecture. Close on the lymphoma
-     case, the capstone that ties the thesis together.};
-  \node[role, anchor=south east] at ([yshift=1pt]ab.north east)
-    {Assistant --- drafts \& structures};
-
-  % --- flow ---
-  \draw[flow] (mb.south) .. controls +(0,-0.55) and +(0,0.6) .. (ab.north);
-\end{tikzpicture}}
-\end{center}
+\smallskip
+\noindent This had two effects. Seeing my ideas written down as I produced them let
+me judge quickly what held together, and the agent's writing freed me to keep
+talking, where before I would have worked in writing anyway. Speaking also turned
+out to be productive and stimulating, or at least pleasant. Saying a sentence aloud
+showed quickly when something was wrong, because it sounded wrong.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% PAGE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \thispagestyle{empty}
 
-\begin{center}
-  \textsc{Note on the Use of AI}
-\end{center}
+\section*{Iterative writing}
+
+\noindent I wrote most of the paragraphs of this thesis informally in my native
+language, French, in something close to text-message style. AI agents helped me turn
+them into academic English, through several rounds of rewriting, mine and the
+agent's. Every iteration ends with me, at the least by a final read, more often by a
+manual correction. Below is the real history of the first paragraph of this thesis.
+
 \bigskip
-
-\noindent\textbf{Iterative writing.}\quad I draft in French, fast and informal.
-The assistant returns an English version; I correct, it revises, until the
-sentence says exactly what I mean.
-
-\bigskip
 \begin{center}
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}
-  % column centres: me on the left, assistant on the right
-  % --- b1: me, French draft ---
-  \node[av, fill=ThesisTertiary] (m1) at (0,-0.35) {\faPenFancy};
-  \node[mebub, text width=6.4cm, anchor=north west,
-        callout absolute pointer={(m1.east)}] (b1) at (0.95,0)
-    {\textsf{\footnotesize drbert $-$20 pts cest un artefact d'\'eval, pas un
-     vrai \'ecart de qualit\'e. faut le dire clairement + renvoyer au tableau}};
-  \node[role, anchor=south west] at ([yshift=1pt]b1.north west) {French draft};
+% Not a conversation but one sentence in three states, so: full-width panels in a
+% vertical flow, no callout bubbles. No \resizebox here; the panels are already set
+% to the text block, and scaling would change the font size against the body text.
+\begin{tikzpicture}[
+  panel/.style={rounded corners=3pt, draw=ThesisNeutral!55, fill=ThesisPaper,
+    line width=0.5pt, text width=9.5cm, inner sep=10pt, align=left,
+    font=\small, text=ThesisInk},
+  aipanel/.style={panel, fill=ThesisPrimary!12, draw=ThesisPrimary!70},
+  flowstep/.style={-{Stealth[length=2.6mm]}, ThesisNeutral!65, line width=0.8pt},
+]
+  % The three states are real and dated: the French note is archived, the English
+  % first pass entered introduction.tex, and the final wording opens the manuscript.
+  \node[panel] (p1)
+    {\textsf{\footnotesize donc probleme: le paradigme qui a gagn\'e cest le
+     pretraining scaling, mais en sant\'e on a pas de donn\'ees cliniques
+     massives publiques pour pre-entrainer des modeles de langue.}};
+  \node[av, fill=ThesisTertiary, left=5mm of p1] {\faPenFancy};
+  \node[role, anchor=south west] at ([yshift=2pt]p1.north west)
+    {My note, in French};
 
-  % --- b2: assistant, English v1 ---
-  \node[av, fill=ThesisPrimaryDark] (a2) at (12.7,-2.45) {\faRobot};
-  \node[aibub, text width=6.4cm, anchor=north east,
-        callout absolute pointer={(a2.west)}] (b2) at (11.75,-2.05)
-    {The 20-point gap for DrBERT is \emph{purely} an evaluation artefact, not a
-     \emph{real} difference in model quality.};
-  \node[role, anchor=south east] at ([yshift=1pt]b2.north east) {English, first pass};
+  \node[aipanel, below=13mm of p1] (p2)
+    {This leads to a fundamental problem: the paradigm that has won is
+     pretraining at scale, but in healthcare we lack massive public clinical
+     data to pretrain language models.};
+  \node[av, fill=ThesisPrimaryDark, left=5mm of p2] {\faRobot};
+  \node[role, anchor=south west] at ([yshift=2pt]p2.north west)
+    {Assistant, first pass};
 
-  % --- b3: me, correction ---
-  \node[av, fill=ThesisTertiary] (m3) at (0,-4.55) {\faPenFancy};
-  \node[mebub, text width=6.4cm, anchor=north west,
-        callout absolute pointer={(m3.east)}] (b3) at (0.95,-4.2)
-    {\textsf{\footnotesize ``purely'' trop fort. mets ``largely'', enl\`eve
-     ``real''. + cite le tableau}};
-  \node[role, anchor=south west] at ([yshift=1pt]b3.north west) {Correction};
+  \node[panel, below=20mm of p2] (p3)
+    {How can we teach an artificial intelligence to read hospital notes when
+     hospital notes cannot be used to teach it? \dots\ But they describe real
+     patients, so they stay inside the hospital, and a system trained on them
+     may have to stay there too.};
+  \node[av, fill=ThesisTertiary, left=5mm of p3] {\faPenFancy};
+  \node[role, anchor=south west] at ([yshift=2pt]p3.north west)
+    {My rewrite, page 1 of this thesis};
 
-  % --- b4: assistant, English v2 ---
-  \node[av, fill=ThesisPrimaryDark] (a4) at (12.7,-6.65) {\faRobot};
-  \node[aibub, text width=6.4cm, anchor=north east,
-        callout absolute pointer={(a4.west)}] (b4) at (11.75,-6.25)
-    {This 20-point gap is \emph{largely} an evaluation artefact
-     (\Cref{tab:compare}), not a difference in pretraining quality.};
-  \node[role, anchor=south east] at ([yshift=1pt]b4.north east) {English, revised};
+  % The elision: a hollow dashed marker sitting ON the dashed run, so the flow is
+  % visibly interrupted rather than merely stretched. No fill, so it stays quiet.
+  \node[rounded corners=3pt, dashed, draw=ThesisNeutral!50, fill=none,
+        line width=0.5pt, minimum width=2.2cm, minimum height=0.62cm,
+        font=\small, text=ThesisNeutral, below=6mm of p2] (g) {\dots};
+  \node[role, anchor=west, align=left] at ([xshift=4mm]g.east)
+    {several rounds, not reproduced here};
 
-  % --- flow arrows ---
-  \draw[flow] (b1.south) .. controls +(0,-0.5) and +(-0.7,0.4) .. (b2.west);
-  \draw[flow] (b2.south) .. controls +(0,-0.5) and +(0.7,0.4)  .. (b3.east);
-  \draw[flow] (b3.south) .. controls +(0,-0.5) and +(-0.7,0.4) .. (b4.west);
-
-  % --- iteration loop glyph (in the open right-centre pocket) ---
-  \node[av, fill=ThesisSecondaryDark, minimum size=7mm] (loop) at (9.7,-4.35) {\faRedo};
-  \node[role, below=1pt of loop, align=center, text width=2.8cm]
-    {repeat until\\it holds};
-\end{tikzpicture}}
+  \draw[flowstep] (p1) -- (p2);
+  \draw[flowstep, dashed] (p2) -- (g);
+  \draw[flowstep, dashed] (g) -- (p3);
+\end{tikzpicture}
 \end{center}
 
 \vfill
-\noindent{\footnotesize\color{ThesisNeutral}The ideas, the claims, and the
-numbers are mine; the assistant helped me turn them into clear prose. I am
-accountable for everything in these pages.}
+\begin{center}
+\begin{tikzpicture}
+  % Deliberately unlike the flow panels: warm, heavier, larger. This is the
+  % statement the page exists for, not another step in a schema.
+  \node[rounded corners=4pt, draw=ThesisTertiaryDark, fill=ThesisTertiary!22,
+        line width=1.2pt, text width=10.2cm, inner sep=16pt, align=left,
+        font=\normalsize\bfseries, text=ThesisInk]
+    {The ideas, the narrative, and the arguments are mine; the assistant helped me
+     get them out of my head and into clear English. I am accountable for
+     everything in these pages.};
+\end{tikzpicture}
+\end{center}
 \clearpage
