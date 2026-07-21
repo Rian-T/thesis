@@ -441,7 +441,7 @@ position. Causal language modeling predicts the next token at every position, so
 every token gives a training signal (dense). Masked language modeling hides about
 15\% of the tokens, here two, and predicts only those from the context on both
 sides, so most positions give no signal (sparse). This gap in how much signal each
-token carries is what the encoder pretraining of \Cref{chap:objectives} exploits.}
+token carries is what the encoder pretraining of \Cref{chap:objectives} investigates.}
 \label{fig:lm-objectives}
 \end{figure}
 
@@ -489,9 +489,7 @@ token but only looks left. Masked training looks both ways but learns from few
 tokens. Recent work tries to get both at once. Some encoders are pretrained with a
 causal phase followed by a short masked phase, which beats masked pretraining alone
 \citep{gisserot2025clm}. Others alternate the two objectives during training
-\citep{antlm2024}. This line is central to the thesis. \Cref{chap:objectives} shows
-that a temporary detour through causal pretraining leaves a lasting and useful mark
-on an encoder. An earlier idea, ELECTRA's replaced-token detection \citep{electra},
+\citep{antlm2024}. An earlier idea, ELECTRA's replaced-token detection \citep{electra},
 also sought a denser signal. It trained the model to spot tokens that a small
 generator had swapped in. Still, recent encoders such as ModernBERT
 \citep{modernbert} show that a good architecture with plain masking is already
@@ -619,7 +617,7 @@ earlier models had used.
 
 To prove the point they trained Chinchilla, a 70-billion-parameter model, on 1.4
 trillion tokens. It beat Gopher, a 280-billion model trained on the same compute,
-scoring 67.6\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven
+scoring 67.5\% against 60.0\% on MMLU, a multiple-choice exam spanning fifty-seven
 subjects. Most large models before it had simply been undertrained: built large, then
 fed too little data to fill them.
 
@@ -1222,10 +1220,7 @@ training.
 
 \subsection{Domain Mismatch}
 
-A tokenizer trained on general text is a poor fit for a technical domain. SciBERT measured
-this gap directly \citep{beltagy_scibert_2019}. Between the general vocabulary of BERT and
-a vocabulary learned from scientific text, only 42\% of the frequent tokens overlap. A
-general tokenizer therefore splits many technical terms into generic fragments, and the
+A tokenizer trained on general text is a poor fit for a technical domain. As SciBERT showed \citep{beltagy_scibert_2019}, a general tokenizer splits many technical terms into generic fragments, and the
 model has to reassemble each such term from the pieces, which makes those terms harder to
 learn and to represent.
 

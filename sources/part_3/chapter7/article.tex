@@ -34,10 +34,16 @@ PARHAF and the FRACCO NER dataset remain multi-mention tasks, where all predicti
 matched greedily by decreasing confidence. The two regimes are summarized in
 \Cref{fig:p3-metrics,tab:p3-metrics}.
 
-The evaluation type bank and the training settings are given in \Cref{app:eval-details}. We report two eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
+The evaluation type bank and the training settings are given in \Cref{app:eval-details}. We report three eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
 reference, making it permissive about boundaries. Value-$F_1$ requires a Jaccard
-similarity of at least 0.5 between normalized token sets. It measures surface
-agreement and does not measure clinical equivalence. Main model comparisons use paired
+similarity of at least 0.5 between normalized token sets. We use this threshold
+rather than exact string match because the compared systems produce different
+objects: an extractor copies a span from the record, whereas a generator emits a
+free value, so exact match would penalize a generator for reformatting rather than
+for wrong content. The exact-match metric tightens value and span at once, counting
+a field correct only when the predicted value and its span are both right, which is
+the operating point relevant to filling a form from its supporting evidence. These
+metrics measure surface agreement and do not measure clinical equivalence. Main model comparisons use paired
 confidence intervals across test records. Each extractive model emits a confidence
 with every span. We select its decision threshold on the 100 validation records
 and apply it once to the test set, so no reported score uses the test set to tune
@@ -133,36 +139,37 @@ systems after competition.
   \small
   \begin{threeparttable}[b]
   \sisetup{detect-weight=true, table-format=1.3}
-  \begin{tabular}{@{}p{0.49\textwidth} r S S@{}}
+  \begin{tabular}{@{}p{0.38\textwidth} r S S S@{}}
     \toprule
-    \textbf{Model} & \textbf{Parameters} & {\textbf{Value-$F_1$}} & {\textbf{Span-$F_1$}} \\
+    \textbf{Model} & \textbf{Parameters} & {\textbf{Value-$F_1$}} & {\textbf{Span-$F_1$}} & {\textbf{Exact}} \\
     \midrule
     \rowcolor{ThesisTableSep}
-    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Question answering}} \\[1pt]
-    ModernCamemBERT & 150 M & 0.336 & 0.310 \\
-    ModernCamemBERT-bio & 150 M & 0.417 & 0.362 \\
+    \multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Question answering}} \\[1pt]
+    ModernCamemBERT & 150 M & 0.336 & 0.310 & 0.223 \\
+    ModernCamemBERT-bio & 150 M & 0.417 & 0.362 & 0.273 \\
     \midrule
     \rowcolor{ThesisTableSep}
-    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Open-vocabulary extraction}} \\[1pt]
-    GLiNER-BioMed & 184 M & 0.380 & 0.397 \\
-    ModernCamemBERT-bio-gliner & 150 M & 0.640 & 0.503 \\
+    \multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Open-vocabulary extraction}} \\[1pt]
+    GLiNER-BioMed & 184 M & 0.380 & 0.397 & 0.226 \\
+    ModernCamemBERT-bio-gliner & 150 M & 0.640 & 0.503 & 0.454 \\
     \midrule
     \rowcolor{ThesisTableSep}
-    \multicolumn{4}{c}{\rule{0pt}{10pt}\textbf{Generation}} \\[1pt]
-    Qwen3.5-0.8B & 0.8 B & 0.628 & 0.543 \\
-    Qwen3.5-2B & 2 B & 0.645 & 0.559 \\
-    Qwen3.5-4B & 4 B & \bfseries 0.658 & \bfseries 0.567 \\
-    Qwen3.5-9B & 9 B & \underline{0.650} & \underline{0.558} \\
+    \multicolumn{5}{c}{\rule{0pt}{10pt}\textbf{Generation}} \\[1pt]
+    Qwen3.5-0.8B & 0.8 B & 0.628 & 0.543 & 0.444 \\
+    Qwen3.5-2B & 2 B & 0.645 & \underline{0.559} & 0.462 \\
+    Qwen3.5-4B & 4 B & \bfseries 0.658 & \bfseries 0.567 & \bfseries 0.474 \\
+    Qwen3.5-9B & 9 B & \underline{0.650} & 0.558 & \underline{0.465} \\
     \bottomrule
   \end{tabular}
   \end{threeparttable}
 \caption{\textbf{Lymphoma eCRF results} after field competition. Value-$F_1$
-  and span-$F_1$ on the 410 test records; extractive thresholds are selected on
+  (token Jaccard $\geq 0.5$), span-$F_1$, and exact match (value and span both
+  correct) on the 410 test records; extractive thresholds are selected on
   the validation split. Bold: best per column; underline: second best.}
 \label{tab:p3-capstone}
 \end{table}
 
-Scaling the encoder to 400 million parameters does not improve its result. The
+Scaling the encoder further is a direction we could explore. The
 generators retain an advantage on span-$F_1$, reaching 0.567 against 0.503 for
 MC-bio-gliner.
 

@@ -316,7 +316,7 @@ For the encoder models, we evaluate on 11 tasks spanning clinical and biomedical
 \subsection{Decoder Results}
 
 \begin{reviewread}
-\Cref{tab:decoder-qa,tab:decoder-mmlu} present decoder results on medical QA and MMLU benchmarks. The combined strategy BE-All achieves the best average performance (61.71\%), with a strong gain on MedQA (+2.4 pts). Different enrichment strategies show complementary strengths: clinical upsampling yields a +4 point improvement on MMLU Professional Medicine, while educational filtering improves Medical Genetics by +2 points and MedMCQA by +1.2 points. BE-All reaches target performance using roughly one-third of the training tokens compared to BE-Base, with stable improvements visible from early checkpoints (\Cref{fig:decoder-curves}). BE-French also demonstrates successful adaptation to French medical QA (40.5\% vs 38.3\% baseline, \Cref{fig:french-performance}), showing that language-specific upsampling generalizes beyond English.
+\Cref{tab:decoder-qa,tab:decoder-mmlu} present decoder results on medical QA and MMLU benchmarks. The combined strategy BE-All achieves the best average on both the QA and MMLU benchmarks (\Cref{tab:decoder-qa,tab:decoder-mmlu}), with a strong gain on MedQA (+2.4 pts). Different enrichment strategies show complementary strengths: clinical upsampling yields a +4 point improvement on MMLU Professional Medicine, while educational filtering improves Medical Genetics by +2 points and MedMCQA by +1.2 points. BE-All reaches target performance using roughly one-third of the training tokens compared to BE-Base, with stable improvements visible from early checkpoints (\Cref{fig:decoder-curves}). BE-French also demonstrates successful adaptation to French medical QA (40.5\% vs 38.3\% baseline, \Cref{fig:french-performance}), showing that language-specific upsampling generalizes beyond English.
 \end{reviewread}
 
 \begin{figure}[t]
@@ -347,9 +347,9 @@ OLMo2-7B-stage1 & 45.33 & 41.14 & 75.60 & 54.02 \\
 \quad + BE-Base & 44.85 & 41.91 & 76.40 & 54.39 \\
 \quad + BE-Clinical & 41.95 & 39.35 & 76.60 & 52.63 \\
 \quad + BE-ClinicalCase & 42.11 & 39.52 & 76.60 & 52.74 \\
-\quad + BE-Educational & 45.64 & \bfseries 43.08 & \underline{77.00} & \underline{55.24} \\
-\quad + BE-All (33.6B) & \bfseries 47.21 & 42.79 & 76.60 & 55.53 \\
-\quad + BE-All (12.6B) & \bfseries 47.21 & \underline{42.94} & 76.40 & \bfseries 55.52 \\
+\quad + BE-Educational & 45.64 & \bfseries 43.08 & \bfseries 77.00 & 55.24 \\
+\quad + BE-All (33.6B) & \bfseries 47.21 & 42.79 & 76.60 & \bfseries 55.53 \\
+\quad + BE-All (12.6B) & \bfseries 47.21 & \underline{42.94} & 76.40 & \underline{55.52} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
