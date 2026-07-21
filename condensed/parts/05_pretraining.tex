@@ -87,24 +87,24 @@ On the eight French biomedical tasks the detour beats the matched MLM baseline, 
 & \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
-ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 63.4 & 55.3 & 55.6 \\
-DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & \textbf{68.0} & \textbf{62.3} & 49.9 \\
-CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & 61.6 & 56.6 & 36.1 \\
-CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 61.5 & 54.7 & 34.5 \\
+ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 68.0 & 59.7 & 56.7 \\
+DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & 69.6 & 62.8 & 50.1 \\
+CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & \textbf{70.8} & \textbf{65.2} & 38.3 \\
+CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 69.5 & 62.7 & 36.5 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Base, 150M)}} \\[1pt]
-MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 65.4 & 56.8 & 57.9 \\
-CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 65.9 & 58.2 & 60.8 \\
+MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 68.5 & 61.4 & 58.9 \\
+CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 68.6 & 61.9 & 61.6 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Large, 350M)}} \\[1pt]
-MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & 66.1 & 58.0 & \underline{61.8} \\
-CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & \underline{67.0} & \underline{59.5} & \textbf{63.3} \\
+MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & \underline{70.4} & \underline{63.5} & \underline{63.0} \\
+CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & 70.3 & 63.1 & \textbf{64.2} \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-It reaches 60.8\% average $F_1$ against 57.9\% at Base, and 63.3\% against 61.8\% at
+It reaches 61.6\% average $F_1$ against 58.9\% at Base, and 64.2\% against 63.0\% at
 Large. Since the two trajectories differ only in the Phase~1 objective, the gap is
 the effect of that objective alone, at no extra cost, and it transfers to English.
 We release these models as ModernCamemBERT-bio, MC-bio for short.

@@ -15,11 +15,11 @@ For this thesis, the useful lesson is that some of the machinery developed for d
 \end{reviewread}
 
 \begin{reviewread}
-In this chapter, we introduce a two-phase pretraining strategy for ModernCamemBERT-bio: first, continual pretraining with a causal language modeling objective, then a short ``decay'' phase that converts the model back to masked language modeling. The resulting encoder outperforms the standard MLM-only approach by +2.9 $F_1$ on average across 8 French biomedical tasks (Base) and +1.5 $F_1$ (Large), winning on all 8. The effect transfers to English at three scales, with gains of +0.3 to +0.8 $F_1$ depending on model size.
+In this chapter, we introduce a two-phase pretraining strategy for ModernCamemBERT-bio: first, continual pretraining with a causal language modeling objective, then a short ``decay'' phase that converts the model back to masked language modeling. The resulting encoder outperforms the standard MLM-only approach by +2.8 $F_1$ on average across 8 French biomedical tasks (Base) and +1.2 $F_1$ (Large), winning on all 8. The effect transfers to English at three scales, with gains of +0.3 to +0.8 $F_1$ depending on model size.
 \end{reviewread}
 
 \begin{reviewread}
-The CLM phase leaves a lasting imprint on low transformer layers. CKA analysis shows that layers 0--7 diverge 5--44$\times$ more between CLM and MLM models than seed noise alone, and this divergence persists through extended MLM decay. Freeze interventions establish a double dissociation: freezing low layers during CLM eliminates the downstream benefit; freezing mid layers preserves it. The advantage cannot be localized after training: transplanting layer groups from the CLM model into the MLM model recovers at most 35\% of the gap, because the benefit depends on how the layers co-adapt during training rather than on any single group.
+The CLM phase leaves a lasting imprint on low transformer layers. CKA analysis shows that layers 0--7 diverge 5--44$\times$ more between CLM and MLM models than seed noise alone, and this divergence persists through extended MLM decay. Freeze interventions show that low layers are necessary: freezing low layers during CLM eliminates the downstream benefit, while freezing mid layers preserves it. The advantage cannot be localized after training: transplanting layer groups from the CLM model into the MLM model recovers at most 35\% of the gap, because the benefit depends on how the layers co-adapt during training rather than on any single group.
 \end{reviewread}
 
 
@@ -175,25 +175,25 @@ HoC & Classification & EN & 512 \\
 & \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Avg} \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
-ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 63.4 & 55.3 & 55.6 \\
-DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & \textbf{68.0} & \textbf{62.3} & 49.9 \\
-CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & 61.6 & 56.6 & 36.1 \\
-CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 61.5 & 54.7 & 34.5 \\
+ModernCamemBERT & 8192 & 70.1 & 55.3 & 63.3 & 20.2 & 60.6 & 56.4 & 68.0 & 59.7 & 56.7 \\
+DrBERT & 512 & 53.0 & 35.6 & 37.9 & 21.4 & \underline{63.6} & 57.0 & 69.6 & 62.8 & 50.1 \\
+CamemBERT-bio & 512 & 41.9 & 20.1 & 12.8 & 9.6 & 38.6 & 47.7 & \textbf{70.8} & \textbf{65.2} & 38.3 \\
+CamemBERT & 512 & 40.8 & 19.4 & 11.9 & 9.5 & 37.4 & 40.6 & 69.5 & 62.7 & 36.5 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Base, 150M)}} \\[1pt]
-MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 65.4 & 56.8 & 57.9 \\
-CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 65.9 & 58.2 & 60.8 \\
+MLM baseline & 8192 & 69.9 & 56.8 & 64.9 & 23.5 & 62.5 & 63.4 & 68.5 & 61.4 & 58.9 \\
+CLM detour & 8192 & 74.8 & 60.1 & 71.0 & 25.5 & \underline{63.6} & \textbf{67.4} & 68.6 & 61.9 & 61.6 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Our Models (Large, 350M)}} \\[1pt]
-MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & 66.1 & 58.0 & \underline{61.8} \\
-CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & \underline{67.0} & \underline{59.5} & \textbf{63.3} \\
+MLM baseline & 8192 & \underline{79.4} & \underline{63.3} & \underline{72.6} & \underline{29.1} & \textbf{64.5} & 61.2 & \underline{70.4} & \underline{63.5} & \underline{63.0} \\
+CLM detour & 8192 & \textbf{80.7} & \textbf{65.4} & \textbf{74.4} & \textbf{30.4} & \textbf{64.5} & \underline{64.8} & 70.3 & 63.1 & \textbf{64.2} \\
 \bottomrule
 \end{tabular}
 }
 \end{table*}
 
 \begin{reviewread}
-\Cref{tab:french-results} presents the French results. For Base, the CLM detour $\theta_A$ achieves 60.8\% average $F_1$, outperforming the MLM baseline $\theta_B$ on all 8 tasks (+2.9pp). For Large, $\theta_A$ reaches 63.3\% versus 61.8\% for $\theta_B$ (+1.5pp). Since the two trajectories differ only in the Phase~1 objective, this gap is the effect of that objective alone. CamemBERT-bio and CamemBERT average 36\% and 35\% overall, limited by their 512-token context on long clinical documents. We release the CLM-detour models as ModernCamemBERT-bio, MC-bio for short (Base and Large).
+\Cref{tab:french-results} presents the French results. For Base, the CLM detour $\theta_A$ achieves 61.6\% average $F_1$, outperforming the MLM baseline $\theta_B$ on all 8 tasks (+2.8pp). For Large, $\theta_A$ reaches 64.2\% versus 63.0\% for $\theta_B$ (+1.2pp). Since the two trajectories differ only in the Phase~1 objective, this gap is the effect of that objective alone. CamemBERT-bio and CamemBERT average 38\% and 36\% overall, limited by their 512-token context on long clinical documents. We release the CLM-detour models as ModernCamemBERT-bio, MC-bio for short (Base and Large).
 \end{reviewread}
 
 \subsection{English Biomedical Tasks}
@@ -233,7 +233,7 @@ CLM detour & 8192 & 90.4 & 61.3 & 94.7 & \bfseries 56.5 & \bfseries 84.2 & \unde
 \end{table*}
 
 \begin{reviewread}
-\Cref{tab:english-results} shows the English results at three scales. CLM outperforms MLM on average at all scales, with the gap widening at Large scale (+0.8pp, 7/11 task wins). The smaller English effect is expected: ModernBERT was pretrained on web data that commonly includes biomedical corpora such as PubMed, so its low layers already partially encode biomedical features. ModernCamemBERT, by contrast, was pretrained on general French web text without biomedical sources, leaving a larger domain gap and correspondingly stronger CLM benefit (+2.9pp vs +0.3pp). We release the English models as ModernBERT-bio.
+\Cref{tab:english-results} shows the English results at three scales. CLM outperforms MLM on average at all scales, with the gap widening at Large scale (+0.8pp, 7/11 task wins). The smaller English effect is expected: ModernBERT was pretrained on web data that commonly includes biomedical corpora such as PubMed, so its low layers already partially encode biomedical features. ModernCamemBERT, by contrast, was pretrained on general French web text without biomedical sources, leaving a larger domain gap and correspondingly stronger CLM benefit (+2.8pp vs +0.3pp). We release the English models as ModernBERT-bio.
 \end{reviewread}
 
 \subsection{Optimal Decay Ratio}
@@ -350,13 +350,13 @@ A ratio of 1 means no CLM-specific effect. Low layers (0--7) show ratios of 5--4
 \end{figure}
 
 \begin{reviewread}
-Do these low-layer changes actually drive the downstream improvement? A freeze experiment holds a group of layers fixed during one phase of training, so that the rest of the model still trains normally around it. If the benefit depends on a layer group being modified during a given phase, freezing that group in that phase should remove the benefit. We run three such experiments on the 22-layer French Base model, where the CLM-MLM gap is largest (+2.9pp):
+Do these low-layer changes actually drive the downstream improvement? A freeze experiment holds a group of layers fixed during one phase of training, so that the rest of the model still trains normally around it. If the benefit depends on a layer group being modified during a given phase, freezing that group in that phase should remove the benefit. We run three such experiments on the 22-layer French Base model, where the CLM-MLM gap is largest (+2.8pp):
 \end{reviewread}
 
 \begin{itemize}
     \item \textbf{Experiment~1} (low freeze, CLM phase): Layers 0--7 frozen during CLM, then normal decay. Tests whether low-layer modification during CLM is necessary.
     \item \textbf{Experiment~2} (low freeze, decay phase): Normal CLM, then layers 0--7 frozen during decay. Tests whether low-layer CLM changes persist without further updates.
-    \item \textbf{Experiment~3} (mid freeze, CLM phase): Layers 8--14 frozen during CLM, then normal decay. Together with Experiment~1, tests selectivity: if freezing low layers eliminates the benefit while freezing mid layers preserves it, this constitutes a double dissociation.
+    \item \textbf{Experiment~3} (mid freeze, CLM phase): Layers 8--14 frozen during CLM, then normal decay. Together with Experiment~1, tests selectivity: if freezing low layers eliminates the benefit while freezing mid layers preserves it, the effect specifically requires low-layer modifications.
 \end{itemize}
 
 \begin{reviewread}
@@ -371,21 +371,21 @@ The three conditions are summarized in \Cref{fig:freeze} and \Cref{tab:freeze}.
 \textbf{Condition} & \textbf{Avg $F_1$} & $\boldsymbol{\Delta}$ \textbf{vs MLM} \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{3}{c}{\rule{0pt}{9pt}\textbf{References}} \\[1pt]
-MLM baseline & 57.9 & --- \\
-CLM detour & \bfseries 60.8 & +2.9 \\
+MLM baseline & 58.9 & --- \\
+CLM detour & \bfseries 61.6 & +2.7 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{3}{c}{\rule{0pt}{9pt}\textbf{Freeze interventions}} \\[1pt]
-Freeze L0--7 (CLM phase) & 58.4 & +0.5 \\
-Freeze L8--14 (CLM phase) & 60.3 & +2.4 \\
-Freeze L0--7 (decay phase) & 60.3 & +2.4 \\
+Freeze L0--7 (CLM phase) & 59.3 & +0.4 \\
+Freeze L8--14 (CLM phase) & 61.2 & +2.3 \\
+Freeze L0--7 (decay phase) & 61.2 & +2.3 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Freeze intervention results} (French Base, 8 tasks, 9 seeds). Freezing low layers during CLM eliminates the benefit ($p=0.36$ vs MLM baseline). Freezing mid layers preserves it. Freezing low layers during decay has negligible effect.}
+\caption{\textbf{Freeze intervention results} (French Base, 8 tasks, 9 seeds). Freezing low layers during CLM eliminates the benefit ($p=0.25$ vs MLM baseline). Freezing mid layers preserves it. Freezing low layers during decay has negligible effect.}
 \label{tab:freeze}
 \end{table}
 
 \begin{reviewread}
-Freezing low layers (0--7) during CLM drops $F_1$ from 60.8\% to 58.4\%. We cannot reject the null hypothesis that the resulting model matches the MLM baseline ($p = 0.36$, paired bootstrap across 8 tasks $\times$ 9 seeds). Freezing mid layers (8--14) during CLM preserves the full benefit (60.3\%). Together, these two experiments point to an asymmetry in this French Base setting, where the CLM gain depends on adapting the low layers and not the mid layers. Freezing low layers during decay has negligible effect ($-$0.5pp, 60.3\%), consistent with MLM decay preserving the CLM imprint in low layers.
+Freezing low layers (0--7) during CLM drops $F_1$ from 61.6\% to 59.3\%. We cannot reject the null hypothesis that the resulting model matches the MLM baseline ($p = 0.25$, paired bootstrap across 8 tasks $\times$ 9 seeds). Freezing mid layers (8--14) during CLM preserves the full benefit (61.2\%). Together, these two experiments point to an asymmetry in this French Base setting, where the CLM gain depends on adapting the low layers and not the mid layers. Freezing low layers during decay has negligible effect ($-$0.4pp, 61.2\%), consistent with MLM decay preserving the CLM imprint in low layers.
 \end{reviewread}
 
 \subsection{Non-Localizability}

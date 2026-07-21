@@ -88,24 +88,24 @@ appariée, comme le rapporte la \Cref{tab:french-results}.
 & \textbf{Ctx} & \textbf{FRACCO-30} & \textbf{FRACCO-100} & \textbf{CANTEMIST} & \textbf{DISTEMIST} & \textbf{MedDialog} & \textbf{DiaMED} & \textbf{EMEA} & \textbf{Medline} & \textbf{Moy.} \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Références}} \\[1pt]
-ModernCamemBERT & 8192 & 70,1 & 55,3 & 63,3 & 20,2 & 60,6 & 56,4 & 63,4 & 55,3 & 55,6 \\
-DrBERT & 512 & 53,0 & 35,6 & 37,9 & 21,4 & \underline{63,6} & 57,0 & \textbf{68,0} & \textbf{62,3} & 49,9 \\
-CamemBERT-bio & 512 & 41,9 & 20,1 & 12,8 & 9,6 & 38,6 & 47,7 & 61,6 & 56,6 & 36,1 \\
-CamemBERT & 512 & 40,8 & 19,4 & 11,9 & 9,5 & 37,4 & 40,6 & 61,5 & 54,7 & 34,5 \\
+ModernCamemBERT & 8192 & 70,1 & 55,3 & 63,3 & 20,2 & 60,6 & 56,4 & 68,0 & 59,7 & 56,7 \\
+DrBERT & 512 & 53,0 & 35,6 & 37,9 & 21,4 & \underline{63,6} & 57,0 & 69,6 & 62,8 & 50,1 \\
+CamemBERT-bio & 512 & 41,9 & 20,1 & 12,8 & 9,6 & 38,6 & 47,7 & \textbf{70,8} & \textbf{65,2} & 38,3 \\
+CamemBERT & 512 & 40,8 & 19,4 & 11,9 & 9,5 & 37,4 & 40,6 & 69,5 & 62,7 & 36,5 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Nos modèles (Base, 150M)}} \\[1pt]
-Référence MLM & 8192 & 69,9 & 56,8 & 64,9 & 23,5 & 62,5 & 63,4 & 65,4 & 56,8 & 57,9 \\
-Détour CLM & 8192 & 74,8 & 60,1 & 71,0 & 25,5 & \underline{63,6} & \textbf{67,4} & 65,9 & 58,2 & 60,8 \\
+Référence MLM & 8192 & 69,9 & 56,8 & 64,9 & 23,5 & 62,5 & 63,4 & 68,5 & 61,4 & 58,9 \\
+Détour CLM & 8192 & 74,8 & 60,1 & 71,0 & 25,5 & \underline{63,6} & \textbf{67,4} & 68,6 & 61,9 & 61,6 \\
 \midrule
 \rowcolor{ThesisTableSep} \multicolumn{11}{c}{\rule{0pt}{10pt}\textbf{Nos modèles (Large, 350M)}} \\[1pt]
-Référence MLM & 8192 & \underline{79,4} & \underline{63,3} & \underline{72,6} & \underline{29,1} & \textbf{64,5} & 61,2 & 66,1 & 58,0 & \underline{61,8} \\
-Détour CLM & 8192 & \textbf{80,7} & \textbf{65,4} & \textbf{74,4} & \textbf{30,4} & \textbf{64,5} & \underline{64,8} & \underline{67,0} & \underline{59,5} & \textbf{63,3} \\
+Référence MLM & 8192 & \underline{79,4} & \underline{63,3} & \underline{72,6} & \underline{29,1} & \textbf{64,5} & 61,2 & \underline{70,4} & \underline{63,5} & \underline{63,0} \\
+Détour CLM & 8192 & \textbf{80,7} & \textbf{65,4} & \textbf{74,4} & \textbf{30,4} & \textbf{64,5} & \underline{64,8} & 70,3 & 63,1 & \textbf{64,2} \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-Il atteint 60,8\% de F-mesure moyenne contre 57,9\% en Base, et 63,3\% contre 61,8\%
+Il atteint 61,6\% de F-mesure moyenne contre 58,9\% en Base, et 64,2\% contre 63,0\%
 en Large. Comme les deux trajectoires ne diffèrent que par l'objectif de la Phase~1,
 l'écart est l'effet de cet objectif seul, sans coût supplémentaire, et il se transfère
 à l'anglais. Nous publions ces modèles français sous le nom ModernCamemBERT-bio, MC-bio en abrégé.
