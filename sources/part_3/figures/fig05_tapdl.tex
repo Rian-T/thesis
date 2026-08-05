@@ -3,7 +3,7 @@
   \providecommand{\hlspan}[1]{{\setlength{\fboxsep}{1.5pt}\colorbox{ThesisPrimary!24}{\textcolor{ThesisPrimaryDark}{\textbf{#1}}}}}
   \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[font=\scriptsize\sffamily,
-    block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.2cm,
+    block/.style={rounded corners=3pt, text width=3.2cm, minimum height=2.7cm,
       align=left, inner sep=7pt, text=ThesisInk, anchor=north},
     report/.style ={block, draw=ThesisNeutral!55,       fill=ThesisPaper},
     proposal/.style={block, draw=ThesisSecondaryDark,    fill=ThesisSecondary!14},
@@ -20,13 +20,15 @@
       8 cycles\dots};
     \node[proposal] (b2) at (\bx,0)    {\textbf{LLM proposal}\\[3pt]
       \texttt{field}: first-line treatment\\
-      \texttt{string}: CHOEP-14};
+      \texttt{value}: CHOEP-14\\
+      \texttt{evidence}: CHOEP-14};
     \node[localize] (b3) at (2*\bx,0)  {\textbf{Deterministic\\localization}\\[4pt]
-      match the literal string, anchor its character \mbox{offsets}, resolve collisions};
-    \node[silver]   (b4) at (3*\bx,0)  {\textbf{Silver span}\\[3pt]
+      match the evidence excerpt, anchor its character \mbox{offsets}, resolve collisions};
+    \node[silver]   (b4) at (3*\bx,0)  {\textbf{Silver field annotation}\\[3pt]
       \texttt{field}: first-line treatment\\
+      \texttt{value}: CHOEP-14\\
       \texttt{offsets}: \texttt{[128, 136]}\\
-      \texttt{slice}: ``CHOEP-14''};
+      \texttt{evidence}: ``CHOEP-14''};
 
     \draw[flow] (b1)--(b2);
     \draw[flow] (b2)--(b3);
@@ -39,7 +41,8 @@
       node[midway, above=6pt, text=ThesisNeutral, font=\scriptsize\bfseries] {deterministic};
   \end{tikzpicture}%
   }
-  \caption{Each form value is proposed semantically by the language
-  model, then localized deterministically into an offset-anchored silver span.}
+  \caption{The language model proposes a field value and a supporting excerpt.
+  The excerpt is then localized deterministically to produce an evidence span
+  with character offsets.}
   \label{fig:p3-tapdl}
 \end{figure}
