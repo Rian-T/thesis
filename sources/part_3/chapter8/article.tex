@@ -1,45 +1,65 @@
 \section{Introduction}
 
-A fixed classifier can only return the classes it saw during training. Clinical
-study forms do not work that way. The fields of a form change from one cohort to
-the next, and a model trained on one set of fields cannot answer a question about
-a field it has never seen. This chapter builds an extractor that reads clinical
+A fixed classifier can only return the classes it saw during training. A model
+trained on one set of clinical fields therefore cannot answer a question about a
+field it has never seen. This chapter builds an extractor that reads clinical
 text and returns the values of fields that were not fixed in advance, without
 using any hospital label to learn them.
 
-The idea is to describe each requested type in natural language at the moment the
-model is used, rather than to fix the set of types when the model is trained. The
-output interface can then accept a new field without replacing its classification
-layer. GLiNER~\citep{zaratiana2024gliner} follows this design: it represents
-candidate spans and type descriptions in a shared space, then selects the spans
-that match the requested description (\Cref{fig:p3-open-query}). This interface
-makes new queries possible, but useful extraction still depends on how well the
-model represents medical descriptions.
-
-\input{sources/part_3/figures/fig07_inference}
+At inference, GLiNER~\citep{zaratiana2024gliner} receives each requested type
+together with a natural-language description of what it means. It represents
+candidate spans and type descriptions in a shared space, then selects the spans that match each
+description. This design allows the same model to
+extract new fields without replacing a fixed classification layer. Its usefulness
+for medical text therefore depends on how well it represents medical
+descriptions.
 
 
 \section{The Open-Vocabulary Extractor}
 
-Two parts have to work together for description-based extraction. The model needs
-a space in which medical descriptions and text spans can be compared, and it needs
-to be trained to select spans from that space. We build the first part on top of a
-biomedical encoder, and the second part on generalist annotations that carry no
-hospital label.
+Medical descriptions can name the same concept in different ways, while closely
+related concepts may differ by only a few words. ModernCamemBERT-bio has learned
+from biomedical text, but its pretraining objectives do not explicitly teach it
+which descriptions should be close or far apart. We therefore add a contrastive
+training stage to improve its representation of complete inputs, and call the
+resulting model ModernCamemBERT-bio-embed, or MC-bio-embed.
 
-ModernCamemBERT-bio-embed, MC-bio-embed for short, builds the first part, the space in
-which descriptions and spans are compared. It starts from ModernCamemBERT-bio, the
-biomedical encoder developed in \Cref{chap:objectives}. Medical terms and relations derived from the resources
-of \Cref{chap:ontobook} provide the contrastive pairs that train this description
-space, as summarized in \Cref{fig:p3-medembed}.
+We return to the CIM-10, ATC, and CCAM resources introduced in
+\Cref{chap:ontobook}. OntoBook turned their relations into pretraining text.
+Here, we use their labels, synonyms, definitions, and relations directly to
+train representations of complete inputs. Positive pairs express matching or
+related concepts, while exclusions and closely related concepts provide hard
+negatives. MC-bio-embed represents each input by mean-pooling its token
+representations and applying L2 normalization.
 
 \input{sources/part_3/figures/fig07_medembed}
 
-We first test this space through terminology retrieval. OntoBench-FR asks a
-model to match a French clinical term to its correct entry across four
-terminologies, CIM-10, ATC, CCAM, and ICD-O. MC-bio-embed reaches 60.35\% mean
-accuracy at rank one, compared with 50.84\% for the strongest baseline
-(\Cref{tab:p3-medembed}).
+For contrastive training, we used a multiple-negatives ranking loss and a
+triplet loss. The multiple-negatives ranking loss uses the other examples in the
+batch as negative pairs. The triplet loss compares each positive pair with a
+related but incorrect concept used as a hard negative. The full training
+settings are reported in \Cref{tab:hparams}.
+
+We also continued contrastive training on biomedical passages and complete
+documents to improve the representation of long inputs. However, this second
+training stage reduced retrieval performance, especially on FRACCO. We
+therefore retained the checkpoint trained only on medical terminologies.
+
+To test the resulting embeddings, we construct OntoBench-FR, a benchmark for
+retrieving medical codes and relations from text. It contains 33,595
+four-choice items across 22 tasks. CIM-10 contributes seven tasks,
+ATC four, and CCAM seven. They cover label-to-code and synonym-to-code
+retrieval, hierarchy, exclusions, causal and manifestation relations, and
+associated or incompatible procedures. For example, given the synonym
+``choléra classique'', the model must select its CIM-10 code, A00.0, among four
+related codes.
+
+FRACCO~\citep{pignat2024fracco} contributes four tasks built from French
+oncology reports: span-to-code, context-to-code, document-to-code, and
+code-to-span retrieval. For every item, the model encodes the question and four
+candidates and selects the candidate with the highest similarity. We report
+accuracy at rank one, averaged equally across tasks within each family and then
+across the four families.
 
 \begin{table}[t]
   \centering
@@ -48,7 +68,7 @@ accuracy at rank one, compared with 50.84\% for the strongest baseline
     \sisetup{detect-weight=true}
     \begin{tabular}{l S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=2.2]}
       \toprule
-      \textbf{Model} & {\textbf{CIM-10}} & {\textbf{ATC}} & {\textbf{CCAM}} & {\textbf{ICD-O}} & {\textbf{Mean}} \\
+      \textbf{Model} & {\textbf{CIM-10}} & {\textbf{ATC}} & {\textbf{CCAM}} & {\textbf{FRACCO}} & {\textbf{Mean}} \\
       \midrule
       \rowcolor{ThesisTableSep}
       \multicolumn{6}{c}{\rule{0pt}{10pt}\textbf{Baselines}} \\[1pt]
@@ -62,112 +82,106 @@ accuracy at rank one, compared with 50.84\% for the strongest baseline
       \bottomrule
     \end{tabular}
   \end{threeparttable}
-\caption{\textbf{Retrieval accuracy on OntoBench-FR.} Accuracy at rank one, in percent, across the four terminology tasks; the mean gives equal weight to the four tasks.}
+\caption{\textbf{Retrieval accuracy on OntoBench-FR.} Accuracy at rank one, in
+percent. Each source score averages its retrieval subtasks, and the mean gives
+equal weight to the four benchmark families.}
 \label{tab:p3-medembed}
 \end{table}
 
-The second part is the extractor that selects spans. It follows the GLiNER2
-span--description design \citep{zaratiana2025gliner2}, trained on the generalist
-annotations from \Cref{chap:synthetic} using equal proportions of descriptions
-produced by the annotator and their canonical forms, with no training label from
-a hospital record. The released checkpoint has 150 million parameters and is named
-ModernCamemBERT-bio-gliner-base. We write its full model name as
-ModernCamemBERT-bio-gliner and use the short form MC-bio-gliner in the rest of
-this part.
+MC-bio-embed obtains the highest mean score and leads on CIM-10, CCAM, and
+FRACCO, while Solon~\citep{arbaretier2024solon} remains slightly stronger on
+ATC. The terminology results
+mainly measure in-domain grounding because their source terminologies were used
+during training. FRACCO provides stronger evidence of transfer, since its tasks
+are built from clinical text.
 
-This training produces a generalist model that can query types through their
-descriptions. The model can later be adapted to the lymphoma form using its 89
-field descriptions and generated records. Performance on that form and transfer
-to other descriptions remain separate questions, since specializing the model
-does not guarantee that its initial openness is preserved.
+Retrieving the right medical concept does not yet locate its mentions in a
+document. These results lead us to retain MC-bio-embed, rather than
+ModernCamemBERT-bio, as the backbone of the GLiNER2 extractor used
+below~\citep{zaratiana2025gliner2}. We train the extractor on the annotations in
+\textit{biomed-fr-v2-entities} (\Cref{sec:gliner-data}). The resulting
+150-million-parameter model is called MC-bio-gliner.
 
 
 \section{Public Clinical Text in the Training Corpus}
 
-Does public clinical text actually help this extractor? We answer with an
-ablation on the composition of the generalist corpus, keeping the evaluation set
-fixed to the 200 records shared by all runs. The complete corpus is compared with
-a corpus without public clinical paragraphs and with a second biomedical control
-corpus. \Cref{fig:p3-section-supervision} reports the global effect and breaks it
-down by form section. All scores in this section are micro-averaged value-$F_1$,
-the metric defined in \Cref{chap:evaluation}.
+We train the extractor on three versions of
+\textit{biomed-fr-v2-entities}. The first uses the complete corpus. The second
+removes all clinical paragraphs. The third also removes them, but repeats
+biomedical examples until the corpus has its original size. Comparing the last
+two conditions measures the effect of adding more examples, while comparing the
+first and third measures the effect of their clinical content.
+
+We evaluate the three models zero-shot on the same 200 generated patient
+records, before any adaptation to the lymphoma form. \Cref{fig:p3-section-supervision}
+reports micro-averaged value-$F_1$, defined in \Cref{chap:evaluation}, globally
+and for each section of the form.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.86\textwidth]{plots/part_3/output/fig08_section_supervision.pdf}
-  \caption{Value-$F_1$ by corpus composition: the global effect, then broken down
-  by eCRF section; the biomedical control is reported only at the global level.}
+  \caption{Value-$F_1$ by training-corpus composition, globally and by eCRF
+  section. The size-matched biomedical control is reported only for the global
+  score.}
   \label{fig:p3-section-supervision}
 \end{figure}
 
-This ablation measures the open-vocabulary extractor before any task adaptation.
-It is applied zero-shot to a 200-record probe, so its absolute value-$F_1$ sits
-far below the task-adapted model of \Cref{chap:evaluation}, and only the
-differences between corpus conditions carry meaning here. The global effect is
-modest: value-$F_1$ reaches 0.205 with the complete corpus, compared with 0.183
-without public clinical paragraphs and 0.170 for the biomedical control. The
-difference between the first two conditions is 0.022.
+The absolute scores remain low because the models have never been trained on
+the lymphoma task. We therefore focus on differences between corpus
+conditions. Value-$F_1$ reaches 0.205 with the complete corpus, compared with
+0.183 after removing the clinical paragraphs, a difference of 0.022. Matching
+the corpus size with repeated biomedical examples does not recover this loss
+and instead gives 0.170. In this experiment, the gain therefore comes from the
+clinical source rather than from the number of training examples alone.
 
-The aggregate result hides a more concentrated effect. Removing public clinical
-text reduces first-line treatment value-$F_1$ from 0.211 to zero and second-line
-treatment value-$F_1$ from 0.050 to zero, while the larger disease-history
-section changes from 0.242 to 0.228. Public clinical text therefore has its
-largest observed effect on the treatment sections of these 200 generated records.
+The section scores show where this difference occurs. Without public clinical
+text, value-$F_1$ falls from 0.211 to zero for first-line treatment and from
+0.050 to zero for second-line treatment. By comparison, disease history changes
+from 0.242 to 0.228. On these 200 generated records, public clinical text mainly
+helps the extractor identify treatment information.
 
 
-\section{Transfer to Unseen Descriptions}
+\section{Extraction with Additional Types}
 
-OntoBench-FR tests terminology retrieval, but it does not show whether a new
-description helps locate spans in text. No manual span reference is available for
-arbitrary descriptions, so we evaluate with a reference-free LLM judge. We pool
-and deduplicate the candidate spans from the compared models, remove their model
-identity, and ask the judge whether each span matches the requested description.
-Mean average precision (MAP) then evaluates the resulting ranking without choosing
-a decision threshold, a score we call LLM-judge MAP.
+We selected MC-bio-embed based on its results on OntoBench-FR, but we have not
+yet tested whether it is also a better backbone for GLiNER2. We therefore
+replace it with ModernCamemBERT-bio and leave everything else unchanged.
 
-We call descriptions constructed to be absent from the evaluation benchmarks
-\emph{benchmark-absent}, though they are not guaranteed to be absent from every
-training source, and we report them separately from familiar descriptions. The
-comparison changes only the description encoder, replacing ModernCamemBERT-bio
-with MC-bio-embed while the extractor remains fixed. \Cref{fig:p3-novel-types} reports
-both conditions.
+We evaluate both models on the twenty types listed in \Cref{tab:type-bank}. Ten
+are common clinical types used in existing benchmarks, which we call benchmark
+types. The other ten are additional compositional or cross-domain types not
+used in these benchmarks. They may still appear in the training data, so this
+experiment does not measure transfer to entirely unseen concepts.
+
+Evaluation on \textit{biomed-fr-v2-entities} measures whether the extractor
+recovers the spans originally annotated by Qwen3-235B. However, the extractor
+may return a valid span that is absent from these annotations. We therefore
+reverse the evaluation. We pool the spans returned by both models, remove
+duplicates, and hide which model produced each span. Qwen3-235B then evaluates
+whether each prediction matches the requested type. We use these judgements to
+compute mean average precision (MAP) for each model. We call this metric
+LLM-judge MAP.
+\Cref{fig:p3-novel-types} reports the results for both sets of types.
 
 \begin{center}
 \begin{minipage}{\linewidth}
 \centering
   \includegraphics[width=0.78\textwidth]{plots/part_3/output/fig09_novel_types.pdf}
-  \captionof{figure}{LLM-judge MAP for familiar and benchmark-absent type descriptions.}
+  \captionof{figure}{LLM-judge MAP for benchmark and additional types.}
   \label{fig:p3-novel-types}
 \end{minipage}
 \end{center}
 
-For familiar descriptions, LLM-judge MAP increases from 0.478 with
-ModernCamemBERT-bio to 0.517 with MC-bio-embed, a gain of 0.039. For benchmark-absent
-descriptions, it increases from 0.333 to 0.382, a gain of 0.049. The larger gain
-in the second condition is consistent with the intended role of contrastive
-description training. These scores reflect the preferences of a reference-free LLM
-judge, not agreement with a human medical reference.
-
-
-\section{Limitations}
-
-The same model family contributes to corpus annotation, record generation, and
-the evaluation of benchmark-absent descriptions, which may favour shared
-conventions. The public-text ablation changes an entire source family and does
-not isolate one linguistic property. Its section-level differences describe the
-effect of that intervention, but they do not identify its linguistic cause.
+For benchmark types, LLM-judge MAP increases from 0.478 with
+ModernCamemBERT-bio to 0.517 with MC-bio-embed, a gain of 0.039. For
+additional types, it increases from 0.333 to 0.382, a gain of
+0.049. The slightly larger observed gain in the second condition is consistent
+with the purpose of contrastive description training. It remains evidence from
+an LLM judge rather than agreement with a human medical reference.
 
 
 \section*{Conclusion}
 
-Trained only on generalist annotations, with no hospital label, the extractor
-still reads clinical text and returns the values of fields described in natural
-language at inference time. What makes its open queries useful is the description
-encoder. MC-bio-embed improves terminology retrieval on OntoBench-FR and helps locate
-spans for benchmark-absent descriptions, so the extractor can be asked for new
-fields rather than only the ones fixed at training time. Two
-questions stay open. Target-form performance and transfer to other descriptions
-must still be measured separately, and local span--description similarity does
-not determine the role of a repeated mention in a patient trajectory.
-\Cref{chap:evaluation} therefore moves from local extraction to complete
-longitudinal form filling.
+At this stage, MC-bio-gliner is a generalist extractor. We ultimately want to
+fill a lymphoma eCRF from a complete patient record. \Cref{chap:evaluation}
+tests whether MC-bio-gliner can be adapted to this task.

@@ -33,10 +33,12 @@ modèle.
 \end{center}
 \medskip
 
-Le budget n'est pas dépensé là où on l'attendrait : entraîner l'encodeur est la partie
-peu coûteuse, et l'essentiel va au modèle de langue qui réécrit et annote le corpus,
-où notre chaîne reste plus légère parce qu'elle sélectionne un corpus biomédical petit
-et ciblé plutôt que de reformuler un corpus à l'échelle du web.
+Les contributions réduisent le coût à trois étapes. Le filtrage au niveau du
+paragraphe conserve les performances avec trois fois moins de tokens. Le
+pré-entraînement continu évite de reconstruire un encodeur à partir de zéro. Enfin,
+MC-bio-gliner approche les résultats d'un générateur vingt-sept fois plus grand. Les
+gains concernent donc les données d'entraînement, le calcul et la mémoire nécessaire
+à l'utilisation du modèle.
 
 Les dossiers synthétiques de lymphome partent de cas cliniques issus de
 Biomed-Enriched, sélectionnés pour leur qualité et parce qu'ils portent sur le
@@ -47,36 +49,29 @@ Remplir un formulaire clinique à partir de données publiques était la cible. 
 modèle au travail en contexte clinique pose une autre question, sur la façon dont il se
 comporte plutôt que sur ce qu'il sait.
 
-Les méthodes de cette thèse ont été conçues pour être efficientes, de petits encodeurs
-plutôt que de grands modèles génératifs, mais des signes indiquent que le champ prend
-une autre direction : les hôpitaux se dotent de leur propre infrastructure GPU et
-déploient localement de grands modèles généralistes, pour que les données patients ne
-quittent jamais l'établissement. Les encodeurs que cette thèse a privilégiés rendent la
-même réponse à la même entrée. Les grands modèles décodeurs, non : leur sortie peut
-changer quand la forme de surface d'une question change, quand un fait est déplacé dans
-un contexte plus long, ou quand un utilisateur insiste sur plusieurs tours. Cette
-instabilité comportementale est largement invisible aux jeux d'évaluation que le champ
-utilise pour juger les modèles médicaux, qui testent surtout la connaissance factuelle
-par des questions propres.
+Les méthodes de cette thèse ont été conçues pour être efficientes, avec de petits
+encodeurs plutôt que de grands modèles génératifs. Le champ semble pourtant prendre
+une autre direction. Les hôpitaux se dotent de leur propre infrastructure GPU et
+déploient localement de grands modèles généralistes afin que les données des patients
+ne quittent pas l'établissement. Ces modèles sont utilisés dans des interactions
+ouvertes, où leur réponse peut changer avec les mots employés, le contexte ou la
+pression exercée par un utilisateur au fil de plusieurs échanges. Cette instabilité
+comportementale est largement invisible aux jeux d'évaluation actuels, qui testent
+surtout les connaissances médicales à partir de questions isolées.
 
-Dans un jeu d'évaluation préliminaire, TABIB, nous perturbons des modèles biomédicaux
-français de façons qui préservent la vérité médicale tout en changeant la forme de
-l'interaction : noms de marque au lieu de dénominations communes, une paire de
-médicaments insérée dans un compte-rendu, un patient qui insiste sur plusieurs tours.
-Sur sept protocoles, aucun modèle n'est sûr sur tous, et les échecs partagent une
-forme. Le fait médical reste intact et seule la forme change, pourtant la réponse
-bouge.
+Nous introduisons TABIB, un jeu d'évaluation préliminaire fondé sur le thésaurus des
+interactions médicamenteuses de l'ANSM. Ses sept protocoles modifient la présentation
+d'un même problème par les noms des médicaments, le contexte clinique, la langue, la
+pression du patient ou le profil démographique. Aucun des sept modèles évalués ne
+reste stable dans toutes ces conditions.
 
-Les échecs sont concrets. Le contexte clinique change le résultat : un modèle perd 74
-points de sensibilité quand la même paire de médicaments est insérée dans un court
-compte-rendu. Sous pression multi-tours, cinq des sept modèles donnent un conseil
-dangereux dans 12 à 28\% des dialogues. La capitulation sous la pression du patient est le genre d'échec qui
-pourrait laisser passer une association contre-indiquée en automédication, et c'est un
-comportement qu'un jeu d'évaluation factuel, par construction, ne voit jamais. La même
-cécité se retrouve au triage comparatif : chaque modèle rebat son ordre de priorité
-quand les noms des patients, les codes postaux et les marqueurs d'assurance sont
-permutés sur des cas médicalement identiques, et une évaluation qui note un patient à la
-fois, où les différences restent sous 0,03, le manque entièrement.
+Les effets observés sont parfois importants. Pour un modèle, placer une interaction
+dans un court compte-rendu réduit la sensibilité de 74 points. Sous pression au cours
+de plusieurs échanges, cinq modèles sur sept donnent un conseil dangereux dans 12 à
+28\% des conversations. Dans le protocole de triage, permuter les noms, les codes
+postaux et la couverture sociale modifie aussi l'ordre de priorité produit par tous
+les modèles. TABIB reste toutefois une première étude sur de petits modèles ouverts,
+sans validation des jugements par des cliniciens.
 
 Les systèmes qui atteignent la pratique clinique française deviennent des agents : un
 modèle doté d'outils, d'un dossier patient et de logiciels hospitaliers locaux,
@@ -84,40 +79,32 @@ agissant sur plusieurs étapes au lieu de répondre à une seule requête. Déte
 fait médical ne règle plus la sécurité, car l'agent agit sur ce fait à travers une
 chaîne d'étapes.
 
-Nous avons commencé à construire un environnement agentique exploratoire pour le
-cadre clinique. Le modèle agit comme un agent à un poste clinique simulé, avec un dossier
-patient qu'il peut lire et écrire, un outil pour consulter le thésaurus officiel des
-interactions médicamenteuses de l'ANSM, et un outil pour délivrer une ordonnance, qui
-est un acte irréversible. Une tâche cache un patient dont le dossier contient une paire
-de médicaments contre-indiquée accompagnée d'une note falsifiée affirmant qu'un médecin
-a levé la contre-indication.
-
-Même cette petite sonde montre que le verdict de sécurité dépend autant du dispositif
-que du modèle.
+Nous prolongeons TABIB par une expérience exploratoire dans laquelle GLM-5.2 agit à
+un poste clinique simulé. Le modèle peut consulter et modifier un dossier, interroger
+le thésaurus de l'ANSM et émettre une prescription. Le dossier contient une
+association médicamenteuse contre-indiquée et une note falsifiée affirmant qu'un
+médecin l'a autorisée.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{plots/part_3/output/conclusion_agentic_gradient_fr.pdf}
-  \caption{Le même modèle et la même note falsifiée sous quatre dispositifs de réalisme
-  croissant : le nombre de sessions, sur vingt, comportant un acte dangereux passe
-  d'aucune en configuration de type conversation à cinq sous pression agentique,
-  tandis qu'une note authentique mais périmée et la délivrance de la contre-indication
-  officielle (marqueur ouvert) le déplacent bien moins. Les barres sont des intervalles
-  de Wilson à 95\%.}
+  \caption{Prescriptions dangereuses dans vingt sessions par condition. GLM-5.2 est
+  évalué en conversation, avec des outils sur un seul tour, dans une procédure
+  agentique, puis dans la même procédure sous pression du patient.}
   \label{fig:conclusion-agentic-gradient}
 \end{figure}
 
-Avec le même modèle et la même note falsifiée, aucune prescription dangereuse n'est
-produite lors des vingt essais limités à une seule question. Lorsque le modèle dispose
-d'outils et que le patient insiste au fil de plusieurs échanges, il prescrit dans cinq
-cas sur vingt. Cet échec n'apparaît donc qu'au cours d'une interaction en plusieurs
-étapes et reste invisible dans un jeu d'évaluation fondé sur une question et une
-réponse. Fournir la
-contre-indication officielle avec le cas ne protège pas non plus le modèle : environ un
-cinquième prescrivent quand même contre le verdict qu'ils viennent de lire. Un chiffre
-de sécurité issu d'un jeu de type conversation ou de questions à choix multiples n'est
-pas une borne supérieure du risque en déploiement ; ici il est faux d'un large facteur,
-zéro contre un quart, pour le même modèle et le même artefact.
+Nous comparons quatre conditions de vingt sessions. Le modèle ne prescrit dans aucune
+session lorsqu'il répond à une seule question, dans deux sessions avec des outils
+utilisés sur un seul tour, dans une session au cours d'une procédure agentique et dans
+cinq sessions lorsque le patient exerce aussi une pression répétée. Ces effectifs sont
+faibles et leurs intervalles de confiance restent larges.
+
+Le résultat nul de la première condition est toutefois trompeur. Le modèle refuse
+presque toutes les prescriptions, y compris celles qui sont sûres. Le taux de
+prescriptions dangereuses ne suffit donc pas à mesurer si le système est réellement
+utile. Lorsque la contre-indication officielle est directement ajoutée au dernier
+scénario, le modèle prescrit encore dans quatre sessions sur vingt.
 
 Les dossiers ne peuvent quitter l'hôpital : le test ne peut donc être mené à
 l'extérieur. Le mener à l'intérieur est pire encore, car un agent sous évaluation est un
@@ -138,20 +125,19 @@ médecine depuis des décennies, et ceux qui les ont construits ont travaillé a
 sous les contraintes de leur temps. Ce qui est différent aujourd'hui, c'est l'échelle commerciale.
 Ces systèmes sont développés et vendus par des entreprises qui se disputent les mêmes
 hôpitaux, et un hôpital qui en installe un est difficile à en détacher. Arriver le
-premier garde le service pendant des années : la pression est donc de déployer tôt,
-avant que les preuves ne soient réunies. Cette pression appartient aux entreprises, et
-c'est aussi ce qui fait d'elles la mauvaise partie pour mesurer le résultat.
+premier peut assurer une place dans le service pendant des années. Les entreprises ont
+donc intérêt à déployer tôt, avant que toutes les preuves soient réunies. Elles ne
+peuvent pas être seules à évaluer les systèmes qu'elles vendent.
 
-Une évaluation indépendante est ce que la situation nécessite, et elle n'existe pas au
-niveau qu'ont atteint ces systèmes. La construire est la part de la recherche.
-L'évaluation telle qu'elle est souvent pratiquée mesure surtout ce qu'un modèle sait et
-la fréquence à laquelle il répond correctement, ce qui suffisait tant que les modèles
-répondaient. Elle n'établit
-pas comment il se comporte lorsqu'il agit. Ce qui manque, c'est une discipline : des
-environnements assez réalistes pour observer les modèles en situation, des mesures
-assez fines pour saisir leur comportement, et des preuves sur la fiabilité de ces
-mesures.
-Aucune entreprise n'a de raison de la construire. L'évaluation dans ce champ est une
+Ces systèmes ont besoin d'une évaluation indépendante, mais les méthodes actuelles
+n'ont pas suivi leur évolution. Les évaluations mesurent surtout ce qu'un modèle sait
+et la fréquence à laquelle il répond correctement. Elles ont été conçues pour des
+modèles qui répondaient à des questions, pas pour des systèmes qui agissent.
+Construire de nouvelles méthodes d'évaluation est désormais un problème de recherche
+à part entière. Il faut des environnements assez réalistes pour observer les modèles
+en situation, des mesures assez fines pour saisir leur comportement et des preuves
+que ces mesures sont fiables. Les entreprises ont peu d'intérêt à mener seules ce
+travail. L'évaluation dans ce champ est une
 collection d'exercices séparés depuis aussi longtemps que le champ
 existe~\citep{truongkoyejo2026aims}. La médecine en a construit une pour ses propres
 traitements, avec des essais contrôlés et une surveillance après mise sur le marché.

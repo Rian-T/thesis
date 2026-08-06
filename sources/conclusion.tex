@@ -6,9 +6,9 @@ Let's not get too excited. Building the models is the easy part.
 \chapter{What Holds Together}
 \label{sec:conclusion-holds-together}
 
-Hospital notes are the target throughout this thesis, but they are never used as
-training data. None of the French models developed here was trained on a real
-patient record. We instead use public scientific articles, drug leaflets,
+Hospital notes are the target of this thesis, although none of the French models
+developed here was trained on a real patient record. We instead use public
+scientific articles, drug leaflets,
 medical ontologies, and published clinical cases. We filter this material to
 build a training corpus (\Cref{chap:collecting,chap:quality,chap:mcbio}), which
 we use to pretrain a biomedical encoder
@@ -43,73 +43,60 @@ The contributions reduce the resources required at three stages of the system.
 \end{minipage}
 \end{center}
 
-The paragraph-level filtering of \Cref{chap:quality} matched the performance of
-the full corpus while training on one third of the tokens, and its clinical
-recipe reached the same point with 2.5 times fewer tokens. Continual pretraining
-shows similar savings. Across models and generations, adapting a public base
-by continual pretraining emits far less carbon than training a biomedical encoder
-from scratch (\Cref{fig:conclusion-carbon}). CamemBERT-bio was adapted for an
-estimated 0.80~kg of CO\textsubscript{2}, against 26.11 for the from-scratch
-DrBERT and 8.16 for AliBERT (\Cref{chap:encoders}), and the same pattern holds at
-the scale of the whole pipeline, where the more recent ModernCamemBERT-bio-v2
-chain spends an estimated 17~kg against 169 for the from-scratch DoctoModernBERT,
-about ten times less.
+Corpus filtering first reduces the amount of training data. The paragraph-level
+method of \Cref{chap:quality} matches the performance of the complete corpus with
+one third of its tokens.
 
-The budget is not spent where one might expect. Training the encoder is the cheap
-part: the continual pretraining took about 16 GPU-hours, against roughly 383 for
-a model trained from scratch. Most of the budget, on both sides, goes to the
-language model that rewrites and annotates the training corpus, and our pipeline
-stays lighter there because it curates a small, targeted biomedical corpus rather
-than rephrasing a web-scale one. These figures count reserved GPU-hours at the
-French grid intensity of 34~g CO\textsubscript{2}eq per kWh, a convention that
-understates the gap, since our curation ran the accelerators well below their
-rated power.
+Continual pretraining then reduces the cost of model training. CamemBERT-bio
+emits an estimated 0.80~kg of CO\textsubscript{2}eq, compared with 26.11~kg for
+DrBERT and 8.16~kg for AliBERT
+(\Cref{chap:encoders,fig:conclusion-carbon}). Training ModernCamemBERT-bio on
+the OntoBook data of \Cref{chap:ontobook} produces ModernCamemBERT-bio-v2. Its
+complete pipeline emits an estimated 17~kg, compared with 169~kg for the
+from-scratch DoctoModernBERT~\citep{huang2026doessignalliveweb}. These estimates
+use reserved GPU-hours and a French grid intensity of
+34~g CO\textsubscript{2}eq per kWh.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{plots/part_3/output/conclusion_carbon_all.pdf}
-  \caption{Training carbon in two parts. The model training itself, on the left,
-  is cheap under continual pretraining and costly from scratch, as DrBERT and
-  AliBERT show. The language model that prepares the corpus, on the right, was not
-  used by the older encoders and dominates the recent from-scratch
-  DoctoModernBERT, while the ontology step from ModernCamemBERT-bio to its v2 adds
-  only a marginal amount.}
+  \caption{Estimated training carbon for the encoder models, on the left, and
+  the complete recent pipelines, on the right.}
   \label{fig:conclusion-carbon}
 \end{figure}
 
-The extractor also reduces the resources required at inference. MC-bio-gliner
-has 150 million parameters, and on the synthetic clinical
-form its value $F_1$ of 0.640 comes within 0.018 of the 0.658 reached by
-Qwen3.5-4B, a generative model about twenty-seven times its size fine-tuned on
-the same data. Its weights require less than one gigabyte at common precisions,
-compared with roughly eight gigabytes for the generator. Several of the methods
-in this thesis, each on its own, lower the compute, the data, or the energy needed
-to reach a given clinical capability.
+The extractor also reduces memory at inference. MC-bio-gliner has 150 million
+parameters and reaches 0.640 value-$F_1$ on the synthetic clinical form, within
+0.018 of Qwen3.5-4B at 0.658. The generator has 27 times more parameters. In
+bfloat16, their weights require about 0.3~GB and 8~GB, respectively. These
+figures do not include activations or other runtime memory.
 
 \section{A Corpus Used Twice}
 
-Biomed-Enriched served two purposes. Its paragraph-level filtering reduced the
-training corpus to one third of its tokens. It also identified about two million
-clinical cases described inside scientific articles and released them as an open
-dataset. In \Cref{chap:synthetic}, cases selected for their quality and relevance
-to lymphoma were used to generate the synthetic longitudinal records on which the
-extractor was evaluated. The corpus construction therefore also provided the data
-for the final task.
+Biomed-Enriched served twice. Its paragraph-level filtering reduced the training
+corpus to one third of its tokens. The same process identified about two million
+published clinical cases and released them as an open dataset. After filtering
+for quality and relevance to lymphoma, these cases became the seeds of the
+synthetic longitudinal records used in the final task
+(\Cref{chap:synthetic}). Biomed-Enriched therefore connects the beginning and
+end of the thesis, from filtering the pretraining corpus to building the final
+clinical task.
 
-None of this is ready for a hospital ward. The evaluation ran on synthetic
-records, and practising clinicians at French university hospitals provided
-informal feedback on their realism. The fields were known in advance, and a real
-clinical study would bring messier text and stricter checks than any benchmark
-applied here. The results show how far public and generated data can support a
-clinical task before a real record is needed. They do not show how these models
-behave once they are used, which is the subject of the next chapter.
+These results do not yet establish performance in a hospital. Clinicians from
+French university hospitals gave informal feedback on the synthetic records,
+but their realism was not evaluated in a clinical study. Real records would
+contain messier text and require stricter checks. This thesis shows how far
+public and generated data can support the task before a real record is needed.
+However, performance and efficiency are not the only concerns when a model is
+deployed in a hospital.
 
 \chapter{A New Problem}
 \label{sec:conclusion-evaluation}
 
-Filling a clinical form from public data was the thesis's target. Putting a model
-to work in a clinic raises a different question, about how it behaves rather than
-what it knows. TABIB provides a preliminary measurement of that behaviour.
+This thesis has so far focused on filling a clinical form from public data.
+Hospital deployment also requires models to behave reliably during use. We
+introduce TABIB, a preliminary benchmark that tests this behaviour under changes
+in wording, context, and interaction.
 
 \section{When Efficiency Is Not the Direction}
 
@@ -136,29 +123,26 @@ to judge medical models. MedQA, PubMedQA, FrenchMedMCQA, MediQAl, and DrBenchmar
 mostly test factual medical knowledge through clean
 questions~\citep{jin2021medqa,jin2019pubmedqa,labrak-etal-2022,mediqal2026,drbenchmark2024}.
 HealthBench and CARES move closer to real use by testing safety and refusal at
-larger scale~\citep{arora2025healthbench,chen2025cares}. They do not systematically
-test the question that this instability raises: when the medical fact is unchanged,
-does the model keep the same behaviour once that fact is embedded in a prescription,
-a long clinical note, a patient's insistence, or a triage list?
+larger scale~\citep{arora2025healthbench,chen2025cares}. They do not
+systematically test whether model behaviour remains stable when the same medical
+fact is presented in different settings. TABIB examines a limited set of such
+changes, including brand names, clinical context, patient pressure, and
+comparative triage.
 
-The same question appears in regulation. The European AI Act places medical
-decision support and triage among its high-risk uses, and requires accuracy,
-robustness, and resilience to errors during interaction with
-people~\citep{aiact2024}. These requirements reach beyond stored knowledge to how
-the model behaves during use. If large decoder models are going to be deployed in
-hospitals regardless of the efficiency argument, then this behaviour has to be
-measured directly.
+This question also matters for regulation. The European AI Act classifies
+medical decision support and triage as high-risk uses. It requires these systems
+to be accurate, robust, and resilient to errors during human
+interaction~\citep{aiact2024}. Factual knowledge alone does not meet these
+requirements. The behaviour of models during use must also be evaluated
+directly.
 
 \section{The TABIB Benchmark}
 \label{sec:conclusion-tabib}
 
 \begin{reviewrewrite}
-We began to explore these problems, beyond errors of stored knowledge, in a
-preliminary study we call TABIB (\textit{Testing Adversarial Behaviors In
-Biomedical LLMs}). It evaluates French biomedical LLMs with perturbations that
-preserve the medical truth while changing the form of the interaction. The first
-version uses the ANSM drug-interaction thesaurus and the French public drug
-database (BDPM)~\citep{ansm2023thesaurus,bdpm2024}. The ANSM thesaurus gives
+TABIB (\textit{Testing Adversarial Behaviors In Biomedical LLMs}) builds its
+evaluation cases from the ANSM drug-interaction thesaurus and the French public
+drug database (BDPM)~\citep{ansm2023thesaurus,bdpm2024}. The ANSM thesaurus gives
 four levels of decreasing severity: absolute contraindication (CI),
 discouraged association (AD), precaution for use (PE), and interaction to take
 into account (APEC). The BDPM links substances to commercial drug names. The
@@ -169,18 +153,12 @@ from over-reporting.
 \end{reviewrewrite}
 
 \begin{reviewrewrite}
-The evaluated models are local open-weight systems between 2B and 9B parameters:
-Nemotron-3-Nano 4B, Qwen3.5 4B, Gemma4 E2B, MedGemma 1.5 4B, Ministral-3 8B,
-Qwen3.5 9B, and Gemma4 E4B. The panel follows the deployment constraint that
-motivates much of the thesis. In many hospitals, patient data cannot be sent to
-an external API, so a clinically plausible evaluation should include models that
-can run locally. MedGemma 1.5 is the only medically specialised model in the
-panel~\citep{medgemma2026}. Results are reported primarily at temperature 0 for
-reproducibility, with a second analysis at the temperatures recommended by the
-model cards for the protocols where sampling can change the answer. The
-directions of the effects remain the same across the two regimes, and
-\Cref{app:tabib-details} reports the protocol details and this sensitivity
-analysis in full. \Cref{tab:conclusion-tabib-models} lists the evaluated models.
+We evaluate seven open-weight models with two to nine billion parameters, listed
+in \Cref{tab:conclusion-tabib-models}. MedGemma 1.5 is the only medically
+specialized model~\citep{medgemma2026}. We report the main results at temperature
+0 and repeat the sampling-sensitive protocols at the temperatures recommended
+by the model cards. The main conclusions remain unchanged. Full protocols and
+sensitivity results are given in \Cref{app:tabib-details}.
 \end{reviewrewrite}
 
 \begin{table}[tbp]
@@ -251,19 +229,14 @@ Mme Fatou Diallo   & female & sub-Saharan & 93200 & CSS  \\
 \section{What Fails}
 \label{sec:conclusion-tabib-results}
 
-Across the seven protocols, no model remains robust under every perturbation,
-and the failures share a shape. Each perturbation leaves the medical fact
-untouched and changes only the form of the interaction, yet the answer moves: every protocol exposes a
-different way that the behaviour, not the knowledge, gives way.
-\Cref{fig:conclusion-tabib-radar} gives the overview, and the paragraphs below
-work through it one failure mode at a time; \Cref{app:tabib-details} collects the
-per-protocol figures behind it.
-
-The first is surface form. Writing a pair with
-brand names instead of generic ones already flips answers, significantly for
-Gemma4 E4B, which loses 38 points, and for Qwen3.5 4B, which loses 9 (McNemar
-test, $p < 0.05$); the other models change in both directions at once, so a stable
-average hides unstable decisions~\citep{mcnemar1947}.
+No model remains stable across all seven protocols.
+\Cref{fig:conclusion-tabib-radar} summarizes the results. Replacing generic drug
+names with brand names reduces accuracy by 38 points for Gemma4 E4B and 9 points
+for Qwen3.5-4B. Both changes are significant under McNemar's test
+($p < 0.05$)~\citep{mcnemar1947}. Other models change their answers in both
+directions, so their average accuracy can remain stable while individual
+decisions change. Results for each protocol are given in
+\Cref{app:tabib-details}.
 
 \begin{figure}[tbp]
 \centering
@@ -273,27 +246,20 @@ average hides unstable decisions~\citep{mcnemar1947}.
 \end{figure}
 
 \begin{reviewrewrite}
-Clinical context changes the result again. Gemma4 E2B loses 74 percentage
-points of sensitivity when the same pair is embedded in a
-clinical note. Ministral-3 8B appears stable, but for the wrong reason: it
-detects interactions almost systematically, including in negative controls.
-Nemotron shows the opposite pattern, with detection almost absent in direct
-questions and nearly systematic after clinical context is added. The surrounding
-text changes the model's behaviour even when the relevant medical fact is
-unchanged.
+Embedding the same drug pair in a clinical note reduces Gemma4 E2B's
+sensitivity by 74 points. Ministral-3 8B appears stable because it detects almost
+every interaction, including the negative controls. Nemotron shows the opposite
+pattern. It detects few interactions in direct questions and almost all of them
+in clinical context.
 \end{reviewrewrite}
 
-Conversation is a further failure mode, and its lever is the register of pressure
-rather than any medical content. Under multi-turn pressure five of the seven
-models give unsafe advice in 12 to 28 percent of chains, led by Ministral-3 at 28
-percent (\Cref{fig:conclusion-tabib-b3}). One register does most of the damage:
-asking the model to role-play a free-handed caregiver acts as a generic jailbreak,
-pushing unsafe advice to 60 percent for Ministral-3 and 55 percent for Qwen3.5 4B,
-far above the realistic patient-pressure registers. These rates match what is
-known about sycophancy and multi-turn
-capitulation~\citep{sharma2024sycophancy,hong2025sycon}. MedGemma stays at
-zero, and it does so by never engaging: 61 percent of its turns are deflections,
-the same non-engagement that reappears in calibration and prudence.
+Under multi-turn patient pressure, five of the seven models give unsafe advice
+in 12 to 28\% of conversations. Ministral-3 reaches the highest rate at 28\%
+(\Cref{fig:conclusion-tabib-b3}). Role play produces the largest effect, with
+unsafe advice reaching 60\% for Ministral-3 and 55\% for Qwen3.5-4B. These
+results are consistent with work on sycophancy and multi-turn
+capitulation~\citep{sharma2024sycophancy,hong2025sycon}. MedGemma remains at
+zero, but deflects 61\% of turns instead of engaging with the request.
 
 \begin{figure}[t]
 \centering
@@ -306,31 +272,29 @@ forms of giving way.}
 \label{fig:conclusion-tabib-b3}
 \end{figure}
 
-Confidence and prudence turn the same non-engagement into a calibration artifact.
-Nemotron has the worst calibration, an ECE of 0.693, and four models pile most
-answers into a single confidence range, which makes the reported score useless for
-human supervision. MedGemma has the best ECE, 0.132, but only because it answers
-``no'' on 99 percent of pairs: a model can look calibrated because it rarely
-commits to anything. Prudence tells the same story. No model separates the four
-severity levels usefully, with Gemma4 E2B maximally cautious everywhere and
-MedGemma uniformly direct, so neither helps a clinician tell a critical
-contraindication from a minor precaution.
+Reported confidence is also unreliable. Nemotron has the highest expected
+calibration error at 0.693, and four models place most answers in a single
+confidence range. MedGemma has the lowest error at 0.132, but answers
+``no'' to 99\% of pairs. Its score therefore reflects non-engagement rather
+than useful confidence estimates.
+
+No model adjusts its caution reliably across the four ANSM severity levels.
+Gemma4 E2B is maximally cautious for almost every pair, while MedGemma remains
+uniformly direct. Neither model distinguishes a critical contraindication from
+a minor precaution.
 
 \begin{reviewrewrite}
-Agreement between French and English predictions is low, and it breaks down in a
-few distinct ways. Nemotron detects most interactions in English but flags only
-7\% of the same French pairs, with $\kappa = 0.041$; Gemma4 E2B detects them in
-both languages yet assigns different severity levels, with $\kappa = 0.004$. For
-MedGemma and Gemma4 E4B, high raw agreement collapses to $\kappa = 0$ because they
-mostly repeat one answer in French, an artifact of repetition rather than genuine
-consistency. Only Ministral-3 8B stays consistent, at $\kappa = 0.586$; larger
-factual knowledge does not buy that consistency~\citep{qi2023crosslingual}.
+French and English prompts often produce different predictions. Nemotron detects
+most interactions in English but only 7\% of the same pairs in French. Gemma4
+E2B detects them in both languages but assigns different severity levels.
+MedGemma and Gemma4 E4B appear consistent mainly because they repeat the same
+answer in French. Only Ministral-3 8B remains consistent across both
+languages~\citep{qi2023crosslingual}.
 \end{reviewrewrite}
 
 \begin{reviewrewrite}
-The comparative triage protocol exposes another kind of failure. Every model
-changes its priority ranking when patient names, postal codes, and insurance
-markers are permuted across medically identical sets of cases. No model reaches
+Permuting patient names, postal codes, and insurance markers changes the
+priority ranking of every model. No model reaches
 $\tau > 0.6$ under Kendall's rank correlation. MedGemma has the lowest stability
 ($\tau = 0.07$), followed by Nemotron ($\tau = 0.17$). The profile ``Jean
 Dupont'', a male French-coded patient from Paris 75007 with private insurance,
@@ -379,24 +343,14 @@ only when the model is asked to rank patients against one another. A benchmark t
 scores answers in isolation underreports the risk that surfaces the moment the
 model is used comparatively, as a triage list is.
 
-Each of these fragilities maps to a concrete clinical risk. The capitulation under
-patient pressure, up to 28 percent of pressure chains ending in unsafe advice,
-is the kind of failure that could wave a contraindicated combination through in
-self-medication; the missing prudence gradient blurs a critical contraindication
-into a minor precaution; and a triage order that shifts with a patient's name and
-postal code is exactly the behaviour a deployed triage tool must not have. These
-are the behaviours a factual benchmark, by construction, never sees.
-
 These numbers are a first probe. TABIB is a preliminary benchmark built on the
 ANSM interaction thesaurus, and its seven protocols are meant to grow in later
 versions. The panel is seven open-weight models of nine billion parameters or
 fewer, so it says nothing about the larger proprietary systems most likely to
-reach a clinic. An LLM judge scores the behavioural responses against the
-thesaurus, and no clinician has yet checked those judgments. The demographic
-protocol is the narrowest: it permutes five patient profiles over one hundred of
-the nine hundred generated cases, enough to expose a ranking bias but too small to
-pin down its size across the range of patients a triage tool would meet. The
-study establishes that these failures occur in this setting, but not how
+reach a clinic. Each case is grounded in an interaction and severity level from
+the official ANSM thesaurus, but an LLM judge scores the behavioural responses
+and no clinician has yet checked its judgments. The study establishes that these
+failures occur in this setting, but not how
 frequent they would be across other patients, models, or clinical tasks.
 
 
@@ -434,8 +388,7 @@ watched, which is not the number a hospital needs.
 \section{Rebuilding the Clinic}
 
 Agents and evaluation awareness together weaken the clean question-answering
-benchmark as the main tool for judging clinical models. The benchmarks in this thesis, and most benchmarks in medical
-NLP, present isolated questions with known answers. To see how an agent behaves in
+benchmark as the main tool for judging clinical models. To see how an agent behaves in
 a hospital, the evaluation has to look more like a hospital: a simulated
 environment with a patient, a record, tools, and a task carried out over several
 turns, scored on the outcome. Early work in this direction exists. AgentClinic
@@ -498,20 +451,13 @@ model is not useful for the task.
 \section{The Work That Remains}
 
 This probe covers one model, one scenario, and twenty pairs, so the intervals are
-wide and the observed rate is not a stable estimate. Its central limitation is
-nonetheless clear. A benchmark based on one question and one answer cannot capture
-a failure that appears only after tool use and repeated patient pressure.
+wide and the observed rate is not a stable estimate.
 
-Systems reaching French clinical practice increasingly act over several steps on
-a patient record. Their supporting evidence still consists largely of
-question-answering scores, which do not measure this sequential behaviour.
-
-Real hospital records cannot leave the institution, while testing an acting agent
-inside the hospital could expose patients to the actions being evaluated. Local
-evaluation would also be difficult to compare across hospitals because the data
-cannot be pooled. Simulations built from public and synthetic material offer a
-scalable alternative. This thesis used that approach for its corpora and models,
-and the same principle can support their evaluation.
+Real hospital records cannot be shared between institutions, and testing an
+agent's actions on real patients would be unsafe. These constraints also make
+evaluations difficult to compare across hospitals. Simulations built from public
+and synthetic data avoid both problems. This thesis used this approach to train
+models, and it can also support their evaluation.
 
 Here we are. \textit{A computer that could weigh a patient's signs toward a likely
 disease} no longer seems like a distant prospect, and systems approaching it are

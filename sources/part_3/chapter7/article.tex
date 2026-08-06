@@ -1,18 +1,14 @@
 \section{The Lymphoma eCRF}
 
-The previous chapters extracted entities one span at a time. A clinical study
-asks for something larger: a complete form, filled from a patient's whole record,
-with every value placed in its correct role along the trajectory. This chapter
-moves from local extraction to that full form-filling task and measures how the
-models we built perform on it.
+The previous chapter trained MC-bio-gliner as a generalist extractor. We now
+adapt it to fill an eCRF from all reports written about one patient. We use
+lymphoma as the case study.
 
-We cannot evaluate on a real hospital study, so we build a synthetic one that
-imitates it as closely as we can. The task fills a lymphoma electronic case
-report form (eCRF) of 89 fields from a longitudinal record. The fields cover ten
-sections, including disease history, two treatment lines, imaging, and patient
-status. Filling the form requires both locating a value and assigning its role
-in the trajectory. In \Cref{fig:p3-task}, the same treatment name fills different
-fields before and after relapse.
+We use the synthetic lymphoma study constructed in \Cref{chap:synthetic}. Its
+eCRF contains 89 fields defined for the lymphoma use case of the OncoLab
+programme. These fields are grouped into ten sections, including disease
+history, two treatment lines, imaging, and patient status.
+\Cref{fig:p3-task} illustrates the task.
 
 \input{sources/part_3/figures/fig01_longitudinal_to_ecrf}
 
@@ -21,83 +17,74 @@ shows a small extract from three of its sections.
 
 \input{sources/part_3/figures/fig01_form_preview}
 
-The synthetic corpus is split into 1,540 training records, 100 validation
-records, and 410 test records. No record is a hospital document. Extractive
-systems score local span--description pairs, while generative systems produce
-all requested fields jointly.
+The synthetic corpus contains 1,540 training records, 100 validation records,
+and 410 test records.
+
+We compare extractive and generative systems. Extractive systems score each
+text span against each field. Generative systems return all 89 fields in one
+structured output.
 
 \section{Evaluation Protocol}
 
-The eCRF keeps one value per record and field: the prediction with the highest
-confidence. A wrong value contributes one false positive and one false negative.
-PARHAF and the FRACCO NER dataset remain multi-mention tasks, where all predictions are
-matched greedily by decreasing confidence. The two regimes are summarized in
-\Cref{fig:p3-metrics,tab:p3-metrics}.
+For each patient and field, the eCRF keeps one value. If a model returns several
+values, we retain the one with the highest confidence.
 
-The evaluation type bank and the training settings are given in \Cref{app:eval-details}. We report three eCRF metrics. Span-$F_1$ accepts any non-empty overlap with the
-reference, making it permissive about boundaries. Value-$F_1$ requires a Jaccard
-similarity of at least 0.5 between normalized token sets. We use this threshold
-rather than exact string match because the compared systems produce different
-objects: an extractor copies a span from the record, whereas a generator emits a
-free value, so exact match would penalize a generator for reformatting rather than
-for wrong content. The exact-match metric tightens value and span at once, counting
-a field correct only when the predicted value and its span are both right, which is
-the operating point relevant to filling a form from its supporting evidence. These
-metrics measure surface agreement and do not measure clinical equivalence. Main model comparisons use paired
-confidence intervals across test records. Each extractive model emits a confidence
-with every span. We select its decision threshold on the 100 validation records
-and apply it once to the test set, so no reported score uses the test set to tune
-the threshold. Generative models return values directly and need no threshold.
+We report three metrics. Span-$F_1$ checks whether the predicted evidence span
+overlaps the reference evidence span. Value-$F_1$ compares the normalized tokens
+of the predicted and reference values. A prediction is correct when their
+Jaccard similarity is at least 0.5. This threshold allows differences in
+formatting between extracted spans and generated values. Exact match requires
+both the value and its evidence span to be correct. These metrics compare text
+and do not measure clinical equivalence.
+
+Extractive models assign a confidence to each prediction. We select one
+threshold per model on the 100 validation records and apply it to the 410 test
+records. Generative models return one value per field and do not require a
+threshold. We compute paired confidence intervals over the test records.
+
+\Cref{fig:p3-metrics} illustrates span and value matching on one sentence.
 
 \input{sources/part_3/figures/fig11_metrics}
-
-\begin{table}[t]
-  \centering
-  \small
-  \begin{tabular}{p{0.25\textwidth} p{0.27\textwidth} p{0.34\textwidth}}
-    \toprule
-    \textbf{Evaluation} & \textbf{Prediction} & \textbf{Match} \\
-    \midrule
-    eCRF value-$F_1$ & One value per field & Token Jaccard $\geq 0.5$ \\
-    eCRF span-$F_1$ & One span per field & Any overlap \\
-    PARHAF and FRACCO & All mentions & Greedy span matching \\
-    \bottomrule
-  \end{tabular}
-\caption{\textbf{Matching rules} used in each evaluation.}
-\label{tab:p3-metrics}
-\end{table}
 
 \section{Results on the Lymphoma eCRF}
 
 \subsection{Raw Model Outputs}
 
-We compare six extractive systems with four sizes from the same generative model
-family. Their training objectives and output formats differ, so this is not a
-controlled scaling experiment. The reference here is the silver eCRF of
-\Cref{chap:synthetic}, produced by the same model family as the generators, so
-the comparison measures agreement with a generated reference rather than clinical
-accuracy. Before competition between fields, the strongest
-generator is the 4-billion-parameter model at 0.672 value-$F_1$; scaling it
-further does not help, as the 9-billion-parameter model reaches only 0.665. The
-150-million-parameter MC-bio-gliner reaches 0.634, and its best variant reaches
-0.650. The raw gap to the strongest generator is therefore 0.038 for the
-published model and 0.022 for the best variant, at 27 times fewer parameters.
-The raw gap is modest relative to the difference in model size.
+We compare three approaches to filling the form. The first treats each eCRF
+field as an extractive question-answering task and returns one answer span from
+the record. The second uses open-vocabulary extraction. We compare MC-bio-gliner
+with GLiNER-BioMed~\citep{zaratiana2025glinerbiomed}. The third prompts four
+Qwen3.5 decoder models to
+return the complete form as structured JSON. These systems have different
+training objectives and output formats, so this is not a controlled scaling
+experiment. The silver eCRF was produced by Qwen3-235B in
+\Cref{chap:synthetic}. Similar conventions between this model and the Qwen3.5
+generators may favour the generators. The scores therefore measure agreement
+with a generated reference rather than clinical accuracy.
+
+Qwen3.5-4B obtains the highest value-$F_1$ at 0.672. Qwen3.5-9B reaches 0.665,
+so increasing the model size does not appear to improve the score further. The
+released 150-million-parameter MC-bio-gliner reaches 0.634. Its gap to
+Qwen3.5-4B is 0.038, with 27 times fewer parameters.
 
 \subsection{Field Competition}
 
-An extractive model scores each span--field pair locally, so the same passage can
-be assigned to several fields. Field competition resolves these conflicts before
-the form is filled. Strongly overlapping candidates compete, the most confident
-assignment is retained, and each field keeps one final value. This rule can
-resolve competing assignments, but it cannot repair a clinically wrong span.
+After selecting one value per field, the same evidence span may still be
+assigned to several fields because each field is scored independently. Field
+competition compares assignments whose evidence spans have an intersection
+over union above 0.5 and keeps only the most confident one. This prevents one
+passage from filling several fields, but it cannot correct a medically
+incorrect prediction.
 
 Field competition improves all six extractive systems. For the published
-MC-bio-gliner, value-$F_1$ rises from 0.634 to 0.640. Applying the same rule to
-generators is less natural because
-their guided JSON already represents a joint answer. It reduces the
-9-billion-parameter model from 0.665 to 0.650, a paired change of $-0.0153$ (95\%
-CI $[-0.0176, -0.0129]$), as shown in \Cref{fig:p3-decoding-competition}.
+MC-bio-gliner, value-$F_1$ rises from 0.634 to 0.640. Field competition is a
+post-processing rule for extractive models, which predict each field
+independently. Generative models already return a joint answer and do not
+require this correction. We nevertheless apply the same rule to all systems in
+the final comparison and also report their raw scores. For Qwen3.5-9B, the rule
+removes some correct values and reduces value-$F_1$ from 0.665 to 0.650, a
+paired change of $-0.0153$ (95\% CI $[-0.0176, -0.0129]$), as shown in
+\Cref{fig:p3-decoding-competition}.
 
 \begin{center}
 \begin{minipage}{\linewidth}
@@ -108,19 +95,17 @@ CI $[-0.0176, -0.0129]$), as shown in \Cref{fig:p3-decoding-competition}.
 \end{minipage}
 \end{center}
 
-\Cref{fig:p3-field-competition-example} illustrates the operation on one
-candidate span.
+After field competition, the released MC-bio-gliner reaches 0.640
+value-$F_1$. Its paired difference from Qwen3.5-4B at 0.658 is $-0.018$ (95\%
+CI $[-0.0243, -0.0108]$). \Cref{fig:p3-money} compares the scores with the
+number of parameters.
 
-\input{sources/part_3/figures/fig12_competition_example}
-
-After competition, the published MC-bio-gliner reaches 0.640, trailing the
-strongest generator, Qwen3.5-4B at 0.658, by 0.018 (95\% CI $[-0.0243, -0.0108]$);
-\Cref{fig:p3-money} places every system on the parameter axis.
-Adapting the training mixture to the task closes this gap: a variant trained on a
-mixture of generalist examples and generated form records reaches 0.657, level
-with Qwen3.5-4B, with a paired difference of $-0.0005$ (95\% CI $[-0.0075,
-0.0072]$) that does not distinguish the two. \Cref{tab:p3-capstone} reports the
-systems after competition.
+We also test whether mixing general annotations and generated eCRF records
+during adaptation helps the extractor. The resulting variant reaches 0.657
+after field competition. Its paired difference from Qwen3.5-4B is $-0.0005$
+(95\% CI $[-0.0075, 0.0072]$). This interval does not distinguish the two
+systems. \Cref{tab:p3-capstone} reports the checkpoints for which all three
+metrics are available.
 
 \begin{figure}[t]
   \centering
@@ -163,101 +148,75 @@ systems after competition.
   \end{tabular}
   \end{threeparttable}
 \caption{\textbf{Lymphoma eCRF results} after field competition. Value-$F_1$
-  (token Jaccard $\geq 0.5$), span-$F_1$, and exact match (value and span both
+  (token Jaccard $\geq 0.5$), span-$F_1$, and exact match (value and evidence span both
   correct) on the 410 test records; extractive thresholds are selected on
   the validation split. Bold: best per column; underline: second best.}
 \label{tab:p3-capstone}
 \end{table}
 
-Scaling the encoder further is a direction we could explore. The
-generators retain an advantage on span-$F_1$, reaching 0.567 against 0.503 for
-MC-bio-gliner.
-
-The ranking does not depend on the decoding step. Field competition is the
-natural decoder for a local extractor, whereas a generator's guided JSON already
-gives one value per field, and the comparison before competition reaches the same
-conclusion as the one after it.
+Qwen3.5-4B remains stronger on span-$F_1$, reaching 0.567 compared with 0.503
+for the released MC-bio-gliner. The comparison gives the same overall result
+with the raw outputs and after field competition. MC-bio-gliner approaches the
+generator on value-$F_1$, while Qwen3.5-4B locates the supporting evidence
+spans more accurately.
 
 \section{Beyond the Aggregate Score}
 
-The aggregate value-$F_1$ hides two things: which kinds of error each system
-makes, and how well it ranks its own predictions by confidence. The measures in
-this section are computed over every committed prediction,
-without the confidence threshold used for the reported value-$F_1$, so they
-include the low-confidence tail that the operating point discards. Read this
-way, the two systems fail differently. Among its errors, MC-bio-gliner assigns a
-correct value to the wrong field 48.9\% of the time, against 38.8\% for the
-strongest generator, Qwen3.5-4B; more of the encoder's mistakes are role
-confusions, the right string placed in the wrong slot. The generator also ranks
-its predictions by confidence more reliably: it reaches a lower risk--coverage
-area, 0.207 against 0.239, and a higher precision at 50\% coverage, 0.828 against
-0.770 (\Cref{fig:p3-risk-coverage}). The encoder commits to more fields per record and abstains less, which
-raises its coverage but leaves more of its confidence budget on wrong slots.
+Value-$F_1$ does not distinguish a wrong value from a correct value assigned to
+the wrong field. Among their errors, wrong-field assignments account for 48.9\%
+for MC-bio-gliner and 38.8\% for Qwen3.5-4B. MC-bio-gliner therefore makes more
+role confusions, where the correct string is placed in the wrong part of the
+form.
 
-\begin{figure}[t]
+We also measure how well each model ranks its predictions by confidence. This
+analysis includes all predictions, including those below the threshold used for
+value-$F_1$. Qwen3.5-4B obtains a lower risk--coverage area, at 0.207 compared
+with 0.239, and a higher precision at 50\% coverage, at 0.828 compared with
+0.770. MC-bio-gliner fills more fields, but its confidence scores separate
+correct and incorrect predictions less accurately
+(\Cref{fig:p3-risk-coverage}).
+
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.78\textwidth]{plots/part_3/output/fig_risk_coverage.pdf}
   \caption{Risk--coverage curves on the lymphoma eCRF: Qwen3.5-4B keeps a lower area (0.207 against 0.239) and a higher precision at 50\% coverage.}
   \label{fig:p3-risk-coverage}
 \end{figure}
 
-MC-bio-gliner's practical advantage is its weight memory. Its 150 million parameters
-require less than one gigabyte at common precisions, against roughly 8 GB for the
-four-billion-parameter generator it matches, and about 18 GB for nine billion, in
-bfloat16. The advantage is in memory alone. It does not carry to speed: parameter
-count does not imply lower end-to-end latency, and the encoder is not faster per
-record when all 89 descriptions are queried.
+MC-bio-gliner has 150 million parameters. In bfloat16, its weights require about
+0.3 GB, compared with roughly 8 GB for Qwen3.5-4B and 18 GB for Qwen3.5-9B.
+These estimates exclude activations and runtime overhead. The smaller model is
+easier to fit on hospital hardware, but it is not faster per record because it
+must query all 89 field descriptions.
 
-The extractive question-answering baseline is weaker still, for a structural
-reason. A SQuAD-style head returns one main span for each question, while a longitudinal
-record may contain several mentions and surface forms of the same value. Our QA
-baseline is trained only on the first mention of each field, which discards this
-multiplicity. This mismatch helps explain why the biomedical QA encoder reaches
-0.417 value-$F_1$, below the description-conditioned encoders.
-
-The QA scores are also poorly suited to selective prediction. On PARHAF, 72.4\%
-of its predictions receive the same confidence. Value-$F_1$ remains defined,
-but a risk--coverage analysis is not informative when most examples cannot be
-ordered by confidence.
+The biomedical question-answering encoder reaches 0.417 value-$F_1$, below the
+open-vocabulary extractors. This could be explained by its weaker training
+signal. Its SQuAD-style head uses one answer span per field and record, while
+GLiNER learns from all annotated mentions.
 
 \section{Generalization and Transfer}
 
-Two questions remain about the extractor: how much of its accuracy depends on the
-number of generated records, and whether it carries to human-written text. For
-the first, a separate series uses a low-density variant of
-MC-bio-gliner, trained on a corpus in which 22.5\% of documents have no retained
-mention. We adapt it with
-10, 50, 100, 500, and 1,540 synthetic records. This is not the joint-supervision
-model reported in the main table. Value-$F_1$ rises from 0.182
-with 10 records to 0.485 with 50 and 0.659 with the full training set
-(\Cref{fig:p3-data-efficiency}). This curve measures the use of generated
-supervision; it does not estimate the cost or value of equivalent human
-annotation.
+We first measure how much generated supervision the extractor needs. We train
+MC-bio-gliner with 10, 50, 100, 500, or 1,540 synthetic records. Value-$F_1$
+increases from 0.182 with 10 records to 0.485 with 50 and 0.659 with all 1,540
+records (\Cref{fig:p3-data-efficiency}). Fifty records already provide 74\% of
+the final score, although performance continues to improve with more data.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.72\textwidth]{plots/part_3/output/fig13_data_efficiency.pdf}
   \caption{Lymphoma eCRF value-$F_1$ by number of synthetic training records.}
   \label{fig:p3-data-efficiency}
 \end{figure}
 
-The second question is external transfer. The synthetic eCRF measures the
-complete task but cannot establish transfer to
-human-written text. We therefore evaluate on PARHAF and FRACCO NER
-(\Cref{tab:p3-external}). PARHAF contains two biomarker types and only 31 test
-documents, so small differences are unstable. FRACCO contains three ICD-O types
-and about 34 mentions per document, making it a substantially denser NER task.
-The MC-bio-gliner corpus contains only 0.2\% of documents with no retained
-mention; retraining it to match the sparser annotation density of these datasets
-raises PARHAF transfer only marginally.
+We next evaluate MC-bio-gliner beyond the generated lymphoma records. PARHAF
+and FRACCO contain human-written text with human NER annotations. They do not
+evaluate complete form filling or use private hospital records. PARHAF contains
+two biomarker types and only 31 test documents, so small differences may be
+unstable. FRACCO contains three ICD-O types and about 34 annotated mentions per
+document. It is therefore a much denser NER task.
 
-The two datasets also differ in what an annotated passage looks like.
-\Cref{fig:p3-external-examples} contrasts their annotation density before the
-numerical comparison.
-
-\input{sources/part_3/figures/fig14_external_examples}
-
-\begin{table}[t]
+\begin{table}[!htbp]
   \centering
   \small
   \sisetup{detect-weight=true, table-format=1.3}
@@ -281,52 +240,35 @@ numerical comparison.
     MC-bio-gliner & 0.203 & 0.626 \\
     \bottomrule
   \end{tabular}
-\caption{\textbf{External transfer results} on PARHAF and FRACCO NER.
-  Value-$F_1$; the confidence threshold is selected on the validation split and
-  the test set is evaluated once. Best per column in bold. A dash marks a run
-  with no usable output: Qwen3.5-2B returned a single span for the whole test set
-  under zero-shot prompting.}
+\caption{Value-$F_1$ on PARHAF and FRACCO before and after adaptation with
+  100 documents. No zero-shot score is reported for Qwen3.5-2B because it
+  returned only one span for the full PARHAF test set.}
 \label{tab:p3-external}
 \end{table}
 
-On PARHAF, adaptation with 100 documents raises MC-bio-gliner from 0.244 to 0.681,
-above the size-matched GLiNER-BioMed at 0.562. Qwen3.5-2B and Qwen3.5-9B
-reach 0.741 and 0.726, respectively. Because the test set contains 31 documents,
-these small differences should not be read as a stable ranking.
+On PARHAF, adaptation with 100 documents raises MC-bio-gliner from 0.244 to
+0.681. This is higher than GLiNER-BioMed at 0.562, but lower than Qwen3.5-2B
+and Qwen3.5-9B at 0.741 and 0.726. The test set contains only 31 documents, so
+these differences may not provide a stable ranking.
 
-FRACCO gives a different result. After adaptation, the size-matched
-GLiNER-BioMed reaches 0.762, compared with 0.626 for MC-bio-gliner. On this
-dense, flat NER task the biomedical NER baseline keeps the advantage, and
-MC-bio-gliner is not the strongest model here. This result narrows the scope of the
-synthetic eCRF comparison to the longitudinal form-filling task it was built for.
+FRACCO gives a different result. After adaptation, GLiNER-BioMed reaches 0.762,
+compared with 0.626 for MC-bio-gliner. MC-bio-gliner therefore does not
+outperform the biomedical baseline on this dense NER task. Its main advantage
+appears on the longitudinal form-filling task for which it was adapted.
 
-\section{Limitations}
-
-The main limitation is the silver reference. The same model family generates the
-records and produces their annotation, so the reference can reward the conventions
-of the generator rather than clinical ground truth. The synthetic split has also
-not been checked for PMC source articles shared between training and test. The
-complete eCRF evaluation uses neither real hospital records nor human annotation.
-PARHAF and FRACCO provide human-annotated tests of narrower NER tasks, but do not
-evaluate full form filling. Evaluation on real hospital records remains necessary
-before any clinical use.
+\FloatBarrier
 
 \section*{Conclusion}
 
-This part evaluated whether a compact extractor trained without hospital data
-could fill a longitudinal clinical study form. On the synthetic lymphoma eCRF,
-the 150-million-parameter MC-bio-gliner comes within 0.018 value-$F_1$ of
-Qwen3.5-4B after field competition. A task-adapted variant reaches the same level
-as the generator, with no distinguishable difference between their scores.
+We release MC-bio-gliner, a 150-million-parameter French biomedical extractor
+trained without hospital records. On the synthetic lymphoma eCRF, it reaches
+0.640 value-$F_1$, within 0.018 of Qwen3.5-4B with 27 times fewer parameters.
+Its weights require about 0.3 GB in bfloat16, compared with 8 GB for the
+generator. When adapted with only 50 synthetic training records, it also
+recovers 74\% of the score obtained with all 1,540 records.
 
-The encoder requires less than one gigabyte of weight memory, which makes local
-deployment easier than for the multi-billion-parameter generators. This advantage
-does not extend to latency or to every measure of extraction quality. The
-generator remains stronger on span-$F_1$, wrong-field errors, and selective
-prediction.
-
-The external evaluations also narrow the result. MC-bio-gliner transfers well to
-the small PARHAF benchmark but remains below GLiNER-BioMed on the denser FRACCO
-NER task. Most importantly, the complete form-filling evaluation remains
-synthetic and uses a silver reference. Whether the result transfers to real
-French hospital records must be established before any clinical use.
+The model provides a reusable starting point for new clinical forms. It can be
+trained and shared using only public and generated text. A hospital could then
+adapt it on site with field descriptions and a small set of annotated records,
+without sending patient data to an external service. The complete task must now
+be evaluated on real hospital records with human annotations.

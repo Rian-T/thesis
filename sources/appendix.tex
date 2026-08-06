@@ -1,10 +1,10 @@
 \partepigraph{``Above all else show the data.''}{%
 Edward Tufte, \textit{The Visual Display of Quantitative Information}}
 
-These appendices collect the material that supports the chapters but would break
-their flow: training configurations and hyperparameter tables, annotation prompts
-and schemas, long worked examples, and evaluation type banks. Each one is meant to
-be read from the chapter that points to it, not straight through.
+The appendices contain supporting material that would interrupt the flow of the
+chapters. This includes training settings, hyperparameter tables, annotation
+prompts and schemas, worked examples, and evaluation type banks. Each appendix
+is intended to be read alongside the chapter that refers to it.
 
 \chapter{Content-Type Annotation and Classifiers}
 \label{app:content-types}
@@ -15,8 +15,9 @@ how the annotations are distilled into a small classifier, and how that classifi
 is run at corpus scale. Two iterations exist. The first, behind Biomed-Enriched,
 annotates PubMed Central with Llama-3.1-70B-Instruct over three dimensions and
 distils into a multilingual XLM-RoBERTa-base classifier. The second, behind the
-French corpus of \Cref{chap:mcbio}, annotates with MedGemma over a richer
-twenty-dimension schema and distils into a CamemBERTv2-base classifier.
+French corpus of \Cref{chap:mcbio}, annotates with
+Qwen3-Next-80B-A3B-Instruct over a richer twenty-dimension schema and distils
+into a CamemBERTv2-base classifier.
 
 \section{Annotation}
 
@@ -711,10 +712,10 @@ sex              = "F"            # stable, single-valued
 
 \section{Type bank}
 
-The reference-free evaluation of \Cref{chap:evaluation} scores each model on two
-sets of ten types: ten common clinical types that any annotation effort would
-include, and ten novel types built to be compositional or cross-domain, which no
-benchmark uses. \Cref{tab:type-bank} lists them.
+The reference-free evaluation of \Cref{chap:architectures} scores each model on
+two sets of ten types. The benchmark types are common clinical types used in
+existing benchmarks. The additional types are compositional or cross-domain
+types not used in these benchmarks. \Cref{tab:type-bank} lists them.
 
 \begin{table}[t]
   \centering
@@ -722,7 +723,7 @@ benchmark uses. \Cref{tab:type-bank} lists them.
   \setlength{\tabcolsep}{14pt}
   \begin{tabular}{@{}ll@{}}
     \toprule
-    Common types & Novel types \\
+    Benchmark types & Additional types \\
     \midrule
     disease            & adverse effect \\
     drug               & implantable device \\
@@ -736,7 +737,7 @@ benchmark uses. \Cref{tab:type-bank} lists them.
     treatment          & immunocompromised status \\
     \bottomrule
   \end{tabular}
-\caption{The twenty evaluation types: ten common, ten novel.}
+\caption{The twenty types used for the reference-free evaluation.}
 \label{tab:type-bank}
 \end{table}
 
@@ -756,10 +757,11 @@ the extractor.
     backbone            & ModernCamemBERT-bio & MC-bio-embed \\
     parameters          & 149M                & 149M \\
     context length      & 8192                & 8192 \\
-    objective           & contrastive (ranking + triplet) & span matching \\
-    learning rate       & 2e\text{-}5 then 1e\text{-}5 & 1e\text{-}5 (enc.) / 5e\text{-}4 (head) \\
+    pooling             & mean + L2 normalization & -- \\
+    objective           & multiple-negatives ranking + triplet & span matching \\
+    learning rate       & 2e\text{-}5 & 1e\text{-}5 (enc.) / 5e\text{-}4 (head) \\
     effective batch     & 128                 & 16 \\
-    steps / epochs      & 20k steps per stage & 2 epochs \\
+    steps / epochs      & 20k steps           & 2 epochs \\
     precision           & fp16                & fp16 \\
     \bottomrule
   \end{tabular}

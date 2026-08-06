@@ -11,29 +11,20 @@
       text width=5.35cm, minimum height=2.15cm, align=left, inner sep=9pt}]
 
     % One clinical sentence, mentions highlighted (span = primary, value = secondary)
-    \node[passage] (sent) at (0,2.75) {``Déc : début d'une chimiothérapie par protocole
+    \node[passage] (sent) at (0,1.45) {``Déc : début d'une chimiothérapie par protocole
       \hlspan{CHOEP-14}, \hlspan{8 cycles}, J1 = \hlval{25 mai 2018}.''};
 
-    % Row 1 — what counts as an extraction target
-    \node[unit] (ecrf) at (-3.0,0.7) {\textbf{eCRF}\\[2pt]
-      {\scriptsize\itshape\color{ThesisNeutral}one value for the requested field}\\[6pt]
-      \hlspan{CHOEP-14}};
-    \node[unit] (ner) at (3.0,0.7) {\textbf{Named entity recognition}\\[2pt]
-      {\scriptsize\itshape\color{ThesisNeutral}every mention in the text}\\[6pt]
-      \hlspan{CHOEP-14}\, \hlspan{8 cycles}\, \hlval{25 mai 2018}};
-
-    % Row 2 — how a single match is scored
-    \node[unit] (span) at (-3.0,-1.85) {\textbf{Span $F_1$}\\[2pt]
-      {\scriptsize\itshape\color{ThesisNeutral}token overlap of the span}\\[6pt]
+    \node[unit] (span) at (-3.0,-0.55) {\textbf{Span $F_1$}\\[2pt]
+      {\scriptsize\itshape\color{ThesisNeutral}overlap of the evidence span}\\[6pt]
       reference:\ protocole \hlspan{CHOEP-14}\\[2pt]
       prediction:\ \hlspan{CHOEP-14}};
-    \node[unit] (val) at (3.0,-1.85) {\textbf{Value $F_1$}\\[2pt]
+    \node[unit] (val) at (3.0,-0.55) {\textbf{Value $F_1$}\\[2pt]
       {\scriptsize\itshape\color{ThesisNeutral}overlap of the normalised value}\\[6pt]
       reference:\ \hlval{25 mai 2018}\\[2pt]
       prediction:\ \hlval{mai 2018}\quad Jaccard $=2/3$};
   \end{tikzpicture}%
   }
-  \captionof{figure}{Four evaluation units illustrated on one clinical sentence.}
+  \captionof{figure}{Span and value matching illustrated on one clinical sentence.}
   \label{fig:p3-metrics}
 \end{minipage}
 \end{center}

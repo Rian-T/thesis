@@ -74,7 +74,6 @@ A 27-year-old female presented with four episodes of exertional syncope. Cathete
 \caption{\textbf{Document-level vs.\ paragraph-level filtering.} A low-quality web page can be discarded entirely (left). A scientific article mixes high-value content (clinical cases, reviews) with boilerplate (right). Paragraph-level annotation allows keeping the valuable parts.}
 \label{fig:motivation}
 \end{figure}
-% TODO: replace example paragraphs with real extracts from a single PMC article
 
 \begin{reviewread}
 \Cref{fig:motivation} illustrates the difference. A web page about astronomy scores low throughout and can be safely discarded. A PMC article on pulmonary hypertension, by contrast, contains a textbook-quality review paragraph, a boilerplate committee note, and a clinical case report with real diagnostic values. Document-level filtering would either keep all three or discard all three. Neither is the right answer.
@@ -91,11 +90,6 @@ In this chapter, we introduce a paragraph-level annotation framework that distin
 
 \section{Content Heterogeneity in Scientific Articles}
 \label{sec:heterogeneity}
-
-% === EXAMPLE: mixed content in a single article ===
-% TODO: Add a concrete example here — a real PMC article showing
-% a clinical case paragraph, a methods paragraph, and a boilerplate
-% paragraph side by side, with their annotation scores.
 
 \begin{reviewread}
 Large language models for biomedicine are typically pretrained on PubMed Central (PMC) Open Access articles. While valuable, this corpus presents challenges including heterogeneous quality, predominance of English content (approximately 98\%), uneven representation of clinical cases, and variable educational value. Existing filtering approaches operate at the article level: BioMistral~\citep{labrak-etal-2024-biomistral} upsampled non-English articles, while Meditron~\citep{chen2023meditron} scored articles using MeSH tags, publication type, journal reputation, recency, and citation count. These methods assume that entire documents are either valuable or not.
@@ -146,8 +140,6 @@ We follow the two-stage annotation process of \Cref{fig:pipeline}, on a single 8
 \paragraph{Stage 1: LLM annotation.}
 We used Llama-3.1-70B-Instruct~\citep{touvron2024llama3}, with the full prompt and the annotation schema given in \Cref{app:content-types}, to annotate a diverse subset of 400,000 paragraphs (approximately 0.33\% of the corpus) across multiple dimensions: type classification (clinical case, study, review, other), domain categorization (clinical, biomedical, other), and educational quality (1--5 scale). Language was identified separately using langdetect.
 
-% TODO: include annotation prompt in appendix, reference it here
-
 \paragraph{Stage 2: Distillation.}
 To scale annotation to the full corpus, we distilled the LLM annotations into a smaller XLM-RoBERTa-base model~\citep{conneau2020xlmr} trained to jointly predict all annotation dimensions. On 39,800 held-out paragraphs, the student closely matches the Llama-3.1-70B labels (\Cref{tab:distillation}). These annotations are neural heuristics for data curation, and no medical expert verified them. Similar to FineWeb-Edu~\citep{penedo2024fineweb}, they guide which content to prioritize during pretraining.
 
@@ -194,9 +186,6 @@ Most PMC paragraphs receive an educational score of 4, with a mean of 3.48 and m
 \begin{reviewread}
 Using the distilled model, we annotated the full PMC corpus and constructed several dataset variants through strategic filtering and upsampling, summarized in \Cref{tab:be-variants}. Upsampling refers to duplicating articles in the training corpus, proportionally increasing their sampling probability.
 \end{reviewread}
-
-% TODO: add example of a clinical case paragraph extracted from a
-% genomics article — showing that clinical content hides in unexpected places
 
 \begin{table}[t]
 \centering

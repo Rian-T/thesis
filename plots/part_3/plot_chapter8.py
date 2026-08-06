@@ -287,11 +287,11 @@ def _make_section_supervision_figure(data: SupervisionData):
 
 
 def _make_novel_types_figure(data: NovelTypeData):
-    """Compact dumbbell: MC-bio-embed vs ModernCamemBERT-bio on familiar and
-    benchmark-absent descriptions, with the gain annotated on each row (B4)."""
+    """Compact dumbbell: MC-bio-embed vs ModernCamemBERT-bio on benchmark and
+    additional types, with the gain annotated on each row (B4)."""
 
     fig, ax = plt.subplots(figsize=(4.6, 1.95))
-    regimes = ("Familiar\ndescriptions", "Benchmark-absent\ndescriptions")
+    regimes = ("Benchmark\ntypes", "Additional\ntypes")
     y_positions = (1, 0)
     for index, (regime, y_position) in enumerate(zip(regimes, y_positions)):
         medembed = data.medembed[index]
@@ -372,7 +372,7 @@ def _make_novel_types_figure(data: NovelTypeData):
     ax.scatter([], [], s=82, color=COLORS["primary"], label="MC-bio-embed")
     ax.scatter([], [], s=46, color=COLORS["neutral"], label="ModernCamemBERT-bio")
     ax.legend(frameon=False, fontsize=7.5, loc="upper center",
-              bbox_to_anchor=(0.5, 1.02), ncol=2, columnspacing=1.2,
+              bbox_to_anchor=(0.5, 1.08), ncol=2, columnspacing=1.2,
               handletextpad=0.4)
     return fig
 

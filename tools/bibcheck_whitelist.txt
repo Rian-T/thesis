@@ -26,7 +26,6 @@ tang2024txt360                  # TxT360 LLM pretraining dataset (HuggingFace, n
 # Ch.1/Ch.2 intro expansion — books, legal texts, web stats (genuinely no resolvable DOI):
 mycin_book_1984                 # Buchanan & Shortliffe, MYCIN Experiments, Addison-Wesley 1984 (book)
 lighthill_1973                  # Lighthill Report, Science Research Council 1973 (report, no DOI)
-aphp_eds_scale                  # AP-HP CDW scale (PubMed PMIDs, no single DOI). numbers VERIFIED vs abstracts: PMID 41647696 "Of 333 852 cancer patients", PMID 41133988 "population of 109 448 patients"
 gdpr_art9                       # GDPR Art. 9 (EUR-Lex CELEX 32016R0679, legal)
 cnil_mr004                      # CNIL MR-004 délibération 2018-155 (legal)
 hdh_loi                         # LOI 2019-774 art. 41, Health Data Hub (legal)

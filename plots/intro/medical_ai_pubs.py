@@ -10,7 +10,7 @@ Source: research/ch1_deep.md Part B. Exact (URL-decoded) queries:
   Series 3 (deep learn.):  "deep learning"[tiab]
   Series 4 (machine learning): "machine learning"[tiab]  (accessed 2026-06-16)
 
-2025 counts are partial-year; recent years still accrue with indexing lag.
+Recent-year counts, including 2025, may still accrue with indexing lag.
 
 Run:
   uv run --with matplotlib --with numpy python plots/intro/medical_ai_pubs.py
@@ -40,7 +40,7 @@ ai = {
     2003: 1757, 2004: 2713, 2005: 3579, 2006: 4009, 2007: 4391, 2008: 4835,
     2009: 4572, 2010: 4389, 2011: 5205, 2012: 5454, 2013: 6667, 2014: 6656,
     2015: 6478, 2016: 6481, 2017: 7696, 2018: 10233, 2019: 14585, 2020: 19032,
-    2021: 24936, 2022: 29695, 2023: 26228, 2024: 38015, 2025: 50559,  # 2025 partial
+    2021: 24936, 2022: 29695, 2023: 26228, 2024: 38015, 2025: 50559,
 }
 
 # Series 2 — "expert system"[tiab] OR "expert systems"[tiab]
@@ -59,7 +59,7 @@ expert = {
 deep = {
     2010: 9, 2011: 13, 2012: 11, 2013: 34, 2014: 60, 2015: 128, 2016: 289,
     2017: 806, 2018: 2142, 2019: 4367, 2020: 7604, 2021: 12285, 2022: 16930,
-    2023: 18525, 2024: 20989, 2025: 27390,  # 2025 partial
+    2023: 18525, 2024: 20989, 2025: 27390,
 }
 
 # Series 4 — "machine learning"[tiab]  (accessed 2026-06-16)
@@ -69,7 +69,7 @@ ml = {
     2003: 94, 2004: 148, 2005: 192, 2006: 278, 2007: 335, 2008: 409, 2009: 491,
     2010: 556, 2011: 706, 2012: 767, 2013: 1083, 2014: 1360, 2015: 1735,
     2016: 2294, 2017: 3320, 2018: 5503, 2019: 8721, 2020: 13326, 2021: 19578,
-    2022: 24760, 2023: 28019, 2024: 34037, 2025: 46363,  # 2025 partial
+    2022: 24760, 2023: 28019, 2024: 34037, 2025: 46363,
 }
 
 

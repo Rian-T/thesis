@@ -2,17 +2,11 @@
 life''}{%
 Ludwig Wittgenstein, \textit{Philosophical Investigations}}
 
-A clinical study follows each patient over time and records a fixed set of
-variables, such as the treatment given and its start date, in a structured form.
-These values already appear in consultation notes, discharge summaries, and
-pathology reports, but later documents may correct earlier ones. Filling the form
-therefore requires finding each value and determining which statement still holds.
-
-No open corpus pairs French hospital reports with forms completed by clinicians.
-The supervision must therefore be constructed from public and generated text.
-Because confidential records cannot be sent to an external API, the resulting
-extractor must also run on hospital hardware. The question is whether public and
-generated text are enough for a task whose real data no one can show us.
+A clinical study records a fixed set of variables in an electronic case report
+form (eCRF). These values are spread across reports written throughout a
+patient's care and must be assigned to the right fields. Since no open dataset
+pairs French hospital reports with completed eCRFs, we train an extractor from
+public and generated text that can run inside the hospital.
 
 \chapter{Synthetic Data for Task Adaptation}
 \label{chap:synthetic}

@@ -4,8 +4,8 @@
   \resizebox{0.9\textwidth}{!}{%
   \begin{tikzpicture}[font=\small\sffamily,
     tok/.style={font=\small\sffamily, text=ThesisInk},
-    span/.style={rounded corners=2pt, draw=ThesisPrimaryDark, line width=0.9pt,
-      fill=ThesisPrimary!24, inner sep=3pt, font=\small\sffamily\bfseries,
+    span/.style={rounded corners=2pt, draw=ThesisNeutral!65, line width=0.9pt,
+      fill=ThesisNeutral!10, inner sep=3pt, font=\small\sffamily\bfseries,
       text=ThesisInk},
     query/.style={rounded corners=3pt, draw=ThesisNeutral!55, line width=0.9pt,
       fill=ThesisNeutral!12, inner sep=6pt, align=center, font=\small\sffamily,
@@ -31,7 +31,7 @@
       ``first-line treatment''};
 
     % --- Similarity node (centre-right), spaced from both inputs ---
-    \node[sim] (sim) at (6.15,0.3) {span--\\description\\similarity};
+    \node[sim] (sim) at (6.15,0.3) {candidate span--\\description\\score};
 
     % --- Answer (right) ---
     \node[ans] (ans) at (10.0,0.3) {CHOEP-14};
@@ -47,7 +47,8 @@
 
   \end{tikzpicture}%
   }
-  \captionof{figure}{Span selection from a clinical text and a type description.}
+  \captionof{figure}{Each candidate span is scored against the requested type
+  description; spans above the selection threshold are returned.}
   \label{fig:p3-open-query}
 \end{minipage}
 \end{center}

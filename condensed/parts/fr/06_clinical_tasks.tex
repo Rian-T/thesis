@@ -12,11 +12,11 @@ extraire de documents cliniques des variables propres à chaque étude. Chaque p
 demande des champs différents, généralement avec peu ou pas de données annotées. Aucun
 jeu de données ouvert n'associe un dossier hospitalier français à un formulaire rempli
 par un clinicien, et les dossiers eux-mêmes ne peuvent quitter l'hôpital, la
-supervision doit donc être construite plutôt que collectée. Nous utilisons de grands
-modèles de langue pour annoter du texte public, pour juger des types jamais observés
-quand les références fixes font défaut, et pour générer des dossiers synthétiques de
-lymphome dérivés de cas cliniques publiés dans des articles scientifiques. Les deux
-voies utilisent Qwen3-235B avec une sortie JSON contrainte, et les annotations
+supervision doit donc être construite plutôt que collectée. Nous utilisons
+Qwen3-235B pour annoter le texte public et construire la supervision automatique.
+Pour les dossiers synthétiques, Qwen3-Next-80B-A3B sélectionne d'abord les cas
+publiés qui portent sur le lymphome. Qwen3-235B les transforme ensuite en
+comptes-rendus longitudinaux et remplit l'eCRF correspondant. Les annotations ainsi
 obtenues sont automatiques, dites \textit{silver}, plutôt que produites par des humains.
 
 \begin{center}
@@ -68,15 +68,20 @@ en une frise temporelle française structurée, puis nous générons les documen
 à un, en réextrayant la frise après chaque génération comme contrôle de cohérence,
 de sorte qu'un compte-rendu à une date donnée ne reçoive que les événements déjà
 survenus. Le corpus obtenu contient 2\,050 dossiers longitudinaux, chacun avec une
-médiane de huit documents et de 22\,314 caractères, et 31\% d'entre eux
-comportent une deuxième ligne de traitement. En faire un jeu d'entraînement pour l'extraction est
-l'étape suivante : chaque valeur doit être reliée à l'un des 89 champs du
-formulaire qui nous intéresse et localisée dans le dossier complet. Une dernière passe du modèle de
-langue sur 16\,375 comptes-rendus produit 237\,194 annotations reliant des segments de
-texte à ces champs. La référence est automatique plutôt qu'humaine. La même famille
-de modèles génère les dossiers et propose leurs
-étiquettes, ce qui peut favoriser les conventions du générateur plutôt que la vérité
-clinique.
+médiane de huit documents et de 22\,314 caractères, et 31\% d'entre eux comportent
+une deuxième ligne de traitement.
+
+Pour construire la référence, le modèle lit tous les comptes-rendus d'un patient et
+remplit les 89 champs de l'eCRF. Pour chaque champ non vide, il fournit une valeur et
+le passage du dossier qui justifie cette valeur. Nous localisons ce passage par
+correspondance exacte, puis approximative si nécessaire. Lorsque aucune
+correspondance n'est trouvée, le champ est remis à zéro. La procédure produit
+237\,194 associations entre un champ et un passage justificatif. Cette référence
+reste automatique plutôt qu'humaine. Chaque passage retenu existe donc bien dans le
+dossier, mais cela ne garantit ni que la valeur soit correcte ni qu'elle ait été
+attribuée au bon champ. La même famille de modèles génère les dossiers et propose
+leurs étiquettes, ce qui peut favoriser les conventions du générateur plutôt que la
+vérité clinique.
 
 La chaîne de génération a été affinée avec les retours d'une équipe de cliniciens de
 CHU français. Recueillis à travers une interface d'annotation web et des échanges avec
@@ -85,11 +90,18 @@ la qualité des annotations automatiques et le réalisme du texte généré. Ils
 les versions suivantes. Une évaluation structurée et reproductible du réalisme
 clinique, avec un protocole défini et un panel de cliniciens, reste à mener.
 
-Pour exploiter ces annotations, nous construisons MC-bio-gliner, un extracteur de
-150 millions de paramètres fondé sur l'architecture GLiNER. Le modèle compare les
-segments du document à une description en langage naturel de chaque champ recherché.
-Il peut ainsi traiter à l'inférence des champs qui n'étaient pas fixés lors de son
-pré-entraînement. Nous l'adaptons au formulaire à partir des dossiers générés.
+L'extracteur doit comprendre les descriptions des champs qu'il recherche. Nous
+ajoutons donc à ModernCamemBERT-bio une phase d'entraînement contrastif sur les
+terminologies CIM-10, ATC et CCAM. Nous évaluons le modèle en lui demandant de
+retrouver un code médical à partir de son nom, d'un synonyme ou d'un compte-rendu
+clinique. Le modèle obtenu, MC-bio-embed, dépasse les autres encodeurs testés. Nous
+l'utilisons comme base de MC-bio-gliner, un extracteur de 150 millions de paramètres
+fondé sur l'architecture GLiNER.
+
+MC-bio-gliner compare les segments du document à une description en langage naturel
+de chaque champ recherché. Il peut ainsi traiter des champs qui n'étaient pas fixés
+lors de son entraînement généraliste. Nous l'adaptons ensuite au formulaire du
+lymphome à partir des dossiers générés.
 
 Nous l'évaluons de deux manières. La value-$F_1$ mesure si le contenu extrait
 correspond à la valeur attendue, tandis que la span-$F_1$ vérifie si le modèle a
