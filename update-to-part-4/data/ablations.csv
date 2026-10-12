@@ -1,0 +1,15 @@
+piece,verdict,measure,protocol,source
+retirer la perte de détection,+0.098,val 0.670 -> 0.776 (det_w 0.1 -> 0),balayage det_w 0.1/0.02/0.002/0,ARCHITECTURE.md §4
+transducteur appris vs taxonomy.py (300 lignes de règles),+0.174 bout en bout ; exact-match 0.8975 vs 0.630,15927 paires test,ablation directe,ARCHITECTURE.md §4
+options de vocabulaire encodées (CAT),+0.121 puis +0.252,,ablations antérieures (lignée découplée/intégrée),ARCHITECTURE.md §4
+abstention dans le même softmax,+0.071,0.532 -> 0.603,ablation,JOURNAL.md
+seuil déduit de la métrique (F1/2),+0.015 à 1 epoch ; 0 à 3 epochs,,calibration val -> test,ARCHITECTURE.md §4
+tête d'affectation (sélection),retirée,-0.000 au rang 1 ; 0.615 sans ancrage après 4 epochs,contrôle au rang 1 + test pré-enregistré,ARCHITECTURE.md §5
+MLP de la route copie,retiré,val 0.777 vs 0.776,ablation ctx=sonly,ARCHITECTURE.md §7
+compétition entre champs (alpha),retirée,alpha = 0.0000 après entraînement (4 fois),paramètre libre,ARCHITECTURE.md §7
+pool large (1024 vs 256),retiré,rien à budget fixe,,ARCHITECTURE.md §7
+décision de remplir apprise (15 param.),retirée,+0.001 sur un seuil,régression logistique sur 9 indices,ARCHITECTURE.md §7
+somme marginale vs affectation dure,non nécessaire,0.771 vs 0.776 (1 epoch),,ARCHITECTURE.md §7
+ancre de section (regex ===),abandonnée (artefact du générateur),DATE 0.759 -> 0.835 avec regex ; +0.001 à +0.006 en générique,transducteur seul,ARCHITECTURE.md §10 + WORKPLAN
+fenêtre de lecture 24k -> 45k,+0.023 (éval +0.009 ; entraînement +0.014),0.786 -> 0.809,choix sur val puis test,WORKPLAN
+encodeur 150M -> 395M,+0.006,0.809 -> 0.815,même fenêtre,WORKPLAN

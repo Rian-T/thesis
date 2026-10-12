@@ -1,0 +1,174 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds}
+\usepackage{amsmath}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\begin{document}
+
+\section*{eCRF lymphome : approche et résultats}
+
+Remplir 89 champs depuis un dossier patient de 22\,000 caractères.
+Une valeur par champ, ou rien. Une valeur fausse coûte 2, une abstention 1.
+
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=6mm and 8mm,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=4pt, font=\small},
+  opt/.style={box, fill=black!4, minimum height=11mm, text width=30mm},
+  big/.style={box, fill=black!8, text width=95mm},
+  out/.style={align=center, font=\small\itshape},
+  ar/.style={-{Latex[length=2mm]}, thick}
+]
+
+\node[big] (in) {dossier patient + schéma des 89 champs\\ dans une seule séquence};
+\node[box, below=of in, text width=60mm, fill=black!10] (enc)
+  {encodeur GLiNER2, 150\,M\\ \textbf{inchangé}};
+\node[box, below=of enc, text width=60mm] (s)
+  {$S$ = score champ $\times$ span\\ \textbf{déjà calculé}};
+
+\node[opt, below left=10mm and 12mm of s] (copie) {copie\\ $S[f,\cdot]$};
+\node[opt, below=10mm of s] (vocab) {vocabulaire\\ valeurs vues};
+\node[opt, below right=10mm and 12mm of s] (null) {$\bot$\\ abstention};
+
+\node[box, below=8mm of copie, text width=32mm, fill=black!6] (tr)
+  {transducteur\\ 2\,M, partagé par 89};
+\node[out, below=8mm of vocab] (v2) {\og urbain \fg{}};
+\node[out, below=8mm of null] (v3) {champ vide};
+\node[out, below=6mm of tr] (v1) {\og 2017-04-15 \fg{}};
+
+\draw[ar] (in) -- (enc);
+\draw[ar] (enc) -- (s);
+\draw[ar] (s) -- (copie);
+\draw[ar] (s) -- (vocab);
+\draw[ar] (s) -- (null);
+\draw[ar] (copie) -- (tr);
+\draw[ar] (tr) -- (v1);
+\draw[ar] (vocab) -- (v2);
+\draw[ar] (null) -- (v3);
+
+\begin{scope}[on background layer]
+  \node[draw, dashed, rounded corners, fit=(copie)(vocab)(null),
+        inner sep=6pt, label={[font=\small]above right:un seul softmax}] {};
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5em}
+Une seule perte, le span est caché, on ne dit que la valeur :
+\[
+L \;=\; -\log \sum_{\text{spans}} P(\text{span}\mid\text{champ})\cdot P(\text{valeur}\mid\text{span},\text{champ})
+\]
+Aucune perte de détection. C'est la condition pour que ça marche.
+
+\vspace{1.5em}
+
+\begin{table}[h]\centering
+\caption*{\textbf{Résultat.} Test 410 documents. Macro-F1 par famille.}
+\begin{tabular}{lccccc}
+\toprule
+ & macro & CAT & DATE & NUM & ORD \\
+\midrule
+v3b nu                                  & 0.487 & 0.430 & 0.307 & 0.537 & 0.673 \\
+Qwen3.5-9B finetuné, mêmes données      & 0.582 & 0.488 & 0.447 & 0.590 & 0.791 \\
+v3b + têtes (avant)                     & 0.603 & 0.682 & 0.380 & 0.596 & 0.755 \\
+\ \ + transducteur, abstention, seuil   & 0.673 & 0.711 & 0.497 & 0.652 & 0.781 \\
+\ \ + perte rééquilibrée                & 0.739 & 0.781 & 0.610 & 0.730 & 0.834 \\
+\textbf{\ \ + perte de détection retirée} & \textbf{0.771} & 0.807 & 0.660 & 0.758 & 0.858 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]\centering
+\caption*{\textbf{Ce qui apporte.}}
+\begin{tabular}{lc}
+\toprule
+ & gain \\
+\midrule
+retirer la perte de détection        & +0.098 \\
+transducteur appris vs 300 lignes de règles & +0.174 \\
+abstention dans le même softmax      & +0.071 \\
+seuil déduit de la métrique ($F_1/2$) & +0.015 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]\centering
+\caption*{\textbf{Le poids de la perte de détection.} Validation.}
+\begin{tabular}{lcccc}
+\toprule
+poids & 0.1 & 0.02 & 0.002 & \textbf{0} \\
+\midrule
+macro & 0.670 & 0.673 & 0.749 & \textbf{0.776} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]\centering
+\caption*{\textbf{Qui trouve le bon span.} Rappel au rang 1.}
+\begin{tabular}{lccc}
+\toprule
+poids de la perte de détection & 0.1 & 0.002 & \textbf{0} \\
+\midrule
+score de détection             & 0.727 & 0.789 & \textbf{0.820} \\
+score de détection, DATE seul  & 0.470 & 0.586 & \textbf{0.635} \\
+la tête                        & $+0.005$ & $+0.010$ & $-0.000$ \\
+la tête sans le score          & 0.234 & 0.215 & 0.187 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Retirer la perte de détection rend la détection meilleure.
+Elle apprend à pointer là où l'annotateur a pointé, et l'annotateur ne pointe
+jamais sur un titre de section, où vivent 55.7\% des dates.
+
+\begin{table}[h]\centering
+\caption*{\textbf{La bonne valeur est-elle atteignable ?} DATE, pool de 256 spans.}
+\begin{tabular}{lc}
+\toprule
+avant (12 candidats par champ)   & 0.61 \\
+avec perte de détection          & 0.752 \\
+\textbf{sans perte de détection} & \textbf{0.832} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+52.8\% des spans gagnants de DATE ne touchent aucun span annoté.
+
+\begin{table}[h]\centering
+\caption*{\textbf{Ce qui a été retiré}, chaque fois par une mesure.}
+\begin{tabular}{ll}
+\toprule
+300 lignes de règles écrites à la main & battues 0.895 contre 0.630 \\
+perte de détection                     & nuisible, 0.670 contre 0.771 \\
+tête de sélection                      & $-0.000$ au rang 1 \\
+MLP de la route copie                  & au plus 0.004 \\
+compétition entre champs               & reste à 0, quatre fois \\
+pool large (1024 contre 256)           & rien \\
+règle de remplissage apprise           & +0.001 sur un seuil \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]\centering
+\caption*{\textbf{Ce qui reste.}}
+\begin{tabular}{lc}
+\toprule
+aujourd'hui                        & 0.771 \\
+si on savait quand on a raison     & 0.907 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Le gold vient d'un seul annotateur automatique, sur des documents synthétiques
+du même pipeline.
+
+\end{document}

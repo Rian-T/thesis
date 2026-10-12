@@ -1,0 +1,392 @@
+{
+ "history_bcl6_ihc_raw": {
+  "family": "NUM",
+  "acc": 0.0,
+  "n": 12
+ },
+ "history_age_adjusted_ipi_au_diagnostic": {
+  "family": "ORD",
+  "acc": 0.0,
+  "n": 3
+ },
+ "history_bcl2_ihc_raw": {
+  "family": "NUM",
+  "acc": 0.042,
+  "n": 24
+ },
+ "second_line_date_of_progression_or_relapse": {
+  "family": "DATE",
+  "acc": 0.047,
+  "n": 43
+ },
+ "imaging_number_of_affected_organs": {
+  "family": "NUM",
+  "acc": 0.055,
+  "n": 218
+ },
+ "first_line_date_of_progression_or_relapse": {
+  "family": "DATE",
+  "acc": 0.102,
+  "n": 127
+ },
+ "history_extranodalinv_n_at_diagnosis": {
+  "family": "NUM",
+  "acc": 0.125,
+  "n": 24
+ },
+ "other_lines_total_number_of_treatment_lines": {
+  "family": "NUM",
+  "acc": 0.157,
+  "n": 331
+ },
+ "first_line_date_of_transplant_therapy_after_treatment": {
+  "family": "DATE",
+  "acc": 0.161,
+  "n": 31
+ },
+ "first_line_end_date_of_treatment": {
+  "family": "DATE",
+  "acc": 0.174,
+  "n": 235
+ },
+ "second_line_end_date_of_treatment": {
+  "family": "DATE",
+  "acc": 0.178,
+  "n": 45
+ },
+ "second_line_date_of_transplant_therapy_after_treatment": {
+  "family": "DATE",
+  "acc": 0.188,
+  "n": 16
+ },
+ "second_line_date_of_response_assessment_to_treatment": {
+  "family": "DATE",
+  "acc": 0.216,
+  "n": 51
+ },
+ "imaging_date_of_tepscan_new_progression": {
+  "family": "DATE",
+  "acc": 0.256,
+  "n": 39
+ },
+ "history_date_of_diagnosis_of_lymphoma": {
+  "family": "DATE",
+  "acc": 0.279,
+  "n": 365
+ },
+ "imaging_date_of_tepscan_2nd_line_or_before_next_line": {
+  "family": "DATE",
+  "acc": 0.299,
+  "n": 87
+ },
+ "history_ipi_extranodinv_at_diagnosis": {
+  "family": "NUM",
+  "acc": 0.333,
+  "n": 27
+ },
+ "imaging_date_of_tepscan_1st_rechute": {
+  "family": "DATE",
+  "acc": 0.337,
+  "n": 86
+ },
+ "imaging_dmax": {
+  "family": "NUM",
+  "acc": 0.35,
+  "n": 40
+ },
+ "antecedents_alcohol_status": {
+  "family": "CAT",
+  "acc": 0.444,
+  "n": 27
+ },
+ "first_line_date_of_response_assessment_to_treatment": {
+  "family": "DATE",
+  "acc": 0.448,
+  "n": 268
+ },
+ "news_date_of_last_news": {
+  "family": "DATE",
+  "acc": 0.482,
+  "n": 392
+ },
+ "second_line_response_assessment_to_treatment": {
+  "family": "CAT",
+  "acc": 0.482,
+  "n": 56
+ },
+ "second_line_start_date_of_treatment": {
+  "family": "DATE",
+  "acc": 0.489,
+  "n": 90
+ },
+ "other_lines_oms_score_on_all_other_treatment_lines": {
+  "family": "ORD",
+  "acc": 0.527,
+  "n": 55
+ },
+ "demography_professional_status": {
+  "family": "CAT",
+  "acc": 0.547,
+  "n": 296
+ },
+ "second_line_treatment_cycles_n": {
+  "family": "NUM",
+  "acc": 0.553,
+  "n": 76
+ },
+ "news_date_of_last_visit": {
+  "family": "DATE",
+  "acc": 0.555,
+  "n": 326
+ },
+ "first_line_start_date_of_treatment": {
+  "family": "DATE",
+  "acc": 0.569,
+  "n": 343
+ },
+ "history_coo_test": {
+  "family": "CAT",
+  "acc": 0.58,
+  "n": 138
+ },
+ "history_disease_diagnosis": {
+  "family": "CAT",
+  "acc": 0.603,
+  "n": 370
+ },
+ "first_line_transplant_therapy_after_treatment": {
+  "family": "CAT",
+  "acc": 0.634,
+  "n": 238
+ },
+ "first_line_treatment": {
+  "family": "CAT",
+  "acc": 0.642,
+  "n": 349
+ },
+ "second_line_transplant_therapy_after_treatment": {
+  "family": "CAT",
+  "acc": 0.644,
+  "n": 73
+ },
+ "first_line_radiation": {
+  "family": "CAT",
+  "acc": 0.65,
+  "n": 283
+ },
+ "second_line_treatment": {
+  "family": "CAT",
+  "acc": 0.653,
+  "n": 118
+ },
+ "second_line_radiation": {
+  "family": "CAT",
+  "acc": 0.678,
+  "n": 87
+ },
+ "imaging_largest_tumor_size": {
+  "family": "NUM",
+  "acc": 0.681,
+  "n": 270
+ },
+ "history_transformation_prior_indolent_lymphoid_malignancy": {
+  "family": "CAT",
+  "acc": 0.694,
+  "n": 36
+ },
+ "antecedents_smoking_status": {
+  "family": "CAT",
+  "acc": 0.705,
+  "n": 61
+ },
+ "first_line_response_assessment_to_treatment": {
+  "family": "CAT",
+  "acc": 0.708,
+  "n": 284
+ },
+ "history_myc_fish": {
+  "family": "CAT",
+  "acc": 0.719,
+  "n": 121
+ },
+ "second_line_method_of_response_assessment_to_treatment": {
+  "family": "CAT",
+  "acc": 0.719,
+  "n": 57
+ },
+ "history_myc_ihc": {
+  "family": "CAT",
+  "acc": 0.725,
+  "n": 120
+ },
+ "history_bcl2_ihc": {
+  "family": "CAT",
+  "acc": 0.726,
+  "n": 190
+ },
+ "history_bcl6_ihc": {
+  "family": "CAT",
+  "acc": 0.728,
+  "n": 202
+ },
+ "first_line_adverse_effects_presence": {
+  "family": "CAT",
+  "acc": 0.728,
+  "n": 232
+ },
+ "history_ngs_status": {
+  "family": "CAT",
+  "acc": 0.733,
+  "n": 15
+ },
+ "second_line_oms_score": {
+  "family": "ORD",
+  "acc": 0.736,
+  "n": 110
+ },
+ "first_line_treatment_cycles_n": {
+  "family": "NUM",
+  "acc": 0.766,
+  "n": 286
+ },
+ "demography_marital_status": {
+  "family": "CAT",
+  "acc": 0.781,
+  "n": 215
+ },
+ "news_date_of_death": {
+  "family": "DATE",
+  "acc": 0.784,
+  "n": 97
+ },
+ "history_bcl2_fish": {
+  "family": "CAT",
+  "acc": 0.8,
+  "n": 100
+ },
+ "first_line_oms_score": {
+  "family": "ORD",
+  "acc": 0.819,
+  "n": 337
+ },
+ "first_line_method_of_response_assessment_to_treatment": {
+  "family": "CAT",
+  "acc": 0.831,
+  "n": 290
+ },
+ "history_ldh_blood_levels_at_diagnosis": {
+  "family": "NUM",
+  "acc": 0.846,
+  "n": 188
+ },
+ "history_myc_ihc_raw": {
+  "family": "NUM",
+  "acc": 0.851,
+  "n": 47
+ },
+ "history_symptom_b_at_diagnosis": {
+  "family": "CAT",
+  "acc": 0.851,
+  "n": 370
+ },
+ "history_ipi_score_at_diagnosis": {
+  "family": "ORD",
+  "acc": 0.854,
+  "n": 164
+ },
+ "imaging_tepscan_1st_rechute_realised": {
+  "family": "CAT",
+  "acc": 0.854,
+  "n": 96
+ },
+ "history_tumor_origin": {
+  "family": "CAT",
+  "acc": 0.855,
+  "n": 352
+ },
+ "first_line_grade_ctcae_treatment": {
+  "family": "ORD",
+  "acc": 0.861,
+  "n": 108
+ },
+ "imaging_score_deauville_or_lugano": {
+  "family": "ORD",
+  "acc": 0.87,
+  "n": 215
+ },
+ "history_bcl6_fish": {
+  "family": "CAT",
+  "acc": 0.886,
+  "n": 88
+ },
+ "antecedents_immunosuppression_treatment": {
+  "family": "CAT",
+  "acc": 0.892,
+  "n": 74
+ },
+ "imaging_suvmax": {
+  "family": "NUM",
+  "acc": 0.914,
+  "n": 186
+ },
+ "imaging_tepscan_new_progression_realised": {
+  "family": "CAT",
+  "acc": 0.918,
+  "n": 49
+ },
+ "history_oms_score_au_diagnostic": {
+  "family": "ORD",
+  "acc": 0.94,
+  "n": 367
+ },
+ "history_ann_arbor_score_at_diagnosis": {
+  "family": "ORD",
+  "acc": 0.946,
+  "n": 298
+ },
+ "history_age_at_diagnosis": {
+  "family": "NUM",
+  "acc": 0.948,
+  "n": 366
+ },
+ "demography_sexe": {
+  "family": "CAT",
+  "acc": 0.961,
+  "n": 387
+ },
+ "news_vital_status_at_last_news": {
+  "family": "CAT",
+  "acc": 0.969,
+  "n": 392
+ },
+ "imaging_tepscan_or_before_next_line_realised": {
+  "family": "CAT",
+  "acc": 0.97,
+  "n": 100
+ },
+ "history_weight_au_diagnostic": {
+  "family": "NUM",
+  "acc": 0.997,
+  "n": 305
+ },
+ "demography_birth_date": {
+  "family": "DATE",
+  "acc": 1.0,
+  "n": 408
+ },
+ "demography_living_environment": {
+  "family": "CAT",
+  "acc": 1.0,
+  "n": 188
+ },
+ "news_cause_of_death": {
+  "family": "CAT",
+  "acc": 1.0,
+  "n": 97
+ },
+ "history_height_au_diagnostic": {
+  "family": "NUM",
+  "acc": 1.0,
+  "n": 297
+ }
+}

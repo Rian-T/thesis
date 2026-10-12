@@ -1,0 +1,5 @@
+where_the_DATE_target_is,pct_of_3971_targets,source
+dans le span annoté,73.7,git c9f3321 (audit_date_arith.py)
+ailleurs dans le document,14.9,
+à un décalage régulier d'une date du document,6.7,
+non dérivable,4.7,

@@ -1,0 +1,571 @@
+- category: Démographie
+  subfields:
+  - field_type: date
+    label: Mois et année de naissance
+    name: demography_birth_date
+  - field_type: select
+    label: Sexe
+    name: demography_sexe
+    valid_values:
+    - homme
+    - femme
+  - field_type: select
+    label: Statut marital
+    name: demography_marital_status
+    valid_values:
+    - marié
+    - en vie avec un partenaire
+    - célibataire
+    - divorcé
+    - veuf
+  - field_type: select
+    label: Habitat
+    name: demography_living_environment
+    valid_values:
+    - rural
+    - urbain
+    - semi-urbain
+  - field_type: openlist
+    label: Situation professionnelle
+    name: demography_professional_status
+    valid_values:
+    - actif
+    - retraité
+    - etudiant
+    - sans statut professionnel
+    - invalidité
+  - field_type: text
+    label: Categorie professionnelle
+    name: demography_professional_category
+- category: Histoire de la maladie
+  subfields:
+  - field_type: date
+    label: Date de diagnostic du lymphome
+    name: history_date_of_diagnosis_of_lymphoma
+    date_after: demography_birth_date
+  - field_type: number
+    label: Age au diagnostic
+    name: history_age_at_diagnosis
+  - field_type: select
+    label: Diagnose
+    name: history_disease_diagnosis
+    valid_values:
+    - LBDGC
+    - LH
+    - LF
+  - field_type: text
+    label: Sous-type de maladie
+    name: history_disease_subtype
+  - field_type: select
+    label: Origine de la tumeur
+    name: history_tumor_origin
+    valid_values:
+    - ganglion lymphatique
+    - non ganglion lymphatique
+  - field_type: text
+    label: Variante morphologique
+    name: history_morphological_variant
+  - field_type: select
+    label: Test COO
+    name: history_coo_test
+    valid_values:
+    - GC
+    - NGC
+    - indeterminé
+  - field_type: select
+    label: MYC_FISH
+    name: history_myc_fish
+    valid_values:
+    - Réarrangement
+    - Pas de réarrangement
+  - field_type: select
+    label: BCL2_FISH
+    name: history_bcl2_fish
+    valid_values:
+    - Réarrangement
+    - Pas de réarrangement
+  - field_type: select
+    label: BCL6_FISH
+    name: history_bcl6_fish
+    valid_values:
+    - Réarrangement
+    - Pas de réarrangement
+  - field_type: select
+    label: MYC_IHC
+    name: history_myc_ihc
+    valid_values:
+    - Positif
+    - Négatif
+  - field_type: measure
+    label: MYC_IHC_RAW
+    name: history_myc_ihc_raw
+  - field_type: select
+    label: BCL2_IHC
+    name: history_bcl2_ihc
+    valid_values:
+    - Positif
+    - Négatif
+  - field_type: measure
+    label: BCL2_IHC_RAW
+    name: history_bcl2_ihc_raw
+  - field_type: select
+    label: BCL6_IHC
+    name: history_bcl6_ihc
+    valid_values:
+    - Positif
+    - Négatif
+  - field_type: measure
+    label: BCL6_IHC_RAW
+    name: history_bcl6_ihc_raw
+  - field_type: select
+    label: statut NGS
+    name: history_ngs_status
+    valid_values:
+    - Réalisé
+    - Non réalisé
+  - field_type: yesno
+    label: Transformation préalable à la malignité indolente
+    name: history_transformation_prior_indolent_lymphoid_malignancy
+  - field_type: measure
+    default_unit: kg
+    label: Poids au diagnostic
+    name: history_weight_at_diagnosis
+  - field_type: measure
+    default_unit: cm
+    label: Taille au diagnostic
+    name: history_height_at_diagnosis
+  - field_type: select
+    label: score OMS au diagnostic
+    name: history_oms_score_au_diagnostic
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - field_type: yesno
+    label: Symptôme B au diagnostic
+    name: history_symptom_b_at_diagnosis
+  - field_type: select
+    label: Score Ann Arbor au diagnostic
+    name: history_ann_arbor_score_at_diagnosis
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+  - field_type: number
+    label: ExtranodalInvN au diagnostic
+    name: history_extranodalinv_n_at_diagnosis
+  - field_type: number
+    label: IPI_ExtranodInv au diagnostic
+    name: history_ipi_extranodinv_at_diagnosis
+  - field_type: select
+    label: IPI ajusté par l'âge au diagnostic
+    name: history_age_adjusted_ipi_au_diagnostic
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+  - field_type: select
+    label: Score IPI au diagnostic
+    name: history_ipi_score_at_diagnosis
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - field_type: select
+    label: Score FIPI au diagnostic
+    name: history_flipi_score_at_diagnosis
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - field_type: number
+    label: Score GELF au diagnostic
+    name: history_gelf_score_at_diagnosis
+  - field_type: number
+    label: Score Hasenclever au diagnostic
+    name: history_hasenclever_score_at_diagnosis
+  - field_type: number
+    label: Score EORTC au diagnostic
+    name: history_eortc_score_at_diagnosis
+  - field_type: measure
+    default_unit: UI/l
+    label: Niveau de LDH sang au diagnostic
+    name: history_ldh_blood_levels_at_diagnosis
+- category: Antécédents
+  subfields:
+  - field_type: yesno
+    label: Statut tabagique
+    name: antecedents_smoking_status
+  - field_type: yesno
+    label: Statut alcoolique
+    name: antecedents_alcohol_status
+  - field_type: text
+    label: Antecédents de cancer
+    name: antecedents_cancer
+    duplicate_field: true
+  - field_type: openlist
+    label: Antécédents
+    name: antecedents_other
+    duplicate_field: true
+    valid_values:
+    - Insuffisance cardiaque
+    - Hypertension
+    - Diabete
+    - Insuffisance rénale
+    - Insuffisance hépatique
+    - Syndrome métabolique
+    - Désordes hématologiques
+    - Maladies autoimmunes
+  - field_type: yesno
+    label: Traitement immunosupresseur
+    name: antecedents_immunosuppression_treatment
+  - field_type: text
+    label: Chirurgie
+    name: antecedents_surgery
+- category: 1ère ligne de traitement
+  subfields:
+  - field_type: select
+    label: Score OMS 1ère ligne
+    name: 1st_line_oms_score
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - field_type: openlist
+    label: Traitement 1ère ligne
+    name: 1st_line_treatment
+    valid_values:
+    - CHOP
+    - mini-CHOP
+    - R-CHOP
+    - R-miniCHOP
+    - G-CHOP
+    - R-CHVP
+    - RDHAOX
+    - R-GEMOX
+    - R-ICE
+    - R-HOLOXAN
+    - ABVD
+    - Beacopp
+  - field_type: number
+    label: Nombre de cycles de traitement 1ère ligne
+    name: 1st_line_treatment_cycles_n
+  - field_type: yesno
+    label: Radiothérapie 1ère ligne
+    name: 1st_line_radiation
+  - field_type: date
+    label: Date de début de traitement 1ère ligne
+    name: 1st_line_start_date_of_treatment
+    date_after: history_date_of_diagnosis_of_lymphoma
+  - field_type: date
+    label: Date de fin de traitement 1ère ligne
+    name: 1st_line_end_date_of_treatment
+    date_after: 1st_line_start_date_of_treatment
+  - field_type: yesno
+    label: Transplantation thérapeutique après 1ère ligne
+    name: 1st_line_transplant_therapy_after_treatment
+  - field_type: date
+    label: Date de transplantation thérapeutique
+    name: 1st_line_date_of_transplant_therapy_after_treatment
+    date_after: 1st_line_start_date_of_treatment
+  - field_type: date
+    label: Date d'évaluation de la réponse à la 1ère ligne
+    name: 1st_line_date_of_response_assessment_to_treatment
+    date_after: 1st_line_start_date_of_treatment
+  - field_type: openlist
+    label: Évaluation de la réponse au traitement 1ère ligne
+    name: 1st_line_response_assessment_to_treatment
+    valid_values:
+    - Réponse complète
+    - Réponse partielle
+    - Progression
+    - Stable
+  - field_type: openlist
+    label: Méthode d'évaluation de la réponse au traitement 1ère ligne
+    name: 1st_line_method_of_response_assessment_to_treatment
+    valid_values:
+    - Radiologique
+    - Biologique
+    - Évaluation clinique
+  - field_type: date
+    label: Date de 1ère progression ou rechute
+    name: 1st_line_date_of_progression_or_relapse
+    date_after: 1st_line_start_date_of_treatment
+  - field_type: yesno
+    label: Survenue d'effets indésirables 1ère ligne de traitement
+    name: 1st_line_adverse_effects_presence
+  - field_type: text
+    label: Effets indésirables 1ère ligne de traitement
+    name: 1st_line_adverse_effects_description
+    duplicate_field: true
+  - field_type: select
+    label: Grade CTCAE 1ère ligne de traitement
+    name: 1st_line_grade_ctcae_treatment
+    parent_field: 1st_line_adverse_effects_description
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+- category: 2ème ligne de traitement
+  subfields:
+  - field_type: select
+    label: Score OMS 2ème ligne
+    name: 2nd_line_oms_score
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - field_type: openlist
+    label: Traitement 2ème ligne
+    name: 2nd_line_treatment
+    valid_values:
+    - CHOP
+    - mini-CHOP
+    - R-CHOP
+    - R-miniCHOP
+    - G-CHOP
+    - R-CHVP
+    - RDHAOX
+    - R-GEMOX
+    - R-ICE
+    - R-HOLOXAN
+    - ABVD
+    - Beacopp
+  - field_type: number
+    label: Nombre de cycles de traitement 2ème ligne
+    name: 2nd_line_treatment_cycles_n
+  - field_type: yesno
+    label: Radiothérapie 2ème ligne
+    name: 2nd_line_radiation
+  - field_type: date
+    label: Date de début de traitement 2ème ligne
+    name: 2nd_line_start_date_of_treatment
+    date_after: 1st_line_end_date_of_treatment
+  - field_type: date
+    label: Date de fin de traitement 2ème ligne
+    name: 2nd_line_end_date_of_treatment
+    date_after: 2nd_line_start_date_of_treatment
+  - field_type: number
+    label: Transplantation thérapeutique après 2ème ligne
+    name: 2nd_line_transplant_therapy_after_treatment
+  - field_type: date
+    label: Date de transplantation thérapeutique
+    name: 2nd_line_date_of_transplant_therapy_after_treatment
+    date_after: 2nd_line_start_date_of_treatment
+  - field_type: date
+    label: Date d'évaluation de la réponse à la 2ème ligne
+    name: 2nd_line_date_of_response_assessment_to_treatment
+    date_after: 2nd_line_start_date_of_treatment
+  - field_type: select
+    label: Évaluation de la réponse au traitement 2ème ligne
+    name: 2nd_line_response_assessment_to_treatment
+    valid_values:
+    - RC
+    - RP
+    - Progression
+    - Stable
+    - NA
+  - field_type: select
+    label: Méthode d'évaluation de la réponse au traitement 2ème ligne
+    name: 2nd_line_method_of_response_assessment_to_treatment
+    valid_values:
+    - Radiologique
+    - Biologique
+    - Évaluation clinique
+  - field_type: date
+    label: Date de 2ème progression ou rechute
+    name: 2nd_line_date_of_progression_or_relapse
+    date_after: 2nd_line_start_date_of_treatment
+- category: Autres lignes de traitement
+  subfields:
+  - field_type: number
+    label: Nombre total de lignes de traitement reçus
+    name: other_lines_total_number_of_treatment_lines
+  - field_type: number
+    label: Score OMS sur toutes les autres lignes de traitement
+    name: other_lines_oms_score_on_all_other_treatment_lines
+    duplicate_field: true
+    valid_values:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+- category: Imagerie
+  subfields:
+  - field_type: yesno
+    label: TEP scan 1ère rechute réalisé
+    name: imaging_tepscan_1st_rechute_realised
+  - field_type: date
+    label: Date TEP scan de 1ère rechute
+    name: imaging_date_of_tepscan_1st_rechute
+    parent_field: imaging_tepscan_1st_rechute_realised
+    date_after: 1st_line_start_date_of_treatment
+  - field_type: yesno
+    label: TEP scan de fin 2 ligne ou avant ligne suivante réalisé
+    name: imaging_tepscan_or_before_next_line_realised
+  - field_type: date
+    label: Date TEP scan de fin de 2 ligne ou avant ligne suivante
+    name: imaging_date_of_tepscan_2nd_line_or_before_next_line
+    parent_field: imaging_tepscan_or_before_next_line_realised
+    date_after: 2nd_line_end_date_of_treatment
+  - field_type: yesno
+    label: TEP scan de nouvelle progression
+    name: imaging_tepscan_new_progression_realised
+    duplicate_field: true
+  - field_type: date
+    label: Date TEP scan de nouvelle progression
+    name: imaging_date_of_tepscan_new_progression
+    parent_field: imaging_tepscan_new_progression_realised
+    date_after: 2nd_line_end_date_of_treatment
+  - field_type: measure
+    label: SUVmax
+    name: imaging_suvmax
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: number
+    label: TMTV
+    name: imaging_tmtv
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: number
+    label: TMTS
+    name: imaging_tmts
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: measure
+    label: Dmax
+    name: imaging_dmax
+    parent_field: imaging_tepscan_new_progression_realised
+    default_unit: mm
+  - field_type: number
+    label: Score deauville ou lugano
+    name: imaging_score_deauville_or_lugano
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: text
+    label: Sites extra-ganglionnaires
+    name: imaging_extra_ganglionary_sites
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: number
+    label: Nombre d'organes atteints
+    name: imaging_number_of_affected_organs
+    parent_field: imaging_tepscan_new_progression_realised
+  - field_type: measure
+    default_unit: mm
+    label: Taille de la plus grande tumeur
+    name: imaging_largest_tumor_size
+    parent_field: imaging_tepscan_new_progression_realised
+- category: Dernières nouvelles
+  subfields:
+  - field_type: date
+    label: Date de la dernière visite
+    name: news_date_of_last_visit
+    date_after: history_date_of_diagnosis_of_lymphoma
+  - field_type: date
+    label: Date des dernieres nouvelles
+    name: news_date_of_last_news
+    date_after: news_date_of_last_visit
+  - field_type: select
+    label: Statut vital aux dernieres nouvelles
+    name: news_vital_status_at_last_news
+    valid_values:
+    - vivant
+    - décédé
+  - field_type: date
+    label: Date de décès
+    name: news_date_of_death
+    date_after: news_date_of_last_news
+  - field_type: select
+    label: Cause de décès
+    name: news_cause_of_death
+    valid_values:
+    - lié au lymphome
+    - non lié au lymphome
+- category: _meta_Evaluation
+  subfields:
+  - field_type: select
+    label: Patient source
+    name: patient_source
+    valid_values:
+    - Qwen3 v1
+    - Qwen3 v2
+    - Qwen3 v3
+    - Qwen3 v4
+    - Qwen3 v5
+    - Mistral
+    - GPT-4o
+    - Claude
+    - Other
+  - field_type: select
+    label: Qualité de la langue
+    name: evaluation_language_quality
+    valid_values:
+    - Non applicable
+    - Excellent
+    - Bon
+    - Passable
+    - Insuffisant
+    - Très insuffisant
+  - field_type: select
+    label: Cohérence médicale
+    name: evaluation_medical_consistency
+    valid_values:
+    - Non applicable
+    - Excellent
+    - Bon
+    - Passable
+    - Insuffisant
+    - Très insuffisant
+  - field_type: select
+    label: Complétude de la note
+    name: evaluation_completeness_of_the_note
+    valid_values:
+    - Non applicable
+    - Excellent
+    - Bon
+    - Passable
+    - Insuffisant
+    - Très insuffisant
+  - field_type: select
+    label: Synthèse de la note
+    name: evaluation_note_synthesis
+    valid_values:
+    - Non applicable
+    - Excellent
+    - Bon
+    - Passable
+    - Insuffisant
+    - Très insuffisant
+  - field_type: select
+    label: Appréciation générale de la note
+    name: evaluation_general_appreciation
+    valid_values:
+    - Non applicable
+    - Excellent
+    - Bon
+    - Passable
+    - Insuffisant
+    - Très insuffisant
+  - field_type: textarea
+    label: Commentaires
+    name: evaluation_comments
+    duplicate_field: true

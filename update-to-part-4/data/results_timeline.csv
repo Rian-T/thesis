@@ -1,0 +1,13 @@
+date,step,split,macro,CAT,DATE,NUM,ORD,note,source
+2026-07-22,v3b nu (GLiNER seul, contexte complet),test,0.487,0.430,0.307,0.537,0.673,baseline sans tête,ARCHITECTURE.md §2
+2026-07-22,Qwen3.5-9B finetuné (1540 docs, sorties verbatim canonisées après coup),test,0.582,0.488,0.447,0.590,0.791,voir README §6 : baseline entraîné à recopier des spans,ARCHITECTURE.md §2 + build_llm_sft.py
+2026-07-23,GLiNER intégré + têtes (cap 9000 car.),test,0.501,0.477,0.320,0.580,0.629,JOURNAL : on ne bat pas Qwen,JOURNAL.md §6
+2026-07-28,même modèle lu à 30k car.,test,0.529,,,,,bug MAX_CHARS=9000 corrigé (+0.100 depuis 0.429 sur métrique corrigée),JOURNAL.md §1
+2026-07-28,v5-null (abstention apprise),test,0.603,0.682,0.380,0.596,0.755,premier passage devant Qwen-9B,JOURNAL.md
+2026-07-29,+ transducteur + abstention + seuil F1/2,test,0.673,0.711,0.497,0.652,0.781,,git 9c75c5f
+2026-07-29,+ perte de détection rééquilibrée (det_w 0.002),test,0.739,0.781,0.610,0.730,0.834,,git eca15d6
+2026-07-29,+ perte de détection supprimée (det_w 0),test,0.771,0.807,0.660,0.758,0.858,1 epoch,git dea25d6
+2026-07-29,3 epochs,test,0.786,0.817,0.684,0.765,0.877,= modèle publié v1 (-ecrf) après correctif du prompt d'éval,ARCHITECTURE.md §2
+2026-08-13,v1 évalué à cap 45000,test,0.795,,0.725,,,poids entraînés à 24k,git cfdf5e5
+2026-08-13,v2 (têtes ré-entraînées à cap 45000),test,0.809,0.836,0.742,0.775,0.883,= modèle publié -ecrf-v2,WORKPLAN journal
+2026-08-13,large (395M, cap 45000),test,0.815,0.836,0.738,0.791,0.896,= modèle publié -ecrf-large,WORKPLAN journal

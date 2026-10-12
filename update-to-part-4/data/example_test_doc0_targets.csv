@@ -1,0 +1,60 @@
+field,family,label,canonical_value,annotated_spans,source_documents
+demography_birth_date,DATE,date de naissance,1953-03-15,née le 15 mars 1953,
+demography_sexe,CAT,sexe,femme,patiente Sandrine Mathieu,
+demography_marital_status,CAT,statut marital,veuve,"Veuve, vit seule dans un appartement à Nancy, proche famille disponible. || veuve, résidant à Nancy, ancienne secrétaire médicale retraitée || veuve, ancienne secrétaire médicale retraitée, résidant à Nancy",Compte-rendu de RCP — 2017-04-15 || Compte-rendu de RCP — 2021-10-18 || Consultation d'ANNONCE diagnostique — 2017-04-10
+demography_living_environment,CAT,environnement de vie,urbain,vit seule dans un appartement à Nancy,Consultation d'ANNONCE diagnostique — 2017-04-10
+demography_professional_status,CAT,,retraité,"ancienne secrétaire médicale retraitée || ancienne secrétaire médicale retraitée, résidant à Nancy",Compte-rendu de RCP — 2017-04-15 || Compte-rendu de RCP — 2021-10-18
+demography_professional_category,TXT,catégorie professionnelle,secrétaire médicale,"ancienne secrétaire médicale retraitée || ancienne secrétaire médicale retraitée, résidant à Nancy",Compte-rendu de RCP — 2017-04-15 || Compte-rendu de RCP — 2021-10-18
+history_date_of_diagnosis_of_lymphoma,DATE,date du diagnostic,2017-04-10,Le diagnostic a été posé le 10 avril 2017,Compte-rendu de RCP — 2017-04-15
+history_age_at_diagnosis,NUM,âge au diagnostic,64,patiente âgée de 64 ans,Compte-rendu de RCP — 2017-04-15
+history_disease_diagnosis,CAT,diagnostic du lymphome,LBDGC,lymphome B diffus à grandes cellules || lymphome B diffus à grandes cellules (LBDGC) || Lymphome B diffus à grandes cellules,Compte-rendu anatomo-pathologique — 2021-10-15 || Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+history_disease_subtype,TXT,sous-type de lymphome,phénotype non germinal (ABC-like),phénotype non-germinatif (ABC-like),Compte-rendu anatomo-pathologique — 2021-10-15
+history_tumor_origin,CAT,site d'origine tumorale,ganglion lymphatique,biopsie ganglionnaire axillaire,Consultation d'ANNONCE diagnostique — 2017-04-10
+history_morphological_variant,TXT,variant morphologique,"prolifération massive et diffuse de grandes cellules lymphoïdes, noyau irrégulier, chromatine fine, nucléoles marqués, cytoplasme abondant","prolifération massive et diffuse de grandes cellules lymphoïdes. Ces cellules présentent un noyau irrégulier, à chromatine fine, avec un ou plusieurs nucléoles parfois très marqués. Le cytoplasme est abondant.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_coo_test,CAT,test cellule d'origine (COO),NGC,"phénotype non germinal || phénotype non germinal (CD20+, BCL6+, MUM1+) || phénotype non-germinatif (ABC-like)",Compte-rendu anatomo-pathologique — 2021-10-15 || Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+history_myc_fish,CAT,FISH MYC,Pas de réarrangement,"Aucun réarrangement des gènes MYC, BCL2 ou BCL6 n’est détecté.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_bcl2_fish,CAT,FISH BCL2,Pas de réarrangement,"Aucun réarrangement des gènes MYC, BCL2 ou BCL6 n’est détecté.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_bcl6_fish,CAT,FISH BCL6,Pas de réarrangement,"Aucun réarrangement des gènes MYC, BCL2 ou BCL6 n’est détecté.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_myc_ihc,CAT,IHC MYC,Positif,MYC est exprimé chez 25 % des cellules.,Compte-rendu anatomo-pathologique — 2021-10-15
+history_myc_ihc_raw,NUM,IHC MYC (texte brut),25,MYC est exprimé chez 25 % des cellules.,Compte-rendu anatomo-pathologique — 2021-10-15
+history_bcl2_ihc,CAT,IHC BCL2,Positif,"L’expression de BCL2 est hétérogène, observée chez environ 40 % des cellules.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_bcl2_ihc_raw,NUM,IHC BCL2 (texte brut),40,"L’expression de BCL2 est hétérogène, observée chez environ 40 % des cellules.",Compte-rendu anatomo-pathologique — 2021-10-15
+history_bcl6_ihc,CAT,IHC BCL6,Positif,"BCL6+ || CD20+, CD3-, CD5-, CD10-, BCL6+",Compte-rendu anatomo-pathologique — 2021-10-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+history_ngs_status,CAT,statut NGS,Réalisé,Analyse moléculaire (NGS) : une mutation du gène CARD11 (p.K215T) est identifiée.,Compte-rendu anatomo-pathologique — 2021-10-15
+history_weight_au_diagnostic,NUM,poids au diagnostic,58,Poids : 58 kg,Consultation d'ANNONCE diagnostique — 2017-04-10
+history_height_au_diagnostic,NUM,taille au diagnostic,162,"taille : 1,62 m",Consultation d'ANNONCE diagnostique — 2017-04-10
+history_oms_score_au_diagnostic,ORD,score OMS au diagnostic,1,OMS 1 || état général conservé (OMS 1),Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+history_symptom_b_at_diagnosis,CAT,signes B au diagnostic,yes,"Signes B présents (fièvre, sueurs, perte de poids >10 % du poids initial)",Consultation d'ANNONCE diagnostique — 2017-04-10
+history_ann_arbor_score_at_diagnosis,ORD,stade Ann Arbor,3,Stade de la maladie : IIIB (Ann Arbor) || Stade IIIB (Ann Arbor) || stade IIIB (Ann Arbor),Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10 || TEP-scan — 2017-04-12
+history_ipi_score_at_diagnosis,ORD,score IPI,3,"IPI intermédiaire (3 facteurs : âge >60 ans, stade III-IV, plus de 1 territoire extra-ganglionnaire, LDH élevée, OMS ≥1) || IPI intermédiaire (3)",Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+history_ldh_blood_levels_at_diagnosis,NUM,taux de LDH au diagnostic,3.2,"LDH à 3,2N",Consultation d'ANNONCE diagnostique — 2017-04-10
+antecedents_smoking_status,CAT,statut tabagique,yes,"Antécédent de tabacologie (15 paquets-ans), arrêt il y a 8 ans. || Antécédents de tabacologie (15 paquets-ans, arrêt il y a 8 ans)",Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+antecedents_other,TXT,,tabacologie,"Antécédent de tabacologie (15 paquets-ans), arrêt il y a 8 ans.",Consultation d'ANNONCE diagnostique — 2017-04-10
+first_line_oms_score,ORD,score OMS (1re ligne),1,OMS 1,Consultation d'ANNONCE diagnostique — 2017-04-10
+first_line_treatment,CAT,traitement de 1re ligne,R-CHOP,"traitement par R-CHOP (rituximab, cyclophosphamide, doxorubicine, vincristine, prednisone), en 6 à 8 cures || traitement par R-CHOP, 8 cycles prévus",Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+first_line_treatment_cycles_n,NUM,nombre de cycles (1re ligne),8,8 cycles prévus,Compte-rendu de RCP — 2017-04-15
+first_line_start_date_of_treatment,DATE,date de début (1re ligne),2017-04-15,"Début du traitement par R-CHOP prévu en ambulatoire, cure J1C1 le 15 avril 2017. || J1 = 15 avril 2017",Compte-rendu de RCP — 2017-04-15 || Consultation d'ANNONCE diagnostique — 2017-04-10
+first_line_end_date_of_treatment,DATE,date de fin (1re ligne),2017-10,traitée pour un LBDGC stade IIIB par R-CHOP × 8 entre avril et octobre 2017,Compte-rendu de RCP — 2021-10-18
+first_line_date_of_response_assessment_to_treatment,DATE,date d'évaluation de réponse (1re ligne),2017-10,réponse complète confirmée par TEP-scan (Deauville 1) en octobre 2017,Compte-rendu de RCP — 2021-10-18
+first_line_response_assessment_to_treatment,CAT,réponse au traitement (1re ligne),Réponse complète,réponse complète confirmée par TEP-scan (Deauville 1) en octobre 2017,Compte-rendu de RCP — 2021-10-18
+first_line_method_of_response_assessment_to_treatment,CAT,méthode d'évaluation de réponse (1re ligne),Radiologique,réponse complète confirmée par TEP-scan (Deauville 1) en octobre 2017,Compte-rendu de RCP — 2021-10-18
+first_line_date_of_progression_or_relapse,DATE,date de progression/rechute (1re ligne),2021-10,"Rechute nodulaire cervicale survenue en 2021 || une rechute ganglionnaire cervicale est survenue après 4,5 ans de rémission",Compte-rendu anatomo-pathologique — 2021-10-15 || Compte-rendu de RCP — 2021-10-18
+second_line_oms_score,ORD,score OMS (2e ligne),1,L’état général est conservé (OMS 1),Compte-rendu de RCP — 2021-10-18
+second_line_treatment,CAT,traitement de 2e ligne,R-ICE,"traitement de sauvetage par R-ICE (rituximab, ifosfamide, carboplatine, étoposide), 2 cycles prévus",Compte-rendu de RCP — 2021-10-18
+second_line_treatment_cycles_n,NUM,nombre de cycles (2e ligne),2,2 cycles prévus,Compte-rendu de RCP — 2021-10-18
+second_line_start_date_of_treatment,DATE,date de début (2e ligne),2021-10-25,J1 du premier cycle fixé au 25 octobre 2021,Compte-rendu de RCP — 2021-10-18
+second_line_date_of_response_assessment_to_treatment,DATE,date d'évaluation de réponse (2e ligne),2021-11-15,Réévaluation intercure par TEP-TDM corps entier en J1 du cycle 3 (prévue 15 novembre 2021),Compte-rendu de RCP — 2021-10-18
+second_line_response_assessment_to_treatment,CAT,réponse au traitement (2e ligne),Progression,une progression malgré traitement a été notée en novembre 2021,lettre de sortie — 2022-09-01
+second_line_method_of_response_assessment_to_treatment,CAT,méthode d'évaluation de réponse (2e ligne),Radiologique,une progression malgré traitement a été notée en novembre 2021,lettre de sortie — 2022-09-01
+other_lines_total_number_of_treatment_lines,NUM,,3,"Deux cures de R-ICE ont été administrées, mais une progression malgré traitement a été notée en novembre 2021. Un traitement par lenalidomide a été introduit en continu, sans réponse durable. Une leucocytaphérèse a été réalisée en mars 2022, permettant la production d’un produit CAR T autologue anti-CD19 et anti-CD22.",lettre de sortie — 2022-09-01
+imaging_tepscan_1st_rechute_realised,CAT,,yes,Réévaluation intercure par TEP-TDM corps entier en J1 du cycle 3 (prévue 15 novembre 2021),Compte-rendu de RCP — 2021-10-18
+imaging_date_of_tepscan_1st_rechute,DATE,,2021-11-15,Réévaluation intercure par TEP-TDM corps entier en J1 du cycle 3 (prévue 15 novembre 2021),Compte-rendu de RCP — 2021-10-18
+imaging_suvmax,NUM,SUVmax,18.7,"SUVmax de 18,7",TEP-scan — 2017-04-12
+imaging_dmax,NUM,,18,"le plus gros foyer de fixation ganglionnaire est observé au niveau para-aortique, mesurant 18 mm de grand axe",TEP-scan — 2017-04-12
+imaging_score_deauville_or_lugano,ORD,score de Deauville/Lugano,5,Score Deauville : 5,TEP-scan — 2017-04-12
+imaging_extra_ganglionary_sites,TXT,sites extra-ganglionnaires (imagerie),splénique,avec atteinte splénique homogène,TEP-scan — 2017-04-12
+imaging_largest_tumor_size,NUM,taille de la plus grosse lésion,18,"le plus gros foyer de fixation ganglionnaire est observé au niveau para-aortique, mesurant 18 mm de grand axe",TEP-scan — 2017-04-12
+news_date_of_last_news,DATE,,2022-09-01,"Je vous écris afin de vous informer du décès de Mme Mathieu Sandrine, née le 15 mars 1953, survenu le 1er septembre 2022",lettre de sortie — 2022-09-01
+news_vital_status_at_last_news,CAT,,décédé,survenu le 1er septembre 2022,lettre de sortie — 2022-09-01
+news_date_of_death,DATE,date de décès,2022-09-01,survenu le 1er septembre 2022,lettre de sortie — 2022-09-01
+news_cause_of_death,CAT,cause du décès,non lié au lymphome,"décès consécutif à une insuffisance hépatique fulminante secondaire à une réactivation de l’hépatite B, sur fond de non-adhérence au traitement antiviral prophylactique après thérapie CAR T. La progression lymphomateuse n’était pas cliniquement ou radiologiquement documentée à ce stade.",lettre de sortie — 2022-09-01

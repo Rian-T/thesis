@@ -1,0 +1,40 @@
+{
+ "cause": {
+  "CAT": {
+   "OK": 3914,
+   "ABSTENTION_cible_en_tete": 1426,
+   "MAUVAISE_VAL": 348,
+   "ABSTENTION_cible_ailleurs": 382,
+   "INATTEIGNABLE": 43
+  },
+  "DATE": {
+   "OK": 1195,
+   "ABSTENTION_cible_ailleurs": 555,
+   "INATTEIGNABLE": 702,
+   "ABSTENTION_cible_en_tete": 354,
+   "MAUVAISE_VAL": 243
+  },
+  "NUM": {
+   "OK": 1614,
+   "ABSTENTION_cible_ailleurs": 391,
+   "ABSTENTION_cible_en_tete": 470,
+   "INATTEIGNABLE": 86,
+   "MAUVAISE_VAL": 182
+  },
+  "ORD": {
+   "OK": 1230,
+   "ABSTENTION_cible_en_tete": 186,
+   "ABSTENTION_cible_ailleurs": 148,
+   "MAUVAISE_VAL": 97
+  }
+ },
+ "seuil_optimal": 0.4,
+ "macro_seuil_optimal": 0.6729992563004134,
+ "macro_oracle_remplissage": 0.7484585471488914,
+ "masse_gold": {
+  "CAT": 0.6094564700752156,
+  "DATE": 0.39420367165529757,
+  "NUM": 0.5785554073245065,
+  "ORD": 0.69005992579609
+ }
+}

@@ -1,0 +1,138 @@
+=== Consultation d'ANNONCE diagnostique — 2017-04-10 ===
+Consultation d'hématologie, 10 avril 2017, Dr Martin, patiente Sandrine Mathieu, née le 15 mars 1953.
+
+Motif de la consultation : Annonce du diagnostic de lymphome.
+
+La patiente a été adressée suite à la découverte fortuite d’adénopathies axillaires et abdominales lors d’un bilan thoraco-abdomino-pelvien réalisé pour asthénie et perte de poids de 7 kg en deux mois, associée à des sueurs nocturnes fréquentes. Elle rapporte également une fièvre intermittente non documentée. Aucun antécédent personnel oncologique. Antécédent de tabacologie (15 paquets-ans), arrêt il y a 8 ans. Pas d’antécédent familial marquant. Veuve, vit seule dans un appartement à Nancy, proche famille disponible.
+
+Examen clinique : patiente en état général conservé, OMS 1. Poids : 58 kg, taille : 1,62 m. Signes B présents (fièvre, sueurs, perte de poids >10 % du poids initial). Pas d’ADP palpable au terrain cervical ni susclaviculaire. Abdomen souple, pas de splénomégalie ni d’hépatomégalie à la palpation. Examen cardio-respiratoire et neurologique sans particularité.
+
+Biologie de la veille : NFS dans les limites, Hb à 11,8 g/dl, leucocytes à 6,8 G/L, plaquettes à 210 000/mm³. LDH à 3,2N. Bilan hépatique et rénal normaux. Sérologies virales : VHB négatif, VHC négatif, VIH négatif. BHC négatif.
+
+Le bilan histologique issu de la biopsie ganglionnaire axillaire, réalisé le 8 avril 2017, confirme un lymphome B diffus à grandes cellules, de phénotype non germinal (CD20+, BCL6+, MUM1+), avec index prolifératif (Ki-67) à 85 %. Le bilan d’extension par TEP-TDM total montre une hyperfixation pathologique diffuse aux territoires axillaires bilatéraux, abdominaux (para-aortiques, iliaques) et spléniques, avec atteinte hépatique minime. Pas de localisation osseuse ou médullaire. Myélogramme réalisé le 9 avril sans atteinte.
+
+Stade de la maladie : IIIB (Ann Arbor), IPI intermédiaire (3 facteurs : âge >60 ans, stade III-IV, plus de 1 territoire extra-ganglionnaire, LDH élevée, OMS ≥1).
+
+Discussion clinique : il s’agit d’un LBDGC extensif avec symptômes B et pronostic intermédiaire selon l’IPI. Le traitement de première ligne repose sur une immuno-chimiothérapie par R-CHOP (rituximab, cyclophosphamide, doxorubicine, vincristine, prednisone), en 6 à 8 cures, selon réponse évaluée à l’intercure. La patiente a été informée du diagnostic, de l’objectif du traitement (guérison), des effets secondaires attendus (cytopenies, neuropathie, cardiotoxicité, infection), ainsi que de la nécessité d’un suivi étroit. Consentement obtenu pour la prise en charge.
+
+Au total : patiente présentant un LBDGC stade IIIB, IPI 3, avec bon état général. Diagnostic confirmé histologiquement et évalué par bilan complet.
+
+Conclusion et conduite à tenir : début du traitement par R-CHOP prévu en ambulatoire, cure J1C1 le 15 avril 2017. Rendez-vous en consultation pré-thérapeutique le 12 avril pour bilan pré-tt et pose de chambre implantable. RCP validée le 10 avril. Prochaine consultation après J1C1 pour évaluation de tolérance.
+
+=== TEP-scan — 2017-04-12 ===
+Service de médecine nucléaire
+Patient : Mathieu Sandrine
+Date de naissance : 15/03/1953
+Date de l'examen : 12 avril 2017
+Médecin prescripteur : Dr Martin (hématologie)
+Indication : bilan d'extension d'un lymphome B diffus à grandes cellules récemment diagnostiqué.
+
+Technique : acquisition corps entier 60 minutes après injection intraveineuse de 320 MBq de 18-FDG. Glycémie capillaire pré-injection à 0,98 g/L. Examen réalisé dans un contexte de jeûne de 6 heures, sans apport nutritionnel exogène. Bonne distribution du traceur, sans artefact notable.
+
+Il est retrouvé une hyperfixation diffuse du 18-FDG aux territoires ganglionnaires sus- et sous-diaphragmatiques. Les adénopathies cervicales, axillaires bilatérales, médiastinales (stations 2R, 4R, 4L, 5, 6, 7), hilaires, para-aortiques pré-aortiques et latérao-aortiques, iliaques primitifs, communs et externes sont concernés, avec une intensité modérée à intense. Le plus gros foyer de fixation ganglionnaire est observé au niveau para-aortique, mesurant 18 mm de grand axe, avec un SUVmax de 18,7.
+
+On note une splénomégalie de 142 mm sur la coupe axiale, associée à une hyperfixation homogène du parenchyme splénique, supérieure à celle du foie, renforçant l'atteinte splénique. Aucune focalité focale dans la rate.
+
+Pas d'hyperfixation anormale au niveau hépatique, osseux, médullaire ou cérébral. Pas d'atteinte pulmonaire, pleurale, péricardique ou cutanée. Les reins, les surrénales, le tube digestif et les glandes mammaires sont sans particularité.
+
+Au total : extension ganglionnaire étendue sus- et sous-diaphragmatique, avec atteinte splénique homogène, en faveur d'un stade IIIB (Ann Arbor) d'un lymphome B diffus à grandes cellules. Pas de localisation extra-ganglionnaire autre que splénique.
+
+Conclusion : aspects en faveur d'une dissémination métaboliquement active du lymphome, avec hyperfixation ganglionnaire diffuse et splénomégalie fixante. Score Deauville : 5.
+
+=== Compte-rendu de RCP — 2017-04-15 ===
+Réunion de Concertation Pluridisciplinaire – Onco-hématologie
+Hôpital de Nancy
+15 avril 2017
+Présents : Dr Martin (hématologue), Dr Lefebvre (oncologue), Dr Nguyen (radiologue), Dr Bertrand (anatomopathologiste), Mme Rousseau (coordinatrice de RCP)
+
+Cas de Mme Mathieu, Sandrine, née le 15 mars 1953, suivie pour lymphome B diffus à grandes cellules (LBDGC) stade IIIB.
+
+Il s'agit de la première RCP consécutive au diagnostic posé le 10 avril 2017, confirmé par biopsie ganglionnaire axillaire. Aucune RCP antérieure n’a été tenue.
+
+Synthèse clinique mise à jour : patiente âgée de 64 ans, veuve, résidant à Nancy, ancienne secrétaire médicale retraitée. Antécédents de tabacologie (15 paquets-ans, arrêt il y a 8 ans), sans autre comorbidité notable. Examen clinique à l’annonce : état général conservé (OMS 1), signes B présents (fièvre, sueurs nocturnes, perte de poids >10 %). Pas d’adénopathies palpables en territoire cervical ou sus-claviculaire. Abdomen souple, pas de splénomégalie clinique. Biologie initiale : Hb à 11,8 g/dl, leucocytes à 6,8 G/L, plaquettes à 210 000/mm³, LDH à 3,2N. Sérologies virales négatives (VHB, VHC, VIH), BHC négatif. Le bilan histologique montre un lymphome B diffus à grandes cellules, phénotype non germinal (CD20+, BCL6+, MUM1+), index Ki-67 à 85 %. Le bilan d’extension par TEP-TDM du 12 avril 2017 montre une hyperfixation diffuse aux territoires ganglionnaires sus- et sous-diaphragmatiques, avec splénomégalie homogène fixante (SUVmax ganglionaire à 18,7), sans atteinte hépatique focale, osseuse ou médullaire. Score Deauville 5. Stade IIIB (Ann Arbor), IPI intermédiaire (3).
+
+Discussion : devant un LBDGC extensif à cellules B, de phénotype non germinal, hautement prolifératif (Ki-67 à 85 %), avec symptômes B et stade avancé, le traitement de référence en première ligne est la chimio-immunothérapie R-CHOP. Huit cycles sont indiqués en raison du stade élevé et de l’IPI intermédiaire. La patiente est éligible à une prise en charge curative en ambulatoire, avec bonne tolérance attendue compte tenu de son état général conservé. La pose d’une chambre implantable est prévue avant le début du traitement. Les risques de cytopenies, de neuropathie périphérique, de cardiotoxicité et d’infections sont discutés. Une évaluation intercure par TEP est prévue après 4 cycles pour évaluer la réponse métabolique.
+
+Décision : début d’un traitement par R-CHOP, 8 cycles prévus, J1 = 15 avril 2017. Évaluation de la réponse après 4 cycles par TEP-TDM corps entier (J1C5). Surveillance clinique et biologique rapprochée. Information complète de la patiente réalisée, consentement recueilli.
+
+Signé : Rousseau, coordinatrice de RCP – Dr Martin, médecin référent
+
+=== Compte-rendu anatomo-pathologique — 2021-10-15 ===
+Réf : 21-56789
+Nom : Mathieu
+Prénom : Sandrine
+DDN : 15/03/1953
+Date du prélèvement : 15 octobre 2021
+Type et site du prélèvement : biopsie ganglionnaire cervicale
+Médecin demandeur : Dr Martin, service d’hématologie
+
+Renseignements cliniques : Patiente suivie pour un lymphome B diffus à grandes cellules diagnostiqué en 2017, stade IIIB, traité initialement par R-CHOP avec réponse complète. Rechute nodulaire cervicale survenue en 2021 après 4,5 ans de rémission. Prélèvement réalisé dans le cadre de la caractérisation histologique et moléculaire de la rechute.
+
+Macroscopie : reçu en coupelle, un fragment lymphonodal mesurant 0,8 cm de grand axe, de consistance ferme, de couleur gris-blanchâtre en coupe. Fragment inclus intégralement.
+
+Microscopie : architecture effacée par une prolifération massive et diffuse de grandes cellules lymphoïdes. Ces cellules présentent un noyau irrégulier, à chromatine fine, avec un ou plusieurs nucléoles parfois très marqués. Le cytoplasme est abondant. On note un haut index mitotique et des figures de lyse cellulaires. Il n’y a pas de nécrose franche. L’infiltrat est dense et remplace intégralement le tissu ganglionnaire.
+
+Immunohistochimie : les cellules tumorales sont CD20+, CD3-, CD5-, CD10-, BCL6+, MUM1+. L’expression de BCL2 est hétérogène, observée chez environ 40 % des cellules. MYC est exprimé chez 25 % des cellules. L’index prolifératif marqué par le Ki67 est de 80 %. Les cellules sont négatives pour EBER (ISH).
+
+FISH : réalisée sur lame non-déparaffinée. Aucun réarrangement des gènes MYC, BCL2 ou BCL6 n’est détecté.
+
+Analyse moléculaire (NGS) : une mutation du gène CARD11 (p.K215T) est identifiée. Aucune autre mutation significative n’est retrouvée dans le panel exploré.
+
+Classification selon le sous-type cellulaire d’origine (COO, algorithme de Hans) : phénotype non-germinatif (ABC-like).
+
+Conclusion : Lymphome B diffus à grandes cellules, phénotype non-germinatif (ABC), avec mutation CARD11 K215T. Les caractéristiques immunohistochimiques et moléculaires sont identiques à celles du clone initial, en faveur d’une rechute du lymphome primitif.
+
+=== Compte-rendu de RCP — 2021-10-18 ===
+Réunion de Concertation Pluridisciplinaire – Onco-hématologie
+Hôpital de Nancy
+18 octobre 2021
+Présents : Dr Martin (hématologue), Dr Lefebvre (oncologue), Dr Nguyen (radiologue), Dr Bertrand (anatomopathologiste), Mme Rousseau (coordinatrice de RCP)
+
+Cas de Mme Mathieu, Sandrine, 68 ans, suivie pour lymphome B diffus à grandes cellules (LBDGC) stade IIIB.
+
+Rappel des RCP antérieures :
+- RCP du 15 avril 2017 : diagnostic initial de LBDGC stade IIIB, IPI 3, avec symptômes B et atteinte métaboliquement active diffusée (TEP Deauville 5). Décision de traitement par R-CHOP en première ligne, 8 cycles prévus, avec évaluation intercure par TEP après 4 cycles.
+
+Synthèse clinique mise à jour : la patiente est âgée de 68 ans, veuve, ancienne secrétaire médicale retraitée, résidant à Nancy. Elle a été initialement traitée pour un LBDGC stade IIIB par R-CHOP × 8 entre avril et octobre 2017, avec réponse complète confirmée par TEP-scan (Deauville 1) en octobre 2017. Le suivi post-thérapeutique a été régulier jusqu’en 2021, sans signe de rechute. En octobre 2021, elle présente une rechute clinique avec adénopathies cervicales progressives. Une biopsie ganglionnaire cervicale a été réalisée le 15 octobre 2021. L’analyse anatomo-pathologique confirme un LBDGC de phénotype non germinal (CD20+, CD10-, BCL6+, MUM1+), avec index Ki-67 à 80 %, identique au clone initial. Le FISH est négatif pour les réarrangements MYC, BCL2 et BCL6. Une mutation CARD11 K215T est détectée en NGS. L’atteinte est localisée aux territoires ganglionnaires cervicaux. L’évaluation initiale montre une maladie localisée à progression lente, survenue 4,5 ans après la rémission complète. L’état général est conservé (OMS 1). Les sérologies virales pratiquées en 2017 (VHB, VHC, VIH) étaient négatives. La biologie actuelle n’est pas disponible dans les documents fournis.
+
+Discussion : il s’agit d’une rechute tardive de LBDGC, survenue après une réponse complète durable de 4,5 ans. La caractérisation histologique et moléculaire confirme la nature du clone primitif, sans transformation ni apparition de double expresser ou double hit. La mutation CARD11 K215T est associée à une activation constitutive de la voie NF-κB, fréquemment retrouvée dans les formes ABC, avec un pronostic potentiellement défavorable. Compte tenu de l’âge et de l’absence de comorbidités majeures, la patiente est éligible à une prise en charge intensive. L’objectif thérapeutique est la ponte vers greffe de cellules souches autologue ou, en alternative, vers thérapie CAR T, en fonction de la réponse au traitement de sauvetage. En l’absence de réponse complète après R-CHOP en première ligne, une stratégie de pontage vers thérapie ciblée est justifiée. Le protocole R-ICE (rituximab, ifosfamide, carboplatine, étoposide) est recommandé en deuxième ligne pour son efficacité dans la mobilisation et la réduction tumorale avant cellules CAR T. Deux cycles sont proposés, suivis d’une réévaluation par TEP-TDM pour décider de la faisabilité de la collecte ou de l’administration de CAR T anti-CD19/CD22. La nécessité d’une surveillance virologique hépatique (VHB) est rappelée, malgré des sérologies initialement négatives, en raison du risque de rechute virale sous immunosuppression.
+
+Décision : début d’un traitement de sauvetage par R-ICE, 2 cycles prévus, J1 du premier cycle fixé au 25 octobre 2021. Réévaluation intercure par TEP-TDM corps entier en J1 du cycle 3 (prévue 15 novembre 2021) pour évaluer la réponse et planifier la collecte de cellules ou l’accès à la thérapie CAR T. Surveillance clinique et biologique rapprochée, avec bilan hépatique mensuel et recherche systématique de VHB (AgHBs, ADN-VHB) avant chaque cycle.
+
+Signé : Rousseau, coordinatrice de RCP – Dr Martin, médecin référent
+
+=== lettre de sortie — 2022-09-01 ===
+Dr Bernard
+Médecin traitant
+15 rue du Docteur Calmette
+54000 Nancy
+
+1er septembre 2022
+
+Objet : Concernant Mme Mathieu Sandrine, n° dossier 2017-456
+
+Cher confrère,
+
+Je vous écris afin de vous informer du décès de Mme Mathieu Sandrine, née le 15 mars 1953, survenu le 1er septembre 2022, à 40 jours de son admission pour réactivation fulminante de l’hépatite B, dans un contexte de thérapie CAR T récente.
+
+Il convient de rappeler que cette patiente avait été diagnostiquée en avril 2017 d’un lymphome B diffus à grandes cellules (LBDGC) stade IIIB, avec IPI intermédiaire (3). Elle avait obtenu une réponse complète après 8 cures de R-CHOP, confirmée par TEP-scan (Deauville 1) en octobre 2017. Un suivi régulier avait été assuré sans signe de rechute jusqu’en octobre 2021, date à laquelle une rechute ganglionnaire cervicale est survenue après 4,5 ans de rémission.
+
+Devant cette rechute tardive, une RCP avait conclu à la faisabilité d’un traitement de sauvetage par R-ICE en vue de pontage vers thérapie CAR T. Deux cures de R-ICE ont été administrées, mais une progression malgré traitement a été notée en novembre 2021. Un traitement par lenalidomide a été introduit en continu, sans réponse durable. Une leucocytaphérèse a été réalisée en mars 2022, permettant la production d’un produit CAR T autologue anti-CD19 et anti-CD22. Le conditionnement lymphoablant (Flu/Cy) a été administré du 8 au 10 avril 2022, suivi de l’infusion séquentielle de CAR T 22 puis 19 du 13 au 16 avril 2022.
+
+L’évolution initiale post-infusion a été marquée par un syndrome de libération de cytokines (CRS) de grade 2, survenu le 16 avril, avec fièvre et élévation biologique de l’IL-6 et de la ferritine, traité symptomatiquement sans nécessité de tocilizumab. La reprise hématologique était satisfaisante, avec des neutrophiles à 0,33 G/L et des lymphocytes à 0,51 G/L au 20 avril. Un pic de prolifération des CAR T a été observé en J+21, avec une fréquence de 1,4 % de cellules CAR T circulantes et une éradication complète des B-lymphocytes périphériques.
+
+Dans ce contexte, un traitement préventif par entécavir 0,5 mg/j avait été instauré dès le début du conditionnement, en raison du risque de réactivation du VHB malgré des sérologies initialement négatives. Cependant, la patiente a cessé ce traitement de manière autonome à partir du 14 mai 2022, malgré des rappels répétés.
+
+Elle a été réadmise le 23 juillet 2022 pour ictère, prurit, urine foncée et vomissements évoluant depuis 7 jours. À l’admission, la biologie a révélé une réactivation majeure du virus de l’hépatite B : HBsAg+, HBeAg+, anti-HBc+, avec une charge virale à 2,57 x 10⁸ UI/mL, associée à des transaminases fortement élevées et une hyperbilirubinémie. Le traitement antiviral a été réintroduit immédiatement par entécavir à 1 mg/j, mais sans réponse clinique ni biologique.
+
+L’évolution a été rapidement péjorative, avec survenue d’un coma hépatique et d’une dissociation enzyme-bilirubine dès le 28 juillet, en faveur d’une insuffisance hépatique fulminante. Une prise en charge en réanimation a été mise en place, incluant des échanges plasmatiques périodiques, sans amélioration. Le décès est survenu le 1er septembre 2022.
+
+Au total : décès consécutif à une insuffisance hépatique fulminante secondaire à une réactivation de l’hépatite B, sur fond de non-adhérence au traitement antiviral prophylactique après thérapie CAR T. La progression lymphomateuse n’était pas cliniquement ou radiologiquement documentée à ce stade.
+
+Je vous remercie pour le suivi assidu de cette patiente tout au long de sa maladie. Cette situation rappelle l’importance cruciale de la poursuite du traitement antiviral au long cours après immunothérapie cellulaire, même en l’absence de sérologie positive initiale.
+
+Restant à votre disposition, je vous prie d’agréer, cher confrère, l’expression de mes salutations confraternelles.
+
+Dr Martin
+Hématologie
+CHU de Nancy

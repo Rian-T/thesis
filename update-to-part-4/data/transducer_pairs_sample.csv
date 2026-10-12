@@ -1,0 +1,65 @@
+family,field,span,value,value_equals_span
+CAT,news_vital_status_at_last_news,"pas de mention de décès, patient en suivi",vivant,False
+CAT,news_vital_status_at_last_news,M. Klein est aujourd’hui dans une phase de récupération fonctionnelle,vivant,False
+CAT,second_line_radiation,pas de mention de radiothérapie,no,False
+CAT,demography_professional_status,éducateur sportif,actif,False
+CAT,history_disease_diagnosis,diagnostic de lymphome B diffus à grandes cellules (DLBCL),LBDGC,False
+CAT,history_symptom_b_at_diagnosis,Pas de signes B cliniques,no,False
+CAT,history_bcl2_ihc,"Elles sont négatives pour CD5, CD10, CD30, bcl-2, CD3, CD45RO, Kappa, Lambda et MPO",négatif,False
+CAT,history_coo_test,COO (classification selon Hans) : non déterminée en raison de l’absence de panel complet d’immunohistochimie requis.,indéterminé,False
+CAT,history_bcl6_ihc,BCL6+,Positif,False
+CAT,first_line_response_assessment_to_treatment,"Le patient est en rémission clinique, sans signe de rechute à ce stade",Réponse complète,False
+CAT,history_myc_ihc,"BCL2, BCL6 et MYC n'ont pas été réalisés",Négatif,False
+CAT,history_disease_diagnosis,"Diagnostic de lymphome lymphoplasmocytaire (LLP), infiltrant la moelle osseuse à hauteur d’environ 30 %",autre,False
+CAT,demography_living_environment,vit en colocation à Créteil,urbain,False
+CAT,first_line_response_assessment_to_treatment,réponse complète confirmée au TEP-scan de fin de traitement,Réponse complète,False
+CAT,history_bcl2_fish,sans réarrangement de BCL2,Pas de réarrangement,False
+DATE,news_date_of_last_visit,Le patient est vu aux urgences... le 15 septembre 2016,2016-09-15,False
+DATE,history_date_of_diagnosis_of_lymphoma,"Prélèvement du 07 mars 2021
+Biopsie percutanée guidée par scanner de la masse surrénalienne droite
+[...]
+Conclusion :
+Lésion correspondant à un lymphome malin non hodgkinien du type lymphome B diffus à grandes cellules (DLBCL)",2021-03-08,False
+DATE,news_date_of_last_news,"Consultation d'hématologie, 20 août 2023",2023-08-20,False
+DATE,first_line_date_of_response_assessment_to_treatment,TEP-scan du 18 janvier 2021 : réponse complète métabolique,2021-01-18,False
+DATE,first_line_date_of_progression_or_relapse,"réadmis en urgence le 10 septembre 2016, soit moins de trois semaines après sa dernière visite, pour céphalées intenses, vomissements en jet et ataxie marquée",2016-09-10,False
+DATE,news_date_of_last_visit,10 mai 2018,2018-05-10,False
+DATE,first_line_date_of_response_assessment_to_treatment,évaluation métabolique en fin de traitement pour lymphome de Burkitt diagnostiqué en juin 2017,2017-09-15,False
+DATE,history_date_of_diagnosis_of_lymphoma,Date du prélèvement : 10 avril 2019,2019-04-10,False
+DATE,first_line_end_date_of_treatment,TEP-TDM de fin de traitement du 10 octobre 2019,2019-10-10,False
+DATE,demography_birth_date,Date de naissance : 15/04/1963,1963-04-15,False
+DATE,imaging_date_of_tepscan_2nd_line_or_before_next_line,Évaluation intermédiaire par TEP-scan après 3 cycles (J1C4).,2020-10-05,False
+DATE,news_date_of_last_news,"Consultation d'hématologie, 15 août 2017",2017-08-15,False
+DATE,first_line_end_date_of_treatment,achèvement de son traitement par R-CHOP en août 2017,2017-08-31,False
+DATE,news_date_of_last_news,"Consultation d'hématologie, 1er juin 2025, Dr Martin, patient Jean Henry né le 15 mai 1974.",2025-06-01,False
+DATE,imaging_date_of_tepscan_2nd_line_or_before_next_line,"Le protocole prévoit six cures de R-CHOP à 21 jours d’intervalle, avec évaluation intermédiaire par TEP-scan après trois cycles.",2015-11-15,False
+NUM,first_line_treatment_cycles_n,en 6 cycles,6,False
+NUM,history_ldh_blood_levels_at_diagnosis,"LDH à 3,1N",3.1,False
+NUM,history_age_at_diagnosis,"Mme Marchand, 41 ans",41,False
+NUM,history_ldh_blood_levels_at_diagnosis,LDH à 322 UI/L,322,False
+NUM,imaging_largest_tumor_size,Lésion sous-cutanée hétérogène de 8 cm,8,False
+NUM,imaging_suvmax,"SUVmax = 18,5",18.5,False
+NUM,history_height_au_diagnostic,taille 178 cm,178,False
+NUM,history_weight_au_diagnostic,Poids à 74 kg,74,False
+NUM,imaging_suvmax,"avec SUVmax de 5,3",5.3,False
+NUM,history_ldh_blood_levels_at_diagnosis,"LDH à 2,1N",2.1,False
+NUM,other_lines_total_number_of_treatment_lines,Le patient a été traité par 7 cures de R-CHOP entre mai et septembre 2019,1,False
+NUM,history_age_at_diagnosis,"M. Vasseur Henri, 22 ans",22,False
+NUM,other_lines_total_number_of_treatment_lines,six cycles de R-COP ont été complétés sans complication majeure,1,False
+NUM,history_age_at_diagnosis,patient de 58 ans,58,False
+NUM,history_weight_au_diagnostic,Poids 68 kg,68,False
+ORD,history_oms_score_au_diagnostic,Examen clinique : état général conservé (OMS 1),1,False
+ORD,history_ipi_score_at_diagnosis,IPI intermédiaire-haut (score 3/5),3,False
+ORD,history_ipi_score_at_diagnosis,Le score IPI était à 3/5,3,False
+ORD,history_oms_score_au_diagnostic,OMS à 3.,3,False
+ORD,second_line_oms_score,"état général altéré, OMS 2",2,False
+ORD,history_oms_score_au_diagnostic,Examen clinique : OMS 0.,0,False
+ORD,history_ipi_score_at_diagnosis,"L’IPI est de 3 (âge > 60 exclu, LDH normale, OMS < 2, stade avancé, > 1 extraganglionnaire : hépatomégalie)",3,False
+ORD,history_oms_score_au_diagnostic,OMS à 4,4,False
+ORD,second_line_oms_score,"état général conservé, OMS à 1",1,False
+ORD,history_oms_score_au_diagnostic,OMS 1,1,False
+ORD,history_ann_arbor_score_at_diagnosis,"La RCP d’onco-hématologie du 19 mars 2024 retient un diagnostic présomptif de P-MZL stade III-IV, avec un IPI à 2 (âge >40 ans, stade avancé).",4,False
+ORD,history_ann_arbor_score_at_diagnosis,stade IE selon Ann Arbor,1,False
+ORD,imaging_score_deauville_or_lugano,Score Deauville 4,4,False
+ORD,history_ipi_score_at_diagnosis,l’état général préservé (IPI = 2),2,False
+ORD,history_ann_arbor_score_at_diagnosis,lymphome de Hodgkin classique stade IV,4,False

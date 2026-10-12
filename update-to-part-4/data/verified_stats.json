@@ -1,0 +1,56 @@
+{
+  "lengths": {
+    "train": {
+      "n_docs": 1540,
+      "chars_median": 22363,
+      "chars_mean": 22636,
+      "pct_docs_gt_9000": 100.0,
+      "pct_docs_gt_24000": 39.1,
+      "pct_docs_gt_45000": 0.06
+    },
+    "validation": {
+      "n_docs": 100,
+      "chars_median": 22151,
+      "chars_mean": 22844,
+      "pct_docs_gt_9000": 100.0,
+      "pct_docs_gt_24000": 39.0,
+      "pct_docs_gt_45000": 0.0
+    },
+    "test": {
+      "n_docs": 410,
+      "chars_median": 22288,
+      "chars_mean": 22751,
+      "pct_docs_gt_9000": 100.0,
+      "pct_docs_gt_24000": 38.5,
+      "pct_docs_gt_45000": 0.0
+    }
+  },
+  "test_targets_by_family": {
+    "DATE": {
+      "n_targets": 3049,
+      "pct_value_literal_in_its_annotated_span": 4.9,
+      "pct_value_literal_anywhere_in_document": 54.8,
+      "pct_date_equal_to_a_section_header_date": 54.4
+    },
+    "CAT": {
+      "n_targets": 6157,
+      "pct_value_literal_in_its_annotated_span": 23.1,
+      "pct_value_literal_anywhere_in_document": 53.4
+    },
+    "NUM": {
+      "n_targets": 2768,
+      "pct_value_literal_in_its_annotated_span": 61.0,
+      "pct_value_literal_anywhere_in_document": 83.0
+    },
+    "ORD": {
+      "n_targets": 1668,
+      "pct_value_literal_in_its_annotated_span": 80.4,
+      "pct_value_literal_anywhere_in_document": 100.0
+    }
+  },
+  "test_docs_without_annotation": 2,
+  "test_targets_all": {
+    "n_targets": 13642,
+    "pct_value_not_literal_in_document": 34.6
+  }
+}

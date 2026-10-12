@@ -1,0 +1,6 @@
+run,mode,split,macro_F1_CAT_ORD,CAT,ORD,accuracy,ECE,Brier,note
+ce,cross-entropy,validation,0.739,0.728,0.749,0.846,0.020,0.227,45 champs (35 CAT + 10 ORD) ; argmax sans seuil
+proper,CE + Brier + RPS,validation,0.752,0.738,0.767,0.850,0.018,0.217,
+rlcd,CE + objectif de décision calibrée,validation,0.839,0.836,0.843,0.893,0.046,0.172,
+ce_cont,ce continué,validation,0.862,0.843,0.881,0.902,0.029,0.152,
+proper_cont,proper continué,validation,0.871,0.847,0.896,0.906,0.029,0.150,aucun test lancé

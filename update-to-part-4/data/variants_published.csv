@@ -1,0 +1,6 @@
+hub_repo,date,role,encoder,params,train_window_chars,metric,test_score,in_thesis
+rntc/mc-bio-gliner-lymphome,2026-07-22,extracteur de spans (V5FROMV3B),MedEmbed-v9 (via v3b),150M,24000 (spans),value-F1 Jaccard>=0.5 après compétition,0.640,oui (tab:p3-capstone)
+rntc/mc-bio-gliner-lymphome-joint,2026-07-22,extracteur de spans (V5MIX6),MedEmbed-v9 (via v3e),150M,24000 (spans),value-F1 Jaccard>=0.5 après compétition,0.657,oui (texte ch7)
+rntc/mc-bio-gliner-lymphome-ecrf,2026-07-30,valeurs canoniques (v1),MedEmbed-v9 (via V5FROMV3B),150M,24000,macro-F1 par famille chaîne canonique,0.786,non
+rntc/mc-bio-gliner-lymphome-ecrf-v2,2026-08-13,valeurs canoniques (v2),MedEmbed-v9 (via V5FROMV3B),150M,45000,macro-F1 par famille chaîne canonique,0.809,non
+rntc/mc-bio-gliner-lymphome-ecrf-large,2026-08-13,valeurs canoniques (large),ModernCamemBERT-bio-large MLM (via v3e-large),395M,45000,macro-F1 par famille chaîne canonique,0.815,non
